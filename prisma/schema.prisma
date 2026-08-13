@@ -26,6 +26,8 @@ datasource db {
 // ProfessionalStatus: "none" | "pending" | "approved" | "suspended"
 // ShoutType: "text" | "image" | "video"
 // NoteType: "private" | "public"
+// EventType: "social" | "party" | "meetup" | "sports" | "cultural" | "live" | "exclusive" | "sale" | "upcoming"
+// ChatSortMode: "recent" | "intent" | "quality" | "unread" | "online"
 
 model User {
   id            String    @id @default(cuid())
@@ -81,6 +83,9 @@ model User {
   professionalStatus String @default("none")
   verificationStatus String @default("none")
   voucher       String?
+  // AI / chat quality
+  detectedIntent String?
+  chatQualityScore Float?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -115,6 +120,7 @@ model User {
   banners          Banner[]
   verifications    Verification[]
   sessions         UserSession[]
+  profileFields    ProfileField[]
 }
 
 model Message {
@@ -129,21 +135,23 @@ model Message {
   type          String    @default("text")
   mediaUrl      String?
   // ── Chat Feature Fields ──
-  replyToId     String?   // Thread: reply to specific message
-  reactions     String?   // JSON: {"❤️":["uid1"],"😂":["uid2"]}
+  replyToId     String?
+  reactions     String?
   isPinned      Boolean   @default(false)
   isFavorited   Boolean   @default(false)
-  expiresAt     DateTime? // Disappearing messages
+  expiresAt     DateTime?
   isRecalled    Boolean   @default(false)
-  translation   String?   // AI-translated content
-  translatedLang String?  // Target language code
-  scheduledAt   DateTime? // Scheduled send
-  albumId       String?   // Shared album
-  locationData  String?   // JSON: {lat,lng,name}
-  eventId       String?   // Event created from chat
-  voiceDuration Int?      // Voice message seconds
-  pollData      String?   // JSON: {question, options, votes}
-  callData      String?   // JSON: {type, link, duration}
+  translation   String?
+  translatedLang String?
+  scheduledAt   DateTime?
+  albumId       String?
+  locationData  String?
+  eventId       String?
+  voiceDuration Int?
+  pollData      String?
+  callData      String?
+  // AI summary
+  aiSummary     String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -217,6 +225,23 @@ model Album {
 
   user   User    @relation(fields: [userId], references: [id])
   photos Photo[]
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROFILE FIELDS — Flexible key-value for kinks/sexual/interest data
+// Keys: tribes, fetishes, sm_level, ff_role, safer_sex, dick_size,
+//   circumcision, hair_color, hair_length, eye_color, beard, piercings,
+//   tattoos, going_out, music_genres, sports, food, travel_style,
+//   profession, religion, meet_at, dirty_sex, body_mods
+// ═══════════════════════════════════════════════════════════════
+model ProfileField {
+  id     String @id @default(cuid())
+  userId String
+  key    String
+  value  String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
 }
 
 model Fansite {
@@ -336,6 +361,8 @@ model Event {
   startDate   DateTime
   endDate     DateTime?
   imageUrl    String?
+  type        String   @default("social")
+  attendeeCount Int    @default(0)
   ownerId     String
   isPublic    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -381,10 +408,6 @@ model Boost {
 
   user User @relation(fields: [userId], references: [id])
 }
-
-// ═══════════════════════════════════════════════════════════════
-// NEW MODELS FROM OMOLINK REPORT
-// ═══════════════════════════════════════════════════════════════
 
 model Shout {
   id        String   @id @default(cuid())

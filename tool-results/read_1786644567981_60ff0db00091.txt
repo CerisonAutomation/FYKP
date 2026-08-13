@@ -1,0 +1,732 @@
+     1→App settings
+     2→Average body
+     3→Bottom Sheet
+     4→Circumcision
+     5→Explore here
+     6→FF Versatile
+     7→Film & Video
+     8→GET PLUS NOW
+     9→GPS location
+    10→Main Picture
+    11→My Languages
+    12→New visitors
+    13→No piercings
+    14→Non-renewing
+    15→Notification
+    16→Ongoing call
+    17→PLUS Upgrade
+    18→Party Animal
+    19→Relationship
+    20→Safe: condom
+    21→Scuba diving
+    22→Supporter of
+    23→Take picture
+    24→Unblock %s ?
+    25→Use Location
+    26→Video paused
+    27→Voice search
+    28→circle_group
+    29→  Here's an article that may help:
+    30→  More than %1$d new notifications
+    31→  Please provide a valid location.
+    32→  Save or block unlimited profiles
+    33→  Show favourite stats in Big Grid
+    34→  There is one attachment selected
+    35→  Your PLUS membership ended on %s
+    36→  cubic-bezier(0.0, 0.0, 0.2, 1.0)
+    37→  cubic-bezier(0.0, 0.0, 1.0, 1.0)
+    38→  cubic-bezier(0.4, 0.0, 0.2, 1.0)
+    39→  cubic-bezier(0.4, 0.0, 1.0, 1.0)
+    40→ Get unlimited access with PLUS.
+    41→ QuickShare album.
+    42→ Search for a place or address
+    43→ sharing your pictures.
+    44→ si no actives Serveis de Google Play.
+    45→ to help us improve the app. This data may be associated with device identifiers but is not used to identify you personally. Do you allow us to collect this data?
+    46→!!My PLUS subscription and payments
+    47→!!Rejected pictures cannot be moved
+    48→!!There are %d attachments selected
+    49→!!There are no attachments selected
+    50→!!There is one attachment selected.
+    51→""Be seen in this location with PLUS
+    52→""Contact folder could not be saved.
+    53→""Get unlimited QuickShare with PLUS
+    54→""Hide your profile visits with PLUS
+    55→""There are %d attachments selected.
+    56→""There are no attachments selected.
+    57→""This conversation has been closed.
+    58→##Agent file attachment with name %s.
+    59→##Can I see your QuickShare pictures?
+    60→##For starters, add a profile picture
+    61→##I have found what I was looking for
+    62→##Read more about safer sex practices
+    63→##Show my favourite stats on Big Grid
+    64→##Upload unlimited pictures with PLUS
+    65→##wants to see your QuickShare album.
+    66→##{resource} album or user not found.
+    67→$$Agent image attachment with name %s.
+    68→$$Contact folder could not be deleted.
+    69→$$Please select a language for support
+    70→$$Please select at least one language.
+    71→$$The trip ends too far in the future.
+    72→%%Here are some articles that may help:
+    73→%%His QuickShare album has no pictures.
+    74→%%Upgrade to PLUS and see the hot pics!
+    75→%%tried to start a video call with you.
+    76→%1$d days free trial
+    77→%1$s Missed video calls
+    78→%1$s has more pictures.
+    79→%1$s new footprints
+    80→%1$s opened article '%2$s'
+    81→%1$s tried to call you
+    82→%d (na) kalakip ang pinili
+    83→%d (na) kalakip ang pinili.
+    84→%d Like
+    85→%d Likes
+    86→%d linked profiles
+    87→%d new notification
+    88→%d new notifications
+    89→%d pictures
+    90→%s PLUS (compensation)
+    91→%s PLUS (free)
+    92→%s PLUS (gift received)
+    93→%s PLUS (promotion)
+    94→%s PLUS (referral)
+    95→%s PLUS (voucher)
+    96→%s PLUS (with renewal)
+    97→%s PLUS (without renewal)
+    98→%s liked
+    99→&&Account settings change in progress...
+   100→&&Allow ROMEO to send you notifications?
+   101→&&Message could not be reported as spam.
+   102→&&See your visitors from the last 7 days
+   103→&&Your QuickShare album has no pictures.
+   104→&&Your profile picture could not be set.
+   105→''Do you really want to clear the search?
+   106→''Hindi sinusuportahan ang mga attachment
+   107→''PLUS users get unlimited Radar results.
+   108→''Renews automatically at full price (%s)
+   109→''Reporting Discrimination or Hate Speech
+   110→''This picture has already been uploaded.
+   111→''You can view my private pictures 
+   112→''Your picture was uploaded successfully.
+   113→''https://www.romeo.com/en/care/location/
+   114→((Add travel plans and be seen in 5 cities
+   115→((This QuickShare album is already shared.
+   116→((This text appears in the search results.
+   117→((Unlock over 120 search options with PLUS
+   118→((https://www.romeo.com/en/care/safer-sex/
+   119→((users want to see your QuickShare album.
+   120→(This album is not editable)
+   121→))Someone left a Footprint on your profile!
+   122→))The specified album is not a shared album
+   123→))You can pick a location within 100km only
+   124→**1. Add pictures to your
+   125→**All received Likes will be marked as read.
+   126→**Congratulations! You're now a PLUS member.
+   127→**Do you really want to report this picture?
+   128→**Hindi sinusuportahan ang uri ng attachment
+   129→**Upgrade to PLUS 
+   130→**Your PLUS membership renews automatically.
+   131→+ Add Contact Folder
+   132→++Improved list view with customizable stats!
+   133→++Save and block unlimited contacts with PLUS
+   134→,,Appear offline to others with Invisible Mode
+   135→,,Drag the map, type an address or turn on GPS
+   136→,,If you don't want any contact, simply block.
+   137→,,Please select between one to five languages.
+   138→,,The new contact folder could not be created.
+   139→,,You have already saved or blocked this user.
+   140→,,Your search expired. Search is refreshing...
+   141→,,to be seen in a location %1$s before arrival
+   142→--Are you sure you want to delete this picture?
+   143→--Choose a non-sexual picture for your profile.
+   144→..No recurring payment to cancel has been found.
+   145→..Product list failed to load. Please try again.
+   146→..This user shows publicly in your friends list.
+   147→..You are currently being shown in this location
+   148→//Do you really want to clear your visitors list?
+   149→//Do you really want to delete this conversation?
+   150→//There is no QuickShare album request to revoke.
+   151→//This QuickShare feature is temporarily offline.
+   152→//Who are you and what are you looking for?
+   153→00Customize your list view and pick up to %s stats
+   154→00Do you really want to clear your list of visits?
+   155→00See your visitors from the last 7 days with PLUS
+   156→00Select your favourite stats to show on List View
+   157→00Share your private album with someone for 1 hour
+   158→11Do you really want to make the "%s" album public?
+   159→11The size of the file to be uploaded is too large.
+   160→11User has been unblocked and removed from contacts
+   161→11Your access to this QuickShare album has expired.
+   162→22Do you really want to delete the selected picture?
+   163→22Do you really want to report this message as spam?
+   164→22The saved search you requested could not be found.
+   165→22Your profile picture has been successfully updated
+   166→22https://www.romeo.com/en/care/safety/#verification
+   167→33Do you really want to delete the selected pictures?
+   168→33Set your profile to anywhere and explore the world.
+   169→44Long press to grant access to your QuickShare album.
+   170→44VideoChat needs access to the microphone and camera.
+   171→55Oops, something went wrong while reporting this user.
+   172→55The person you are trying to call is in another call.
+   173→55This QuickShare album is already shared or requested.
+   174→55You can't lock more messages. Please upgrade to PLUS.
+   175→55You will be seen in this location %1$s before arrival
+   176→55https://www.romeo.com/en/care/gender-and-orientation/
+   177→66Please wait until the picture has loaded to attach it.
+   178→66Renews automatically after trial ends. Cancel anytime.
+   179→66Share your private pictures
+   180→66You and %s are now linked as friends on your profiles.
+   181→66You are blocked by the owner of the requested profile.
+   182→77Are you sure you want to clear Likes notification list?
+   183→77The format of the file to be uploaded is not supported.
+   184→77This picture was rejected and classified as unsuitable.
+   185→77Your QuickShare album is already shared with this user.
+   186→88Are you sure you want to clear all visits from the list?
+   187→88Choose your grid view & add your favourite profile stats
+   188→88It's not possible to link your own profile as a partner.
+   189→88The dimensions of the file to be uploaded are too large.
+   190→88Type a message and I will find someone who can help you.
+   191→88You've already requested access to his QuickShare album.
+   192→88users have granted you access to their QuickShare album.
+   193→99Conversations started from this app will be visible here.
+   194→9We do not allow hate speech on ROMEO. Hate speech is defined as a direct attack on people/person based on race, ethnicity, national origin, religious affiliation, sexual orientation, gender identity, physical appearance, and/or disability.
+   195→;;Only sexually neutral pictures can be used as main picture.
+   196→;;PLUS users can hide their profile visits within 30 seconds.
+   197→;;Your main profile picture should not contain sexual content
+   198→;;com.google.android.material.bottomsheet.BottomSheetBehavior
+   199→<<You have been blocked by the owner of the requested profile.
+   200→<MIIEqDCCA5CgAwIBAgIJANWFuGx90071MA0GCSqGSIb3DQEBBAUAMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbTAeFw0wODA0MTUyMzM2NTZaFw0zNTA5MDEyMzM2NTZaMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbTCCASAwDQYJKoZIhvcNAQEBBQADggENADCCAQgCggEBANbOLggKv+IxTdGNs8/TGFy0PTP6DHThvbbR24kT9ixcOd9W+EaBPWW+wPPKQmsHxajtWjmQwWfna8mZuSeJS48LIgAZlKkpFeVyxW0qMBujb8X8ETrWy550NaFtI6t9+u7hZeTfHwqNvacKhp1RbE6dBRGWynwMVX8XW8N1+UjFaq6GCJukT4qmpN2afb8sCjUigq0GuMwYXrFVee74bQgLHWGJwPmvmLHC69EH6kWr22ijx4OKXlSIx2xT1AsSHee70w5iDBiK4aph27yH3TxkXy9V89TDdexAcKk/cVHYNnDBapcavl7y0RiQ4biu8ymM8Ga/nmzhRKya6G0cGw8CAQOjgfwwgfkwHQYDVR0OBBYEFI0cxb6VTEM8YYY6FbBMvAPyT+CyMIHJBgNVHSMEgcEwgb6AFI0cxb6VTEM8YYY6FbBMvAPyT+CyoYGapIGXMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbYIJANWFuGx90071MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEEBQADggEBABnTDPEF+3iSP0wNfdIjIz1AlnrPzgAIHVvXxunW7SBrDhEglQZBbKJEk5kT0mtKoOD1JMrSu1xuTKEBahWRbqHsXclaXjoBADb0kkjVEJu/Lh5hgYZnOjvlba8Ld7HCKePCVePoTJBdI4fvugnL8TsgK05aIskyY0hKI9L8KfqfGTl1lzOv2KoWD0KWwtAWPoGChZxmQ+nBli+gwYMzM1vAkP+aayLe0a1EQimlOalO762r0GXO0ks+UeXde2Z4e+8S/pf7pITEI/tP+MxJTALw9QUWEv9lKTk+jkbqxbsh8nfBUapfKqYn0eidpwq2AzVp3juYl7//fKnaPhJD9gs=
+   201→==Could not open your system settings. Please open it manually.
+   202→==You've successfully requested access to his QuickShare album.
+   203→=>%1$s no s'executar
+   204→>>In order to make calls you need to allow incoming video calls.
+   205→>>It is not possible to hide a visit when a footprint was given.
+   206→>>You can report a message as spam by long-pressing the message.
+   207→??GPS is disabled. Enable GPS for a better experience in Settings
+   208→??Travel dates cannot be in the past. Change start date to today?
+   209→??Try uploading pictures to get more attention from other Romeos.
+   210→??VideoChat is temporarily unavailable. Please try again shortly.
+   211→??We're sorry, but you can only specify a maximum of 5 languages.
+   212→@@Subscription management needs to be done through the Play Store.
+   213→@@Up to 5 travel locations are allowed. Click to delete or cancel.
+   214→@@com.google.android.material.theme.MaterialComponentsViewInflater
+   215→About my d***
+   216→Account Settings
+   217→Active
+   218→Add a profile picture*
+   219→Add attachments
+   220→Add contact folder
+   221→Albums
+   222→All Albums
+   223→Allow incoming video calls
+   224→App version no longer supported
+   225→Appear offline with PLUS
+   226→Archive pictures
+   227→Athletic
+   228→Attachment could not be sent
+   229→Attachment type not supported
+   230→Attachments
+   231→Attachments not supported
+   232→Audio enabled
+   233→Audio muted
+   234→Average
+   235→Average hair length
+   236→BBIt's not possible for you to grant QuickShare access to this user.
+   237→BBNot shown on your profile but can be attached in private messages.
+   238→BBPLUS users can select Invisible Mode and appear offline to others.
+   239→BBPurchase consumption failed. Please restart the app and try again.
+   240→BBWe were unable to detect your location. Please select it manually.
+   241→BBYou have already uploaded this picture. Please choose another one.
+   242→BBYou have successfully unlocked your QuickShare album for %1$d min.
+   243→BBcom.google.android.material.search.SearchBar$ScrollingViewBehavior
+   244→Back to Visits
+   245→Badminton
+   246→Beard
+   247→Bed & Breakfast
+   248→Bedroom
+   249→Big Grid
+   250→Block %s?
+   251→Blocked
+   252→Body Hair
+   253→Body Type
+   254→Body diversity rocks!
+   255→Boots
+   256→Bottom
+   257→Bottom only
+   258→CCPurchase registration failed. Please restart the app and try again.
+   259→CCSorry. It's not possible to report pictures that are not displayed.
+   260→CCTo send attachments you need to allow permissions in your settings.
+   261→CCcom.google.android.material.behavior.HideBottomViewOnScrollBehavior
+   262→Call declined
+   263→Call ended
+   264→Call ended unexpectedly.
+   265→Calling...
+   266→Cancel
+   267→Cancel subscription
+   268→Canceled
+   269→Canceling Upload
+   270→Cancellation was successful!
+   271→Care
+   272→Choose a topic
+   273→Choose your location*
+   274→Clear list
+   275→Club
+   276→Collapse bottom sheet
+   277→Collapse the bottom sheet
+   278→Condom
+   279→Contact Folder
+   280→Contact customer support
+   281→Conversations
+   282→Could not delete saved phrase
+   283→Could not hide visit
+   284→Could not open device settings. Please enable installation of apps from unknown sources in your device settings to update the app.
+   285→D*** size
+   286→Delete "%s" album?
+   287→Delete contact folder
+   288→Delete picture
+   289→Delete pictures
+   290→Details of your purchase can be seen in "Transaction history" in the "Settings".
+   291→Dirty sex
+   292→Dismiss bottom sheet
+   293→Donkey
+   294→EEPurchase acknowledgment failed. Please restart the app and try again.
+   295→Email was not sent because the weekly password reset limit has been exceeded. Please double check your inbox or contact Support.
+   296→End call
+   297→Enjoy your FREE unlimited contact saving and blocking.
+   298→Enter contact folder name
+   299→Every app that works with sharing of GPS harbors certain risks; other users might find out where you are. That
+   300→Exhibition
+   301→Expand bottom sheet
+   302→Expand the bottom sheet
+   303→Explore other places with
+   304→FF Active
+   305→FF Passive
+   306→FFIt's not possible for you to leave a footprint on this user's profile.
+   307→FFYou reached the limits for save or block users. Please upgrade to Plus
+   308→Failed to fetch attachments
+   309→Feedback: VideoChat
+   310→Filters are too confusing
+   311→Footprints
+   312→Freelancer
+   313→Frog
+   314→Full beard
+   315→GPS location
+   316→GPS privacy information
+   317→Genders I'm into
+   318→Genuine
+   319→Get Support
+   320→Get verified!
+   321→Give Feedback
+   322→Groups
+   323→HHPLUS users can save, edit and send phrases for a faster chat experience.
+   324→HHYou have no shares left today. Upgrade to PLUS and get unlimited shares.
+   325→Hairy
+   326→Help Center loaded
+   327→Help us improve the App!
+   328→Hide your profile visits
+   329→Hindi maipadala ang attachment
+   330→How was the call?
+   331→I don't like ROMEO
+   332→I don't offer Bed & Breakfast.
+   333→I need help
+   334→I offer Bed & Breakfast
+   335→I'm Looking for*
+   336→I'm into
+   337→I'm looking for
+   338→IIThis picture cannot be used as a profile picture until it has been rated.
+   339→If you purchased PLUS, once we have received your payment, your PLUS subscription will be activated and you will receive a confirmation message.
+   340→In a call
+   341→Incoming call
+   342→Incoming call...
+   343→Incoming video call from
+   344→Install updated version
+   345→Into
+   346→Invisible
+   347→Ipinadala mo noong %s
+   348→Ipinadala ni %1$s noong %2$s.
+   349→It is necessary to enable or allow installation of apps from unknown sources in your device settings to update this application.
+   350→It might take a few hours to process your payment, so please do not repeat the payment process.
+   351→JJIt's not possible to grant or request access to your own QuickShare album.
+   352→JJNew version of Google Play services needed. It will update itself shortly.
+   353→JJPLUS users can choose their grid view & add their favourite profile stats.
+   354→JJThis action is not supported. Please go to the desktop website to do this.
+   355→Jeans
+   356→KKCould not open Play Store. Please try again or manually install the update.
+   357→Keep in mind that you will need to manually cancel your PLUS subscription directly on Play Store to avoid any recurring payments.
+   358→Kiss
+   359→Kitten
+   360→LLIt's not possible for you to request access to this user's QuickShare album.
+   361→LOCATION SETTINGS
+   362→Languages
+   363→Leather
+   364→Leave footprint
+   365→Like
+   366→Like this picture
+   367→Likes
+   368→Likes could not be retrieved.
+   369→Lingerie
+   370→List View
+   371→Loading support tickets
+   372→Location
+   373→Location shared
+   374→Location unknown.
+   375→Look for the camera icon in the chat screen and tap to start a VideoChat!
+   376→Looking for
+   377→Looking for dates
+   378→Looking for friends
+   379→Looking for my age
+   380→Looking for my gender
+   381→Looking for my orientation
+   382→Looking for relationship
+   383→Lycra
+   384→MMInvisibility is a PLUS feature. Long press your avatar to change your status.
+   385→Magdagdag ng mga attachment
+   386→Manage Subscription
+   387→Manage albums
+   388→Manage pictures
+   389→May isang kalakip na pinili
+   390→May isang kalakip na pinili.
+   391→Me and S&M
+   392→Message could not be locked.
+   393→Missed video call
+   394→More bottom
+   395→More top
+   396→Muslim
+   397→Muslim (Shia)
+   398→Muslim (Sunni)
+   399→My PLUS Membership
+   400→My Partner
+   401→My Relationship Status
+   402→My Travel Plans
+   403→My location
+   404→My play position
+   405→My private notes
+   406→My trips
+   407→NNActive locations cannot be deleted. Please change your location and try again.
+   408→NNWatch your search results change as you type.
+   409→Nearby
+   410→New album
+   411→New notification
+   412→Night life / Clubbing
+   413→No FF
+   414→No SM
+   415→No anal
+   416→No beard
+   417→No dirty
+   418→No support tickets
+   419→No tattoos
+   420→No vote
+   421→Not checked
+   422→Not verified yet
+   423→Not very hairy
+   424→Notification sound
+   425→Notifications
+   426→OOYou have reached your QuickShare limit today. 
+   427→OOYour PLUS transaction history is currently unavailable. Please try again later.
+   428→OR%1$s no s'executar
+   429→Official Profile
+   430→Once you're verified we'll reward you with FREE unlimited contact saving and blocking.
+   431→One new footprint
+   432→One picture
+   433→Open
+   434→Open in browser
+   435→Open navigation drawer
+   436→Open on phone
+   437→Open to
+   438→Orientations I'm into
+   439→Other travelers
+   440→Our Groups feature brings together like-minded people on topics they're interested in. Unfortunately we're not able to show this content in our apps.
+   441→PICTURE ARCHIVE
+   442→PLUS
+   443→PLUS users can be seen in the Radar of their travel destination 2 weeks before they arrive to start getting to know the local ROMEOs.
+   444→PROFILE PICTURES
+   445→Partner
+   446→Partner profile
+   447→Picture
+   448→Picture Upload
+   449→Picture archive
+   450→Picture could not be updated.
+   451→Picture likes
+   452→Picture reported successfully.
+   453→Picture shared
+   454→Picture too big
+   455→Picture under review
+   456→Pictures
+   457→Pictures I liked
+   458→Pictures shared
+   459→Piercings
+   460→Pinili ni %1$s ang %2$s
+   461→Play safe?
+   462→Please enable video calls
+   463→Please help us improve
+   464→Position
+   465→PrEP
+   466→PrEP and condom
+   467→Preferences
+   468→Private
+   469→Private Parties
+   470→Probably genuine
+   471→Problems with PLUS membership
+   472→Profile Location
+   473→Profile could not be opened.
+   474→Profile has been blocked.
+   475→Profile pictures
+   476→Profile type is not supported.
+   477→Profile was not blocked
+   478→Push notifications
+   479→QQYou've exceeded your picture upload limit. Upgrade to PLUS for unlimited storage.
+   480→QUICKSHARE
+   481→QuickShare
+   482→QuickShare album.
+   483→Quickshare
+   484→REAL-TIME SEARCH
+   485→ROMEO UNCUT
+   486→RRFootprint could not be set. Please try again or contact Support if error persists.
+   487→Radar
+   488→Radar Grid Views
+   489→Raver
+   490→Read Support Message
+   491→Recent searches
+   492→Recently active users:
+   493→Remove attachment with name %s.
+   494→Remove no vote
+   495→Remove yes vote
+   496→Renews automatically
+   497→Report
+   498→Report %s
+   499→Report or block
+   500→Report picture
+   501→Reported as spam
+   502→Romeo album
+   503→Romeo likes this picture
+   504→Romeos like this picture
+   505→Romeos nearby
+   506→Rubber
+   507→SORTING OPTIONS
+   508→SSYou exceeded your picture upload limit for this album. Please choose another album.
+   509→SSYour PLUS membership renews automatically and can be managed directly at the Store.
+   510→START A CONVERSATION
+   511→SVCal una nova versi
+   512→Safe
+   513→Safe: PrEP
+   514→Safe: PrEP and condom
+   515→Safe: TasP
+   516→Safe: let's talk
+   517→Safer Sex
+   518→Save a phrase by tapping Add
+   519→Saved Phrases
+   520→Saved phrases
+   521→Screening an incoming call
+   522→Search
+   523→Search Location
+   524→Search and Display
+   525→Search failed.
+   526→Search faster and sort smarter.
+   527→Search results loaded
+   528→Search with over 120 options
+   529→See XXX content
+   530→See XXX content with PLUS
+   531→See headlines on Big Grid
+   532→Select an attachment
+   533→Select an attachment.
+   534→Select at least one picture
+   535→Select location
+   536→Select pictures
+   537→Send feedback email
+   538→Send location
+   539→Send saved phrases with PLUS
+   540→Set as main profile picture
+   541→Set location manually
+   542→Settings
+   543→Share QuickShare album
+   544→Shinto
+   545→Show headline in big grid
+   546→Show their headline on Big Grid
+   547→Side (No anal)
+   548→Sign language
+   549→Size & Circumcision
+   550→Slim
+   551→Small Grid
+   552→Smooth
+   553→Someone is using my picture
+   554→Spam
+   555→Speaking my language
+   556→Stocky
+   557→Subscription purchases will be charged to your Google account. Subscriptions auto-renew under identical terms unless canceled at least 24 hours before the end of the current period. You can manage or cancel auto-renewal in your Google Account Settings after purchase. Any free trial or promotional pricing will auto-renew at the regular price after the promotional period ends. You can cancel your subscription anytime in your Google Account Settings. For more information, please visit our
+   558→Support
+   559→Support tickets failed to load
+   560→Support tickets loaded
+   561→Syncing album failed
+   562→Syncing albums failed
+   563→TT%1$s won't run without Google Play services, which are not supported by your device.
+   564→Tap to set profile picture
+   565→TasP
+   566→Tattoos
+   567→Thank you for your report!
+   568→Thanks for your feedback.
+   569→The user is in another call.
+   570→They're Looking For
+   571→This picture will be moved
+   572→This will permanently delete your account on the server and from your device. Any PLUS membership will be lost. Proceed with deleting your profile?
+   573→To get your blue badge and FREE unlimited contact saving and blocking you need to fulfil two conditions:
+   574→Too late for hiding the visit.
+   575→Top only
+   576→Travel
+   577→Travel headline
+   578→Travelers arriving
+   579→Travelers only
+   580→UUInternal Error: 403 Forbidden. Please try again or contact Support if error persists.
+   581→Unable to like the picture.
+   582→Unable to unlike the picture.
+   583→Unblock
+   584→Uncut
+   585→Unexpected call error
+   586→Unlimited Radar scrolling
+   587→Unlock this profile with PLUS
+   588→Unverified user
+   589→Upgrade to PLUS
+   590→Upgrade to ROMEO PLUS
+   591→Upload picture
+   592→Upload unlimited pictures
+   593→Use GPS location
+   594→Use as main picture
+   595→User has been unblocked
+   596→VVError opening selected picture. Please try again or contact Support if error persists.
+   597→VVFootprint could not be removed. Please try again or contact Support if error persists.
+   598→Verified user
+   599→Versatile
+   600→Version %1$s
+   601→Version %s (Build %s)
+   602→Very hairy
+   603→Very likely genuine
+   604→Video
+   605→Video started
+   606→VideoChat
+   607→VideoChat (End call)
+   608→View pictures
+   609→Visit our website
+   610→Visited
+   611→Visitor
+   612→Visitors
+   613→WWFree users have a limited amount of search options. Upgrade to PLUS to unlock them all.
+   614→WWOops! Facebook authorization failed. You can try again or use a different login option.
+   615→Walang piniling kalakip
+   616→Walang piniling kalakip.
+   617→Was this article helpful?
+   618→When we receive your payment, your purchase will appear in your "Transaction history" on ROMEO. Please be aware this may take a few days.
+   619→Wrestling
+   620→XXDraft message could not be saved. Please try again or contact Support if error persists.
+   621→XXPLUS users can share and request unlimited QuickShare albums. Free users get %d per day.
+   622→XXPicture order could not be saved. Please try again or contact Support if error persists.
+   623→XXPlease note that your PLUS subscription that was linked to this account is still active.
+   624→YYYou can only buy a new membership if you cancel the current one on %s and it has expired.
+   625→Yes vote
+   626→You are a PLUS member
+   627→You are using a very old version of our app and unfortunately we had to stop supporting it. We hope that you are able to update to a newer version. If not, you can always use our website.
+   628→You are using an outdated version of the app that we have to stop supporting, please update for the latest features and bug fixes. Sorry for this inconvenience and thank you for being part of our community!
+   629→You can only buy a new membership if your current gift has expired.
+   630→You have PLUS thanks to a gift from %1$s. Your membership runs until %2$s.
+   631→You have an additional PLUS membership pending. Please check your history for details. You can only buy a new membership if you don't have any pending ones.
+   632→You have been verified
+   633→You tried to call %1$s
+   634→You're not verified
+   635→You're not verified yet
+   636→Your account is permanently banned and will be deleted automatically within 30 days. If you have any questions, please contact customer support.
+   637→Your email %s is not verified
+   638→Your email address needs to be verified in order to contact other Romeos.
+   639→Your last visit was hidden.
+   640→Your profile has been rejected and a message explaining the rejection has been sent to you. If you have any questions please contact our Support Dept.
+   641→ZZNecessary in order to get notified about new messages, footprints, picture likes and more.
+   642→ZZOops, something went wrong: account argument missing. Please try again or contact Support.
+   643→[[Your picture was uploaded successfully. It will appear on your profile once it is approved.
+   644→[]%1$s no s'executar
+   645→\\Add more pictures. Profiles with at least 5 pictures have a much higher chance of engagement
+   646→\\Media folders could not be retrieved. Please try again or contact Support if error persists.
+   647→\\VideoChat isn't compatible with this version of the app. Please download the latest version.
+   648→\\Your visited list is currently unavailable due to minor maintenance. Please try again later.
+   649→]]Your visitors list is currently unavailable due to minor maintenance. Please try again later.
+   650→^^Internal Error: Unsupported Media Type. Please try again or contact Support if error persists.
+   651→^^This picture hasn't been rated yet. Please wait a couple of minutes or choose another picture.
+   652→``If you would like to keep your account but not be visible to others, you can pause your account.
+   653→ab%1$s no es pot executar sense Serveis de Google Play, que no 
+   654→bbOops, the friends list could not be loaded. Please try again or contact Support if error persists.
+   655→bbYour list of visitors could not be cleared. Please try again or contact Support if error persists.
+   656→ccIn urgent cases or if the reported matter is not publicly visible, please contact the support team.
+   657→contact Support
+   658→cubic-bezier(0, 0, 0.2, 1)
+   659→cubic-bezier(0, 0, 1, 1)
+   660→cubic-bezier(0.2, 0, 0, 1)
+   661→cubic-bezier(0.4, 0, 1, 1)
+   662→d like to collect usage data 
+   663→ddOops, something went wrong with QuickShare: missing privileges. Please try again or contact Support.
+   664→ddYour complete ROMEO profile is just a few steps away. Would you like to continue where you left off?
+   665→ddhttps://support.romeo.com/hc/en-us/articles/360002536237-How-do-I-install-the-UNCUT-App-for-Android-
+   666→donkey
+   667→eeFree users can only access their visitors from the last 24 hours. Upgrade to PLUS to unlock them all.
+   668→eePausing your account won't affect the duration of your PLUS membership, which expires or renews on %s
+   669→ffOops, something went wrong with QuickShare: invalid id on delete. Please try again or contact Support.
+   670→ffYou have free PLUS. This is granted to all users in countries with restricted LGBT+ freedom or rights.
+   671→ffhttps://www.planetromeofoundation.org/funded-projects/?utm_source=romeo-uncut&utm_medium=profile-badge
+   672→fhRADAR does not work with private locations. Please go to "Settings" and select a non
+   673→frog
+   674→ggOops, something went wrong with QuickShare: invalid id on request. Please try again or contact Support.
+   675→ggSorry, but it's not possible to buy PLUS at this time due to minor maintenance. Please try again later.
+   676→ggSorry, but our search system is currently unavailable due to minor maintenance. Please try again later.
+   677→has given you a footprint.
+   678→hhConnection Error: Online status could not be set. Please try again or contact Support if error persists.
+   679→hhIt is necessary to enable access to external storage in your device settings to update this application.
+   680→hhLocation tracking in your device is disabled. Would you like to go to your system settings to change it?
+   681→hhLocation tracking on your device is disabled. Would you like to go to your system settings to change it?
+   682→hhOops, something went wrong with QuickShare: invalid value on 'get'. Please try again or contact Support.
+   683→hhSorry, but our picture system is currently unavailable due to minor maintenance. Please try again later.
+   684→hhYou need to enable camera and storage permissions in your settings to allow "ROMEO" to upload a picture.
+   685→hhYour PLUS membership will end on %s. You can only buy a new membership when the current one has expired.
+   686→https://www.romeo.com/care
+   687→iiOops, something went wrong with QuickShare: grants argument invalid. Please try again or contact Support.
+   688→iiOops, something went wrong with QuickShare: invalid value on 'post'. Please try again or contact Support.
+   689→iiOops, something went wrong with QuickShare: invalid value on delete. Please try again or contact Support.
+   690→iiOops, something went wrong with QuickShare: invalid value on grants. Please try again or contact Support.
+   691→kiss
+   692→kitten
+   693→likes your picture.
+   694→llConnection Error: Selected folder could not be moved. Please try again or contact Support if error persists.
+   695→llConnection Error: Selected folder could not be saved. Please try again or contact Support if error persists.
+   696→m looking for
+   697→mmConnection Error: Visitor list could not be retrieved. Please try again or contact Support if error persists.
+   698→mmOops, something went wrong while deleting the album: missing privileges. Please try again or contact Support.
+   699→mmOops, something went wrong with QuickShare: 'request' argument required. Please try again or contact Support.
+   700→mmOops, something went wrong with your account changes: parameter missing. Please try again or contact Support.
+   701→mmThe list of profiles you visited could not be cleared. Please try again or contact Support if error persists.
+   702→nnConnection Error: Selected folder could not be deleted. Please try again or contact Support if error persists.
+   703→nnIf you set this as your main profile picture, it will be moved from this album to your profile pictures album.
+   704→nnOops, something went wrong with QuickShare: missing privileges on 'post'. Please try again or contact Support.
+   705→ooConnection Error: Footprint list could not be retrieved. Please try again or contact Support if error persists.
+   706→ooConnection Error: Selected picture could not be deleted. Please try again or contact Support if error persists.
+   707→ooOops, something went wrong while loading the album(s): missing privileges. Please try again or contact Support.
+   708→pYour payment is currently being processed.
+   709→ppSalamat. Isang mensahe ang ipinadala sa team. Makikita mo ang mensaheng ito at makadaragdag ng mga detalye dito:
+   710→private location.
+   711→qqPlease select a location within a %1$skm radius from your current position, or explore other locations with %2$s.
+   712→s why we allow users to choose their location. If you want to keep your location secret, do not use 
+   713→ssIf you don't find it in your inbox, check your spam folder, make sure you entered the correct email or username, or
+   714→ssYou need to cancel your PLUS membership directly on Play Store, unfortunately we are not able to cancel it for you.
+   715→t like the content
+   716→t like the design
+   717→t match my age preferences
+   718→to be seen in this location
+   719→transition_location_button
+   720→transition_location_search
+   721→ve already reached your free picture limit %d. Upgrade to PLUS or delete an old picture before you can add a new one.
+   722→ve reached the maximum amount of albums.
+   723→vvYour profile is currently in review with our Support admins. If you wish to know more details, please contact support.
+   724→wwYou've already reached your free contact limit. Upgrade to PLUS or delete an old contact before you can save a new one.
+   725→yyNothing to show here yet. Get noticed by uploading a hot new pic or sending a footprint to some sexy ROMEOs in your area.
+   726→zzAn error occurred in the payment process. Please try again. If the error keeps happening, please contact our Support Team.
+   727→zzFree users can only access their visitors from the last 24 hours. Upgrade to PLUS to unlock visitors from the last 7 days.
+   728→{resource} album not found.
+   729→||If you delete your account, you will permanently lose your profile, pictures, messages and contacts. This can not be undone.
+   730→||We're sorry, but it's temporarily not possible to cancel your subscription due to minor maintenance. Please try again later.
+   731→}}Connection Error: List of profiles you visited could not be retrieved. Please try again or contact Support if error persists.
+   732→}}Salamat. Isang mensahe ang ipinadala sa team. Kung kailangan ng tugon, makikipag-ugnayan sila sa iyo sa pamamagitan ng email.

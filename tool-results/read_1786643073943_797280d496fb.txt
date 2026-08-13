@@ -1,0 +1,502 @@
+     1→     1→# ReverseAPK Analysis Report
+     2→     2→## grindr-7.5.0.apk
+     3→     3→Generated: Thu Aug 13 00:55:35 CEST 2026
+     4→     4→
+     5→     5→## AndroidManifest.xml
+     6→     6→```xml
+     7→     7→<?xml version="1.0" encoding="utf-8"?>
+     8→     8→<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="29" android:compileSdkVersionCodename="10" package="com.grindrapp.android" platformBuildVersionCode="29" platformBuildVersionName="10">
+     9→     9→    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    10→    10→    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    11→    11→    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    12→    12→    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    13→    13→    <uses-permission android:name="android.permission.VIBRATE"/>
+    14→    14→    <uses-permission android:name="android.permission.INTERNET"/>
+    15→    15→    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    16→    16→    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    17→    17→    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    18→    18→    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    19→    19→    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    20→    20→    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    21→    21→    <permission android:name="com.grindrapp.android" android:protectionLevel="signature"/>
+    22→    22→    <uses-permission android:name="com.grindrapp.android"/>
+    23→    23→    <uses-permission android:name="android.permission.CAMERA"/>
+    24→    24→    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+    25→    25→    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    26→    26→    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    27→    27→    <uses-feature android:glEsVersion="0x20000" android:required="true"/>
+    28→    28→    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    29→    29→    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    30→    30→    <uses-feature android:name="android.hardware.location.network"/>
+    31→    31→    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    32→    32→    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    33→    33→    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+    34→    34→    <uses-permission android:name="com.android.vending.BILLING"/>
+    35→    35→    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    36→    36→    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"/>
+    37→    37→    <application android:allowBackup="false" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:fullBackupContent="false" android:hardwareAccelerated="true" android:icon="@mipmap/ic_grindr" android:label="@string/app_name" android:largeHeap="true" android:name="com.grindrapp.android.GrindrApplication" android:networkSecurityConfig="@xml/network_security_config" android:requestLegacyExternalStorage="true" android:resizeableActivity="false" android:supportsRtl="true" android:theme="@style/Theme.AppTheme" android:vmSafeMode="@bool/vm_safe_mode">
+    38→    38→        <activity android:configChanges="locale|layoutDirection" android:name="com.grindrapp.android.store.ui.StoreActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateAlwaysHidden"/>
+    39→    39→        <activity android:name="com.grindrapp.android.ui.videocall.VideoMatchActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar"/>
+    40→    40→        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+    41→    41→        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+    42→    42→        <meta-data android:name="com.facebook.sdk.AutoInitEnabled" android:value="false"/>
+    43→    43→        <meta-data android:name="com.facebook.sdk.AutoLogAppEventsEnabled" android:value="false"/>
+    44→    44→        <meta-data android:name="com.facebook.sdk.AdvertiserIDCollectionEnabled" android:value="false"/>
+    45→    45→        <meta-data android:name="firebase_analytics_collection_enabled" android:value="false"/>
+    46→    46→        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false"/>
+    47→    47→        <meta-data android:name="firebase_performance_collection_enabled" android:value="false"/>
+    48→    48→        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBaKOPTkY2DsuSvnPC3ZzA4yFIVV1WQTxM"/>
+    49→    49→        <meta-data android:name="com.google.firebase.ml.vision.DEPENDENCIES" android:value="face, ocr, barcode"/>
+    50→    50→        <receiver android:exported="true" android:name="com.appsflyer.MultipleInstallBroadcastReceiver">
+    51→    51→            <intent-filter>
+    52→    52→                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+    53→    53→            </intent-filter>
+    54→    54→        </receiver>
+    55→    55→        <activity android:name="com.grindrapp.android.ui.home.HomeActivity" android:screenOrientation="portrait" android:theme="@style/SplashTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
+    56→    56→            <intent-filter>
+    57→    57→                <action android:name="android.intent.action.MAIN"/>
+    58→    58→            </intent-filter>
+    59→    59→        </activity>
+    60→    60→        <activity-alias android:description="@string/app_name" android:enabled="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:name="com.grindrapp.android.HomeActivityOriginal" android:targetActivity="com.grindrapp.android.ui.home.HomeActivity">
+    61→    61→            <intent-filter>
+    62→    62→                <action android:name="android.intent.action.MAIN"/>
+    63→    63→                <category android:name="android.intent.category.LAUNCHER"/>
+    64→    64→            </intent-filter>
+    65→    65→        </activity-alias>
+    66→    66→        <activity-alias android:description="@string/app_name" android:enabled="false" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:name="com.grindrapp.android.HomeActivityUnlimited" android:targetActivity="com.grindrapp.android.ui.home.HomeActivity">
+    67→    67→            <intent-filter>
+    68→    68→                <action android:name="android.intent.action.MAIN"/>
+    69→    69→                <category android:name="android.intent.category.LAUNCHER"/>
+    70→    70→            </intent-filter>
+    71→    71→        </activity-alias>
+    72→    72→        <activity-alias android:description="@string/settings_discreet_icon_camera" android:enabled="false" android:icon="@mipmap/ic_launcher_alt_camera" android:label="@string/settings_discreet_icon_camera" android:name="com.grindrapp.android.HomeActivityCamera" android:roundIcon="@mipmap/ic_launcher_alt_camera" android:targetActivity="com.grindrapp.android.ui.home.HomeActivity">
+    73→    73→            <intent-filter>
+    74→    74→                <action android:name="android.intent.action.MAIN"/>
+    75→    75→                <category android:name="android.intent.category.LAUNCHER"/>
+    76→    76→            </intent-filter>
+    77→    77→        </activity-alias>
+    78→    78→        <activity-alias android:description="@string/settings_discreet_icon_music" android:enabled="false" android:icon="@mipmap/ic_launcher_alt_music" android:label="@string/settings_discreet_icon_music" android:name="com.grindrapp.android.HomeActivityMusic" android:roundIcon="@mipmap/ic_launcher_alt_music" android:targetActivity="com.grindrapp.android.ui.home.HomeActivity">
+    79→    79→            <intent-filter>
+    80→    80→                <action android:name="android.intent.action.MAIN"/>
+    81→    81→                <category android:name="android.intent.category.LAUNCHER"/>
+    82→    82→            </intent-filter>
+    83→    83→        </activity-alias>
+    84→    84→        <activity-alias android:description="@string/settings_discreet_icon_notes" android:enabled="false" android:icon="@mipmap/ic_launcher_alt_notes" android:label="@string/settings_discreet_icon_notes" android:name="com.grindrapp.android.HomeActivityNotes" android:roundIcon="@mipmap/ic_launcher_alt_notes" android:targetActivity="com.grindrapp.android.ui.home.HomeActivity">
+    85→    85→            <intent-filter>
+    86→    86→                <action android:name="android.intent.action.MAIN"/>
+    87→    87→                <category android:name="android.intent.category.LAUNCHER"/>
+    88→    88→            </intent-filter>
+    89→    89→        </activity-alias>
+    90→    90→        <activity-alias android:description="@string/settings_discreet_icon_todo" android:enabled="false" android:icon="@mipmap/ic_launcher_alt_todo" android:label="@string/settings_discreet_icon_todo" android:name="com.grindrapp.android.HomeActivityToDo" android:roundIcon="@mipmap/ic_launcher_alt_todo" android:targetActivity="com.grindrapp.android.ui.home.HomeActivity">
+    91→    91→            <intent-filter>
+    92→    92→                <action android:name="android.intent.action.MAIN"/>
+    93→    93→                <category android:name="android.intent.category.LAUNCHER"/>
+    94→    94→            </intent-filter>
+    95→    95→        </activity-alias>
+    96→    96→        <activity-alias android:description="@string/settings_discreet_icon_calculator" android:enabled="false" android:icon="@mipmap/ic_launcher_alt_calculator" android:label="@string/settings_discreet_icon_calculator" android:name="com.grindrapp.android.HomeActivityCalculator" android:roundIcon="@mipmap/ic_launcher_alt_calculator" android:targetActivity="com.grindrapp.android.ui.home.HomeActivity">
+    97→    97→            <intent-filter>
+    98→    98→                <action android:name="android.intent.action.MAIN"/>
+    99→    99→                <category android:name="android.intent.category.LAUNCHER"/>
+   100→   100→            </intent-filter>
+   101→   101→        </activity-alias>
+   102→   102→        <activity android:name="com.grindrapp.android.ui.newonboarding.NewOnBoardingUpsellActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar" android:windowSoftInputMode="stateHidden|adjustResize"/>
+   103→   103→        <activity android:name="com.grindrapp.android.ui.explore.ExploreMapActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustNothing|stateHidden"/>
+   104→   104→        <activity android:name="com.grindrapp.android.ui.explore.ExploreCascadeActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateHidden|adjustResize"/>
+   105→   105→        <activity android:name="com.grindrapp.android.ui.login.LoginActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateHidden|adjustResize"/>
+   106→   106→        <activity android:name="com.grindrapp.android.ui.account.onboard.LandingActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateAlwaysHidden"/>
+   107→   107→        <activity android:name="com.grindrapp.android.ui.account.onboard.LandingPhoneActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateVisible|adjustResize"/>
+   108→   108→        <activity android:name="com.grindrapp.android.ui.account.onboard.LandingEmailActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustResize"/>
+   109→   109→        <activity android:name="com.grindrapp.android.ui.account.onboard.LandingForgotPwdActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustResize"/>
+   110→   110→        <activity android:name="com.grindrapp.android.ui.account.onboard.LandingSMSVerifyActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustResize"/>
+   111→   111→        <activity android:launchMode="singleTop" android:name="com.grindrapp.android.ui.login.CredentialsChangedActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateHidden|adjustResize"/>
+   112→   112→        <activity android:name="com.grindrapp.android.ui.account.UpdateEmailActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateHidden|adjustResize"/>
+   113→   113→        <activity android:name="com.grindrapp.android.ui.account.signup.CreateAccountEmailActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustPan"/>
+   114→   114→        <activity android:name="com.grindrapp.android.ui.account.sms.SMSVerifyActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustResize"/>
+   115→   115→        <activity android:name="com.grindrapp.android.ui.account.onboard.SmsCountryPickerActivity" android:screenOrientation="portrait" android:theme="@style/GrindrBottomSheetActivity"/>
+   116→   116→        <activity android:name="com.grindrapp.android.ui.password.ForgotPasswordActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustResize"/>
+   117→   117→        <activity android:name="com.grindrapp.android.ui.password.ResetPasswordPhoneActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustResize"/>
+   118→   118→        <activity android:name="com.grindrapp.android.ui.account.verify.AccountVerifyActivity" android:screenOrientation="behind" android:theme="@style/AccountVerifyDialog" android:windowSoftInputMode="adjustResize"/>
+   119→   119→        <activity android:name="com.grindrapp.android.ui.login.ThirdPartyLoginProfileActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+   120→   120→        <activity android:name="com.grindrapp.android.ui.profileV2.BaseCruiseActivityV2" android:screenOrientation="portrait" android:theme="@style/ProfileTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustNothing"/>
+   121→   121→        <activity android:name="com.grindrapp.android.ui.profileV2.ExploreCruiseActivityV2" android:screenOrientation="portrait" android:theme="@style/ProfileTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustNothing"/>
+   122→   122→        <activity android:name="com.grindrapp.android.ui.profileV2.StandaloneCruiseActivityV2" android:screenOrientation="portrait" android:theme="@style/ProfileTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustNothing"/>
+   123→   123→        <activity android:name="com.grindrapp.android.ui.profileV2.LocalCruiseActivity" android:screenOrientation="portrait" android:theme="@style/ProfileTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustNothing"/>
+   124→   124→        <activity android:name="com.grindrapp.android.ui.photos.FullScreenExpiringImageActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar"/>
+   125→   125→        <activity android:name="com.grindrapp.android.ui.photos.FullScreenImageActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar" android:windowSoftInputMode="stateAlwaysHidden"/>
+   126→   126→        <activity android:name="com.grindrapp.android.ui.photos.ChatRoomPhotosActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar" android:windowSoftInputMode="stateAlwaysHidden"/>
+   127→   127→        <activity android:name="com.grindrapp.android.ui.photos.CropImageActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar"/>
+   128→   128→        <activity android:name="com.grindrapp.android.ui.photodecoration.PhotoDecorationActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar"/>
+   129→   129→        <activity android:name="com.grindrapp.android.ui.editprofile.EditProfileActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustPan"/>
+   130→   130→        <activity android:name="com.grindrapp.android.ui.account.RegisterProfileActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+   131→   131→        <activity android:name="com.grindrapp.android.ui.settings.SettingsActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   132→   132→        <activity android:name="com.grindrapp.android.ui.settings.SettingsDeleteProfileActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+   133→   133→        <activity android:name="com.grindrapp.android.ui.settings.SettingsDeleteProfileReasonActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   134→   134→        <activity android:name="com.grindrapp.android.ui.settings.SettingsDeleteProfileOtherReasonActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+   135→   135→        <activity android:name="com.grindrapp.android.ui.settings.SettingsDeactivateActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   136→   136→        <activity android:name="com.grindrapp.android.ui.settings.NotificationSettingsActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   137→   137→        <activity android:name="com.grindrapp.android.ui.settings.DoNotDisturbSettingsActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   138→   138→        <activity android:name="com.grindrapp.android.ui.report.ReportProfileActivity" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustResize"/>
+   139→   139→        <activity android:name="com.grindrapp.android.ui.settings.PrivacySettingsActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   140→   140→        <activity android:name="com.grindrapp.android.ui.web.WebViewActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   141→   141→        <activity android:configChanges="locale|layoutDirection" android:name="com.grindrapp.android.ui.subscription.SubscriptionManagementActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   142→   142→        <activity android:name="com.grindrapp.android.ui.debugtool.DebugToolsActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   143→   143→        <activity android:name="com.grindrapp.android.ui.debugtool.DebugFeatureFlagsActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   144→   144→        <activity android:name="com.grindrapp.android.ui.debugtool.DebugFeatureConfigActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   145→   145→        <activity android:name="com.grindrapp.android.ui.debugtool.DebugOneTrustStringActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   146→   146→        <activity android:name="com.grindrapp.android.ui.debugtool.DebugSDKPermissionActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   147→   147→        <activity android:name="com.grindrapp.android.ui.home.IntentEntryActivity" android:theme="@style/EmptyTheme">
+   148→   148→            <intent-filter>
+   149→   149→                <action android:name="android.intent.action.VIEW"/>
+   150→   150→                <category android:name="android.intent.category.DEFAULT"/>
+   151→   151→                <category android:name="android.intent.category.BROWSABLE"/>
+   152→   152→                <data android:scheme="grindr"/>
+   153→   153→            </intent-filter>
+   154→   154→            <intent-filter>
+   155→   155→                <action android:name="android.intent.action.VIEW"/>
+   156→   156→                <category android:name="android.intent.category.DEFAULT"/>
+   157→   157→                <category android:name="android.intent.category.BROWSABLE"/>
+   158→   158→                <data android:host="grindrx.page.link" android:scheme="https"/>
+   159→   159→            </intent-filter>
+   160→   160→        </activity>
+   161→   161→        <activity android:name="com.grindrapp.android.ui.account.changepwd.ChangePasswordActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateHidden|adjustResize"/>
+   162→   162→        <activity android:name="com.grindrapp.android.ui.account.banned.BannedActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateHidden"/>
+   163→   163→        <activity android:name="com.grindrapp.android.ui.account.banned.DeprecationActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateHidden"/>
+   164→   164→        <activity android:launchMode="singleInstance" android:name="com.grindrapp.android.ui.home.PackageCorruptedActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   165→   165→        <activity android:launchMode="singleInstance" android:name="com.grindrapp.android.ui.account.cert.CertFailActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   166→   166→        <activity android:name="com.grindrapp.android.ui.account.BootstrapFailActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   167→   167→        <activity android:name="com.grindrapp.android.ui.subscription.UpgradeConfirmationActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   168→   168→        <activity android:name="com.grindrapp.android.ui.legal.TermsOfServiceActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   169→   169→        <activity android:name="com.grindrapp.android.ui.legal.PrivacyPolicyActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   170→   170→        <activity android:name="com.grindrapp.android.ui.pin.PinSettingsActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   171→   171→        <activity android:name="com.grindrapp.android.ui.pin.SetPinActivity" android:screenOrientation="portrait" android:theme="@style/Theme.AppCompat.NoActionBar"/>
+   172→   172→        <activity android:name="com.grindrapp.android.ui.pin.PinLockActivity" android:screenOrientation="portrait" android:theme="@style/Theme.AppCompat.NoActionBar"/>
+   173→   173→        <provider android:authorities="com.grindrapp.android.fileprovider" android:exported="false" android:grantUriPermissions="true" android:name="androidx.core.content.FileProvider">
+   174→   174→            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths"/>
+   175→   175→        </provider>
+   176→   176→        <receiver android:exported="false" android:name="com.grindrapp.android.receiver.TimeChangedReceiver">
+   177→   177→            <intent-filter>
+   178→   178→                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+   179→   179→                <action android:name="android.intent.action.TIME_SET"/>
+   180→   180→            </intent-filter>
+   181→   181→        </receiver>
+   182→   182→        <receiver android:exported="false" android:name="com.grindrapp.android.service.push.PushDeleteReceiver">
+   183→   183→            <intent-filter>
+   184→   184→                <action android:name="com.grindrapp.android.service.push.DELETE_NOTIFICATION"/>
+   185→   185→            </intent-filter>
+   186→   186→        </receiver>
+   187→   187→        <receiver android:exported="false" android:name="com.grindrapp.android.receiver.BrazeReceiver">
+   188→   188→            <intent-filter>
+   189→   189→                <action android:name="com.grindrapp.android.intent.APPBOY_PUSH_RECEIVED"/>
+   190→   190→                <action android:name="com.grindrapp.android.intent.APPBOY_NOTIFICATION_OPENED"/>
+   191→   191→            </intent-filter>
+   192→   192→        </receiver>
+   193→   193→        <service android:name="com.grindrapp.android.service.push.PushMessageService">
+   194→   194→            <intent-filter>
+   195→   195→                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+   196→   196→            </intent-filter>
+   197→   197→        </service>
+   198→   198→        <receiver android:exported="true" android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+   199→   199→            <intent-filter>
+   200→   200→                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+   201→   201→                <category android:name="com.grindrapp.android"/>
+   202→   202→            </intent-filter>
+   203→   203→            <intent-filter>
+   204→   204→                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+   205→   205→            </intent-filter>
+   206→   206→        </receiver>
+   207→   207→        <receiver android:enabled="true" android:name="com.grindrapp.android.ui.chat.QuickReplyReceiver"/>
+   208→   208→        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="com.mopub.common.privacy.ConsentDialogActivity" android:theme="@style/MoPubFullscreenTheme"/>
+   209→   209→        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="com.mopub.common.MoPubBrowser" android:theme="@style/MoPubFullscreenTheme"/>
+   210→   210→        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="com.mopub.mobileads.MoPubActivity" android:theme="@style/MoPubFullscreenTheme"/>
+   211→   211→        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="com.mopub.mobileads.MraidActivity" android:theme="@style/MoPubFullscreenTheme"/>
+   212→   212→        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="com.mopub.mobileads.RewardedMraidActivity" android:theme="@style/MoPubFullscreenTheme"/>
+   213→   213→        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="com.mopub.mobileads.MraidVideoPlayerActivity" android:theme="@style/MoPubFullscreenTheme"/>
+   214→   214→        <activity android:name="com.grindrapp.android.ui.photos.EditPhotosActivity" android:screenOrientation="portrait" android:theme="@style/EditPhotoTheme"/>
+   215→   215→        <activity android:name="com.grindrapp.android.ui.subscription.PurchaseDirectlyActivity" android:theme="@style/GrindrEmptyTheme"/>
+   216→   216→        <activity android:label="@string/share_intent_chat" android:launchMode="singleTop" android:name="com.grindrapp.android.ui.chat.ShareToChatActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar" android:windowSoftInputMode="adjustPan">
+   217→   217→            <intent-filter>
+   218→   218→                <action android:name="android.intent.action.SEND"/>
+   219→   219→                <category android:name="android.intent.category.DEFAULT"/>
+   220→   220→                <data android:mimeType="text/plain"/>
+   221→   221→                <data android:mimeType="image/*"/>
+   222→   222→            </intent-filter>
+   223→   223→        </activity>
+   224→   224→        <activity android:launchMode="singleTop" android:name="com.grindrapp.android.ui.chat.ShareChatMessageActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar" android:windowSoftInputMode="adjustPan"/>
+   225→   225→        <activity android:name="com.grindrapp.android.ui.chat.group.invite.ChatCreateGroupActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   226→   226→        <activity android:name="com.grindrapp.android.ui.chat.group.detail.GroupChatDetailsActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   227→   227→        <activity android:launchMode="singleTop" android:name="com.grindrapp.android.ui.chat.ChatActivityV2" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+   228→   228→        <activity android:name="com.grindrapp.android.ui.chat.group.block.BlockedMembersActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   229→   229→        <activity android:name="com.grindrapp.android.ui.chat.group.invite.InviteMembersActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   230→   230→        <activity android:name="com.grindrapp.android.ui.block.IndividualUnblockActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   231→   231→        <activity android:launchMode="singleTask" android:name="com.grindrapp.android.ui.backup.BackupActivity" android:screenOrientation="portrait" android:theme="@style/BackupTheme"/>
+   232→   232→        <activity android:name="com.grindrapp.android.ui.restore.RestoreActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   233→   233→        <activity android:name="com.grindrapp.android.ui.boost.BoostBuyActivity" android:screenOrientation="portrait" android:theme="@style/ConsumablePurchaseTheme"/>
+   234→   234→        <activity android:name="com.grindrapp.android.ui.boost.BoostBundleBuyActivity" android:screenOrientation="portrait" android:theme="@style/ConsumablePurchaseTheme"/>
+   235→   235→        <activity android:name="com.grindrapp.android.ui.boost.BoostUseActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   236→   236→        <activity android:name="com.grindrapp.android.ui.boost.BoostReportActivity" android:screenOrientation="portrait" android:theme="@style/ConsumablePurchaseTheme"/>
+   237→   237→        <activity android:name="com.grindrapp.android.ui.circle.CircleCreateActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   238→   238→        <activity android:name="com.grindrapp.android.ui.circle.CircleInviteActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   239→   239→        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:label="@string/app_name" android:name="com.facebook.FacebookActivity" android:theme="@style/com_facebook_activity_theme"/>
+   240→   240→        <activity android:exported="true" android:name="com.facebook.CustomTabActivity">
+   241→   241→            <intent-filter>
+   242→   242→                <action android:name="android.intent.action.VIEW"/>
+   243→   243→                <category android:name="android.intent.category.DEFAULT"/>
+   244→   244→                <category android:name="android.intent.category.BROWSABLE"/>
+   245→   245→                <data android:scheme="fb1273378622718674"/>
+   246→   246→            </intent-filter>
+   247→   247→        </activity>
+   248→   248→        <activity android:label="@string/support_activity_title" android:name="zendesk.support.guide.HelpCenterActivity" android:theme="@style/GrindrZendeskTheme" android:windowSoftInputMode="adjustResize"/>
+   249→   249→        <activity android:configChanges="orientation|screenSize" android:label="@string/zs_view_article_loading_title" android:name="zendesk.support.guide.ViewArticleActivity" android:theme="@style/GrindrZendeskTheme"/>
+   250→   250→        <activity android:name="zendesk.support.request.RequestActivity" android:theme="@style/GrindrZendeskTheme" android:windowSoftInputMode="adjustResize"/>
+   251→   251→        <activity android:label="@string/request_list_activity_title" android:name="zendesk.support.requestlist.RequestListActivity" android:theme="@style/GrindrZendeskTheme"/>
+   252→   252→        <activity android:launchMode="singleTask" android:name="com.grindrapp.android.ui.videocall.VideoCallActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar"/>
+   253→   253→        <activity android:launchMode="singleTask" android:name="com.grindrapp.android.ui.videocall.VideoRouletteGuideActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar"/>
+   254→   254→        <activity android:launchMode="singleTask" android:name="com.grindrapp.android.ui.videocall.VideoRouletteActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar"/>
+   255→   255→        <activity android:name="com.grindrapp.android.ui.eventcalendar.EventCalendarActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   256→   256→        <activity android:name="com.grindrapp.android.ui.videocall.VideoCallDialogActivity" android:theme="@style/VideoTheme" android:windowSoftInputMode="stateHidden"/>
+   257→   257→        <service android:name="com.grindrapp.android.ui.videocall.VideoCallForegroundService"/>
+   258→   258→        <activity android:name="com.grindrapp.android.ui.viewedme.ViewedMeActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   259→   259→        <activity android:name="com.grindrapp.android.ui.profileV2.ViewedMeCruiseActivityV2" android:screenOrientation="portrait" android:theme="@style/ProfileTheme"/>
+   260→   260→        <activity android:name="com.spotify.sdk.android.authentication.LoginActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   261→   261→        <activity android:name="com.grindrapp.android.ui.spotify.SpotifyActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme"/>
+   262→   262→        <receiver android:name="com.grindrapp.android.receiver.LockScreenReceiver">
+   263→   263→            <intent-filter>
+   264→   264→                <action android:name="android.intent.action.SCREEN_OFF"/>
+   265→   265→            </intent-filter>
+   266→   266→        </receiver>
+   267→   267→        <service android:foregroundServiceType="dataSync" android:name="com.grindrapp.android.service.backup.BackupService"/>
+   268→   268→        <service android:foregroundServiceType="dataSync" android:name="com.grindrapp.android.service.backup.RestoreService"/>
+   269→   269→        <activity android:launchMode="singleTop" android:name="com.grindrapp.android.ui.inbox.search.SearchInboxActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme">
+   270→   270→            <intent-filter>
+   271→   271→                <action android:name="android.intent.action.SEARCH"/>
+   272→   272→            </intent-filter>
+   273→   273→            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable_config_inbox"/>
+   274→   274→        </activity>
+   275→   275→        <activity android:name="com.grindrapp.android.ui.debugtool.instagram.DebugInstagramConnectionActivity"/>
+   276→   276→        <activity android:name="com.grindrapp.android.ui.video.PrivateVideoCaptureActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar"/>
+   277→   277→        <activity android:name="com.grindrapp.android.ui.video.PrivateVideoPlayerActivity" android:screenOrientation="portrait" android:theme="@style/GrindrNoActionBar"/>
+   278→   278→        <receiver android:enabled="true" android:exported="false" android:name="com.grindrapp.android.ui.eventcalendar.EventCalendarBroadcastReceiver"/>
+   279→   279→        <activity android:name="com.grindrapp.android.ui.requestdata.RequestDataActivity" android:screenOrientation="portrait" android:theme="@style/FormTheme" android:windowSoftInputMode="adjustResize"/>
+   280→   280→        <service android:directBootAware="false" android:enabled="@bool/enable_system_alarm_service_default" android:exported="false" android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"/>
+   281→   281→        <service android:directBootAware="false" android:enabled="@bool/enable_system_job_service_default" android:exported="true" android:name="androidx.work.impl.background.systemjob.SystemJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   282→   282→        <service android:directBootAware="false" android:enabled="@bool/enable_system_foreground_service_default" android:exported="false" android:name="androidx.work.impl.foreground.SystemForegroundService"/>
+   283→   283→        <receiver android:directBootAware="false" android:enabled="true" android:exported="false" android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"/>
+   284→   284→        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy">
+   285→   285→            <intent-filter>
+   286→   286→                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+   287→   287→                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
+   288→   288→            </intent-filter>
+   289→   289→        </receiver>
+   290→   290→        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy">
+   291→   291→            <intent-filter>
+   292→   292→                <action android:name="android.intent.action.BATTERY_OKAY"/>
+   293→   293→                <action android:name="android.intent.action.BATTERY_LOW"/>
+   294→   294→            </intent-filter>
+   295→   295→        </receiver>
+   296→   296→        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy">
+   297→   297→            <intent-filter>
+   298→   298→                <action android:name="android.intent.action.DEVICE_STORAGE_LOW"/>
+   299→   299→                <action android:name="android.intent.action.DEVICE_STORAGE_OK"/>
+   300→   300→            </intent-filter>
+   301→   301→        </receiver>
+   302→   302→        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy">
+   303→   303→            <intent-filter>
+   304→   304→                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+   305→   305→            </intent-filter>
+   306→   306→        </receiver>
+   307→   307→        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver">
+   308→   308→            <intent-filter>
+   309→   309→                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+   310→   310→                <action android:name="android.intent.action.TIME_SET"/>
+   311→   311→                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+   312→   312→            </intent-filter>
+   313→   313→        </receiver>
+   314→   314→        <receiver android:directBootAware="false" android:enabled="@bool/enable_system_alarm_service_default" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver">
+   315→   315→            <intent-filter>
+   316→   316→                <action android:name="androidx.work.impl.background.systemalarm.UpdateProxies"/>
+   317→   317→            </intent-filter>
+   318→   318→        </receiver>
+   319→   319→        <activity android:configChanges="keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:launchMode="singleTop" android:name="com.vungle.warren.ui.VungleActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+   320→   320→        <activity android:configChanges="keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:hardwareAccelerated="true" android:launchMode="singleTop" android:name="com.vungle.warren.ui.VungleFlexViewActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   321→   321→        <receiver android:enabled="false" android:name="com.vungle.warren.NetworkProviderReceiver">
+   322→   322→            <intent-filter>
+   323→   323→                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+   324→   324→                <category android:name="android.intent.category.DEFAULT"/>
+   325→   325→            </intent-filter>
+   326→   326→        </receiver>
+   327→   327→        <receiver android:exported="false" android:name="zendesk.support.DeepLinkingBroadcastReceiver">
+   328→   328→            <intent-filter>
+   329→   329→                <action android:name="zendesk.support"/>
+   330→   330→            </intent-filter>
+   331→   331→        </receiver>
+   332→   332→        <provider android:authorities="com.grindrapp.android.zendesk.support.SupportSdkStartupProvider" android:enabled="true" android:exported="false" android:name="zendesk.support.SupportSdkStartupProvider"/>
+   333→   333→        <activity android:exported="true" android:name="androidx.biometric.DeviceCredentialHandlerActivity" android:theme="@style/DeviceCredentialHandlerTheme"/>
+   334→   334→        <activity android:name="com.facebook.CustomTabMainActivity"/>
+   335→   335→        <activity android:exported="false" android:name="com.appboy.ui.AppboyWebViewActivity"/>
+   336→   336→        <activity android:exported="false" android:name="com.appboy.ui.activities.AppboyFeedActivity"/>
+   337→   337→        <activity android:exported="false" android:name="com.appboy.ui.activities.AppboyContentCardsActivity"/>
+   338→   338→        <activity android:exported="false" android:launchMode="singleInstance" android:name="com.appboy.push.AppboyNotificationRoutingActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   339→   339→        <receiver android:exported="false" android:name="com.appboy.BrazePushReceiver"/>
+   340→   340→        <activity android:enabled="false" android:exported="false" android:launchMode="singleInstance" android:name="com.google.android.play.core.missingsplits.PlayCoreMissingSplitsActivity" android:process=":playcore_missing_splits_activity" android:stateNotNeeded="true"/>
+   341→   341→        <activity android:enabled="false" android:exported="false" android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity" android:stateNotNeeded="true" android:theme="@style/Theme.PlayCore.Transparent"/>
+   342→   342→        <service android:enabled="false" android:exported="true" android:name="com.google.android.play.core.assetpacks.AssetPackExtractionService">
+   343→   343→            <meta-data android:name="com.google.android.play.core.assetpacks.versionCode" android:value="10901"/>
+   344→   344→        </service>
+   345→   345→        <service android:enabled="false" android:exported="false" android:name="com.google.android.play.core.assetpacks.ExtractionForegroundService"/>
+   346→   346→        <meta-data android:name="com.google.android.play.billingclient.version" android:value="3.0.0"/>
+   347→   347→        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:name="com.android.billingclient.api.ProxyBillingActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   348→   348→        <service android:directBootAware="true" android:exported="false" android:name="com.google.firebase.components.ComponentDiscoveryService">
+   349→   349→            <meta-data android:name="com.google.firebase.components:com.google.firebase.ml.vision.VisionRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   350→   350→            <meta-data android:name="com.google.firebase.components:com.google.firebase.crashlytics.CrashlyticsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   351→   351→            <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   352→   352→            <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   353→   353→            <meta-data android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   354→   354→            <meta-data android:name="com.google.firebase.components:com.google.firebase.database.ktx.FirebaseDatabaseKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   355→   355→            <meta-data android:name="com.google.firebase.components:com.google.firebase.ml.common.CommonComponentRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   356→   356→            <meta-data android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   357→   357→            <meta-data android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   358→   358→            <meta-data android:name="com.google.firebase.components:com.google.firebase.iid.Registrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   359→   359→            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   360→   360→            <meta-data android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   361→   361→        </service>
+   362→   362→        <uses-library android:name="androidx.camera.extensions.impl" android:required="false"/>
+   363→   363→        <service android:directBootAware="true" android:exported="false" android:name="com.google.firebase.messaging.FirebaseMessagingService">
+   364→   364→            <intent-filter android:priority="-500">
+   365→   365→                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+   366→   366→            </intent-filter>
+   367→   367→        </service>
+   368→   368→        <service android:exported="false" android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery">
+   369→   369→            <meta-data android:name="backend:com.google.android.datatransport.cct.CctBackendFactory" android:value="cct"/>
+   370→   370→        </service>
+   371→   371→        <service android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   372→   372→        <receiver android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"/>
+   373→   373→        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+   374→   374→        <activity android:excludeFromRecents="true" android:exported="false" android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   375→   375→        <service android:exported="true" android:name="com.google.android.gms.auth.api.signin.RevocationBoundService" android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"/>
+   376→   376→        <activity android:excludeFromRecents="true" android:exported="true" android:launchMode="singleTask" android:name="com.google.firebase.auth.internal.FederatedSignInActivity" android:permission="com.google.firebase.auth.api.gms.permission.LAUNCH_FEDERATED_SIGN_IN" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   377→   377→        <activity android:exported="false" android:name="com.google.android.gms.common.api.GoogleApiActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   378→   378→        <provider android:authorities="com.grindrapp.android.firebaseinitprovider" android:exported="false" android:initOrder="100" android:name="com.google.firebase.provider.FirebaseInitProvider"/>
+   379→   379→        <receiver android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementReceiver"/>
+   380→   380→        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService"/>
+   381→   381→        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   382→   382→        <provider android:authorities="com.grindrapp.android.lifecycle-process" android:exported="false" android:multiprocess="true" android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"/>
+   383→   383→        <provider android:authorities="com.grindrapp.android.belvedere2.attachments" android:exported="false" android:grantUriPermissions="true" android:name="zendesk.belvedere.BelvedereFileProvider" android:readPermission="true">
+   384→   384→            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/belvedere_attachment_storage_v2"/>
+   385→   385→        </provider>
+   386→   386→        <provider android:authorities="com.grindrapp.android.FacebookInitProvider" android:exported="false" android:name="com.facebook.internal.FacebookInitProvider"/>
+   387→   387→        <receiver android:exported="false" android:name="com.facebook.CurrentAccessTokenExpirationBroadcastReceiver">
+   388→   388→            <intent-filter>
+   389→   389→                <action android:name="com.facebook.sdk.ACTION_CURRENT_ACCESS_TOKEN_CHANGED"/>
+   390→   390→            </intent-filter>
+   391→   391→        </receiver>
+   392→   392→        <receiver android:exported="true" android:name="com.facebook.CampaignTrackingReceiver" android:permission="android.permission.INSTALL_PACKAGES">
+   393→   393→            <intent-filter>
+   394→   394→                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+   395→   395→            </intent-filter>
+   396→   396→        </receiver>
+   397→   397→        <service android:directBootAware="true" android:exported="false" android:name="androidx.room.MultiInstanceInvalidationService"/>
+   398→   398→        <activity android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize" android:hardwareAccelerated="true" android:name="com.fyber.inneractive.sdk.activities.InneractiveInternalBrowserActivity"/>
+   399→   399→        <activity android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize" android:hardwareAccelerated="true" android:name="com.fyber.inneractive.sdk.activities.InneractiveFullscreenAdActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+   400→   400→        <activity android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize" android:hardwareAccelerated="true" android:name="com.fyber.inneractive.sdk.activities.InneractiveRichMediaVideoPlayerActivityCore" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+   401→   401→        <receiver android:enabled="true" android:exported="false" android:name="com.fyber.inneractive.sdk.video.IAVideoKit">
+   402→   402→            <intent-filter>
+   403→   403→                <action android:name="com.fyber.inneractive.sdk.intent.action.REGISTER_KIT"/>
+   404→   404→            </intent-filter>
+   405→   405→        </receiver>
+   406→   406→        <receiver android:enabled="true" android:exported="false" android:name="com.fyber.inneractive.sdk.mraid.IAMraidKit">
+   407→   407→            <intent-filter>
+   408→   408→                <action android:name="com.fyber.inneractive.sdk.intent.action.REGISTER_KIT"/>
+   409→   409→            </intent-filter>
+   410→   410→        </receiver>
+   411→   411→        <activity android:name="net.pubnative.lite.sdk.consent.UserConsentActivity"/>
+   412→   412→        <activity android:name="net.pubnative.lite.sdk.interstitial.activity.MraidInterstitialActivity"/>
+   413→   413→        <activity android:name="net.pubnative.lite.sdk.interstitial.activity.VastInterstitialActivity"/>
+   414→   414→        <activity android:name="net.pubnative.lite.sdk.rewarded.activity.VastRewardedActivity"/>
+   415→   415→        <receiver android:exported="false" android:name="com.appboy.receivers.AppboyActionReceiver"/>
+   416→   416→        <activity android:configChanges="orientation|screenLayout|screenSize" android:name="com.onetrust.otpublisherssdk.OTPublishersSDKActivity" android:theme="@style/OT.AppTheme.Transparent"/>
+   417→   417→        <activity android:exported="true" android:name="com.spotify.sdk.android.authentication.AuthCallbackActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar">
+   418→   418→            <intent-filter>
+   419→   419→                <action android:name="android.intent.action.VIEW"/>
+   420→   420→                <category android:name="android.intent.category.DEFAULT"/>
+   421→   421→                <category android:name="android.intent.category.BROWSABLE"/>
+   422→   422→                <data android:host="@string/com_spotify_sdk_redirect_host" android:scheme="@string/com_spotify_sdk_redirect_scheme"/>
+   423→   423→            </intent-filter>
+   424→   424→        </activity>
+   425→   425→        <activity android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize" android:name="com.smaato.sdk.core.browser.SmaatoSdkBrowserActivity"/>
+   426→   426→        <activity android:configChanges="mcc|mnc|locale|keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|layoutDirection|fontScale" android:name="com.smaato.sdk.interstitial.InterstitialAdActivity"/>
+   427→   427→        <activity android:configChanges="mcc|mnc|locale|keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|layoutDirection|fontScale" android:launchMode="singleTop" android:name="com.smaato.sdk.rewarded.widget.RewardedInterstitialAdActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+   428→   428→        <meta-data android:name="com.android.dynamic.apk.fused.modules" android:value="base"/>
+   429→   429→        <meta-data android:name="com.android.stamp.source" android:value="https://play.google.com/store"/>
+   430→   430→        <meta-data android:name="com.android.stamp.type" android:value="STAMP_TYPE_STANDALONE_APK"/>
+   431→   431→        <meta-data android:name="com.android.vending.splits" android:resource="@xml/splits0"/>
+   432→   432→        <meta-data android:name="com.android.vending.derived.apk.id" android:value="6"/>
+   433→   433→    </application>
+   434→   434→</manifest>
+   435→   435→```
+   436→   436→
+   437→   437→## Package Info
+   438→   438→<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="29" android:compileSdkVersionCodename="10" package="com.grindrapp.android" platformBuildVersionCode="29" platformBuildVersionName="10">
+   439→   439→
+   440→   440→## Activities
+   441→   441→- com.grindrapp.android.store.ui.StoreActivity
+   442→   442→- com.grindrapp.android.ui.videocall.VideoMatchActivity
+   443→   443→- com.grindrapp.android.ui.home.HomeActivity
+   444→   444→- com.grindrapp.android.HomeActivityOriginal
+   445→   445→- com.grindrapp.android.HomeActivityUnlimited
+   446→   446→- com.grindrapp.android.HomeActivityCamera
+   447→   447→- com.grindrapp.android.HomeActivityMusic
+   448→   448→- com.grindrapp.android.HomeActivityNotes
+   449→   449→- com.grindrapp.android.HomeActivityToDo
+   450→   450→- com.grindrapp.android.HomeActivityCalculator
+   451→   451→- com.grindrapp.android.ui.newonboarding.NewOnBoardingUpsellActivity
+   452→   452→- com.grindrapp.android.ui.explore.ExploreMapActivity
+   453→   453→- com.grindrapp.android.ui.explore.ExploreCascadeActivity
+   454→   454→- com.grindrapp.android.ui.login.LoginActivity
+   455→   455→- com.grindrapp.android.ui.account.onboard.LandingActivity
+   456→   456→- com.grindrapp.android.ui.account.onboard.LandingPhoneActivity
+   457→   457→- com.grindrapp.android.ui.account.onboard.LandingEmailActivity
+   458→   458→- com.grindrapp.android.ui.account.onboard.LandingForgotPwdActivity
+   459→   459→- com.grindrapp.android.ui.account.onboard.LandingSMSVerifyActivity
+   460→   460→- com.grindrapp.android.ui.login.CredentialsChangedActivity
+   461→   461→- com.grindrapp.android.ui.account.UpdateEmailActivity
+   462→   462→- com.grindrapp.android.ui.account.signup.CreateAccountEmailActivity
+   463→   463→- com.grindrapp.android.ui.account.sms.SMSVerifyActivity
+   464→   464→- com.grindrapp.android.ui.account.onboard.SmsCountryPickerActivity
+   465→   465→- com.grindrapp.android.ui.password.ForgotPasswordActivity
+   466→   466→- com.grindrapp.android.ui.password.ResetPasswordPhoneActivity
+   467→   467→- com.grindrapp.android.ui.account.verify.AccountVerifyActivity
+   468→   468→- com.grindrapp.android.ui.login.ThirdPartyLoginProfileActivity
+   469→   469→- com.grindrapp.android.ui.profileV2.BaseCruiseActivityV2
+   470→   470→- com.grindrapp.android.ui.profileV2.ExploreCruiseActivityV2
+   471→   471→- com.grindrapp.android.ui.profileV2.StandaloneCruiseActivityV2
+   472→   472→- com.grindrapp.android.ui.profileV2.LocalCruiseActivity
+   473→   473→- com.grindrapp.android.ui.photos.FullScreenExpiringImageActivity
+   474→   474→- com.grindrapp.android.ui.photos.FullScreenImageActivity
+   475→   475→- com.grindrapp.android.ui.photos.ChatRoomPhotosActivity
+   476→   476→- com.grindrapp.android.ui.photos.CropImageActivity
+   477→   477→- com.grindrapp.android.ui.photodecoration.PhotoDecorationActivity
+   478→   478→- com.grindrapp.android.ui.editprofile.EditProfileActivity
+   479→   479→- com.grindrapp.android.ui.account.RegisterProfileActivity
+   480→   480→- com.grindrapp.android.ui.settings.SettingsActivity
+   481→   481→- com.grindrapp.android.ui.settings.SettingsDeleteProfileActivity
+   482→   482→- com.grindrapp.android.ui.settings.SettingsDeleteProfileReasonActivity
+   483→   483→- com.grindrapp.android.ui.settings.SettingsDeleteProfileOtherReasonActivity
+   484→   484→- com.grindrapp.android.ui.settings.SettingsDeactivateActivity
+   485→   485→- com.grindrapp.android.ui.settings.NotificationSettingsActivity
+   486→   486→- com.grindrapp.android.ui.settings.DoNotDisturbSettingsActivity
+   487→   487→- com.grindrapp.android.ui.report.ReportProfileActivity
+   488→   488→- com.grindrapp.android.ui.settings.PrivacySettingsActivity
+   489→   489→- com.grindrapp.android.ui.web.WebViewActivity
+   490→   490→- com.grindrapp.android.ui.subscription.SubscriptionManagementActivity
+   491→   491→- com.grindrapp.android.ui.debugtool.DebugToolsActivity
+   492→   492→- com.grindrapp.android.ui.debugtool.DebugFeatureFlagsActivity
+   493→   493→- com.grindrapp.android.ui.debugtool.DebugFeatureConfigActivity
+   494→   494→- com.grindrapp.android.ui.debugtool.DebugOneTrustStringActivity
+   495→   495→- com.grindrapp.android.ui.debugtool.DebugSDKPermissionActivity
+   496→   496→- com.grindrapp.android.ui.home.IntentEntryActivity
+   497→   497→- com.grindrapp.android.ui.account.changepwd.ChangePasswordActivity
+   498→   498→- com.grindrapp.android.ui.account.banned.BannedActivity
+   499→   499→- com.grindrapp.android.ui.account.banned.DeprecationActivity
+   500→   500→- com.grindrapp.android.ui.home.PackageCorruptedActivity
+
+[showing lines 1-500 of 1300; use offset=501 with limit to continue reading]

@@ -1,0 +1,803 @@
+   334→## Package Info
+   335→<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="35" android:compileSdkVersionCodename="15" android:installLocation="auto" package="com.planetromeo.android.app" platformBuildVersionCode="35" platformBuildVersionName="15">
+   336→
+   337→## Activities
+   338→- com.planetromeo.android.app.exit_interview.ui.ExitInterviewActivity
+   339→- com.planetromeo.android.app.splash.ui.SplashActivity
+   340→- com.planetromeo.android.app.home.ui.HomeActivity
+   341→- com.planetromeo.android.app.profile.ui.ViewProfileActivity
+   342→- com.planetromeo.android.app.deep_link.DeepLinkActivity
+   343→- com.planetromeo.android.app.media_viewer.picture_management.sectioned_album.ui.SelectSectionedAlbumActivity
+   344→- com.planetromeo.android.app.authentication.signup.ui.ActivitySignup
+   345→- com.planetromeo.android.app.authentication.forgot_password.ui.ForgotPasswordActivity
+   346→- com.planetromeo.android.app.authentication.account_list.ui.AccountListActivity
+   347→- com.planetromeo.android.app.core.ui.RomeoWebViewActivity
+   348→- com.planetromeo.android.app.travel.travel_overview.ui.SpartacusWebViewActivity
+   349→- com.planetromeo.android.app.profile.edit.ui.EditProfileActivity
+   350→- com.planetromeo.android.app.footprints.ui.FootprintsActivity
+   351→- com.planetromeo.android.app.billing.ui.BillingActivity
+   352→- com.planetromeo.android.app.contacts.ui.edit_contact.ui.EditContactActivity
+   353→- com.planetromeo.android.app.media_viewer.picture_management.albums.ui.AlbumListActivity
+   354→- com.planetromeo.android.app.media_viewer.picture_management.ui.AlbumSelectionActivity
+   355→- com.planetromeo.android.app.location.ui.UserLocationActivity
+   356→- com.planetromeo.android.app.media_viewer.picture_management.albums.ui.DisplayAlbumActivity
+   357→- com.planetromeo.android.app.profile.pick_profile.ui.PickProfileActivity
+   358→- com.planetromeo.android.app.location.pick_location.ui.PickLocationActivity
+   359→- com.planetromeo.android.app.location.ui.ShowLocationActivity
+   360→- com.planetromeo.android.app.billing.ui.payment_history.PaymentHistoryActivity
+   361→- com.planetromeo.android.app.billing.ui.payment_order.PaymentOrderActivity
+   362→- com.planetromeo.android.app.profile.change_email.ChangeEmailActivity
+   363→- com.planetromeo.android.app.contacts.ui.friend_requests.FriendRequestsActivity
+   364→- com.planetromeo.android.app.legacy_radar.search_filter_settings.ui.EditRadarSettingsActivity
+   365→- com.planetromeo.android.app.debug.testbed.TestBedActivity
+   366→- com.planetromeo.android.app.authentication.login.ui.LoginActivity
+   367→- com.planetromeo.android.app.profile.interview.ui.StatsInterviewActivity
+   368→- zendesk.support.guide.HelpCenterActivity
+   369→- zendesk.support.guide.ViewArticleActivity
+   370→- zendesk.support.request.RequestActivity
+   371→- zendesk.support.requestlist.RequestListActivity
+   372→- com.planetromeo.android.app.location.places.ui.PlacesAutocompleteActivity
+   373→- com.planetromeo.android.app.authentication.deactivated.ProfileDeactivatedActivity
+   374→- com.planetromeo.android.app.report_and_block.ui.ReportAndBlockActivity
+   375→- com.planetromeo.android.app.report_and_block.ui.ReportCommentActivity
+   376→- com.planetromeo.android.app.report_and_block.ui.ReportHateSpeechActivity
+   377→- com.planetromeo.android.app.debug.ui.DsPlaygroundActivity
+   378→- com.planetromeo.android.app.more_menu.about_us.AboutUsActivity
+   379→- com.planetromeo.android.app.more_menu.support.ui.SupportActivity
+   380→- com.planetromeo.android.app.more_menu.settings.ui.SettingsActivity
+   381→- com.planetromeo.android.app.messages.data_migration.ui.DataMigrationActivity
+   382→- com.planetromeo.android.app.media_viewer.ui.MediaViewerActivity
+   383→- com.planetromeo.android.app.cruise.likes.ui.LikeDetailsActivity
+   384→- com.planetromeo.android.app.radar.ui.detailscreen.RadarPagingActivity
+   385→- com.planetromeo.android.app.core.ui.ServiceUnavailableActivity
+   386→- zendesk.classic.messaging.MessagingActivity
+   387→- com.android.billingclient.api.ProxyBillingActivity
+   388→- com.android.billingclient.api.ProxyBillingActivityV2
+   389→- com.google.android.gms.common.api.GoogleApiActivity
+   390→- androidx.compose.ui.tooling.PreviewActivity
+   391→- com.google.android.play.core.common.PlayCoreDialogWrapperActivity
+   392→
+   393→## Services
+   394→- com.planetromeo.android.app.core.notification.FcmListenerService
+   395→- com.planetromeo.android.app.media_viewer.picture_management.albums.data.UploadPictureService
+   396→- com.google.firebase.components.ComponentDiscoveryService
+   397→- androidx.work.impl.background.systemalarm.SystemAlarmService
+   398→- androidx.work.impl.background.systemjob.SystemJobService
+   399→- androidx.work.impl.foreground.SystemForegroundService
+   400→- androidx.room.MultiInstanceInvalidationService
+   401→- com.google.firebase.messaging.FirebaseMessagingService
+   402→- com.google.android.gms.measurement.AppMeasurementService
+   403→- com.google.android.gms.measurement.AppMeasurementJobService
+   404→- com.google.firebase.sessions.SessionLifecycleService
+   405→- com.google.android.datatransport.runtime.backends.TransportBackendDiscovery
+   406→- com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService
+   407→
+   408→## Permissions
+   409→- android.permission.REQUEST_INSTALL_PACKAGES
+   410→- android.permission.INTERNET
+   411→- android.permission.ACCESS_FINE_LOCATION
+   412→- android.permission.VIBRATE
+   413→- android.permission.ACCESS_COARSE_LOCATION
+   414→- android.permission.CAMERA
+   415→- android.permission.ACCESS_NETWORK_STATE
+   416→- android.permission.MODIFY_AUDIO_SETTINGS
+   417→- android.permission.FOREGROUND_SERVICE
+   418→- android.permission.WAKE_LOCK
+   419→- android.permission.READ_MEDIA_IMAGES
+   420→- android.permission.READ_EXTERNAL_STORAGE
+   421→- android.permission.POST_NOTIFICATIONS
+   422→- android.permission.FOREGROUND_SERVICE_DATA_SYNC
+   423→- android.permission.RECEIVE_BOOT_COMPLETED
+   424→- android.permission.ACCESS_ADSERVICES_ATTRIBUTION
+   425→- android.permission.ACCESS_ADSERVICES_AD_ID
+   426→        <service android:directBootAware="false" android:enabled="@bool/enable_system_job_service_default" android:exported="true" android:name="androidx.work.impl.background.systemjob.SystemJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   427→        <receiver android:directBootAware="false" android:enabled="true" android:exported="true" android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver" android:permission="android.permission.DUMP">
+   428→        <receiver android:exported="true" android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+   429→        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   430→        <receiver android:directBootAware="false" android:enabled="true" android:exported="true" android:name="androidx.profileinstaller.ProfileInstallReceiver" android:permission="android.permission.DUMP">
+   431→        <service android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   432→
+   433→## API URLs Found
+   434→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:2:<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+   435→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:56:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+   436→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:66:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+   437→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:76:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+   438→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:86:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+   439→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:94:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+   440→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:104:      "base_url": "https://pradn.net/img/usr/original/"
+   441→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:4:      "base_url": "https://pradn.net/v12/img/footprints/circular/",
+   442→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:42:      "base_url": "https://pradn.net/v12/img/footprints/rectangular/",
+   443→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:62:      "base_url": "https://pradn.net/img/usr/squarish/",
+   444→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:87:      "base_url": "https://pradn.net/img/usr/portrait/",
+   445→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/client_analytics.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   446→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/developers/mobile/targeting/proto/client_signals.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   447→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/common_types.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   448→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/experiment_payload.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   449→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/messages.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   450→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:120:  // Captured Url: https://wwww.google.com/maps/cities#seattle?id=123
+   451→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:121:  // Logged Url: https://wwww.google.com/maps/cities
+   452→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   453→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/apphosting/datastore/testing/datastore_test_trace.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   454→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/bundle.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   455→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/maybe_document.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   456→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/mutation.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   457→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:39:  // https://github.com/googleapis/googleapis/blob/master/google/firestore/v1/firestore.proto#L735
+   458→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:56:  // https://github.com/googleapis/googleapis/blob/master/google/firestore/v1/firestore.proto#L723
+   459→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   460→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/admin/index.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   461→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/aggregation_result.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   462→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/bloom_filter.proto:54:// A bloom filter (https://en.wikipedia.org/wiki/Bloom_filter).
+   463→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/bloom_filter.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   464→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/common.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   465→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/document.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   466→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:53:      "https://www.googleapis.com/auth/cloud-platform,"
+   467→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:54:      "https://www.googleapis.com/auth/datastore";
+   468→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   469→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/query.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   470→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/write.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   471→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/internal/rate_limit.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   472→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   473→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/sdkserving/fiam_fetch_service.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   474→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/any.proto:3:// https://developers.google.com/protocol-buffers/
+   475→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/api.proto:3:// https://developers.google.com/protocol-buffers/
+   476→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/api.proto:52:// this message itself. See https://cloud.google.com/apis/design/glossary for
+   477→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/api.proto:73:  // versioning](http://semver.org) where the major version number
+   478→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/duration.proto:3:// https://developers.google.com/protocol-buffers/
+   479→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/empty.proto:3:// https://developers.google.com/protocol-buffers/
+   480→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/field_mask.proto:3:// https://developers.google.com/protocol-buffers/
+   481→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/source_context.proto:3:// https://developers.google.com/protocol-buffers/
+   482→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/struct.proto:3:// https://developers.google.com/protocol-buffers/
+   483→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:109:// [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the
+   484→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:124:// [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)
+   485→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:127:// [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with
+   486→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:130:// http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime()
+   487→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:3:// https://developers.google.com/protocol-buffers/
+   488→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:51:// smear](https://developers.google.com/time/smear).
+   489→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:55:// 3339](https://www.ietf.org/rfc/rfc3339.txt) date strings.
+   490→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/type.proto:3:// https://developers.google.com/protocol-buffers/
+   491→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/wrappers.proto:3:// https://developers.google.com/protocol-buffers/
+   492→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/logs/proto/firebase/inappmessaging/campaign_analytics.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   493→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/messaging_event_extension.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   494→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/messaging_event.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+   495→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/COPYRIGHT:7:http://www.apache.org/licenses/LICENSE-2.0
+   496→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:21:https://www.apache.org/licenses/LICENSE-2.0.
+   497→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:29:https://github.com/eclipse-ee4j/injection-api
+   498→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:30:https://github.com/eclipse-ee4j/injection-spec
+   499→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:31:https://github.com/eclipse-ee4j/injection-tck
+   500→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:5:* Project home: https://projects.eclipse.org/projects/cdi.batch
+   501→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/okhttp3/internal/publicsuffix/NOTICE:2:https://publicsuffix.org/list/public_suffix_list.dat
+   502→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/okhttp3/internal/publicsuffix/NOTICE:5:https://mozilla.org/MPL/2.0/
+   503→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_grow_fade_in_from_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+   504→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_popup_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+   505→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_popup_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+   506→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_shrink_fade_out_from_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+   507→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_tooltip_enter.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+   508→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_tooltip_exit.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+   509→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/anim_zoom_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   510→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/anim_zoom_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   511→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_checked_box_inner_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   512→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_checked_box_outer_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   513→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_checked_icon_null_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   514→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_unchecked_box_inner_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   515→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_unchecked_check_path_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   516→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_unchecked_icon_null_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   517→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_off_mtrl_dot_group_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   518→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_off_mtrl_ring_outer_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   519→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_off_mtrl_ring_outer_path_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   520→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_on_mtrl_dot_group_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   521→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_on_mtrl_ring_outer_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   522→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_on_mtrl_ring_outer_path_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   523→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/chat_fragment_translate.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/linear_interpolator">
+   524→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/cycle.xml:2:<cycleInterpolator xmlns:android="http://schemas.android.com/apk/res/android" android:cycles="3"/>
+   525→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/design_bottom_sheet_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   526→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/design_bottom_sheet_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   527→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/design_snackbar_in.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+   528→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/design_snackbar_out.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+   529→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fade_in_delayed.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+   530→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fade_in.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+   531→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fade_out.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+   532→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fragment_fade_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/linear_interpolator">
+   533→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fragment_fast_out_extra_slow_in.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android" android:pathData="M 0,0 C 0.05, 0, 0.133333, 0.06, 0.166666, 0.4 C 0.208333, 0.82, 0.25, 1, 1, 1"/>
+   534→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/friends_fragment_translate.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/linear_interpolator">
+   535→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line1_head_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+   536→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line1_tail_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+   537→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line2_head_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+   538→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line2_tail_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+   539→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_bottom_sheet_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   540→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_bottom_sheet_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   541→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_motion_fade_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   542→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_motion_fade_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   543→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_enter_from_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   544→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_enter_from_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   545→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_exit_to_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   546→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_exit_to_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   547→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/mtrl_bottom_sheet_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   548→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/mtrl_bottom_sheet_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   549→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/mtrl_card_lowers_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+   550→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/no_effect_animation.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+   551→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/picture_like_to_liked.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   552→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/picture_selection_fake.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:ordering="sequentially">
+   553→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/shake.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+   554→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_down.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+   555→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_in_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   556→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_in_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   557→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_in_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   558→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_out_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   559→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_out_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   560→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_up.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+   561→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_covered.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@android:integer/config_mediumAnimTime">
+   562→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in_previous.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+   563→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in_previous2.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+   564→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in_previous3.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+   565→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="400">
+   566→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in2.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="400">
+   567→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in3.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="400">
+   568→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   569→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_out2.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   570→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_out3.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   571→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stay.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+   572→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/text_slide_in_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@integer/counter_animation_duration">
+   573→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/text_slide_in_top.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@integer/counter_animation_duration">
+   574→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/text_slide_out_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@integer/counter_animation_duration">
+   575→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/text_slide_out_top.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@integer/counter_animation_duration">
+   576→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/appbar_always_elevated.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   577→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/design_appbar_state_list_animator.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+   578→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/design_fab_hide_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   579→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/design_fab_show_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   580→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_close_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   581→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_close_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   582→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_fade_enter.xml:2:<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+   583→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_fade_exit.xml:2:<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+   584→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_open_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   585→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_open_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   586→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_appbar_state_list_animator.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+   587→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_btn_state_list_anim.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   588→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_card_elevated_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+   589→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_card_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+   590→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_chip_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   591→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_change_size_collapse_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   592→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_change_size_expand_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   593→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_hide_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   594→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_show_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   595→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_state_list_animator.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   596→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_btn_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   597→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_card_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+   598→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_chip_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   599→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_change_size_collapse_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   600→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_change_size_expand_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   601→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_hide_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   602→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_show_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   603→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_state_list_animator.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   604→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_fab_hide_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   605→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_fab_show_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   606→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_fab_transformation_sheet_collapse_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   607→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_fab_transformation_sheet_expand_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+   608→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/scale_up_down.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+   609→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-night/material_timepicker_button_stroke.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   610→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-night/material_timepicker_clockface.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   611→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-night/material_timepicker_modebutton_tint.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   612→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_default_color_primary_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   613→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_default_color_secondary_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   614→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_highlighted_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   615→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_hint_foreground.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   616→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_primary_text_disable_only.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   617→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_default_color_primary_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   618→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_default_color_secondary_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   619→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_highlighted_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   620→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_hint_foreground.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   621→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_primary_text_disable_only.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   622→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant87.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   623→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant92.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   624→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant94.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   625→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant96.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   626→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant98.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   627→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_background_cache_hint_selector_material_dark.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   628→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_background_cache_hint_selector_material_light.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   629→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_color_highlight_material.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   630→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_hint_foreground_material_dark.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   631→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_hint_foreground_material_light.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   632→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_primary_text_disable_only_material_dark.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   633→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_primary_text_disable_only_material_light.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   634→
+   635→## Potential Secrets / API Keys
+   636→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:289:            android:name="com.planetromeo.android.app.authentication.forgot_password.ui.ForgotPasswordActivity"
+   637→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:456:            android:name="firebase_performance_logcat_enabled"
+   638→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:462:            android:name="com.google.android.geo.API_KEY"
+   639→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:463:            android:value="@string/google_maps_key"/>
+   640→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:468:            android:name="com.google.firebase.messaging.default_notification_icon"
+   641→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:500:                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+   642→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:549:            android:name="com.google.firebase.components.ComponentDiscoveryService"
+   643→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:553:                android:name="com.google.firebase.components:com.google.firebase.perf.FirebasePerfKtxRegistrar"
+   644→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:554:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   645→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:556:                android:name="com.google.firebase.components:com.google.firebase.perf.FirebasePerfRegistrar"
+   646→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:557:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   647→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:559:                android:name="com.google.firebase.components:com.google.firebase.firestore.ktx.FirebaseFirestoreLegacyRegistrar"
+   648→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:560:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   649→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:562:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.display.FirebaseInAppMessagingDisplayKtxRegistrar"
+   650→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:563:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   651→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:565:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.display.FirebaseInAppMessagingDisplayRegistrar"
+   652→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:566:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   653→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:568:                android:name="com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar"
+   654→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:569:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   655→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:571:                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
+   656→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:572:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   657→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:574:                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar"
+   658→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:575:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   659→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:577:                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+   660→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:578:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   661→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:580:                android:name="com.google.firebase.components:com.google.firebase.dynamiclinks.FirebaseDynamicLinksKtxRegistrar"
+   662→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:581:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   663→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:583:                android:name="com.google.firebase.components:com.google.firebase.dynamiclinks.internal.FirebaseDynamicLinkRegistrar"
+   664→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:584:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   665→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:586:                android:name="com.google.firebase.components:com.google.firebase.installations.ktx.FirebaseInstallationsLegacyRegistrar"
+   666→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:587:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   667→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:589:                android:name="com.google.firebase.components:com.google.firebase.remoteconfig.FirebaseRemoteConfigKtxRegistrar"
+   668→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:590:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   669→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:592:                android:name="com.google.firebase.components:com.google.firebase.remoteconfig.RemoteConfigRegistrar"
+   670→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:593:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   671→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:595:                android:name="com.google.firebase.components:com.google.firebase.crashlytics.FirebaseCrashlyticsKtxRegistrar"
+   672→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:596:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   673→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:598:                android:name="com.google.firebase.components:com.google.firebase.crashlytics.CrashlyticsRegistrar"
+   674→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:599:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   675→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:601:                android:name="com.google.firebase.components:com.google.firebase.sessions.FirebaseSessionsRegistrar"
+   676→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:602:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   677→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:604:                android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar"
+   678→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:605:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   679→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:607:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.FirebaseInAppMessagingKtxRegistrar"
+   680→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:608:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   681→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:610:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.FirebaseInAppMessagingRegistrar"
+   682→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:611:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   683→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:613:                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar"
+   684→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:614:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   685→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:616:                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+   686→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:617:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   687→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:619:                android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar"
+   688→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:620:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   689→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:622:                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+   690→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:623:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   691→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:625:                android:name="com.google.firebase.components:com.google.firebase.abt.component.AbtRegistrar"
+   692→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:626:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   693→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:628:                android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar"
+   694→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:629:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   695→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:742:            android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+   696→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:753:            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+   697→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:757:                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+   698→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:778:            android:name="com.google.firebase.sessions.SessionLifecycleService"
+   699→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:785:            android:name="com.google.firebase.provider.FirebaseInitProvider"
+   700→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:787:            android:authorities="com.planetromeo.android.app.firebaseinitprovider"
+   701→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/client_analytics.proto:18:package firebase.transport;
+   702→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-analytics.properties:2:client=firebase-analytics
+   703→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-analytics.properties:3:firebase-analytics_client=22.1.2
+   704→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-annotations.properties:2:client=firebase-annotations
+   705→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-annotations.properties:3:firebase-annotations_client=16.2.0
+   706→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-auth-interop.properties:2:client=firebase-auth-interop
+   707→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-auth-interop.properties:3:firebase-auth-interop_client=20.0.0
+   708→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-database-collection.properties:2:client=firebase-database-collection
+   709→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-database-collection.properties:3:firebase-database-collection_client=18.0.1
+   710→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-encoders-proto.properties:2:client=firebase-encoders-proto
+   711→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-encoders-proto.properties:3:firebase-encoders-proto_client=16.0.0
+   712→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-encoders.properties:2:client=firebase-encoders
+   713→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-encoders.properties:3:firebase-encoders_client=17.0.0
+   714→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-iid-interop.properties:2:client=firebase-iid-interop
+   715→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-iid-interop.properties:3:firebase-iid-interop_client=17.1.0
+   716→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-measurement-connector.properties:2:client=firebase-measurement-connector
+   717→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-measurement-connector.properties:3:firebase-measurement-connector_client=20.0.1
+   718→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/common_types.proto:17:package firebase.inappmessaging;
+   719→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/common_types.proto:19:option java_package = "com.google.firebase.inappmessaging";
+   720→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/experiment_payload.proto:17:package firebase.inappmessaging;
+   721→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/experiment_payload.proto:19:option java_package = "com.google.firebase.inappmessaging";
+   722→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/messages.proto:17:package firebase.inappmessaging;
+   723→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/messages.proto:19:option java_package = "com.google.firebase.inappmessaging";
+   724→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:22:package firebase.perf.v1;
+   725→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:25:option java_outer_classname = "FirebasePerfMetricProto";
+   726→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:26:option java_package = "com.google.firebase.perf.v1";
+   727→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/maybe_document.proto:20:option java_package = "com.google.firebase.firestore.proto";
+   728→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/mutation.proto:23:option java_package = "com.google.firebase.firestore.proto";
+   729→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:20:option java_package = "com.google.firebase.firestore.proto";
+   730→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/internal/rate_limit.proto:17:package com.google.firebase.inappmessaging.internal;
+   731→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/internal/rate_limit.proto:19:option java_package = "com.google.firebase.inappmessaging.internal";
+   732→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:17:package google.internal.firebase.inappmessaging.v1;
+   733→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:19:option java_package = "com.google.internal.firebase.inappmessaging.v1";
+   734→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:36:  .firebase.inappmessaging.Priority priority = 3;
+   735→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:39:  .firebase.inappmessaging.CampaignTime start_time = 4;
+   736→
+   737→## Database References
+   738→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:735:            android:name="androidx.room.MultiInstanceInvalidationService"
+   739→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:245:  // `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
+   740→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:250:  // For example: `chatrooms` or `messages`.
+   741→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:326:  // `projects/{project_id}/databases/{database_id}/documents/chatrooms/{chatroom_id}`
+   742→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:330:  // `chatrooms`.
+   743→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:518:  // `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
+   744→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:584:  // `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
+   745→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:775:    // `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
+   746→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:912:  // `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
+   747→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/menu/menu_travel_date_fragment_new.xml:7:        app:showAsAction="ifRoom"/>
+   748→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/menu/zs_fragment_help_menu_conversations.xml:9:        app:showAsAction="collapseActionView|ifRoom"/>
+   749→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/menu/zs_view_request_conversations_disabled_menu.xml:8:        app:showAsAction="ifRoom"/>
+   750→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/attrs.xml:2850:        <flag name="ifRoom" value="1" />
+   751→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/public.xml:4813:    <public type="id" name="ifRoom" id="0x7f0a026b" />
+   752→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/strings.xml:1704:    <string name="profile_sexual">Bedroom</string>
+   753→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/view/menu/i.java:614:            throw new IllegalArgumentException("SHOW_AS_ACTION_ALWAYS, SHOW_AS_ACTION_IF_ROOM, and SHOW_AS_ACTION_NEVER are mutually exclusive.");
+   754→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/widget/Y.java:208:            InputStream inputStreamOpenInputStream = this.f6823C.getContentResolver().openInputStream(uri);
+   755→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/widget/Y.java:544:        return this.f6823C.getContentResolver().query(builderFragment.build(), null, suggestSelection, strArr2, null);
+   756→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt.java:220:                    ContentResolver contentResolver = context.getContentResolver();
+   757→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt.java:223:                    rVarK = kotlinx.coroutines.flow.e.K(kotlinx.coroutines.flow.e.x(new WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1(contentResolver, uriFor, new b(aVarB, androidx.core.os.h.a(Looper.getMainLooper())), aVarB, context, null)), kotlinx.coroutines.G.b(), kotlinx.coroutines.flow.p.a.b(kotlinx.coroutines.flow.p.f34529a, 0L, 0L, 3, null), Float.valueOf(Settings.Global.getFloat(context.getContentResolver(), "animator_duration_scale", 1.0f)));
+   758→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt.java:3:import android.content.ContentResolver;
+   759→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1.java:111:            android.content.ContentResolver r9 = r9.getContentResolver()     // Catch: java.lang.Throwable -> L1b
+   760→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1.java:123:            android.content.ContentResolver r9 = r8.$resolver
+   761→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1.java:129:            android.content.ContentResolver r0 = r8.$resolver
+   762→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1.java:15:    final /* synthetic */ ContentResolver $resolver;
+   763→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1.java:21:    WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1(ContentResolver contentResolver, Uri uri, WindowRecomposer_androidKt.b bVar, kotlinx.coroutines.channels.a<p134o7.s> aVar, Context context, p170s7.c<? super WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1> cVar) {
+   764→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1.java:23:        this.$resolver = contentResolver;
+   765→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1.java:3:import android.content.ContentResolver;
+   766→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/ui/platform/WindowRecomposer_androidKt$getAnimationScaleFlowFor$1$1$1.java:87:            android.content.ContentResolver r1 = r8.$resolver
+   767→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/CoreComponentFactory.java:31:    public ContentProvider instantiateProvider(ClassLoader classLoader, String str) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+   768→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/CoreComponentFactory.java:32:        return (ContentProvider) a(super.instantiateProvider(classLoader, str));
+   769→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/CoreComponentFactory.java:8:import android.content.ContentProvider;
+   770→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:444:        String string = Settings.Secure.getString(context.getContentResolver(), "enabled_notification_listeners");
+   771→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:237:        XmlResourceParser fileProviderPathsMetaData = getFileProviderPathsMetaData(context, str, context.getPackageManager().resolveContentProvider(str, 128), i8);
+   772→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:26:public class FileProvider extends ContentProvider {
+   773→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:284:    @Override // android.content.ContentProvider
+   774→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:3:import android.content.ContentProvider;
+   775→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:303:    @Override // android.content.ContentProvider
+   776→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:308:    @Override // android.content.ContentProvider
+   777→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:319:    @Override // android.content.ContentProvider
+   778→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:324:    @Override // android.content.ContentProvider
+   779→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:329:    @Override // android.content.ContentProvider
+   780→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:334:    @Override // android.content.ContentProvider
+   781→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:339:    @Override // android.content.ContentProvider
+   782→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/content/FileProvider.java:371:    @Override // android.content.ContentProvider
+   783→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/graphics/drawable/IconCompat.java:413:                return context.getContentResolver().openInputStream(uriN);
+   784→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/graphics/i.java:153:                ParcelFileDescriptor parcelFileDescriptorOpenFileDescriptor = context.getContentResolver().openFileDescriptor(bVarF.d(), "r", cancellationSignal);
+   785→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/graphics/k.java:3:import android.content.ContentResolver;
+   786→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/graphics/k.java:63:        ContentResolver contentResolver = context.getContentResolver();
+   787→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/graphics/k.java:68:                    ParcelFileDescriptor parcelFileDescriptorOpenFileDescriptor = contentResolver.openFileDescriptor(bVar.d(), "r", cancellationSignal);
+   788→
+   789→## HTTP Clients & Libraries
+   790→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:542:            android:name="com.bumptech.glide.integration.okhttp3.OkHttpGlideModule"
+   791→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:51:<h2>Retrofit</h2>
+   792→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:61:<h2>Okhttp</h2>
+   793→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values-de/strings.xml:1175:    <string name="prdata_hobby_sports_VOLLEYBALL">Volleyball</string>
+   794→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values-es/strings.xml:1175:    <string name="prdata_hobby_sports_VOLLEYBALL">Voleibol</string>
+   795→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values-fr/strings.xml:1175:    <string name="prdata_hobby_sports_VOLLEYBALL">Volley–ball</string>
+   796→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values-it/strings.xml:1175:    <string name="prdata_hobby_sports_VOLLEYBALL">Pallavolo</string>
+   797→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values-pt/strings.xml:1085:    <string name="prdata_hobby_sports_VOLLEYBALL">Voleibol</string>
+   798→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/public.xml:7729:    <public type="string" name="prdata_hobby_sports_VOLLEYBALL" id="0x7f140544" />
+   799→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/strings.xml:1239:    <string name="prdata_hobby_sports_VOLLEYBALL">Volleyball</string>
+   800→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/view/g.java:26:import okhttp3.internal.http2.Settings;
+   801→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/view/menu/g.java:27:import okhttp3.internal.http2.Settings;
+   802→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/animation/AnimatedContentKt.java:28:import okhttp3.internal.http2.Http2;
+   803→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/animation/AnimatedVisibilityKt.java:24:import okhttp3.internal.http2.Http2;
+   804→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/animation/CrossfadeKt.java:24:import okhttp3.internal.http2.Http2;
+   805→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/contextmenu/ContextMenuArea_androidKt.java:19:import okhttp3.internal.http2.Http2;
+   806→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/contextmenu/ContextMenuUi_androidKt.java:43:import okhttp3.internal.http2.Http2;
+   807→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/ImageKt.java:19:import okhttp3.internal.http2.Http2;
+   808→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/layout/FlowLayoutKt.java:22:import okhttp3.internal.http2.Http2;
+   809→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/lazy/grid/LazyGridDslKt.java:16:import okhttp3.internal.http2.Http2;
+   810→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/lazy/grid/LazyGridKt.java:32:import okhttp3.internal.http2.Http2;
+   811→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/lazy/layout/RunnableC0864a.java:7:import okhttp3.internal.http2.Http2Connection;
+   812→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/lazy/LazyDslKt.java:12:import okhttp3.internal.http2.Http2;
+   813→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/lazy/LazyListKt.java:31:import okhttp3.internal.http2.Http2;
+   814→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/pager/LazyLayoutPagerKt.java:28:import okhttp3.internal.http2.Http2;
+   815→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/pager/PagerKt.java:15:import okhttp3.internal.http2.Http2;
+   816→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/text/BasicTextFieldKt.java:18:import okhttp3.internal.http2.Http2;
+   817→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/text/BasicTextKt.java:36:import okhttp3.internal.http2.Http2;
+   818→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/text/ClickableTextKt.java:14:import okhttp3.internal.http2.Http2;
+   819→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/text/CoreTextFieldKt.java:68:import okhttp3.internal.http2.Http2;
+   820→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/text/input/internal/C0911x.java:10:import okhttp3.internal.http2.Http2;
+   821→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/text/modifiers/TextAnnotatedStringNode.java:40:import okhttp3.internal.http2.Http2;
+   822→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/text/modifiers/TextStringSimpleNode.java:38:import okhttp3.internal.http2.Http2;
+   823→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/foundation/text/selection/AndroidSelectionHandles_androidKt.java:36:import okhttp3.internal.http2.Http2;
+   824→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/ButtonKt.java:26:import okhttp3.internal.http2.Http2;
+   825→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/DrawerKt.java:38:import okhttp3.internal.http2.Http2;
+   826→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/FloatingActionButtonKt.java:27:import okhttp3.internal.http2.Http2;
+   827→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/J.java:7:import okhttp3.internal.http2.Http2;
+   828→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/ProgressIndicatorKt.java:24:import okhttp3.internal.http2.Http2;
+   829→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/pullrefresh/PullRefreshIndicatorKt.java:44:import okhttp3.internal.http2.Http2;
+   830→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/ScaffoldKt.java:25:import okhttp3.internal.http2.Http2;
+   831→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/SnackbarKt.java:30:import okhttp3.internal.http2.Http2;
+   832→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/SurfaceKt.java:27:import okhttp3.internal.http2.Http2;
+   833→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/TextKt.java:18:import okhttp3.internal.http2.Http2;
+   834→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material/TypographyKt.java:9:import okhttp3.internal.http2.Http2;
+   835→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material3/AndroidMenu_androidKt.java:20:import okhttp3.internal.http2.Http2;
+   836→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material3/AppBarKt.java:32:import okhttp3.internal.http2.Http2;
+   837→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material3/b0.java:5:import okhttp3.internal.http2.Http2;
+   838→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material3/BottomSheetDefaults.java:15:import okhttp3.internal.http2.Http2;
+   839→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/compose/material3/BottomSheetScaffoldKt.java:31:import okhttp3.internal.http2.Http2;
+   840→
+   841→## WebSocket / Realtime References
+   842→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:468:            android:name="com.google.firebase.messaging.default_notification_icon"
+   843→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:497:            android:name="com.planetromeo.android.app.core.notification.FcmListenerService"
+   844→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:500:                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+   845→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:562:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.display.FirebaseInAppMessagingDisplayKtxRegistrar"
+   846→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:565:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.display.FirebaseInAppMessagingDisplayRegistrar"
+   847→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:574:                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar"
+   848→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:577:                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+   849→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:607:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.FirebaseInAppMessagingKtxRegistrar"
+   850→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:610:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.FirebaseInAppMessagingRegistrar"
+   851→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:753:            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+   852→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:757:                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+   853→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/common_types.proto:17:package firebase.inappmessaging;
+   854→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/common_types.proto:19:option java_package = "com.google.firebase.inappmessaging";
+   855→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/common_types.proto:22:import "firebase/inappmessaging/proto/messages.proto";
+   856→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/experiment_payload.proto:17:package firebase.inappmessaging;
+   857→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/experiment_payload.proto:19:option java_package = "com.google.firebase.inappmessaging";
+   858→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/messages.proto:17:package firebase.inappmessaging;
+   859→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/messages.proto:19:option java_package = "com.google.firebase.inappmessaging";
+   860→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/internal/rate_limit.proto:17:package com.google.firebase.inappmessaging.internal;
+   861→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/internal/rate_limit.proto:19:option java_package = "com.google.firebase.inappmessaging.internal";
+   862→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:17:package google.internal.firebase.inappmessaging.v1;
+   863→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:19:option java_package = "com.google.internal.firebase.inappmessaging.v1";
+   864→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:22:import "firebase/inappmessaging/proto/messages.proto";
+   865→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:23:import "firebase/inappmessaging/proto/common_types.proto";
+   866→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:24:import "firebase/inappmessaging/proto/experiment_payload.proto";
+   867→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:36:  .firebase.inappmessaging.Priority priority = 3;
+   868→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:39:  .firebase.inappmessaging.CampaignTime start_time = 4;
+   869→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:42:  .firebase.inappmessaging.CampaignTime end_time = 5;
+   870→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:54:  .firebase.inappmessaging.Content content = 3;
+   871→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:58:  .firebase.inappmessaging.Priority priority = 4;
+   872→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:61:  repeated .firebase.inappmessaging.TriggeringCondition triggering_conditions =
+   873→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:98:  .firebase.inappmessaging.ExperimentPayload experiment_payload = 2;
+   874→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/sdkserving/fiam_fetch_service.proto:17:package google.internal.firebase.inappmessaging.v1.sdkserving;
+   875→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/sdkserving/fiam_fetch_service.proto:19:option java_package = "com.google.internal.firebase.inappmessaging.v1.sdkserving";
+   876→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/sdkserving/fiam_fetch_service.proto:24:import "google/internal/firebase/inappmessaging/v1/campaign.proto";
+   877→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/logs/proto/firebase/inappmessaging/campaign_analytics.proto:15:// Protos for firebase inappmessaging campaign analytics
+   878→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/logs/proto/firebase/inappmessaging/campaign_analytics.proto:19:package logs.proto.firebase.inappmessaging;
+   879→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/logs/proto/firebase/inappmessaging/campaign_analytics.proto:21:option java_package = "com.google.firebase.inappmessaging";
+   880→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/logs/proto/firebase/inappmessaging/campaign_analytics.proto:23:option java_outer_classname = "FirebaseInAppMessagingCampaignAnalyticsProto";
+   881→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/messaging_event_extension.proto:25:// LINT.ThenChange(//depot/google3/logs/proto/firebase/cloud_messaging/client/messaging_event_extension.proto)
+   882→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/messaging_event.proto:19:// Describes a Firebase Messaging event on a client.
+   883→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/messaging_event.proto:89:// LINT.ThenChange(//depot/google3/logs/proto/firebase/cloud_messaging/client/messaging_event.proto)
+   884→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/layout-land/card_landscape_inner.xml:2:<com.google.firebase.inappmessaging.display.internal.layout.CardLayoutLandscape xmlns:android="http://schemas.android.com/apk/res/android" xmlns:fiam="http://schemas.android.com/apk/res-auto"
+   885→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/layout-land/card_landscape_inner.xml:37:</com.google.firebase.inappmessaging.display.internal.layout.CardLayoutLandscape>
+   886→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/layout-land/card.xml:10:</com.google.firebase.inappmessaging.display.internal.layout.FiamCardView>
+   887→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/layout-land/card.xml:2:<com.google.firebase.inappmessaging.display.internal.layout.FiamCardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+   888→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/layout-land/modal.xml:2:<com.google.firebase.inappmessaging.display.internal.layout.FiamRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:fiam="http://schemas.android.com/apk/res-auto"
+   889→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/layout-land/modal.xml:46:    </com.google.firebase.inappmessaging.display.internal.layout.ModalLayoutLandscape>
+   890→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/layout-land/modal.xml:53:</com.google.firebase.inappmessaging.display.internal.layout.FiamRelativeLayout>
+   891→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/layout-land/modal.xml:9:    <com.google.firebase.inappmessaging.display.internal.layout.ModalLayoutLandscape
+   892→
+   893→## Firebase / Google Services
+   894→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:456:            android:name="firebase_performance_logcat_enabled"
+   895→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:459:            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+   896→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:468:            android:name="com.google.firebase.messaging.default_notification_icon"
+   897→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:471:            android:name="com.google.android.gms.ads.APPLICATION_ID"
+   898→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:500:                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+   899→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:509:            android:name="com.google.android.gms.version"
+   900→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:549:            android:name="com.google.firebase.components.ComponentDiscoveryService"
+   901→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:553:                android:name="com.google.firebase.components:com.google.firebase.perf.FirebasePerfKtxRegistrar"
+   902→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:554:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   903→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:556:                android:name="com.google.firebase.components:com.google.firebase.perf.FirebasePerfRegistrar"
+   904→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:557:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   905→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:559:                android:name="com.google.firebase.components:com.google.firebase.firestore.ktx.FirebaseFirestoreLegacyRegistrar"
+   906→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:560:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   907→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:562:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.display.FirebaseInAppMessagingDisplayKtxRegistrar"
+   908→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:563:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   909→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:565:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.display.FirebaseInAppMessagingDisplayRegistrar"
+   910→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:566:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   911→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:568:                android:name="com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar"
+   912→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:569:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   913→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:571:                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
+   914→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:572:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   915→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:574:                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar"
+   916→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:575:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   917→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:577:                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+   918→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:578:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   919→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:580:                android:name="com.google.firebase.components:com.google.firebase.dynamiclinks.FirebaseDynamicLinksKtxRegistrar"
+   920→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:581:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   921→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:583:                android:name="com.google.firebase.components:com.google.firebase.dynamiclinks.internal.FirebaseDynamicLinkRegistrar"
+   922→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:584:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   923→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:586:                android:name="com.google.firebase.components:com.google.firebase.installations.ktx.FirebaseInstallationsLegacyRegistrar"
+   924→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:587:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   925→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:589:                android:name="com.google.firebase.components:com.google.firebase.remoteconfig.FirebaseRemoteConfigKtxRegistrar"
+   926→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:590:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   927→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:592:                android:name="com.google.firebase.components:com.google.firebase.remoteconfig.RemoteConfigRegistrar"
+   928→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:593:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   929→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:595:                android:name="com.google.firebase.components:com.google.firebase.crashlytics.FirebaseCrashlyticsKtxRegistrar"
+   930→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:596:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   931→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:598:                android:name="com.google.firebase.components:com.google.firebase.crashlytics.CrashlyticsRegistrar"
+   932→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:599:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   933→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:601:                android:name="com.google.firebase.components:com.google.firebase.sessions.FirebaseSessionsRegistrar"
+   934→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:602:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   935→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:604:                android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar"
+   936→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:605:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   937→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:607:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.FirebaseInAppMessagingKtxRegistrar"
+   938→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:608:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   939→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:610:                android:name="com.google.firebase.components:com.google.firebase.inappmessaging.FirebaseInAppMessagingRegistrar"
+   940→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:611:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   941→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:613:                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar"
+   942→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:614:                android:value="com.google.firebase.components.ComponentRegistrar"/>
+   943→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:616:                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+   944→
+   945→## OAuth / Authentication
+   946→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:209:                    android:pathPrefix="/auth/login"/>
+   947→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:213:                    android:pathPrefix="/login"/>
+   948→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:265:                    android:pathPrefix="/auth/login"/>
+   949→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:269:                    android:pathPrefix="/login"/>
+   950→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:284:            android:name="com.planetromeo.android.app.authentication.signup.ui.ActivitySignup"
+   951→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:289:            android:name="com.planetromeo.android.app.authentication.forgot_password.ui.ForgotPasswordActivity"
+   952→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:293:            android:name="com.planetromeo.android.app.authentication.account_list.ui.AccountListActivity"
+   953→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:363:            android:name="com.planetromeo.android.app.authentication.login.ui.LoginActivity"
+   954→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:409:            android:name="com.planetromeo.android.app.authentication.deactivated.ProfileDeactivatedActivity"
+   955→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:476:            android:authorities="com.planetromeo.android.app.fileProvider"
+   956→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:485:            android:authorities="com.planetromeo.android.app.androidx-startup">
+   957→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:522:            android:authorities="com.planetromeo.android.app.zendesk.support.SupportSdkStartupProvider"/>
+   958→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:527:            android:authorities="com.planetromeo.android.app.zendesk.support.GuideSdkStartupProvider"/>
+   959→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:535:            android:authorities="com.planetromeo.android.app.zendesk.sdk.user.attachments"
+   960→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:547:            android:authorities="com.planetromeo.android.app.com.squareup.picasso"/>
+   961→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:787:            android:authorities="com.planetromeo.android.app.firebaseinitprovider"
+   962→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:46:    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   963→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/developers/mobile/targeting/proto/client_signals.proto:62:  // The Instance Id Token of the App Instance.
+   964→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/developers/mobile/targeting/proto/client_signals.proto:64:  string app_instance_token = 2;
+   965→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-auth-interop.properties:2:client=firebase-auth-interop
+   966→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase-auth-interop.properties:3:firebase-auth-interop_client=20.0.0
+   967→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:297:  // Identifier for the application that has been registered with firebase.
+   968→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/mutation.proto:36:  // A stream token that was previously sent by the server.
+   969→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/mutation.proto:40:  // After sending this token, earlier tokens may not be used anymore so only a
+   970→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/mutation.proto:41:  // single stream token is retained.
+   971→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/mutation.proto:42:  bytes last_stream_token = 2;
+   972→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:103:  // targets resumed with a resume_token) should be suppressed (buffered) until
+   973→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:42:  // An opaque, server-assigned token that allows watching a query to be
+   974→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:44:  // matches the query. The resume token essentially identifies a point in
+   975→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:47:  // This is related to the snapshot_version in that the resume_token
+   976→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:48:  // effectively also encodes that value, but the resume_token is opaque and
+   977→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:51:  // A consequence of this is that the resume_token should be used when asking
+   978→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:55:  // This is the same value as TargetChange.resume_token
+   979→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:57:  bytes resume_token = 3;
+   980→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/common.proto:61:  // Firestore does not allow 3rd party auth requests to create read-write.
+   981→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:261:  // Optional. A page token, received from a previous `ListDocuments` response.
+   982→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:265:  // in the request that generated the page token.
+   983→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:266:  string page_token = 4 [(google.api.field_behavior) = OPTIONAL];
+   984→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:315:  // A token to retrieve the next page of documents.
+   985→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:318:  string next_page_token = 2;
+   986→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:52:  option (google.api.oauth_scopes) =
+   987→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:53:      "https://www.googleapis.com/auth/cloud-platform,"
+   988→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:54:      "https://www.googleapis.com/auth/datastore";
+   989→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:642:// The first request creates a stream, or resumes an existing one from a token.
+   990→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:645:// only an ID and a token, to use in the next request.
+   991→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:648:// given token, then a response containing only an up-to-date token, to use in
+   992→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:669:  // A stream token that was previously sent by the server.
+   993→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:671:  // The client should set this field to the token from the most recent
+   994→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:673:  // acknowledges that the client has received responses up to this token. After
+   995→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:674:  // sending this token, earlier tokens may not be used anymore.
+   996→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:683:  bytes stream_token = 4;
+   997→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:695:  // A token that represents the position of this response in the stream.
+   998→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:699:  bytes stream_token = 2;
+   999→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:797:  // `resume_token` or `read_time` will be returned. Otherwise, all matching
+  1000→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:800:    // A resume token from a prior
+  1001→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:803:    // Using a resume token with a different target is unsupported and may fail.
+  1002→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:804:    bytes resume_token = 4;
+  1003→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:834:  // The number of documents that last matched the query at the resume token or
+  1004→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:847:    // No change has occurred. Used only to send an updated `resume_token`.
+  1005→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:887:  // A token that can be used to resume the stream for the given `target_ids`,
+  1006→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:891:  bytes resume_token = 4;
+  1007→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:918:  // A page token. Must be a value from
+  1008→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:920:  string page_token = 3;
+  1009→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:929:  // A page token that may be used to continue the list.
+  1010→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:930:  string next_page_token = 2;
+  1011→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/write.proto:288:  // this field existed; that is, re-add the target without a resume token to
+  1012→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/sdkserving/fiam_fetch_service.proto:76:  // [required] app instance id token
+  1013→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/sdkserving/fiam_fetch_service.proto:77:  string app_instance_id_token = 3;
+  1014→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/logs/proto/firebase/inappmessaging/campaign_analytics.proto:129:  // Identifier for the application that has been registered with firebase.
+  1015→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:13:All content is the property of the respective authors or their employers. For
+  1016→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:14:more information regarding authorship of content, please consult the listed
+  1017→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/common_google_signin_btn_text_dark.xml:11:        android:color="@color/common_google_signin_btn_text_dark_focused"/>
+  1018→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/common_google_signin_btn_text_dark.xml:12:    <item android:color="@color/common_google_signin_btn_text_dark_default"/>
+  1019→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/common_google_signin_btn_text_dark.xml:5:        android:color="@color/common_google_signin_btn_text_dark_disabled"/>
+  1020→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/common_google_signin_btn_text_dark.xml:8:        android:color="@color/common_google_signin_btn_text_dark_pressed"/>
+  1021→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/common_google_signin_btn_text_light.xml:11:        android:color="@color/common_google_signin_btn_text_light_focused"/>
+  1022→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/common_google_signin_btn_text_light.xml:12:    <item android:color="@color/common_google_signin_btn_text_light_default"/>
+  1023→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/common_google_signin_btn_text_light.xml:5:        android:color="@color/common_google_signin_btn_text_light_disabled"/>
+  1024→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/common_google_signin_btn_text_light.xml:8:        android:color="@color/common_google_signin_btn_text_light_pressed"/>
+  1025→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/drawable/common_google_signin_btn_icon_dark_focused.xml:15:    <item android:drawable="@drawable/common_google_signin_btn_icon_dark_normal"/>
+  1026→
+  1027→## Location / Maps
+  1028→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/attrs.xml:1728:    <attr name="latLngBoundsNorthEastLatitude" format="float">
+  1029→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/attrs.xml:1730:    <attr name="latLngBoundsNorthEastLongitude" format="float">
+  1030→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/attrs.xml:1732:    <attr name="latLngBoundsSouthWestLatitude" format="float">
+  1031→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/attrs.xml:1734:    <attr name="latLngBoundsSouthWestLongitude" format="float">
+  1032→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/public.xml:832:    <public type="attr" name="latLngBoundsNorthEastLatitude" id="0x7f0402c7" />
+  1033→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/public.xml:833:    <public type="attr" name="latLngBoundsNorthEastLongitude" id="0x7f0402c8" />
+  1034→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/public.xml:834:    <public type="attr" name="latLngBoundsSouthWestLatitude" id="0x7f0402c9" />
+  1035→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/public.xml:835:    <public type="attr" name="latLngBoundsSouthWestLongitude" id="0x7f0402ca" />
+  1036→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/app/y.java:19:    private final LocationManager f6140b;
+  1037→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/app/y.java:36:    y(Context context, LocationManager locationManager) {
+  1038→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/app/y.java:38:        this.f6140b = locationManager;
+  1039→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/app/y.java:44:            f6138d = new y(applicationContext, (LocationManager) applicationContext.getSystemService("location"));
+  1040→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/app/y.java:5:import android.location.LocationManager;
+  1041→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/app/y.java:78:        xVarB.a(jCurrentTimeMillis - 86400000, location.getLatitude(), location.getLongitude());
+  1042→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/app/y.java:79:        xVarB.a(jCurrentTimeMillis, location.getLatitude(), location.getLongitude());
+  1043→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/appcompat/app/y.java:83:        xVarB.a(jCurrentTimeMillis + 86400000, location.getLatitude(), location.getLongitude());
+  1044→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/exifinterface/media/a.java:731:        d[] dVarArr2 = {new d("ExposureTime", 33434, 5), new d("FNumber", 33437, 5), new d("ExposureProgram", 34850, 3), new d("SpectralSensitivity", 34852, 2), new d("PhotographicSensitivity", 34855, 3), new d("OECF", 34856, 7), new d("SensitivityType", 34864, 3), new d("StandardOutputSensitivity", 34865, 4), new d("RecommendedExposureIndex", 34866, 4), new d("ISOSpeed", 34867, 4), new d("ISOSpeedLatitudeyyy", 34868, 4), new d("ISOSpeedLatitudezzz", 34869, 4), new d("ExifVersion", 36864, 2), new d("DateTimeOriginal", 36867, 2), new d("DateTimeDigitized", 36868, 2), new d("OffsetTime", 36880, 2), new d("OffsetTimeOriginal", 36881, 2), new d("OffsetTimeDigitized", 36882, 2), new d("ComponentsConfiguration", 37121, 7), new d("CompressedBitsPerPixel", 37122, 5), new d("ShutterSpeedValue", 37377, 10), new d("ApertureValue", 37378, 5), new d("BrightnessValue", 37379, 10), new d("ExposureBiasValue", 37380, 10), new d("MaxApertureValue", 37381, 5), new d("SubjectDistance", 37382, 5), new d("MeteringMode", 37383, 3), new d("LightSource", 37384, 3), new d("Flash", 37385, 3), new d("FocalLength", 37386, 5), new d("SubjectArea", 37396, 3), new d("MakerNote", 37500, 7), new d("UserComment", 37510, 7), new d("SubSecTime", 37520, 2), new d("SubSecTimeOriginal", 37521, 2), new d("SubSecTimeDigitized", 37522, 2), new d("FlashpixVersion", 40960, 7), new d("ColorSpace", 40961, 3), new d("PixelXDimension", 40962, 3, 4), new d("PixelYDimension", 40963, 3, 4), new d("RelatedSoundFile", 40964, 2), new d("InteroperabilityIFDPointer", 40965, 4), new d("FlashEnergy", 41483, 5), new d("SpatialFrequencyResponse", 41484, 7), new d("FocalPlaneXResolution", 41486, 5), new d("FocalPlaneYResolution", 41487, 5), new d("FocalPlaneResolutionUnit", 41488, 3), new d("SubjectLocation", 41492, 3), new d("ExposureIndex", 41493, 5), new d("SensingMethod", 41495, 3), new d("FileSource", 41728, 7), new d("SceneType", 41729, 7), new d("CFAPattern", 41730, 7), new d("CustomRendered", 41985, 3), new d("ExposureMode", 41986, 3), new d("WhiteBalance", 41987, 3), new d("DigitalZoomRatio", 41988, 5), new d("FocalLengthIn35mmFilm", 41989, 3), new d("SceneCaptureType", 41990, 3), new d("GainControl", 41991, 3), new d("Contrast", 41992, 3), new d("Saturation", 41993, 3), new d("Sharpness", 41994, 3), new d("DeviceSettingDescription", 41995, 7), new d("SubjectDistanceRange", 41996, 3), new d("ImageUniqueID", 42016, 2), new d("CameraOwnerName", 42032, 2), new d("BodySerialNumber", 42033, 2), new d("LensSpecification", 42034, 5), new d("LensMake", 42035, 2), new d("LensModel", 42036, 2), new d("Gamma", 42240, 5), new d("DNGVersion", 50706, 1), new d("DefaultCropSize", 50720, 3, 4)};
+  1045→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/exifinterface/media/a.java:733:        d[] dVarArr3 = {new d("GPSVersionID", 0, 1), new d("GPSLatitudeRef", 1, 2), new d("GPSLatitude", 2, 5, 10), new d("GPSLongitudeRef", 3, 2), new d("GPSLongitude", 4, 5, 10), new d("GPSAltitudeRef", 5, 1), new d("GPSAltitude", 6, 5), new d("GPSTimeStamp", 7, 5), new d("GPSSatellites", 8, 2), new d("GPSStatus", 9, 2), new d("GPSMeasureMode", 10, 2), new d("GPSDOP", 11, 5), new d("GPSSpeedRef", 12, 2), new d("GPSSpeed", 13, 5), new d("GPSTrackRef", 14, 2), new d("GPSTrack", 15, 5), new d("GPSImgDirectionRef", 16, 2), new d("GPSImgDirection", 17, 5), new d("GPSMapDatum", 18, 2), new d("GPSDestLatitudeRef", 19, 2), new d("GPSDestLatitude", 20, 5), new d("GPSDestLongitudeRef", 21, 2), new d("GPSDestLongitude", 22, 5), new d("GPSDestBearingRef", 23, 2), new d("GPSDestBearing", 24, 5), new d("GPSDestDistanceRef", 25, 2), new d("GPSDestDistance", 26, 5), new d("GPSProcessingMethod", 27, 7), new d("GPSAreaInformation", 28, 7), new d("GPSDateStamp", 29, 2), new d("GPSDifferential", 30, 3), new d("GPSHPositioningError", 31, 5)};
+  1046→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/B2/r.java:204:        T(sVar.c().latitude, sVar.c().longitude);
+  1047→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/B2/r.java:213:        T(sVar.c().latitude, sVar.c().longitude);
+  1048→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/B2/r.java:221:        W(latLng.latitude, latLng.longitude, str);
+  1049→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/B2/r.java:244:        if (latLng != null ? this.f376d.c(d9, d10, latLng.latitude, latLng.longitude, 100000L) : false) {
+  1050→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/B2/r.java:368:            p044e7.n<UserAddress> nVarC = this.f378f.c(new UserLocation(null, location.latitude, location.longitude, null, null, false, null, null, 217, null));
+  1051→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:113:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1052→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:118:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1053→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:123:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1054→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:128:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1055→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:133:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1056→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:138:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1057→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:14:import com.google.android.gms.location.FusedLocationProviderApi;
+  1058→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:147:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1059→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:152:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1060→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:159:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1061→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:28:public final class zzbb implements FusedLocationProviderApi {
+  1062→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:54:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1063→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:59:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1064→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbb.java:86:    @Override // com.google.android.gms.location.FusedLocationProviderApi
+  1065→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:104:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1066→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:121:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1067→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:126:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1068→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:131:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1069→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:136:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1070→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:147:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1071→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:156:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1072→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:167:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1073→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:179:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1074→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:20:import com.google.android.gms.location.FusedLocationProviderClient;
+  1075→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:205:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1076→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:216:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1077→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/internal/location/zzbi.java:221:    @Override // com.google.android.gms.location.FusedLocationProviderClient
+  1078→
+  1079→## Payments / Billing
+  1080→
+  1081→## Push Notifications
+  1082→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:497:            android:name="com.planetromeo.android.app.core.notification.FcmListenerService"
+  1083→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:574:                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar"
+  1084→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:577:                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+  1085→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:753:            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+  1086→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/raw/firebase_common_keep.xml:3:    tools:keep="@string/google_app_id,@string/gcm_defaultSenderId,@string/google_api_key,@string/firebase_database_url,@string/ga_trackingId,@string/google_storage_bucket,@string/project_id" />
+  1087→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/public.xml:7124:    <public type="string" name="fcm_fallback_notification_channel_label" id="0x7f140284" />
+  1088→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/public.xml:7149:    <public type="string" name="gcm_defaultSenderId" id="0x7f1402a2" />
+  1089→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/strings.xml:634:    <string name="fcm_fallback_notification_channel_label">Miscellaneous</string>
+  1090→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/values/strings.xml:659:    <string name="gcm_defaultSenderId">4760212605</string>
+  1091→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:101:        static List<NotificationChannelGroup> j(NotificationManager notificationManager) {
+  1092→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:102:            return notificationManager.getNotificationChannelGroups();
+  1093→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:105:        static List<NotificationChannel> k(NotificationManager notificationManager) {
+  1094→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:106:            return notificationManager.getNotificationChannels();
+  1095→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:4:import android.app.NotificationChannel;
+  1096→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:499:    public void d(NotificationChannel notificationChannel) {
+  1097→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:5:import android.app.NotificationChannelGroup;
+  1098→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:500:        b.a(this.f16059b, notificationChannel);
+  1099→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:65:        static void a(NotificationManager notificationManager, NotificationChannel notificationChannel) {
+  1100→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:66:            notificationManager.createNotificationChannel(notificationChannel);
+  1101→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:69:        static void b(NotificationManager notificationManager, NotificationChannelGroup notificationChannelGroup) {
+  1102→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:70:            notificationManager.createNotificationChannelGroup(notificationChannelGroup);
+  1103→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:73:        static void c(NotificationManager notificationManager, List<NotificationChannelGroup> list) {
+  1104→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:74:            notificationManager.createNotificationChannelGroups(list);
+  1105→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:77:        static void d(NotificationManager notificationManager, List<NotificationChannel> list) {
+  1106→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:78:            notificationManager.createNotificationChannels(list);
+  1107→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:82:            notificationManager.deleteNotificationChannel(str);
+  1108→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:86:            notificationManager.deleteNotificationChannelGroup(str);
+  1109→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:89:        static String g(NotificationChannel notificationChannel) {
+  1110→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:90:            return notificationChannel.getId();
+  1111→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:93:        static String h(NotificationChannelGroup notificationChannelGroup) {
+  1112→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:94:            return notificationChannelGroup.getId();
+  1113→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:97:        static NotificationChannel i(NotificationManager notificationManager, String str) {
+  1114→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/androidx/core/app/s.java:98:            return notificationManager.getNotificationChannel(str);
+  1115→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/common/GoogleApiAvailability.java:135:    public void setDefaultNotificationChannelId(Context context, String str) {
+  1116→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/common/GoogleApiAvailability.java:137:            Preconditions.checkNotNull(((NotificationManager) Preconditions.checkNotNull(context.getSystemService("notification"))).getNotificationChannel(str));
+  1117→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/common/GoogleApiAvailability.java:264:                NotificationChannel notificationChannel = notificationManager.getNotificationChannel("com.google.android.gms.availability");
+  1118→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/common/GoogleApiAvailability.java:266:                if (notificationChannel == null) {
+  1119→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/common/GoogleApiAvailability.java:267:                    notificationManager.createNotificationChannel(new NotificationChannel("com.google.android.gms.availability", string, 4));
+  1120→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/common/GoogleApiAvailability.java:268:                } else if (!string.contentEquals(notificationChannel.getName())) {
+  1121→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/common/GoogleApiAvailability.java:269:                    notificationChannel.setName(string);
+  1122→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/common/GoogleApiAvailability.java:270:                    notificationManager.createNotificationChannel(notificationChannel);
+  1123→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/common/GoogleApiAvailability.java:7:import android.app.NotificationChannel;
+  1124→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/measurement/AppMeasurement.java:35:    public static final String FCM_ORIGIN = "fcm";
+  1125→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/android/gms/stats/CodePackage.java:24:    public static final String GCM = "GCM";
+  1126→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/api/Usage.java:101:        public Builder clearProducerNotificationChannel() {
+  1127→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/api/Usage.java:103:            ((Usage) this.instance).clearProducerNotificationChannel();
+  1128→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/api/Usage.java:120:        public String getProducerNotificationChannel() {
+  1129→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/api/Usage.java:121:            return ((Usage) this.instance).getProducerNotificationChannel();
+  1130→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/api/Usage.java:125:        public ByteString getProducerNotificationChannelBytes() {
+  1131→/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/sources/com/google/api/Usage.java:126:            return ((Usage) this.instance).getProducerNotificationChannelBytes();
+  1132→
+  1133→## Decompiled File Count
+  1134→- Java files decompiled: 15484
+  1135→
+  1136→

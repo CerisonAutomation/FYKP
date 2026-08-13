@@ -1,0 +1,1101 @@
+res/EA.webp
+res/Ko.webp
+res/NR.webp
+res/NT.webp
+res/Oi.webp
+res/Tw.webp
+res/V5.png
+res/XD.webp
+res/Xb.webp
+res/Z1.webp
+res/ZW.webp
+res/cz.webp
+res/f8.webp
+res/hX.webp
+res/j2.webp
+res/l-.webp
+res/mC.webp
+res/mV.webp
+res/mn.webp
+res/n4.webp
+res/r9.webp
+"%1$s" copied to clipboard.
+%1$d - %2$d years
+%1$d days free trial
+%1$d percent.
+%1$d selected
+%1$d user
+%1$d users
+%1$d%2$s
+%1$d'%2$d ft
+%1$d/%2$d
+%1$s
+%1$s %2$s
+%1$s Missed video calls
+%1$s has more pictures.
+%1$s hours
+%1$s is copied to clipboard
+CC%1$s is having trouble with Google Play services. Please try again.
+%1$s minutes
+%1$s new footprints
+%1$s o'clock
+%1$s opened article '%2$s'
+%1$s selected %2$s
+%1$s tried to call you
+*.%1$s users have looked at your profile. 
+66%1$s won't run unless you update Google Play services.
+JJ%1$s won't run without Google Play services, which are currently updating.
+PP%1$s won't run without Google Play services, which are missing from your device.
+TT%1$s won't run without Google Play services, which are not supported by your device.
+77%1$s won't work unless you enable Google Play services.
+%1$s 
+ %2$s
+%1$s 
+ End date
+%1$s 
+ %2$s
+%1$s%2$s
+%1$s, %2$s
+%1dd
+%1dh
+%1dm
+%1ds
+%1dw
+%1dy
+%1s is not available
+%1s permission is required
+%d Like
+%d Likes
+%d cm
+%d day
+%d days
+%d kg
+%d lbs
+%d linked profiles
+%d mins
+%d month
+%d months
+%d new notification
+%d new notifications
+%d pictures
+%d secs
+%d week
+%d weeks
+%d year
+%d years
+%s + %d other %s
+%s PLUS (compensation)
+%s PLUS (free)
+%s PLUS (gift received)
+%s PLUS (promotion)
+%s PLUS (referral)
+%s PLUS (voucher)
+%s PLUS (with renewal)
+%s PLUS (without renewal)
+%s article loaded
+%s ft
+%s km
+%s liked
+%s m
+%s mi
+%s says:
+& more
+(Addresses visible only to you)
+(DELETED)
+(PAUSED)
+(This album is not editable)
+*Mandatory fields
++ Add Contact Folder
+##..People with pics get more clicks!
+1 min
+1 sec
+**1. Add pictures to your
+ QuickShare album.
+ 20 characters
+%%1:4760212605:android:3c1ae4b2e018f333
+""2. Tap [[]] to share 
+ for 60 min.
+4760212605
+FF4760212605-og8t21346pipj9ql7astdmg15m7bodes.apps.googleusercontent.com
+5-20 characters
+999+
+<1 min
+<HTML dir=auto> <HEAD><LINK href='%1$s' type='text/css' rel='stylesheet'/></HEAD> <body> <h1 id=title>%2$s</h1> %3$s <footer><p id=footerText>%4$s</p></footer> </body> </HTML>
+A few
+A lot
+%)A user has looked at your profile. 
+ddA verification link has been emailed to you. Please use this link to confirm your new email address.
+A verification link has been sent to your email inbox.
+Your email address needs to be verified in order to contact other Romeos.
+''AIzaSyABrPsJbooKA4JSBdbFwpMi6Etb2uQCFXA
+''AIzaSyDBo7hyuvJwju6WfV_2lTYf8BQ37KpAiLQ
+About Me
+About me
+About my d***
+About this app
+About us
+Accept
+Access requested
+Account
+Account Settings
+Account could not be deleted.
+Account creation
+&&Account settings change in progress...
+Acknowledgements
+Activate
+Active
+NNActive locations cannot be deleted. Please change your location and try again.
+Activity
+Add a profile picture*
+Add account
+Add as friend
+Add attachments
+Add caption
+Add contact folder
+\\Add more pictures. Profiles with at least 5 pictures have a much higher chance of engagement
+Add new phrase
+Add pic
+Add tag
+Add tags
+((Add travel plans and be seen in 5 cities
+Adding a phrase failed.
+Address shared
+Advanced
+Adventure
+Afrikaans
+Age Range
+##Agent file attachment with name %s.
+$$Agent image attachment with name %s.
+Agent message %s.
+Agnostic
+Albanian
+Albums
+All Albums
+All Inclusive Holiday
+All done!
+**All received Likes will be marked as read.
+&&Allow ROMEO to send you notifications?
+Allow incoming video calls
+Allow usage tracking
+Already a Romeo?
+Alt+
+Alternative
+zzAn error occurred in the payment process. Please try again. If the error keeps happening, please contact our Support Team.
+}}Analytical cookies give us a valuable insight to the usage of our app. This allows us to continue to improve our app for you.
+Anglican
+Animist
+Answer
+Answer Bot
+App analytics
+App crashes too often
+App settings
+App version no longer supported
+,,Appear offline to others with Invisible Mode
+Appear offline with PLUS
+Apprentice
+Arab
+Arabic
+Archive pictures
+77Are you sure you want to clear Likes notification list?
+88Are you sure you want to clear all visits from the list?
+--Are you sure you want to delete this picture?
+--Are you sure you want to delete your account?
+88Are you sure you want to leave and discard your changes?
+++Are you sure you want to link this account?
+,,Are you sure you want to pause your account?
+Armenian
+Army
+Arrives in %1s on %2s
+Arts
+Asian
+Atheist
+Athletic
+Attached file with name %s.
+Attachment could not be sent
+Attachment type not supported
+Attachments
+Attachments not supported
+Attention
+Audio enabled
+Audio muted
+Average
+Average body
+Average hair length
+Azerbaijani
+Back
+Back to Visits
+Badminton
+Bahai
+Baptist
+Baseball
+Basketball
+Basque
+""Be seen in this location with PLUS
+Beard
+Become a Beta Tester
+Bed & Breakfast
+Bedroom
+Belarusian
+Belly
+Bengali
+Best Deal
+Big Grid
+Biking
+Birthdate
+Bisexual
+Bisexual Non
+binary
+Bisexual, Other gender
+Black
+Black hair
+Block %s?
+Blocked
+Blond
+Blue
+Blue
+collar
+Board games
+Body Hair
+Body Type
+Body diversity rocks!
+Boots
+Bosnian
+Bottom
+Bottom Sheet
+Bottom only
+Brown
+Brown hair
+Buddhist
+Bulgarian
+Burmese
+Call declined
+Call ended
+Call ended unexpectedly.
+Calling...
+Cambodian
+Camera
+##Can I see your QuickShare pictures?
+Canadian French
+Cancel
+Cancel subscription
+Canceled
+Canceling Upload
+Cancellation was successful!
+Care
+Cars
+Catalan
+Catholic
+Caucasian
+Cebuano
+Change
+Change email
+Change email address
+Change password
+Change to next month
+Change to previous month
+Chaotic
+%%Character limit exceeded %1$d of %2$d
+Characters entered %1$d of %2$d
+Chat
+Chat could not be deleted.
+Check who's around
+Checked
+Chinese
+--Choose a non-sexual picture for your profile.
+Choose a topic
+88Choose your grid view & add your favourite profile stats
+Choose your location*
+Christian
+Circumcision
+Circus
+City breaks
+Civil servant
+Classic
+Classical
+Clear
+Clear all
+Clear list
+Clear query
+Clear text
+Climbing
+Close
+Close app
+Close navigation menu
+Close sheet
+Club
+Collapse
+Collapse bottom sheet
+Collapse the bottom sheet
+Collecting
+Comment with text %s sent.
+Comments loaded.
+Communication
+Community
+Computers
+Concert
+Condom
+Confirm
+Confirm Password
+Confirm current password
+Confucianist
+**Congratulations! You're now a PLUS member.
+ooConnection Error: Footprint list could not be retrieved. Please try again or contact Support if error persists.
+}}Connection Error: List of profiles you visited could not be retrieved. Please try again or contact Support if error persists.
+hhConnection Error: Online status could not be set. Please try again or contact Support if error persists.
+nnConnection Error: Selected folder could not be deleted. Please try again or contact Support if error persists.
+llConnection Error: Selected folder could not be moved. Please try again or contact Support if error persists.
+llConnection Error: Selected folder could not be saved. Please try again or contact Support if error persists.
+ooConnection Error: Selected picture could not be deleted. Please try again or contact Support if error persists.
+mmConnection Error: Visitor list could not be retrieved. Please try again or contact Support if error persists.
+Connection failed.
+""Connection lost. Please try again.
+Consumed
+Contact Folder
+Contact could not be deleted.
+Contact customer support
+$$Contact folder could not be deleted.
+""Contact folder could not be saved.
+Contact us
+Contacts
+Contacts could not be updated.
+Continue
+Continue to delete my account
+Continue to pause my account
+..Contribute to this user's verification status.
+Conversations
+99Conversations started from this app will be visible here.
+Cooking
+Copy
+Copy link
+Copyright ROMEO BV
+Could not delete saved phrase
+Could not hide visit
+KKCould not open Play Store. Please try again or manually install the update.
+Could not open device settings. Please enable installation of apps from unknown sources in your device settings to update the app.
+==Could not open your system settings. Please open it manually.
+!!Could not request profile recheck
+Country
+Create a unique profile name*
+Creating profile
+Creating your profile...
+Creative Chaos
+Croatian
+Cross
+dressing
+Cruise
+Ctrl+
+Current password
+Current selection: %1$s
+00Customize your list view and pick up to %s stats
+Czech
+D*** size
+Dance
+Dance & Electronic
+Danish
+Date
+Date of Birth*
+Date of birth
+Dates
+Decline
+Delete
+Delete "%s" album?
+Delete account
+Delete contact folder
+Delete message
+Delete my account
+Delete picture
+Delete pictures
+Delete profile
+Delivered
+Deselect All
+Design Playground
+Designer stubble
+Di Du Do
+Dialog
+Dialog Icon
+Digital
+Dinner Bell
+Dirty
+Dirty sex
+Discordian
+Discover
+Dismiss
+Dismiss bottom sheet
+Display
+''Do you really want to clear the search?
+00Do you really want to clear your list of visits?
+//Do you really want to clear your visitors list?
+22Do you really want to delete the selected picture?
+33Do you really want to delete the selected pictures?
+//Do you really want to delete this conversation?
+))Do you really want to delete this folder?
+**Do you really want to delete this message?
+11Do you really want to make the "%s" album public?
+**Do you really want to remove this account?
+**Do you really want to remove this contact?
+22Do you really want to report this message as spam?
+**Do you really want to report this picture?
+$$Do you want to get in contact again?
+Do you want to proceed?
+Document
+Done
+Donkey
+Downloading update %1$s
+XXDraft message could not be saved. Please try again or contact Support if error persists.
+Drag handle
+Drag handle double-tapped
+,,Drag the map, type an address or turn on GPS
+Dropdown menu
+Du Di
+Duck
+Dutch
+E-Mail*
+Edit
+Edit caption
+Edit phrase
+Edit profile
+Editing your phrase failed.
+Email
+Email address
+""Email confirmation does not match.
+Email or username
+Email was not sent because the weekly password reset limit has been exceeded. Please double check your inbox or contact Support.
+Employee
+Empty
+Enable
+Enable Google Play services
+End call
+End date
+End date %1$s
+English
+Enter at least 4 characters
+Enter contact folder name
+Enter password to confirm
+Enter valid email address
+Enter your email
+Enter your full name
+Enter your message
+Error
+VVError opening selected picture. Please try again or contact Support if error persists.
+Error: invalid
+Esperanto
+Estonian
+Ethnicity
+Every app that works with sharing of GPS harbors certain risks; other users might find out where you are. That
+s why we allow users to choose their location. If you want to keep your location secret, do not use 
+GPS location
+Everything
+Example: %1$s
+Exceeds max file size (%1$s)
+Exhibition
+Expand bottom sheet
+Expand halfway
+Expand the bottom sheet
+Explore here
+Explore other places with
+Eye Colour
+EyeCandy
+FF Active
+FF Passive
+FF Versatile
+FRIENDS
+Facial hair
+Failed to create request
+Failed to fetch article
+Failed to fetch attachments
+Failed to get articles
+Failed to get categories
+Failed to get sections
+Failed to get tickets
+Failed to load comments
+  Failed to send. Tap for options.
+Fast food
+Favorite
+Favourite Food
+Favourite stats
+Feedback: VideoChat
+File download in progress
+File with name %s.
+Film & Video
+Films
+Filters are too confusing
+Finish
+Finnish
+First of all
+Folder
+Folk
+Football
+VVFootprint could not be removed. Please try again or contact Support if error persists.
+RRFootprint could not be set. Please try again or contact Support if error persists.
+Footprints
+##For starters, add a profile picture
+Forgot my password or username
+Forgot password
+Forgot password?
+Formal dress
+Forward
+ Foundation Donation (
+ %1$.2f)
+eeFree users can only access their visitors from the last 24 hours. Upgrade to PLUS to unlock them all.
+zzFree users can only access their visitors from the last 24 hours. Upgrade to PLUS to unlock visitors from the last 7 days.
+WWFree users have a limited amount of search options. Upgrade to PLUS to unlock them all.
+Freelancer
+French
+Frequently used
+Friends
+Frog
+From
+Full beard
+Function+
+GET PLUS NOW
+??GPS is disabled. Enable GPS for a better experience in Settings
+GPS location
+GPS privacy information
+Galician
+Gallery
+Gaming
+Gay Non
+binary
+Gay, Other gender
+Gender
+Genders I'm into
+General
+Genuine
+Georgian
+German
+Get Google Play services
+Get Support
+""Get unlimited QuickShare with PLUS
+Get verified!
+Give Feedback
+Global
+Go back
+Go to Play Store
+Goat
+Goatee
+HHGoing back will delete your message. Are you sure you want to delete it?
+Going out
+Golf
+!!Google Play services availability
+Google Play services error
+Got it
+Got it!
+Gothic & New wave
+Great Job!
+Greek
+Green
+Greenlandic (Kalaallisut)
+Grey
+Grey hair
+Groups
+HOT STUFF!
+Hair Colour
+Hair Length
+Hairy
+Handball
+Hang Up
+Harp
+Haven't found your date yet?
+Headline
+Heavy metal
+Hebrew
+Hedonist
+Height
+Help Center loaded
+Help us improve the App!
+%%Here are some articles that may help:
+  Here's an article that may help:
+Hide Ads
+Hide your profile visits
+""Hide your profile visits with PLUS
+Hiking
+Hindi
+Hindu
+%%His QuickShare album has no pictures.
+33Hopefully you'll give us another try in the future.
+Hour
+House & Techno
+How was the call?
+Humanist
+Hungarian
+I accept ROMEO's %1$s and %2$s.
+I am
+))I am 18 years or older and I agree to the
+!%I can
+t find what I
+m looking for
+"$I couldn
+t verify my email address
+I don't like ROMEO
+I don't offer Bed & Breakfast.
+I don
+t like the content
+I don
+t like the design
+I found these articles:
+##I have found what I was looking for
+I identify as
+''I just wanted a profile for the weekend
+I met someone
+I need a break from ROMEO
+I need help
+I offer Bed & Breakfast
+++I remembered I have another profile already
+!!I see error messages all the time
+I speak
+I'm Looking for*
+  I'm interested in people between
+I'm into
+I'm looking for
+Ice Hockey
+Icelandic
+TTIf a reply is needed, someone will contact you by email. What is your email address?
+||If you delete your account, you will permanently lose your profile, pictures, messages and contacts. This can not be undone.
+ssIf you don't find it in your inbox, check your spam folder, make sure you entered the correct email or username, or
+,,If you don't want any contact, simply block.
+nnIf you set this as your main profile picture, it will be moved from this album to your profile pictures album.
+``If you would like to keep your account but not be visible to others, you can pause your account.
+HHIf you'd rather just take a break, choose to Pause your account instead.
+Ignore pending request
+Image with name %s.
+Imperial (ft/lbs)
+++Improved list view with customizable stats!
+In a call
+>>In order to make calls you need to allow incoming video calls.
+44In order to use this profile, please re-activate it.
+In progress
+ccIn urgent cases or if the reported matter is not publicly visible, please contact the support team.
+Incoming call
+Incoming call...
+Incoming video call from
+Indian
+Individual
+Indonesian
+Install
+Install updated version
+Interests
+UUInternal Error: 403 Forbidden. Please try again or contact Support if error persists.
+^^Internal Error: Unsupported Media Type. Please try again or contact Support if error persists.
+Into
+Invalid account.
+Invalid email
+Invalid format.
+Invalid input
+Invalid range.
+UUInvalid username or password. Please verify your username and password and try again.
+MMInvisibility is a PLUS feature. Long press your avatar to change your status.
+Invisible
+hhIt is necessary to enable access to external storage in your device settings to update this application.
+It is necessary to enable or allow installation of apps from unknown sources in your device settings to update this application.
+>>It is not possible to hide a visit when a footprint was given.
+BBIt's not possible for you to grant QuickShare access to this user.
+FFIt's not possible for you to leave a footprint on this user's profile.
+HHIt's not possible for you to publicly link your profile to this profile.
+LLIt's not possible for you to request access to this user's QuickShare album.
+88It's not possible for you to send messages to this user.
+JJIt's not possible to grant or request access to your own QuickShare album.
+88It's not possible to link your own profile as a partner.
+Italian
+s too complicated
+s too slow
+Japanese
+Jazz & Blues
+Jeans
+Jewish
+Jobs
+Jogging
+Join now
+Jump
+Just now
+Kannada
+Keep disabled
+Keep in mind that you will need to manually cancel your PLUS subscription directly on Play Store to avoid any recurring payments.
+Keep them coming!
+Kiss
+Kitten
+Known personally
+Korean
+Kurdish
+LOCATION SETTINGS
+Languages
+Last logins
+Last reply %s
+Last reply by %1$s at %2$s.
+Latin
+Latvian
+Learn more
+Leather
+Leave a message
+Leave footprint
+&&Let us know the reason you are leaving
+''Let us know the reasons you are leaving
+Let's continue!
+Let's go deeper
+Let's set up your profile
+Let's talk
+Light brown
+Light brown hair
+Like this picture
+Likes
+Likes could not be retrieved.
+Lingerie
+&&Link request from %s has been ignored.
+Link request not found.
+Link request pending
+List View
+Literature
+Lithuanian
+Loading Profile
+Loading contact details
+Loading media folder...
+Loading media folders...
+Loading support tickets
+Loading
+Local
+Location
+Location shared
+hhLocation tracking in your device is disabled. Would you like to go to your system settings to change it?
+hhLocation tracking on your device is disabled. Would you like to go to your system settings to change it?
+Location unknown.
+Lock
+Log in
+Log out
+Logging in
+Login
+EELogin failed. Please verify your username and password and try again.
+Login failed: %s
+Long
+Long hair
+44Long press to grant access to your QuickShare album.
+Looking for
+Looking for dates
+Looking for friends
+Looking for my age
+Looking for my gender
+Looking for my orientation
+Looking for relationship
+Looking good!
+Love
+Lutheran
+Luxembourgish
+Lycra
+NNM 0,0 C 0.05, 0, 0.133333, 0.06, 0.166666, 0.4 C 0.208333, 0.82, 0.25, 1, 1, 1
+DDM0,16 A11,11 0 0,1 11,5 H21 A11,11 0 0,1 21,27 H11 A11,11 0 0,1 0,16
+DDM0,16 A16,16 0 0,1 16,0 H36 A16,16 0 0,1 36,32 H16 A16,16 0 0,1 0,16
+DDM1,16 A15,15 0 0,1 16,1 H36 A15,15 0 0,1 36,31 H16 A15,15 0 0,1 1,16
+M12,4.5C7,4.5 2.73,7.61 1,12c1.73,4.39 6,7.5 11,7.5s9.27,-3.11 11,-7.5c-1.73,-4.39 -6,-7.5 -11,-7.5zM12,17c-2.76,0 -5,-2.24 -5,-5s2.24,-5 5,-5 5,2.24 5,5 -2.24,5 -5,5zM12,9c-1.66,0 -3,1.34 -3,3s1.34,3 3,3 3,-1.34 3,-3 -1.34,-3 -3,-3z
+))M13.4,15 11,15 11,17 13.4,17 21,17 21,15z
+//M14,18.2 11.4,15.6 10,17 14,21 22,13 20.6,11.6z
+DDM2,16 A14,14 0 0,1 16,2 H16 A14,14 0 0,1 16,30 H16 A14,14 0 0,1 2,16
+NNM2,4.27 L19.73,22 L22.27,19.46 L4.54,1.73 L4.54,1 L23,1 L23,23 L1,23 L1,4.27 Z
+JJM2,4.27 L2,4.27 L4.54,1.73 L4.54,1.73 L4.54,1 L23,1 L23,23 L1,23 L1,4.27 Z
+SSM23,7H9C7.9,7,7,7.9,7,9v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V9C25,7.9,24.1,7,23,7z
+eeM23,7H9C7.9,7,7,7.9,7,9v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V9C25,7.9,24.1,7,23,7z M23,23H9V9h14V23z
+M3.27,4.27 L19.74,20.74
+DDM4,16 A12,12 0 0,1 16,4 H16 A12,12 0 0,1 16,28 H16 A12,12 0 0,1 4,16
+>>M8,16 A8,8 0 0,1 16,8 H16 A8,8 0 0,1 16,24 H16 A8,8 0 0,1 8,16
+MIIEQzCCAyugAwIBAgIJAMLgh0ZkSjCNMA0GCSqGSIb3DQEBBAUAMHQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDAeFw0wODA4MjEyMzEzMzRaFw0zNjAxMDcyMzEzMzRaMHQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDCCASAwDQYJKoZIhvcNAQEBBQADggENADCCAQgCggEBAKtWLgDYO6IIrgqWbxJOKdoR8qtW0I9Y4sypEwPpt1TTcvZApxsdyxMJZ2JORland2qSGT2y5b+3JKkedxiLDmpHpDsz2WCbdxgxRczfey5YZnTJ4VZbH0xqWVW/8lGmPav5xVwnIiJS6HXk+BVKZF+JcWjAsb/GEuq/eFdpuzSqeYTcfi6idkyugwfYwXFU1+5fZKUaRKYCwkkFQVfcAs1fXA5V+++FGfvjJ/CxURaSxaBvGdGDhfXE28LWuT9ozCl5xw4Yq5OGazvV24mZVSoOO0yZ31j7kYvtwYK6NeADwbSxDdJEqO4k//0zOHKrUiGYXtqw/A0LFFtqoZKFjnkCAQOjgdkwgdYwHQYDVR0OBBYEFMd9jMIhF1Ylmn/Tgt9r45jk14alMIGmBgNVHSMEgZ4wgZuAFMd9jMIhF1Ylmn/Tgt9r45jk14aloXikdjB0MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLR29vZ2xlIEluYy4xEDAOBgNVBAsTB0FuZHJvaWQxEDAOBgNVBAMTB0FuZHJvaWSCCQDC4IdGZEowjTAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBAUAA4IBAQBt0lLO74UwLDYKqs6Tm8/yzKkEu116FmH4rkaymUIE0P9KaMftGlMexFlaYjzmB2OxZyl6euNXEsQH8gjwyxCUKRJNexBiGcCEyj6z+a1fuHHvkiaai+KL8W1EyNmgjmyy8AW7P+LLlkR+ho5zEHatRbM/YAnqGcFh5iZBqpknHf1SKMXFh4dd239FJ1jWYfbMDMy3NS5CTMQ2XFI1MvcyUTdZPErjQfTbQe3aDQsQcafEQPD+nqActifKZ0Np0IS9L9kR/wbNvyz6ENwPiTrjV2KRkEjH78ZMcUQXg0L3BYHJ3lc69Vs5Ddf9uUGGMYldX3WfMBEmh/9iFBDAaTCK
+<MIIEqDCCA5CgAwIBAgIJANWFuGx90071MA0GCSqGSIb3DQEBBAUAMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbTAeFw0wODA0MTUyMzM2NTZaFw0zNTA5MDEyMzM2NTZaMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbTCCASAwDQYJKoZIhvcNAQEBBQADggENADCCAQgCggEBANbOLggKv+IxTdGNs8/TGFy0PTP6DHThvbbR24kT9ixcOd9W+EaBPWW+wPPKQmsHxajtWjmQwWfna8mZuSeJS48LIgAZlKkpFeVyxW0qMBujb8X8ETrWy550NaFtI6t9+u7hZeTfHwqNvacKhp1RbE6dBRGWynwMVX8XW8N1+UjFaq6GCJukT4qmpN2afb8sCjUigq0GuMwYXrFVee74bQgLHWGJwPmvmLHC69EH6kWr22ijx4OKXlSIx2xT1AsSHee70w5iDBiK4aph27yH3TxkXy9V89TDdexAcKk/cVHYNnDBapcavl7y0RiQ4biu8ymM8Ga/nmzhRKya6G0cGw8CAQOjgfwwgfkwHQYDVR0OBBYEFI0cxb6VTEM8YYY6FbBMvAPyT+CyMIHJBgNVHSMEgcEwgb6AFI0cxb6VTEM8YYY6FbBMvAPyT+CyoYGapIGXMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbYIJANWFuGx90071MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEEBQADggEBABnTDPEF+3iSP0wNfdIjIz1AlnrPzgAIHVvXxunW7SBrDhEglQZBbKJEk5kT0mtKoOD1JMrSu1xuTKEBahWRbqHsXclaXjoBADb0kkjVEJu/Lh5hgYZnOjvlba8Ld7HCKePCVePoTJBdI4fvugnL8TsgK05aIskyY0hKI9L8KfqfGTl1lzOv2KoWD0KWwtAWPoGChZxmQ+nBli+gwYMzM1vAkP+aayLe0a1EQimlOalO762r0GXO0ks+UeXde2Z4e+8S/pf7pITEI/tP+MxJTALw9QUWEv9lKTk+jkbqxbsh8nfBUapfKqYn0eidpwq2AzVp3juYl7//fKnaPhJD9gs=
+Macedonian
+Main Picture
+Malay
+Malayalam
+Maltese
+Manage Subscription
+Manage albums
+Manage pictures
+Marathi
+Mark all as read
+Married
+Martial Arts
+Maximum %1s.
+Maximum characters exceeded.
+Maybe later
+Me and S&M
+Measurements
+\\Media folders could not be retrieved. Please try again or contact Support if error persists.
+Mediterranean
+Member since: %1$s
+Menu+
+Message
+Message %s.
+Message could not be locked.
+&&Message could not be reported as spam.
+Message could not be sent.
+Message failed
+Message failed. Tap to retry
+Message not sent
+Message options
+Message syncing failed.
+  Message text copied to clipboard
+Messages
+44Messages can't be retrieved. Please try again later.
+77Messages couldn't be retrieved. Please try again later.
+Meta+
+Methodist
+Metric (cm/kg)
+Mexican
+FFMinimum 10 characters. Try using numbers, capital letters and symbols.
+))Minimum one number and one capital letter
+Minute
+Miscellaneous
+Missed video call
+Mixed
+Model building
+More
+More bottom
+  More than %1$d new notifications
+More top
+Mormon
+Motor racing
+Motorbikes
+Mountains
+Moustache
+Movies
+Muscular
+Music
+Musical
+Muslim
+Muslim (Shia)
+Muslim (Sunni)
+My Gender
+My Languages
+My Note
+My Orientation
+My PLUS Membership
+!!My PLUS subscription and payments
+My Partner
+My Relationship Status
+My Travel Plans
+My age
+My body is
+My ethnicity is
+My gender
+My height is
+My location
+My messages are gone
+My online status
+My orientation
+My play position
+My private notes
+My profile headline
+My profile was rejected
+My tickets
+My trips
+My weight is
+NO ADS
+Name
+Nature
+Navigate to current year %1$d
+Navigate to year %1$d
+Navigate up
+Navigation menu
+Nearby
+ZZNecessary in order to get notified about new messages, footprints, picture likes and more.
+New Age
+New Apostolic
+New Password
+New album
+New email address
+New guys:
+New link requests
+New messages in %1$s chats
+New notification
+New profile
+JJNew version of Google Play services needed. It will update itself shortly.
+New visitors
+Newest Romeos
+Next
+Night life / Clubbing
+No FF
+No SM
+No Sports
+No age limits
+No anal
+No articles found
+No beard
+No connection
+No dirty
+No entries
+No entry
+No folder
+No internet connection detected
+No matches found.
+No piercings
+..No recurring payment to cancel has been found.
+No results
+No results for
+No support tickets
+No tattoos
+No vote
+Non smoker
+Non-renewing
+None
+Non
+binary
+binary, Other orientation
+military service
+Norwegian
+Not checked
+Not enough features
+Not enough people near me
+Not now
+Not selected
+Not set
+BBNot shown on your profile but can be attached in private messages.
+::Not shown on your profile, but can be shared with one tap.
+Not single
+Not verified yet
+Not very hairy
+bfNothing to show here yet.
+Like
+ pics of some of your favourite ROMEOs to get some love in return!
+yyNothing to show here yet. Get noticed by uploading a hot new pic or sending a footprint to some sexy ROMEOs in your area.
+\\Nothing to show here yet. Start by checking out profiles of some ROMEOs that catch your eye!
+bfNothing to show here yet. 
+Like
+ pics of some of your favourite ROMEOs to get some love in return!
+Notification
+Notification sound
+Notifications
+Occitan
+Occupation
+Official Profile
+Offline
+Old Catholic
+Oldies
+One new footprint
+One new message
+One picture
+Ongoing call
+Online
+Online status
+;;Only sexually neutral pictures can be used as main picture.
+WWOops! Facebook authorization failed. You can try again or use a different login option.
+UUOops! Our service is temporarily offline. But don't worry, our team is already on it.
+77Oops! Something went wrong. Please try to log in again.
+mmOops, something went wrong while deleting the album: missing privileges. Please try again or contact Support.
+ooOops, something went wrong while loading the album(s): missing privileges. Please try again or contact Support.
+55Oops, something went wrong while reporting this user.
+mmOops, something went wrong with QuickShare: 'request' argument required. Please try again or contact Support.
+iiOops, something went wrong with QuickShare: grants argument invalid. Please try again or contact Support.
+ffOops, something went wrong with QuickShare: invalid id on delete. Please try again or contact Support.
+ggOops, something went wrong with QuickShare: invalid id on request. Please try again or contact Support.
+hhOops, something went wrong with QuickShare: invalid value on 'get'. Please try again or contact Support.
+iiOops, something went wrong with QuickShare: invalid value on 'post'. Please try again or contact Support.
+iiOops, something went wrong with QuickShare: invalid value on delete. Please try again or contact Support.
+iiOops, something went wrong with QuickShare: invalid value on grants. Please try again or contact Support.
+nnOops, something went wrong with QuickShare: missing privileges on 'post'. Please try again or contact Support.
+ddOops, something went wrong with QuickShare: missing privileges. Please try again or contact Support.
+mmOops, something went wrong with your account changes: parameter missing. Please try again or contact Support.
+ZZOops, something went wrong: account argument missing. Please try again or contact Support.
+bbOops, the friends list could not be loaded. Please try again or contact Support if error persists.
+Oops, we are offline
+Open
+Open in browser
+Open navigation drawer
+Open on phone
+Open to
+Optimising data
+Optional comment
+Orchestra
+((Order creation failed. Please try again.
+Organized me
+Oriental Orthodox
+Orientation
+Orientations I'm into
+Orthodox
+Other
+Other gender
+Other hair color
+Other orientation
+Other questions
+Other travelers
+Our Groups feature brings together like-minded people on topics they're interested in. Unfortunately we're not able to show this content in our apps.
+Out of range: %1$s
+PICTURE ARCHIVE
+PLUS Upgrade
+PLUS users can be seen in the Radar of their travel destination 2 weeks before they arrive to start getting to know the local ROMEOs.
+JJPLUS users can choose their grid view & add their favourite profile stats.
+;;PLUS users can hide their profile visits within 30 seconds.
+HHPLUS users can save, edit and send phrases for a faster chat experience.
+BBPLUS users can select Invisible Mode and appear offline to others.
+XXPLUS users can share and request unlimited QuickShare albums. Free users get %d per day.
+''PLUS users get unlimited Radar results.
+PROFILE
+PROFILE PICTURES
+Pagan
+Partially checked
+Partner
+Partner profile
+Party Animal
+Pashto
+Password
+%%Password confirmation does not match.
+Password invalid
+.0Password must include at least one digit (0
+IKPassword must include at least one special character, e.g., ! _ 
+ @ # ? ]
+Password*
+Passwords doesn't match
+Pause account
+Pause my account
+Pause or delete account
+eePausing your account won't affect the duration of your PLUS membership, which expires or renews on %s
+Pedantic
+Pending
+Persian
+Phaser
+Phew
+Photography
+Picture
+Picture Upload
+Picture archive
+Picture could not be updated.
+Picture likes
+XXPicture order could not be saved. Please try again or contact Support if error persists.
+Picture reported successfully.
+Picture shared
+Picture too big
+Picture under review
+Pictures
+Pictures I liked
+Pictures shared
+Piercings
+PlanetRomeo
+Foundation
+PlanetRomeo Foundation
+Planned
+Planning
+Play safe?
+55Please accept the Terms of Use and Privacy Statement.
+%%Please add your password to continue.
+,,Please check the data entered and try again.
+..Please check your login details and try again.
+Please check your messages and emails for more information. Only after you have made the requested change(s), will your account be reactivated. If you've already made the changes, please request another review of your profile. We look forward to having you back!
+Please check your password.
+Please check your profile name.
+88Please choose a profile name with at least 5 characters.
+Please choose a reason:
+  Please describe what happened:
+Please enable video calls
+Please enter Security Code.
+44Please enter a username between 5 and 20 characters.
+Please enter start date.
+EEPlease enter the email address you used to create your ROMEO account.
+Please enter your birthdate.
+$$Please enter your email or username.
+Please help us improve
+XXPlease note that your PLUS subscription that was linked to this account is still active.
+  Please provide a valid location.
+{{Please refer to the verification email sent to you. Use the link in the email to verify your email address, then try again.
+$$Please select a language for support
+qqPlease select a location within a %1$skm radius from your current position, or explore other locations with %2$s.
+Please select a source
+$$Please select at least one language.
+,,Please select between one to five languages.
+""Please tell us more about yourself
+@@Please try again later, or check our X page for live updates:
+%%Please type in a valid E-Mail address
+Please verify your email.
+66Please wait until the picture has loaded to attach it.

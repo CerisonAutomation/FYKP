@@ -1,0 +1,200 @@
+2:## com.clovers.rizz.apk
+8:<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="36" android:compileSdkVersionCodename="16" android:requiredSplitTypes="base__abi,base__density" android:splitTypes="" package="com.clovers.rizz" platformBuildVersionCode="36" platformBuildVersionName="16">
+21:        </intent>
+24:        </intent>
+27:        </intent>
+30:        </intent>
+33:        </intent>
+38:        </intent>
+41:        </intent>
+44:        </intent>
+55:    <permission android:name="com.clovers.rizz.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="signature"/>
+56:    <uses-permission android:name="com.clovers.rizz.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+62:        <activity android:configChanges="assetsPaths|locale|keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|layoutDirection" android:exported="true" android:launchMode="singleTask" android:name="com.clovers.rizz.MainActivity" android:screenOrientation="portrait" android:theme="@style/Theme.App.SplashScreen" android:windowSoftInputMode="adjustResize">
+66:            </intent-filter>
+73:            </intent-filter>
+102:        <provider android:authorities="com.clovers.rizz.FileSystemFileProvider" android:exported="false" android:grantUriPermissions="true" android:name="expo.modules.filesystem.FileSystemFileProvider">
+105:        <provider android:authorities="com.clovers.rizz.ClipboardFileProvider" android:exported="false" android:grantUriPermissions="true" android:name="expo.modules.clipboard.ClipboardFileProvider">
+111:            </intent-filter>
+116:        <provider android:authorities="com.clovers.rizz.ImagePickerFileProvider" android:exported="false" android:grantUriPermissions="true" android:name="expo.modules.imagepicker.fileprovider.ImagePickerFileProvider">
+127:        <provider android:authorities="com.clovers.rizz.cropper.fileprovider" android:exported="false" android:grantUriPermissions="true" android:name="com.canhub.cropper.CropFileProvider">
+134:            </intent-filter>
+162:            </intent-filter>
+165:            </intent-filter>
+168:            </intent-filter>
+171:            </intent-filter>
+188:<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="36" android:compileSdkVersionCodename="16" android:requiredSplitTypes="base__abi,base__density" android:splitTypes="" package="com.clovers.rizz" platformBuildVersionCode="36" platformBuildVersionName="16">
+191:- com.clovers.rizz.MainActivity
+238:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/AndroidManifest.xml:2:<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+376:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim-v33/rns_default_enter_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+377:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim-v33/rns_default_enter_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+378:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim-v33/rns_default_exit_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+379:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim-v33/rns_default_exit_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+380:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/abc_grow_fade_in_from_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+381:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/abc_popup_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+382:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/abc_popup_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+383:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/abc_shrink_fade_out_from_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+384:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/abc_tooltip_enter.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+385:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/abc_tooltip_exit.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+386:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_checked_box_inner_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+387:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_checked_box_outer_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+388:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_checked_icon_null_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+389:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_unchecked_box_inner_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+390:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_unchecked_check_path_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+391:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_unchecked_icon_null_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+392:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_off_mtrl_dot_group_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+393:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_off_mtrl_ring_outer_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+394:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_off_mtrl_ring_outer_path_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+395:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_on_mtrl_dot_group_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+396:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_on_mtrl_ring_outer_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+397:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_on_mtrl_ring_outer_path_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+398:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/catalyst_fade_in.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+399:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/catalyst_fade_out.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+400:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/catalyst_push_up_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+401:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/catalyst_push_up_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+402:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/catalyst_slide_down.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+403:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/catalyst_slide_up.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+404:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/design_bottom_sheet_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+405:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/design_bottom_sheet_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+406:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/fragment_fast_out_extra_slow_in.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android" android:pathData="M 0,0 C 0.05, 0, 0.133333, 0.06, 0.166666, 0.4 C 0.208333, 0.82, 0.25, 1, 1, 1"/>
+407:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line1_head_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+408:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line1_tail_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+409:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line2_head_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+410:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line2_tail_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+411:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/m3_bottom_sheet_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+412:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/m3_bottom_sheet_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+413:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/m3_motion_fade_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+414:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/m3_motion_fade_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+415:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_enter_from_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+416:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_enter_from_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+417:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_exit_to_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+418:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_exit_to_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+419:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/mtrl_bottom_sheet_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+420:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/mtrl_bottom_sheet_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+421:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/mtrl_card_lowers_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+422:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_default_enter_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+423:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_default_enter_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+424:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_default_exit_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+425:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_default_exit_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+426:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_fade_from_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+427:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_fade_in.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+428:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_fade_out.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+429:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_fade_to_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+430:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_ios_from_left_background_close.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+431:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_ios_from_left_background_open.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+432:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_ios_from_left_foreground_close.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+433:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_ios_from_left_foreground_open.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+434:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_ios_from_right_background_close.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+435:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_ios_from_right_background_open.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+436:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_ios_from_right_foreground_close.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+437:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/anim/rns_ios_from_right_foreground_open.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+486:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_hide_password__0_res_0x7f080000.xml:17:            android:pathData="@string/path_password_eye_mask_visible"/>
+487:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_hide_password__0_res_0x7f080000.xml:21:            android:pathData="@string/path_password_eye"/>
+488:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_hide_password__0_res_0x7f080000.xml:9:        android:pathData="@string/path_password_strike_through"
+489:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_hide_password__1_res_0x7f080001.xml:4:    android:duration="@integer/hide_password_duration"
+490:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_hide_password__1_res_0x7f080001.xml:5:    android:valueFrom="@string/path_password_eye_mask_visible"
+491:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_hide_password__1_res_0x7f080001.xml:6:    android:valueTo="@string/path_password_eye_mask_strike_through"
+492:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_hide_password__2_res_0x7f080002.xml:4:    android:duration="@integer/hide_password_duration"
+493:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_show_password__0_res_0x7f080003.xml:16:            android:pathData="@string/path_password_eye_mask_strike_through"/>
+494:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_show_password__0_res_0x7f080003.xml:20:            android:pathData="@string/path_password_eye"/>
+495:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_show_password__0_res_0x7f080003.xml:9:        android:pathData="@string/path_password_strike_through"
+496:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_show_password__1_res_0x7f080004.xml:4:    android:duration="@integer/show_password_duration"
+497:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_show_password__1_res_0x7f080004.xml:5:    android:valueFrom="@string/path_password_eye_mask_strike_through"
+498:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_show_password__1_res_0x7f080004.xml:6:    android:valueTo="@string/path_password_eye_mask_visible"
+499:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_avd_show_password__2_res_0x7f080005.xml:4:    android:duration="@integer/show_password_duration"
+500:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_hide_password__0_res_0x7f080006.xml:17:            android:pathData="@string/path_password_eye_mask_visible"/>
+501:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_hide_password__0_res_0x7f080006.xml:21:            android:pathData="@string/path_password_eye"/>
+502:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_hide_password__0_res_0x7f080006.xml:9:        android:pathData="@string/path_password_strike_through"
+503:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_hide_password__1_res_0x7f080007.xml:5:    android:valueFrom="@string/path_password_eye_mask_visible"
+504:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_hide_password__1_res_0x7f080007.xml:6:    android:valueTo="@string/path_password_eye_mask_strike_through"
+505:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_show_password__0_res_0x7f080009.xml:16:            android:pathData="@string/path_password_eye_mask_strike_through"/>
+506:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_show_password__0_res_0x7f080009.xml:20:            android:pathData="@string/path_password_eye"/>
+507:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_show_password__0_res_0x7f080009.xml:9:        android:pathData="@string/path_password_strike_through"
+508:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_show_password__1_res_0x7f08000a.xml:5:    android:valueFrom="@string/path_password_eye_mask_strike_through"
+509:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/_m3_avd_show_password__1_res_0x7f08000a.xml:6:    android:valueTo="@string/path_password_eye_mask_visible"
+510:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/avd_hide_password.xml:2:<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:drawable="@drawable/_avd_hide_password__0_res_0x7f080000">
+511:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/avd_hide_password.xml:5:        android:animation="@drawable/_avd_hide_password__1_res_0x7f080001"/>
+512:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/avd_hide_password.xml:8:        android:animation="@drawable/_avd_hide_password__2_res_0x7f080002"/>
+513:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/avd_show_password.xml:2:<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:drawable="@drawable/_avd_show_password__0_res_0x7f080003">
+514:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/avd_show_password.xml:5:        android:animation="@drawable/_avd_show_password__1_res_0x7f080004"/>
+515:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/avd_show_password.xml:8:        android:animation="@drawable/_avd_show_password__2_res_0x7f080005"/>
+516:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/design_ic_visibility.xml:9:        android:pathData="@string/path_password_eye"/>
+517:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/design_password_eye.xml:11:        android:drawable="@drawable/avd_hide_password"
+518:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/design_password_eye.xml:15:        android:drawable="@drawable/avd_show_password"
+519:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/m3_avd_hide_password.xml:2:<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:drawable="@drawable/_m3_avd_hide_password__0_res_0x7f080006">
+520:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/m3_avd_hide_password.xml:5:        android:animation="@drawable/_m3_avd_hide_password__1_res_0x7f080007"/>
+521:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/m3_avd_hide_password.xml:8:        android:animation="@drawable/_m3_avd_hide_password__2_res_0x7f080008"/>
+522:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/m3_avd_show_password.xml:2:<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:drawable="@drawable/_m3_avd_show_password__0_res_0x7f080009">
+523:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/m3_avd_show_password.xml:5:        android:animation="@drawable/_m3_avd_show_password__1_res_0x7f08000a"/>
+524:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/m3_avd_show_password.xml:8:        android:animation="@drawable/_m3_avd_show_password__2_res_0x7f08000b"/>
+525:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/m3_password_eye.xml:11:        android:drawable="@drawable/m3_avd_hide_password"
+526:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/drawable/m3_password_eye.xml:15:        android:drawable="@drawable/m3_avd_show_password"
+529:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/attrs.xml:1222:        <enum name="password_toggle" value="1" />
+530:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/attrs.xml:2568:    <attr name="passwordToggleContentDescription" format="string">
+531:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/attrs.xml:2570:    <attr name="passwordToggleDrawable" format="reference">
+532:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/attrs.xml:2572:    <attr name="passwordToggleEnabled" format="boolean">
+533:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/attrs.xml:2574:    <attr name="passwordToggleTint" format="color">
+534:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/attrs.xml:2576:    <attr name="passwordToggleTintMode">
+535:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/integers.xml:13:    <integer name="hide_password_duration">320</integer>
+536:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/integers.xml:62:    <integer name="show_password_duration">200</integer>
+537:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/public.xml:1147:    <public type="attr" name="passwordToggleContentDescription" id="0x7f040412" />
+538:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/public.xml:1148:    <public type="attr" name="passwordToggleDrawable" id="0x7f040413" />
+539:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/public.xml:1149:    <public type="attr" name="passwordToggleEnabled" id="0x7f040414" />
+542:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/menu/crop_image_menu.xml:13:        app:showAsAction="ifRoom"/>
+543:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/menu/crop_image_menu.xml:18:        app:showAsAction="ifRoom">
+544:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/menu/crop_image_menu.xml:8:        app:showAsAction="ifRoom"/>
+545:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/attrs.xml:2872:        <flag name="ifRoom" value="1" />
+546:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/res/values/public.xml:3650:    <public type="id" name="ifRoom" id="0x7f09011e" />
+547:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/c.java:3:import android.content.ContentResolver;
+548:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/c.java:41:    public static AssetFileDescriptor h(Uri uri, ContentResolver contentResolver) {
+549:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/c.java:42:        return MediaStore.openAssetFileDescriptor(contentResolver, uri, "r", null);
+550:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:3:import android.content.ContentResolver;
+551:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:34:        private final ContentResolver f306a;
+552:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:36:        a(ContentResolver contentResolver) {
+553:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:37:            this.f306a = contentResolver;
+554:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:53:        private final ContentResolver f308a;
+555:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:55:        b(ContentResolver contentResolver) {
+556:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:56:            this.f308a = contentResolver;
+557:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:71:        return new d(uri, new f(com.bumptech.glide.b.d(context).k().g(), eVar, com.bumptech.glide.b.d(context).f(), context.getContentResolver()));
+558:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:75:        return c(context, uri, new a(context.getContentResolver()));
+559:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/d.java:79:        return c(context, uri, new b(context.getContentResolver()));
+560:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/f.java:142:    f(List list, a aVar, e eVar, C3.b bVar, ContentResolver contentResolver) {
+561:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/f.java:146:        this.f313d = contentResolver;
+562:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/f.java:3:import android.content.ContentResolver;
+563:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/f.java:31:    private final ContentResolver f313d;
+564:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/f.java:36:    f(List list, e eVar, C3.b bVar, ContentResolver contentResolver) {
+565:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/A3/f.java:37:        this(list, f309f, eVar, bVar, contentResolver);
+601:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/B2/h.java:5:import com.revenuecat.purchases.common.HTTPClient;
+602:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/B2/h.java:79:            case HTTPClient.NO_STATUS_CODE /* -1 */:
+604:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/GeneratedAppGlideModuleImpl.java:37:        new OkHttpLibraryGlideModule().a(context, glide, registry);
+605:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/GeneratedAppGlideModuleImpl.java:43:        new ExpoImageOkHttpClientGlideModule().a(context, glide, registry);
+613:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:123:        HttpURLConnection httpURLConnectionC = c(url, map);
+614:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:124:        this.f29103d = httpURLConnectionC;
+615:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:126:            httpURLConnectionC.connect();
+616:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:175:        HttpURLConnection httpURLConnection = this.f29103d;
+617:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:176:        if (httpURLConnection != null) {
+618:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:177:            httpURLConnection.disconnect();
+619:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:30:    private HttpURLConnection f29103d;
+620:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:44:        public HttpURLConnection a(URL url) {
+621:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:45:            return (HttpURLConnection) url.openConnection();
+622:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:51:        HttpURLConnection a(URL url);
+623:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:58:    private HttpURLConnection c(URL url, Map map) throws p379z3.e {
+624:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:60:            HttpURLConnection httpURLConnectionA = this.f29102c.a(url);
+625:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:62:                httpURLConnectionA.addRequestProperty((String) entry.getKey(), (String) entry.getValue());
+626:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:64:            httpURLConnectionA.setConnectTimeout(this.f29101b);
+627:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:65:            httpURLConnectionA.setReadTimeout(this.f29101b);
+628:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:66:            httpURLConnectionA.setUseCaches(false);
+629:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:67:            httpURLConnectionA.setDoInput(true);
+630:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:68:            httpURLConnectionA.setInstanceFollowRedirects(false);
+631:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:69:            return httpURLConnectionA;
+632:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:7:import java.net.HttpURLConnection;
+633:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:75:    private static int f(HttpURLConnection httpURLConnection) {
+634:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:77:            return httpURLConnection.getResponseCode();
+635:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:87:    private InputStream g(HttpURLConnection httpURLConnection) throws p379z3.e {
+636:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:89:            if (TextUtils.isEmpty(httpURLConnection.getContentEncoding())) {
+637:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:90:                this.f29104e = V3.c.b(httpURLConnection.getInputStream(), httpURLConnection.getContentLength());
+638:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:93:                    Log.d("HttpUrlFetcher", "Got non empty content encoding: " + httpURLConnection.getContentEncoding());
+639:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:95:                this.f29104e = httpURLConnection.getInputStream();
+640:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/bumptech/glide/load/data/j.java:99:            throw new p379z3.e("Failed to obtain InputStream", f(httpURLConnection), e10);
+641:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/facebook/imagepipeline/producers/D.java:100:        HttpURLConnection httpURLConnectionO = o(uri);
+642:/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/sources/com/facebook/imagepipeline/producers/D.java:103:            httpURLConnectionO.setRequestProperty("User-Agent", str);

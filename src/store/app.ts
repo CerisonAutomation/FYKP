@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { User, TabId, Message, Conversation, ChatRequest, Shout, UserFavorite, UserNote, Blog, Video, Banner } from '@/types';
+import type { User, TabId, Message, Conversation, ChatRequest, Shout, UserFavorite, UserNote, Blog, Video, Banner, ProfileField, ChatSortMode, ChatAIAnalysis } from '@/types';
 
 interface AppState {
   currentUser: User | null;

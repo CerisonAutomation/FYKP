@@ -1,0 +1,203 @@
+## API URLs Found
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/AndroidManifest.xml:2:<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:56:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:66:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:76:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:86:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/acknowledgments.html:94:<p>http://www.apache.org/licenses/LICENSE-2.0</p>
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:104:      "base_url": "https://pradn.net/img/usr/original/"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:4:      "base_url": "https://pradn.net/v12/img/footprints/circular/",
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:42:      "base_url": "https://pradn.net/v12/img/footprints/rectangular/",
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:62:      "base_url": "https://pradn.net/img/usr/squarish/",
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/assets/fallback_picture_format.json:87:      "base_url": "https://pradn.net/img/usr/portrait/",
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/client_analytics.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/developers/mobile/targeting/proto/client_signals.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/common_types.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/experiment_payload.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/inappmessaging/proto/messages.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:120:  // Captured Url: https://wwww.google.com/maps/cities#seattle?id=123
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:121:  // Logged Url: https://wwww.google.com/maps/cities
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/firebase/perf/v1/perf_metric.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/apphosting/datastore/testing/datastore_test_trace.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/bundle.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/maybe_document.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/mutation.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:39:  // https://github.com/googleapis/googleapis/blob/master/google/firestore/v1/firestore.proto#L735
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:56:  // https://github.com/googleapis/googleapis/blob/master/google/firestore/v1/firestore.proto#L723
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firebase/firestore/proto/target.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/admin/index.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/aggregation_result.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/bloom_filter.proto:54:// A bloom filter (https://en.wikipedia.org/wiki/Bloom_filter).
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/bloom_filter.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/common.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/document.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:53:      "https://www.googleapis.com/auth/cloud-platform,"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:54:      "https://www.googleapis.com/auth/datastore";
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/firestore.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/query.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/firestore/v1/write.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/internal/rate_limit.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/campaign.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/internal/firebase/inappmessaging/v1/sdkserving/fiam_fetch_service.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/any.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/api.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/api.proto:52:// this message itself. See https://cloud.google.com/apis/design/glossary for
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/api.proto:73:  // versioning](http://semver.org) where the major version number
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/duration.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/empty.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/field_mask.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/source_context.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/struct.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:109:// [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:124:// [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:127:// [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:130:// http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime()
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:51:// smear](https://developers.google.com/time/smear).
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/timestamp.proto:55:// 3339](https://www.ietf.org/rfc/rfc3339.txt) date strings.
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/type.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/google/protobuf/wrappers.proto:3:// https://developers.google.com/protocol-buffers/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/logs/proto/firebase/inappmessaging/campaign_analytics.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/messaging_event_extension.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/messaging_event.proto:7://      http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/COPYRIGHT:7:http://www.apache.org/licenses/LICENSE-2.0
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:21:https://www.apache.org/licenses/LICENSE-2.0.
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:29:https://github.com/eclipse-ee4j/injection-api
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:30:https://github.com/eclipse-ee4j/injection-spec
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:31:https://github.com/eclipse-ee4j/injection-tck
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/META-INF/NOTICE.md:5:* Project home: https://projects.eclipse.org/projects/cdi.batch
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/okhttp3/internal/publicsuffix/NOTICE:2:https://publicsuffix.org/list/public_suffix_list.dat
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/okhttp3/internal/publicsuffix/NOTICE:5:https://mozilla.org/MPL/2.0/
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_grow_fade_in_from_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_popup_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_popup_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_shrink_fade_out_from_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_tooltip_enter.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/abc_tooltip_exit.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/anim_zoom_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/anim_zoom_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_checked_box_inner_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_checked_box_outer_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_checked_icon_null_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_unchecked_box_inner_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_unchecked_check_path_merged_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_checkbox_to_unchecked_icon_null_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_off_mtrl_dot_group_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_off_mtrl_ring_outer_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_off_mtrl_ring_outer_path_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_on_mtrl_dot_group_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_on_mtrl_ring_outer_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/btn_radio_to_on_mtrl_ring_outer_path_animation.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/chat_fragment_translate.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/linear_interpolator">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/cycle.xml:2:<cycleInterpolator xmlns:android="http://schemas.android.com/apk/res/android" android:cycles="3"/>
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/design_bottom_sheet_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/design_bottom_sheet_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/design_snackbar_in.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/design_snackbar_out.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fade_in_delayed.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fade_in.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fade_out.xml:2:<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fragment_fade_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/linear_interpolator">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/fragment_fast_out_extra_slow_in.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android" android:pathData="M 0,0 C 0.05, 0, 0.133333, 0.06, 0.166666, 0.4 C 0.208333, 0.82, 0.25, 1, 1, 1"/>
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/friends_fragment_translate.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/linear_interpolator">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line1_head_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line1_tail_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line2_head_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/linear_indeterminate_line2_tail_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_bottom_sheet_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_bottom_sheet_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_motion_fade_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_motion_fade_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_enter_from_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_enter_from_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_exit_to_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/m3_side_sheet_exit_to_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/mtrl_bottom_sheet_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/mtrl_bottom_sheet_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/mtrl_card_lowers_interpolator.xml:2:<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/no_effect_animation.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/picture_like_to_liked.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/picture_selection_fake.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:ordering="sequentially">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/shake.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_down.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_in_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_in_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_in_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_out_left.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_out_right.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/slide_up.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_covered.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@android:integer/config_mediumAnimTime">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in_previous.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in_previous2.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in_previous3.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="300">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="400">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in2.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="400">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_in3.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="400">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_out.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_out2.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stats_interview_slide_out3.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/stay.xml:2:<translate xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/text_slide_in_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@integer/counter_animation_duration">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/text_slide_in_top.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@integer/counter_animation_duration">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/text_slide_out_bottom.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@integer/counter_animation_duration">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/anim/text_slide_out_top.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="@integer/counter_animation_duration">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/appbar_always_elevated.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/design_appbar_state_list_animator.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/design_fab_hide_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/design_fab_show_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_close_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_close_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_fade_enter.xml:2:<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_fade_exit.xml:2:<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_open_enter.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/fragment_open_exit.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_appbar_state_list_animator.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_btn_state_list_anim.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_card_elevated_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_card_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_chip_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_change_size_collapse_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_change_size_expand_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_hide_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_show_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/m3_extended_fab_state_list_animator.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_btn_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_card_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_chip_state_list_anim.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_change_size_collapse_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_change_size_expand_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_hide_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_show_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_extended_fab_state_list_animator.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_fab_hide_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_fab_show_motion_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_fab_transformation_sheet_collapse_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/mtrl_fab_transformation_sheet_expand_spec.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/animator/scale_up_down.xml:2:<set xmlns:android="http://schemas.android.com/apk/res/android"
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-night/material_timepicker_button_stroke.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-night/material_timepicker_clockface.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-night/material_timepicker_modebutton_tint.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_default_color_primary_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_default_color_secondary_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_highlighted_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_hint_foreground.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_dark_primary_text_disable_only.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_default_color_primary_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_default_color_secondary_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_highlighted_text.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_hint_foreground.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_dynamic_primary_text_disable_only.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant87.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant92.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant94.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant96.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color-v31/m3_ref_palette_dynamic_neutral_variant98.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_background_cache_hint_selector_material_dark.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_background_cache_hint_selector_material_light.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_color_highlight_material.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_hint_foreground_material_dark.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_hint_foreground_material_light.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_primary_text_disable_only_material_dark.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+/Users/cb/ghidra-projects/dating-apps/romeo-3.42.0.apk-reverseapk/jadx/resources/res/color/abc_primary_text_disable_only_material_light.xml:2:<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+## Potential Secrets / API Keys

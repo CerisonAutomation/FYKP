@@ -1,0 +1,2002 @@
+341000→res/FU.png
+341001→res/FW.png
+341002→res/Gf.png
+341003→res/I3.9.png
+341004→res/JT.9.png
+341005→res/Kw.png
+341006→res/LB.png
+341007→res/Li.9.png
+341008→res/Ly.9.png
+341009→res/MM.png
+341010→res/Mk.png
+341011→res/NG.png
+341012→res/No.9.png
+341013→res/OX.png
+341014→res/RJ.png
+341015→res/UR.png
+341016→res/X3.9.png
+341017→res/X4.9.png
+341018→res/X6.9.png
+341019→res/Y3.png
+341020→res/Y7.9.png
+341021→res/Z8.png
+341022→res/ZQ.png
+341023→res/_p.png
+341024→res/d5.9.png
+341025→res/fJ.png
+341026→res/g9.png
+341027→res/gZ.9.png
+341028→res/gj.9.png
+341029→res/gm.png
+341030→res/jL.png
+341031→res/jW.png
+341032→res/k2.png
+341033→res/kd.png
+341034→res/kp.png
+341035→res/nI.9.png
+341036→res/nf.png
+341037→res/o3.png
+341038→res/o9.9.png
+341039→res/oE.png
+341040→res/op.9.png
+341041→res/qD.9.png
+341042→res/qh.png
+341043→res/r0.png
+341044→res/s0.png
+341045→res/s3.9.png
+341046→res/s5.png
+341047→res/sa.png
+341048→res/us.9.png
+341049→res/uu1.9.png
+341050→res/vo.png
+341051→res/w2.9.png
+341052→res/wM.png
+341053→res/wT.png
+341054→res/wm.png
+341055→res/x3.9.png
+341056→res/yS.png
+341057→res/yY.9.png
+341058→res/zV.9.png
+341059→res/zw.9.png
+341060→res/zz.png
+341061→res/7o.9.png
+341062→res/xT.9.png
+341063→res/zN.9.png
+341064→res/11.9.png
+341065→res/7C.9.png
+341066→res/7_.9.png
+341067→res/8h.png
+341068→res/Gt.9.png
+341069→res/Im.9.png
+341070→res/KM.png
+341071→res/LL.png
+341072→res/MD.png
+341073→res/MF.9.png
+341074→res/MQ.png
+341075→res/NA.9.png
+341076→res/OX2.png
+341077→res/Pb.png
+341078→res/Pw.9.png
+341079→res/hZ.9.png
+341080→res/j4.png
+341081→res/o-.png
+341082→res/p8.png
+341083→res/pk.png
+341084→res/so.png
+341085→res/tG.png
+341086→res/u3.png
+341087→res/vo.9.png
+341088→res/y0.png
+341089→res/QZ.9.png
+341090→res/oF.9.png
+341091→res/wL.9.png
+341092→res/8t.xml
+341093→res/Ac1.xml
+341094→res/BW.xml
+341095→res/D-1.xml
+341096→res/-h.webp
+341097→res/0o.webp
+341098→res/2n.webp
+341099→res/Bn.webp
+341100→res/EA.webp
+341101→res/Ko.webp
+341102→res/NR.webp
+341103→res/NT.webp
+341104→res/Oi.webp
+341105→res/Tw.webp
+341106→res/V5.png
+341107→res/XD.webp
+341108→res/Xb.webp
+341109→res/Z1.webp
+341110→res/ZW.webp
+341111→res/cz.webp
+341112→res/f8.webp
+341113→res/hX.webp
+341114→res/j2.webp
+341115→res/l-.webp
+341116→res/mC.webp
+341117→res/mV.webp
+341118→res/mn.webp
+341119→res/n4.webp
+341120→res/r9.webp
+341121→"%1$s" copied to clipboard.
+341122→%1$d - %2$d years
+341123→%1$d days free trial
+341124→%1$d percent.
+341125→%1$d selected
+341126→%1$d user
+341127→%1$d users
+341128→%1$d%2$s
+341129→%1$d'%2$d ft
+341130→%1$d/%2$d
+341131→%1$s
+341132→%1$s %2$s
+341133→%1$s Missed video calls
+341134→%1$s has more pictures.
+341135→%1$s hours
+341136→%1$s is copied to clipboard
+341137→CC%1$s is having trouble with Google Play services. Please try again.
+341138→%1$s minutes
+341139→%1$s new footprints
+341140→%1$s o'clock
+341141→%1$s opened article '%2$s'
+341142→%1$s selected %2$s
+341143→%1$s tried to call you
+341144→*.%1$s users have looked at your profile. 
+341145→66%1$s won't run unless you update Google Play services.
+341146→JJ%1$s won't run without Google Play services, which are currently updating.
+341147→PP%1$s won't run without Google Play services, which are missing from your device.
+341148→TT%1$s won't run without Google Play services, which are not supported by your device.
+341149→77%1$s won't work unless you enable Google Play services.
+341150→%1$s 
+341151→ %2$s
+341152→%1$s 
+341153→ End date
+341154→%1$s 
+341155→ %2$s
+341156→%1$s%2$s
+341157→%1$s, %2$s
+341158→%1dd
+341159→%1dh
+341160→%1dm
+341161→%1ds
+341162→%1dw
+341163→%1dy
+341164→%1s is not available
+341165→%1s permission is required
+341166→%d Like
+341167→%d Likes
+341168→%d cm
+341169→%d day
+341170→%d days
+341171→%d kg
+341172→%d lbs
+341173→%d linked profiles
+341174→%d mins
+341175→%d month
+341176→%d months
+341177→%d new notification
+341178→%d new notifications
+341179→%d pictures
+341180→%d secs
+341181→%d week
+341182→%d weeks
+341183→%d year
+341184→%d years
+341185→%s + %d other %s
+341186→%s PLUS (compensation)
+341187→%s PLUS (free)
+341188→%s PLUS (gift received)
+341189→%s PLUS (promotion)
+341190→%s PLUS (referral)
+341191→%s PLUS (voucher)
+341192→%s PLUS (with renewal)
+341193→%s PLUS (without renewal)
+341194→%s article loaded
+341195→%s ft
+341196→%s km
+341197→%s liked
+341198→%s m
+341199→%s mi
+341200→%s says:
+341201→& more
+341202→(Addresses visible only to you)
+341203→(DELETED)
+341204→(PAUSED)
+341205→(This album is not editable)
+341206→*Mandatory fields
+341207→+ Add Contact Folder
+341208→##..People with pics get more clicks!
+341209→1 min
+341210→1 sec
+341211→**1. Add pictures to your
+341212→ QuickShare album.
+341213→ 20 characters
+341214→%%1:4760212605:android:3c1ae4b2e018f333
+341215→""2. Tap [[]] to share 
+341216→ for 60 min.
+341217→4760212605
+341218→FF4760212605-og8t21346pipj9ql7astdmg15m7bodes.apps.googleusercontent.com
+341219→5-20 characters
+341220→999+
+341221→<1 min
+341222→<HTML dir=auto> <HEAD><LINK href='%1$s' type='text/css' rel='stylesheet'/></HEAD> <body> <h1 id=title>%2$s</h1> %3$s <footer><p id=footerText>%4$s</p></footer> </body> </HTML>
+341223→A few
+341224→A lot
+341225→%)A user has looked at your profile. 
+341226→ddA verification link has been emailed to you. Please use this link to confirm your new email address.
+341227→A verification link has been sent to your email inbox.
+341228→Your email address needs to be verified in order to contact other Romeos.
+341229→''AIzaSyABrPsJbooKA4JSBdbFwpMi6Etb2uQCFXA
+341230→''AIzaSyDBo7hyuvJwju6WfV_2lTYf8BQ37KpAiLQ
+341231→About Me
+341232→About me
+341233→About my d***
+341234→About this app
+341235→About us
+341236→Accept
+341237→Access requested
+341238→Account
+341239→Account Settings
+341240→Account could not be deleted.
+341241→Account creation
+341242→&&Account settings change in progress...
+341243→Acknowledgements
+341244→Activate
+341245→Active
+341246→NNActive locations cannot be deleted. Please change your location and try again.
+341247→Activity
+341248→Add a profile picture*
+341249→Add account
+341250→Add as friend
+341251→Add attachments
+341252→Add caption
+341253→Add contact folder
+341254→\\Add more pictures. Profiles with at least 5 pictures have a much higher chance of engagement
+341255→Add new phrase
+341256→Add pic
+341257→Add tag
+341258→Add tags
+341259→((Add travel plans and be seen in 5 cities
+341260→Adding a phrase failed.
+341261→Address shared
+341262→Advanced
+341263→Adventure
+341264→Afrikaans
+341265→Age Range
+341266→##Agent file attachment with name %s.
+341267→$$Agent image attachment with name %s.
+341268→Agent message %s.
+341269→Agnostic
+341270→Albanian
+341271→Albums
+341272→All Albums
+341273→All Inclusive Holiday
+341274→All done!
+341275→**All received Likes will be marked as read.
+341276→&&Allow ROMEO to send you notifications?
+341277→Allow incoming video calls
+341278→Allow usage tracking
+341279→Already a Romeo?
+341280→Alt+
+341281→Alternative
+341282→zzAn error occurred in the payment process. Please try again. If the error keeps happening, please contact our Support Team.
+341283→}}Analytical cookies give us a valuable insight to the usage of our app. This allows us to continue to improve our app for you.
+341284→Anglican
+341285→Animist
+341286→Answer
+341287→Answer Bot
+341288→App analytics
+341289→App crashes too often
+341290→App settings
+341291→App version no longer supported
+341292→,,Appear offline to others with Invisible Mode
+341293→Appear offline with PLUS
+341294→Apprentice
+341295→Arab
+341296→Arabic
+341297→Archive pictures
+341298→77Are you sure you want to clear Likes notification list?
+341299→88Are you sure you want to clear all visits from the list?
+341300→--Are you sure you want to delete this picture?
+341301→--Are you sure you want to delete your account?
+341302→88Are you sure you want to leave and discard your changes?
+341303→++Are you sure you want to link this account?
+341304→,,Are you sure you want to pause your account?
+341305→Armenian
+341306→Army
+341307→Arrives in %1s on %2s
+341308→Arts
+341309→Asian
+341310→Atheist
+341311→Athletic
+341312→Attached file with name %s.
+341313→Attachment could not be sent
+341314→Attachment type not supported
+341315→Attachments
+341316→Attachments not supported
+341317→Attention
+341318→Audio enabled
+341319→Audio muted
+341320→Average
+341321→Average body
+341322→Average hair length
+341323→Azerbaijani
+341324→Back
+341325→Back to Visits
+341326→Badminton
+341327→Bahai
+341328→Baptist
+341329→Baseball
+341330→Basketball
+341331→Basque
+341332→""Be seen in this location with PLUS
+341333→Beard
+341334→Become a Beta Tester
+341335→Bed & Breakfast
+341336→Bedroom
+341337→Belarusian
+341338→Belly
+341339→Bengali
+341340→Best Deal
+341341→Big Grid
+341342→Biking
+341343→Birthdate
+341344→Bisexual
+341345→Bisexual Non
+341346→binary
+341347→Bisexual, Other gender
+341348→Black
+341349→Black hair
+341350→Block %s?
+341351→Blocked
+341352→Blond
+341353→Blue
+341354→Blue
+341355→collar
+341356→Board games
+341357→Body Hair
+341358→Body Type
+341359→Body diversity rocks!
+341360→Boots
+341361→Bosnian
+341362→Bottom
+341363→Bottom Sheet
+341364→Bottom only
+341365→Brown
+341366→Brown hair
+341367→Buddhist
+341368→Bulgarian
+341369→Burmese
+341370→Call declined
+341371→Call ended
+341372→Call ended unexpectedly.
+341373→Calling...
+341374→Cambodian
+341375→Camera
+341376→##Can I see your QuickShare pictures?
+341377→Canadian French
+341378→Cancel
+341379→Cancel subscription
+341380→Canceled
+341381→Canceling Upload
+341382→Cancellation was successful!
+341383→Care
+341384→Cars
+341385→Catalan
+341386→Catholic
+341387→Caucasian
+341388→Cebuano
+341389→Change
+341390→Change email
+341391→Change email address
+341392→Change password
+341393→Change to next month
+341394→Change to previous month
+341395→Chaotic
+341396→%%Character limit exceeded %1$d of %2$d
+341397→Characters entered %1$d of %2$d
+341398→Chat
+341399→Chat could not be deleted.
+341400→Check who's around
+341401→Checked
+341402→Chinese
+341403→--Choose a non-sexual picture for your profile.
+341404→Choose a topic
+341405→88Choose your grid view & add your favourite profile stats
+341406→Choose your location*
+341407→Christian
+341408→Circumcision
+341409→Circus
+341410→City breaks
+341411→Civil servant
+341412→Classic
+341413→Classical
+341414→Clear
+341415→Clear all
+341416→Clear list
+341417→Clear query
+341418→Clear text
+341419→Climbing
+341420→Close
+341421→Close app
+341422→Close navigation menu
+341423→Close sheet
+341424→Club
+341425→Collapse
+341426→Collapse bottom sheet
+341427→Collapse the bottom sheet
+341428→Collecting
+341429→Comment with text %s sent.
+341430→Comments loaded.
+341431→Communication
+341432→Community
+341433→Computers
+341434→Concert
+341435→Condom
+341436→Confirm
+341437→Confirm Password
+341438→Confirm current password
+341439→Confucianist
+341440→**Congratulations! You're now a PLUS member.
+341441→ooConnection Error: Footprint list could not be retrieved. Please try again or contact Support if error persists.
+341442→}}Connection Error: List of profiles you visited could not be retrieved. Please try again or contact Support if error persists.
+341443→hhConnection Error: Online status could not be set. Please try again or contact Support if error persists.
+341444→nnConnection Error: Selected folder could not be deleted. Please try again or contact Support if error persists.
+341445→llConnection Error: Selected folder could not be moved. Please try again or contact Support if error persists.
+341446→llConnection Error: Selected folder could not be saved. Please try again or contact Support if error persists.
+341447→ooConnection Error: Selected picture could not be deleted. Please try again or contact Support if error persists.
+341448→mmConnection Error: Visitor list could not be retrieved. Please try again or contact Support if error persists.
+341449→Connection failed.
+341450→""Connection lost. Please try again.
+341451→Consumed
+341452→Contact Folder
+341453→Contact could not be deleted.
+341454→Contact customer support
+341455→$$Contact folder could not be deleted.
+341456→""Contact folder could not be saved.
+341457→Contact us
+341458→Contacts
+341459→Contacts could not be updated.
+341460→Continue
+341461→Continue to delete my account
+341462→Continue to pause my account
+341463→..Contribute to this user's verification status.
+341464→Conversations
+341465→99Conversations started from this app will be visible here.
+341466→Cooking
+341467→Copy
+341468→Copy link
+341469→Copyright ROMEO BV
+341470→Could not delete saved phrase
+341471→Could not hide visit
+341472→KKCould not open Play Store. Please try again or manually install the update.
+341473→Could not open device settings. Please enable installation of apps from unknown sources in your device settings to update the app.
+341474→==Could not open your system settings. Please open it manually.
+341475→!!Could not request profile recheck
+341476→Country
+341477→Create a unique profile name*
+341478→Creating profile
+341479→Creating your profile...
+341480→Creative Chaos
+341481→Croatian
+341482→Cross
+341483→dressing
+341484→Cruise
+341485→Ctrl+
+341486→Current password
+341487→Current selection: %1$s
+341488→00Customize your list view and pick up to %s stats
+341489→Czech
+341490→D*** size
+341491→Dance
+341492→Dance & Electronic
+341493→Danish
+341494→Date
+341495→Date of Birth*
+341496→Date of birth
+341497→Dates
+341498→Decline
+341499→Delete
+341500→Delete "%s" album?
+341501→Delete account
+341502→Delete contact folder
+341503→Delete message
+341504→Delete my account
+341505→Delete picture
+341506→Delete pictures
+341507→Delete profile
+341508→Delivered
+341509→Deselect All
+341510→Design Playground
+341511→Designer stubble
+341512→Di Du Do
+341513→Dialog
+341514→Dialog Icon
+341515→Digital
+341516→Dinner Bell
+341517→Dirty
+341518→Dirty sex
+341519→Discordian
+341520→Discover
+341521→Dismiss
+341522→Dismiss bottom sheet
+341523→Display
+341524→''Do you really want to clear the search?
+341525→00Do you really want to clear your list of visits?
+341526→//Do you really want to clear your visitors list?
+341527→22Do you really want to delete the selected picture?
+341528→33Do you really want to delete the selected pictures?
+341529→//Do you really want to delete this conversation?
+341530→))Do you really want to delete this folder?
+341531→**Do you really want to delete this message?
+341532→11Do you really want to make the "%s" album public?
+341533→**Do you really want to remove this account?
+341534→**Do you really want to remove this contact?
+341535→22Do you really want to report this message as spam?
+341536→**Do you really want to report this picture?
+341537→$$Do you want to get in contact again?
+341538→Do you want to proceed?
+341539→Document
+341540→Done
+341541→Donkey
+341542→Downloading update %1$s
+341543→XXDraft message could not be saved. Please try again or contact Support if error persists.
+341544→Drag handle
+341545→Drag handle double-tapped
+341546→,,Drag the map, type an address or turn on GPS
+341547→Dropdown menu
+341548→Du Di
+341549→Duck
+341550→Dutch
+341551→E-Mail*
+341552→Edit
+341553→Edit caption
+341554→Edit phrase
+341555→Edit profile
+341556→Editing your phrase failed.
+341557→Email
+341558→Email address
+341559→""Email confirmation does not match.
+341560→Email or username
+341561→Email was not sent because the weekly password reset limit has been exceeded. Please double check your inbox or contact Support.
+341562→Employee
+341563→Empty
+341564→Enable
+341565→Enable Google Play services
+341566→End call
+341567→End date
+341568→End date %1$s
+341569→English
+341570→Enter at least 4 characters
+341571→Enter contact folder name
+341572→Enter password to confirm
+341573→Enter valid email address
+341574→Enter your email
+341575→Enter your full name
+341576→Enter your message
+341577→Error
+341578→VVError opening selected picture. Please try again or contact Support if error persists.
+341579→Error: invalid
+341580→Esperanto
+341581→Estonian
+341582→Ethnicity
+341583→Every app that works with sharing of GPS harbors certain risks; other users might find out where you are. That
+341584→s why we allow users to choose their location. If you want to keep your location secret, do not use 
+341585→GPS location
+341586→Everything
+341587→Example: %1$s
+341588→Exceeds max file size (%1$s)
+341589→Exhibition
+341590→Expand bottom sheet
+341591→Expand halfway
+341592→Expand the bottom sheet
+341593→Explore here
+341594→Explore other places with
+341595→Eye Colour
+341596→EyeCandy
+341597→FF Active
+341598→FF Passive
+341599→FF Versatile
+341600→FRIENDS
+341601→Facial hair
+341602→Failed to create request
+341603→Failed to fetch article
+341604→Failed to fetch attachments
+341605→Failed to get articles
+341606→Failed to get categories
+341607→Failed to get sections
+341608→Failed to get tickets
+341609→Failed to load comments
+341610→  Failed to send. Tap for options.
+341611→Fast food
+341612→Favorite
+341613→Favourite Food
+341614→Favourite stats
+341615→Feedback: VideoChat
+341616→File download in progress
+341617→File with name %s.
+341618→Film & Video
+341619→Films
+341620→Filters are too confusing
+341621→Finish
+341622→Finnish
+341623→First of all
+341624→Folder
+341625→Folk
+341626→Football
+341627→VVFootprint could not be removed. Please try again or contact Support if error persists.
+341628→RRFootprint could not be set. Please try again or contact Support if error persists.
+341629→Footprints
+341630→##For starters, add a profile picture
+341631→Forgot my password or username
+341632→Forgot password
+341633→Forgot password?
+341634→Formal dress
+341635→Forward
+341636→ Foundation Donation (
+341637→ %1$.2f)
+341638→eeFree users can only access their visitors from the last 24 hours. Upgrade to PLUS to unlock them all.
+341639→zzFree users can only access their visitors from the last 24 hours. Upgrade to PLUS to unlock visitors from the last 7 days.
+341640→WWFree users have a limited amount of search options. Upgrade to PLUS to unlock them all.
+341641→Freelancer
+341642→French
+341643→Frequently used
+341644→Friends
+341645→Frog
+341646→From
+341647→Full beard
+341648→Function+
+341649→GET PLUS NOW
+341650→??GPS is disabled. Enable GPS for a better experience in Settings
+341651→GPS location
+341652→GPS privacy information
+341653→Galician
+341654→Gallery
+341655→Gaming
+341656→Gay Non
+341657→binary
+341658→Gay, Other gender
+341659→Gender
+341660→Genders I'm into
+341661→General
+341662→Genuine
+341663→Georgian
+341664→German
+341665→Get Google Play services
+341666→Get Support
+341667→""Get unlimited QuickShare with PLUS
+341668→Get verified!
+341669→Give Feedback
+341670→Global
+341671→Go back
+341672→Go to Play Store
+341673→Goat
+341674→Goatee
+341675→HHGoing back will delete your message. Are you sure you want to delete it?
+341676→Going out
+341677→Golf
+341678→!!Google Play services availability
+341679→Google Play services error
+341680→Got it
+341681→Got it!
+341682→Gothic & New wave
+341683→Great Job!
+341684→Greek
+341685→Green
+341686→Greenlandic (Kalaallisut)
+341687→Grey
+341688→Grey hair
+341689→Groups
+341690→HOT STUFF!
+341691→Hair Colour
+341692→Hair Length
+341693→Hairy
+341694→Handball
+341695→Hang Up
+341696→Harp
+341697→Haven't found your date yet?
+341698→Headline
+341699→Heavy metal
+341700→Hebrew
+341701→Hedonist
+341702→Height
+341703→Help Center loaded
+341704→Help us improve the App!
+341705→%%Here are some articles that may help:
+341706→  Here's an article that may help:
+341707→Hide Ads
+341708→Hide your profile visits
+341709→""Hide your profile visits with PLUS
+341710→Hiking
+341711→Hindi
+341712→Hindu
+341713→%%His QuickShare album has no pictures.
+341714→33Hopefully you'll give us another try in the future.
+341715→Hour
+341716→House & Techno
+341717→How was the call?
+341718→Humanist
+341719→Hungarian
+341720→I accept ROMEO's %1$s and %2$s.
+341721→I am
+341722→))I am 18 years or older and I agree to the
+341723→!%I can
+341724→t find what I
+341725→m looking for
+341726→"$I couldn
+341727→t verify my email address
+341728→I don't like ROMEO
+341729→I don't offer Bed & Breakfast.
+341730→I don
+341731→t like the content
+341732→I don
+341733→t like the design
+341734→I found these articles:
+341735→##I have found what I was looking for
+341736→I identify as
+341737→''I just wanted a profile for the weekend
+341738→I met someone
+341739→I need a break from ROMEO
+341740→I need help
+341741→I offer Bed & Breakfast
+341742→++I remembered I have another profile already
+341743→!!I see error messages all the time
+341744→I speak
+341745→I'm Looking for*
+341746→  I'm interested in people between
+341747→I'm into
+341748→I'm looking for
+341749→Ice Hockey
+341750→Icelandic
+341751→TTIf a reply is needed, someone will contact you by email. What is your email address?
+341752→||If you delete your account, you will permanently lose your profile, pictures, messages and contacts. This can not be undone.
+341753→ssIf you don't find it in your inbox, check your spam folder, make sure you entered the correct email or username, or
+341754→,,If you don't want any contact, simply block.
+341755→nnIf you set this as your main profile picture, it will be moved from this album to your profile pictures album.
+341756→``If you would like to keep your account but not be visible to others, you can pause your account.
+341757→HHIf you'd rather just take a break, choose to Pause your account instead.
+341758→Ignore pending request
+341759→Image with name %s.
+341760→Imperial (ft/lbs)
+341761→++Improved list view with customizable stats!
+341762→In a call
+341763→>>In order to make calls you need to allow incoming video calls.
+341764→44In order to use this profile, please re-activate it.
+341765→In progress
+341766→ccIn urgent cases or if the reported matter is not publicly visible, please contact the support team.
+341767→Incoming call
+341768→Incoming call...
+341769→Incoming video call from
+341770→Indian
+341771→Individual
+341772→Indonesian
+341773→Install
+341774→Install updated version
+341775→Interests
+341776→UUInternal Error: 403 Forbidden. Please try again or contact Support if error persists.
+341777→^^Internal Error: Unsupported Media Type. Please try again or contact Support if error persists.
+341778→Into
+341779→Invalid account.
+341780→Invalid email
+341781→Invalid format.
+341782→Invalid input
+341783→Invalid range.
+341784→UUInvalid username or password. Please verify your username and password and try again.
+341785→MMInvisibility is a PLUS feature. Long press your avatar to change your status.
+341786→Invisible
+341787→hhIt is necessary to enable access to external storage in your device settings to update this application.
+341788→It is necessary to enable or allow installation of apps from unknown sources in your device settings to update this application.
+341789→>>It is not possible to hide a visit when a footprint was given.
+341790→BBIt's not possible for you to grant QuickShare access to this user.
+341791→FFIt's not possible for you to leave a footprint on this user's profile.
+341792→HHIt's not possible for you to publicly link your profile to this profile.
+341793→LLIt's not possible for you to request access to this user's QuickShare album.
+341794→88It's not possible for you to send messages to this user.
+341795→JJIt's not possible to grant or request access to your own QuickShare album.
+341796→88It's not possible to link your own profile as a partner.
+341797→Italian
+341798→s too complicated
+341799→s too slow
+341800→Japanese
+341801→Jazz & Blues
+341802→Jeans
+341803→Jewish
+341804→Jobs
+341805→Jogging
+341806→Join now
+341807→Jump
+341808→Just now
+341809→Kannada
+341810→Keep disabled
+341811→Keep in mind that you will need to manually cancel your PLUS subscription directly on Play Store to avoid any recurring payments.
+341812→Keep them coming!
+341813→Kiss
+341814→Kitten
+341815→Known personally
+341816→Korean
+341817→Kurdish
+341818→LOCATION SETTINGS
+341819→Languages
+341820→Last logins
+341821→Last reply %s
+341822→Last reply by %1$s at %2$s.
+341823→Latin
+341824→Latvian
+341825→Learn more
+341826→Leather
+341827→Leave a message
+341828→Leave footprint
+341829→&&Let us know the reason you are leaving
+341830→''Let us know the reasons you are leaving
+341831→Let's continue!
+341832→Let's go deeper
+341833→Let's set up your profile
+341834→Let's talk
+341835→Light brown
+341836→Light brown hair
+341837→Like this picture
+341838→Likes
+341839→Likes could not be retrieved.
+341840→Lingerie
+341841→&&Link request from %s has been ignored.
+341842→Link request not found.
+341843→Link request pending
+341844→List View
+341845→Literature
+341846→Lithuanian
+341847→Loading Profile
+341848→Loading contact details
+341849→Loading media folder...
+341850→Loading media folders...
+341851→Loading support tickets
+341852→Loading
+341853→Local
+341854→Location
+341855→Location shared
+341856→hhLocation tracking in your device is disabled. Would you like to go to your system settings to change it?
+341857→hhLocation tracking on your device is disabled. Would you like to go to your system settings to change it?
+341858→Location unknown.
+341859→Lock
+341860→Log in
+341861→Log out
+341862→Logging in
+341863→Login
+341864→EELogin failed. Please verify your username and password and try again.
+341865→Login failed: %s
+341866→Long
+341867→Long hair
+341868→44Long press to grant access to your QuickShare album.
+341869→Looking for
+341870→Looking for dates
+341871→Looking for friends
+341872→Looking for my age
+341873→Looking for my gender
+341874→Looking for my orientation
+341875→Looking for relationship
+341876→Looking good!
+341877→Love
+341878→Lutheran
+341879→Luxembourgish
+341880→Lycra
+341881→NNM 0,0 C 0.05, 0, 0.133333, 0.06, 0.166666, 0.4 C 0.208333, 0.82, 0.25, 1, 1, 1
+341882→DDM0,16 A11,11 0 0,1 11,5 H21 A11,11 0 0,1 21,27 H11 A11,11 0 0,1 0,16
+341883→DDM0,16 A16,16 0 0,1 16,0 H36 A16,16 0 0,1 36,32 H16 A16,16 0 0,1 0,16
+341884→DDM1,16 A15,15 0 0,1 16,1 H36 A15,15 0 0,1 36,31 H16 A15,15 0 0,1 1,16
+341885→M12,4.5C7,4.5 2.73,7.61 1,12c1.73,4.39 6,7.5 11,7.5s9.27,-3.11 11,-7.5c-1.73,-4.39 -6,-7.5 -11,-7.5zM12,17c-2.76,0 -5,-2.24 -5,-5s2.24,-5 5,-5 5,2.24 5,5 -2.24,5 -5,5zM12,9c-1.66,0 -3,1.34 -3,3s1.34,3 3,3 3,-1.34 3,-3 -1.34,-3 -3,-3z
+341886→))M13.4,15 11,15 11,17 13.4,17 21,17 21,15z
+341887→//M14,18.2 11.4,15.6 10,17 14,21 22,13 20.6,11.6z
+341888→DDM2,16 A14,14 0 0,1 16,2 H16 A14,14 0 0,1 16,30 H16 A14,14 0 0,1 2,16
+341889→NNM2,4.27 L19.73,22 L22.27,19.46 L4.54,1.73 L4.54,1 L23,1 L23,23 L1,23 L1,4.27 Z
+341890→JJM2,4.27 L2,4.27 L4.54,1.73 L4.54,1.73 L4.54,1 L23,1 L23,23 L1,23 L1,4.27 Z
+341891→SSM23,7H9C7.9,7,7,7.9,7,9v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V9C25,7.9,24.1,7,23,7z
+341892→eeM23,7H9C7.9,7,7,7.9,7,9v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V9C25,7.9,24.1,7,23,7z M23,23H9V9h14V23z
+341893→M3.27,4.27 L19.74,20.74
+341894→DDM4,16 A12,12 0 0,1 16,4 H16 A12,12 0 0,1 16,28 H16 A12,12 0 0,1 4,16
+341895→>>M8,16 A8,8 0 0,1 16,8 H16 A8,8 0 0,1 16,24 H16 A8,8 0 0,1 8,16
+341896→MIIEQzCCAyugAwIBAgIJAMLgh0ZkSjCNMA0GCSqGSIb3DQEBBAUAMHQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDAeFw0wODA4MjEyMzEzMzRaFw0zNjAxMDcyMzEzMzRaMHQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDCCASAwDQYJKoZIhvcNAQEBBQADggENADCCAQgCggEBAKtWLgDYO6IIrgqWbxJOKdoR8qtW0I9Y4sypEwPpt1TTcvZApxsdyxMJZ2JORland2qSGT2y5b+3JKkedxiLDmpHpDsz2WCbdxgxRczfey5YZnTJ4VZbH0xqWVW/8lGmPav5xVwnIiJS6HXk+BVKZF+JcWjAsb/GEuq/eFdpuzSqeYTcfi6idkyugwfYwXFU1+5fZKUaRKYCwkkFQVfcAs1fXA5V+++FGfvjJ/CxURaSxaBvGdGDhfXE28LWuT9ozCl5xw4Yq5OGazvV24mZVSoOO0yZ31j7kYvtwYK6NeADwbSxDdJEqO4k//0zOHKrUiGYXtqw/A0LFFtqoZKFjnkCAQOjgdkwgdYwHQYDVR0OBBYEFMd9jMIhF1Ylmn/Tgt9r45jk14alMIGmBgNVHSMEgZ4wgZuAFMd9jMIhF1Ylmn/Tgt9r45jk14aloXikdjB0MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLR29vZ2xlIEluYy4xEDAOBgNVBAsTB0FuZHJvaWQxEDAOBgNVBAMTB0FuZHJvaWSCCQDC4IdGZEowjTAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBAUAA4IBAQBt0lLO74UwLDYKqs6Tm8/yzKkEu116FmH4rkaymUIE0P9KaMftGlMexFlaYjzmB2OxZyl6euNXEsQH8gjwyxCUKRJNexBiGcCEyj6z+a1fuHHvkiaai+KL8W1EyNmgjmyy8AW7P+LLlkR+ho5zEHatRbM/YAnqGcFh5iZBqpknHf1SKMXFh4dd239FJ1jWYfbMDMy3NS5CTMQ2XFI1MvcyUTdZPErjQfTbQe3aDQsQcafEQPD+nqActifKZ0Np0IS9L9kR/wbNvyz6ENwPiTrjV2KRkEjH78ZMcUQXg0L3BYHJ3lc69Vs5Ddf9uUGGMYldX3WfMBEmh/9iFBDAaTCK
+341897→<MIIEqDCCA5CgAwIBAgIJANWFuGx90071MA0GCSqGSIb3DQEBBAUAMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbTAeFw0wODA0MTUyMzM2NTZaFw0zNTA5MDEyMzM2NTZaMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbTCCASAwDQYJKoZIhvcNAQEBBQADggENADCCAQgCggEBANbOLggKv+IxTdGNs8/TGFy0PTP6DHThvbbR24kT9ixcOd9W+EaBPWW+wPPKQmsHxajtWjmQwWfna8mZuSeJS48LIgAZlKkpFeVyxW0qMBujb8X8ETrWy550NaFtI6t9+u7hZeTfHwqNvacKhp1RbE6dBRGWynwMVX8XW8N1+UjFaq6GCJukT4qmpN2afb8sCjUigq0GuMwYXrFVee74bQgLHWGJwPmvmLHC69EH6kWr22ijx4OKXlSIx2xT1AsSHee70w5iDBiK4aph27yH3TxkXy9V89TDdexAcKk/cVHYNnDBapcavl7y0RiQ4biu8ymM8Ga/nmzhRKya6G0cGw8CAQOjgfwwgfkwHQYDVR0OBBYEFI0cxb6VTEM8YYY6FbBMvAPyT+CyMIHJBgNVHSMEgcEwgb6AFI0cxb6VTEM8YYY6FbBMvAPyT+CyoYGapIGXMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbYIJANWFuGx90071MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEEBQADggEBABnTDPEF+3iSP0wNfdIjIz1AlnrPzgAIHVvXxunW7SBrDhEglQZBbKJEk5kT0mtKoOD1JMrSu1xuTKEBahWRbqHsXclaXjoBADb0kkjVEJu/Lh5hgYZnOjvlba8Ld7HCKePCVePoTJBdI4fvugnL8TsgK05aIskyY0hKI9L8KfqfGTl1lzOv2KoWD0KWwtAWPoGChZxmQ+nBli+gwYMzM1vAkP+aayLe0a1EQimlOalO762r0GXO0ks+UeXde2Z4e+8S/pf7pITEI/tP+MxJTALw9QUWEv9lKTk+jkbqxbsh8nfBUapfKqYn0eidpwq2AzVp3juYl7//fKnaPhJD9gs=
+341898→Macedonian
+341899→Main Picture
+341900→Malay
+341901→Malayalam
+341902→Maltese
+341903→Manage Subscription
+341904→Manage albums
+341905→Manage pictures
+341906→Marathi
+341907→Mark all as read
+341908→Married
+341909→Martial Arts
+341910→Maximum %1s.
+341911→Maximum characters exceeded.
+341912→Maybe later
+341913→Me and S&M
+341914→Measurements
+341915→\\Media folders could not be retrieved. Please try again or contact Support if error persists.
+341916→Mediterranean
+341917→Member since: %1$s
+341918→Menu+
+341919→Message
+341920→Message %s.
+341921→Message could not be locked.
+341922→&&Message could not be reported as spam.
+341923→Message could not be sent.
+341924→Message failed
+341925→Message failed. Tap to retry
+341926→Message not sent
+341927→Message options
+341928→Message syncing failed.
+341929→  Message text copied to clipboard
+341930→Messages
+341931→44Messages can't be retrieved. Please try again later.
+341932→77Messages couldn't be retrieved. Please try again later.
+341933→Meta+
+341934→Methodist
+341935→Metric (cm/kg)
+341936→Mexican
+341937→FFMinimum 10 characters. Try using numbers, capital letters and symbols.
+341938→))Minimum one number and one capital letter
+341939→Minute
+341940→Miscellaneous
+341941→Missed video call
+341942→Mixed
+341943→Model building
+341944→More
+341945→More bottom
+341946→  More than %1$d new notifications
+341947→More top
+341948→Mormon
+341949→Motor racing
+341950→Motorbikes
+341951→Mountains
+341952→Moustache
+341953→Movies
+341954→Muscular
+341955→Music
+341956→Musical
+341957→Muslim
+341958→Muslim (Shia)
+341959→Muslim (Sunni)
+341960→My Gender
+341961→My Languages
+341962→My Note
+341963→My Orientation
+341964→My PLUS Membership
+341965→!!My PLUS subscription and payments
+341966→My Partner
+341967→My Relationship Status
+341968→My Travel Plans
+341969→My age
+341970→My body is
+341971→My ethnicity is
+341972→My gender
+341973→My height is
+341974→My location
+341975→My messages are gone
+341976→My online status
+341977→My orientation
+341978→My play position
+341979→My private notes
+341980→My profile headline
+341981→My profile was rejected
+341982→My tickets
+341983→My trips
+341984→My weight is
+341985→NO ADS
+341986→Name
+341987→Nature
+341988→Navigate to current year %1$d
+341989→Navigate to year %1$d
+341990→Navigate up
+341991→Navigation menu
+341992→Nearby
+341993→ZZNecessary in order to get notified about new messages, footprints, picture likes and more.
+341994→New Age
+341995→New Apostolic
+341996→New Password
+341997→New album
+341998→New email address
+341999→New guys:
+342000→New link requests
+342001→New messages in %1$s chats
+342002→New notification
+342003→New profile
+342004→JJNew version of Google Play services needed. It will update itself shortly.
+342005→New visitors
+342006→Newest Romeos
+342007→Next
+342008→Night life / Clubbing
+342009→No FF
+342010→No SM
+342011→No Sports
+342012→No age limits
+342013→No anal
+342014→No articles found
+342015→No beard
+342016→No connection
+342017→No dirty
+342018→No entries
+342019→No entry
+342020→No folder
+342021→No internet connection detected
+342022→No matches found.
+342023→No piercings
+342024→..No recurring payment to cancel has been found.
+342025→No results
+342026→No results for
+342027→No support tickets
+342028→No tattoos
+342029→No vote
+342030→Non smoker
+342031→Non-renewing
+342032→None
+342033→Non
+342034→binary
+342035→binary, Other orientation
+342036→military service
+342037→Norwegian
+342038→Not checked
+342039→Not enough features
+342040→Not enough people near me
+342041→Not now
+342042→Not selected
+342043→Not set
+342044→BBNot shown on your profile but can be attached in private messages.
+342045→::Not shown on your profile, but can be shared with one tap.
+342046→Not single
+342047→Not verified yet
+342048→Not very hairy
+342049→bfNothing to show here yet.
+342050→Like
+342051→ pics of some of your favourite ROMEOs to get some love in return!
+342052→yyNothing to show here yet. Get noticed by uploading a hot new pic or sending a footprint to some sexy ROMEOs in your area.
+342053→\\Nothing to show here yet. Start by checking out profiles of some ROMEOs that catch your eye!
+342054→bfNothing to show here yet. 
+342055→Like
+342056→ pics of some of your favourite ROMEOs to get some love in return!
+342057→Notification
+342058→Notification sound
+342059→Notifications
+342060→Occitan
+342061→Occupation
+342062→Official Profile
+342063→Offline
+342064→Old Catholic
+342065→Oldies
+342066→One new footprint
+342067→One new message
+342068→One picture
+342069→Ongoing call
+342070→Online
+342071→Online status
+342072→;;Only sexually neutral pictures can be used as main picture.
+342073→WWOops! Facebook authorization failed. You can try again or use a different login option.
+342074→UUOops! Our service is temporarily offline. But don't worry, our team is already on it.
+342075→77Oops! Something went wrong. Please try to log in again.
+342076→mmOops, something went wrong while deleting the album: missing privileges. Please try again or contact Support.
+342077→ooOops, something went wrong while loading the album(s): missing privileges. Please try again or contact Support.
+342078→55Oops, something went wrong while reporting this user.
+342079→mmOops, something went wrong with QuickShare: 'request' argument required. Please try again or contact Support.
+342080→iiOops, something went wrong with QuickShare: grants argument invalid. Please try again or contact Support.
+342081→ffOops, something went wrong with QuickShare: invalid id on delete. Please try again or contact Support.
+342082→ggOops, something went wrong with QuickShare: invalid id on request. Please try again or contact Support.
+342083→hhOops, something went wrong with QuickShare: invalid value on 'get'. Please try again or contact Support.
+342084→iiOops, something went wrong with QuickShare: invalid value on 'post'. Please try again or contact Support.
+342085→iiOops, something went wrong with QuickShare: invalid value on delete. Please try again or contact Support.
+342086→iiOops, something went wrong with QuickShare: invalid value on grants. Please try again or contact Support.
+342087→nnOops, something went wrong with QuickShare: missing privileges on 'post'. Please try again or contact Support.
+342088→ddOops, something went wrong with QuickShare: missing privileges. Please try again or contact Support.
+342089→mmOops, something went wrong with your account changes: parameter missing. Please try again or contact Support.
+342090→ZZOops, something went wrong: account argument missing. Please try again or contact Support.
+342091→bbOops, the friends list could not be loaded. Please try again or contact Support if error persists.
+342092→Oops, we are offline
+342093→Open
+342094→Open in browser
+342095→Open navigation drawer
+342096→Open on phone
+342097→Open to
+342098→Optimising data
+342099→Optional comment
+342100→Orchestra
+342101→((Order creation failed. Please try again.
+342102→Organized me
+342103→Oriental Orthodox
+342104→Orientation
+342105→Orientations I'm into
+342106→Orthodox
+342107→Other
+342108→Other gender
+342109→Other hair color
+342110→Other orientation
+342111→Other questions
+342112→Other travelers
+342113→Our Groups feature brings together like-minded people on topics they're interested in. Unfortunately we're not able to show this content in our apps.
+342114→Out of range: %1$s
+342115→PICTURE ARCHIVE
+342116→PLUS Upgrade
+342117→PLUS users can be seen in the Radar of their travel destination 2 weeks before they arrive to start getting to know the local ROMEOs.
+342118→JJPLUS users can choose their grid view & add their favourite profile stats.
+342119→;;PLUS users can hide their profile visits within 30 seconds.
+342120→HHPLUS users can save, edit and send phrases for a faster chat experience.
+342121→BBPLUS users can select Invisible Mode and appear offline to others.
+342122→XXPLUS users can share and request unlimited QuickShare albums. Free users get %d per day.
+342123→''PLUS users get unlimited Radar results.
+342124→PROFILE
+342125→PROFILE PICTURES
+342126→Pagan
+342127→Partially checked
+342128→Partner
+342129→Partner profile
+342130→Party Animal
+342131→Pashto
+342132→Password
+342133→%%Password confirmation does not match.
+342134→Password invalid
+342135→.0Password must include at least one digit (0
+342136→IKPassword must include at least one special character, e.g., ! _ 
+342137→ @ # ? ]
+342138→Password*
+342139→Passwords doesn't match
+342140→Pause account
+342141→Pause my account
+342142→Pause or delete account
+342143→eePausing your account won't affect the duration of your PLUS membership, which expires or renews on %s
+342144→Pedantic
+342145→Pending
+342146→Persian
+342147→Phaser
+342148→Phew
+342149→Photography
+342150→Picture
+342151→Picture Upload
+342152→Picture archive
+342153→Picture could not be updated.
+342154→Picture likes
+342155→XXPicture order could not be saved. Please try again or contact Support if error persists.
+342156→Picture reported successfully.
+342157→Picture shared
+342158→Picture too big
+342159→Picture under review
+342160→Pictures
+342161→Pictures I liked
+342162→Pictures shared
+342163→Piercings
+342164→PlanetRomeo
+342165→Foundation
+342166→PlanetRomeo Foundation
+342167→Planned
+342168→Planning
+342169→Play safe?
+342170→55Please accept the Terms of Use and Privacy Statement.
+342171→%%Please add your password to continue.
+342172→,,Please check the data entered and try again.
+342173→..Please check your login details and try again.
+342174→Please check your messages and emails for more information. Only after you have made the requested change(s), will your account be reactivated. If you've already made the changes, please request another review of your profile. We look forward to having you back!
+342175→Please check your password.
+342176→Please check your profile name.
+342177→88Please choose a profile name with at least 5 characters.
+342178→Please choose a reason:
+342179→  Please describe what happened:
+342180→Please enable video calls
+342181→Please enter Security Code.
+342182→44Please enter a username between 5 and 20 characters.
+342183→Please enter start date.
+342184→EEPlease enter the email address you used to create your ROMEO account.
+342185→Please enter your birthdate.
+342186→$$Please enter your email or username.
+342187→Please help us improve
+342188→XXPlease note that your PLUS subscription that was linked to this account is still active.
+342189→  Please provide a valid location.
+342190→{{Please refer to the verification email sent to you. Use the link in the email to verify your email address, then try again.
+342191→$$Please select a language for support
+342192→qqPlease select a location within a %1$skm radius from your current position, or explore other locations with %2$s.
+342193→Please select a source
+342194→$$Please select at least one language.
+342195→,,Please select between one to five languages.
+342196→""Please tell us more about yourself
+342197→@@Please try again later, or check our X page for live updates:
+342198→%%Please type in a valid E-Mail address
+342199→Please verify your email.
+342200→66Please wait until the picture has loaded to attach it.
+342201→Plop
+342202→Polish
+342203→Politics
+342204→Pop-Up Window
+342205→Popular
+342206→Portuguese
+342207→Position
+342208→PrEP
+342209→PrEP and condom
+342210→Preferences
+342211→Preview message
+342212→Primordial Soup
+342213→Privacy Statement
+342214→Privacy Statement*
+342215→Private
+342216→Private Parties
+342217→Probably genuine
+342218→Problems with PLUS membership
+342219→..Product list failed to load. Please try again.
+342220→Profile
+342221→Profile ID: %1$s
+342222→Profile Location
+342223→Profile could not be opened.
+342224→Profile deleted.
+342225→Profile has been blocked.
+342226→Profile name
+342227→Profile name is already taken.
+342228→Profile name is not valid.
+342229→Profile pictures
+342230→Profile type is not supported.
+342231→Profile was not blocked
+342232→Protestant
+342233→Punk
+342234→Punk hair
+342235→EEPurchase acknowledgment failed. Please restart the app and try again.
+342236→BBPurchase consumption failed. Please restart the app and try again.
+342237→CCPurchase registration failed. Please restart the app and try again.
+342238→Push notifications
+342239→QUICKSHARE
+342240→Queer
+342241→Queer Non
+342242→binary
+342243→Queer, Other gender
+342244→QuickShare
+342245→Quickshare
+342246→fhRADAR does not work with private locations. Please go to "Settings" and select a non
+342247→private location.
+342248→REAL-TIME SEARCH
+342249→REJECTED
+342250→ROMEO Sheep
+342251→ROMEO UNCUT
+342252→ROMEO Update
+342253→UUROMEO for Android
+342254→Version %1$s
+342255→Copyright ROMEO BV
+342256→This App is a product of ROMEO BV.
+342257→  ROMEO is temporarily unavailable
+342258→Radar
+342259→Radar Grid Views
+342260→Raindrop
+342261→Range end
+342262→Range start
+342263→Rap & HipHop
+342264→Rate the app
+342265→Raver
+342266→Re-type password*
+342267→Re: %s
+342268→Reactivate
+342269→Read Support Message
+342270→&&Read more about gender and orientation
+342271→##Read more about safer sex practices
+342272→Reason: %1$s
+342273→Recent
+342274→Recent searches
+342275→Recently active users:
+342276→Reconnecting
+342277→Red hair
+342278→Reformist
+342279→Refused
+342280→Reggae & Ska
+342281→!!Rejected pictures cannot be moved
+342282→Relationship
+342283→Religion
+342284→Reload
+342285→Remove %1$s
+342286→Remove attachment with name %s.
+342287→Remove from this device
+342288→Remove no vote
+342289→Remove user
+342290→Remove yes vote
+342291→Rename
+342292→Renews automatically
+342293→66Renews automatically after trial ends. Cancel anytime.
+342294→''Renews automatically at full price (%s)
+342295→Repeat new email
+342296→Report
+342297→Report %s
+342298→Report or block
+342299→Report picture
+342300→Reported as spam
+342301→''Reporting Discrimination or Hate Speech
+342302→Request access
+342303→Resend Link
+342304→Resend email
+342305→Reset Password
+342306→Restart app
+342307→Retired
+342308→Retry
+342309→Retry sending
+342310→Review Again
+342311→RnB & Soul
+342312→Rock
+342313→Romanian
+342314→Romansch
+342315→79Romeo BV 
+342316→ De Ruyterkade 7, 1013 Amsterdam, Netherlands
+342317→Romeo album
+342318→Romeo likes this picture
+342319→Romeos
+342320→Romeos like this picture
+342321→Romeos nearby
+342322→Rowing
+342323→Rubber
+342324→Rugby
+342325→Russian
+342326→SORTING OPTIONS
+342327→START A CONVERSATION
+342328→Safe
+342329→Safe: PrEP
+342330→Safe: PrEP and condom
+342331→Safe: TasP
+342332→Safe: condom
+342333→Safe: let's talk
+342334→Safer Sex
+342335→Sailing
+342336→Save
+342337→Save a phrase by tapping Add
+342338→++Save and block unlimited contacts with PLUS
+342339→Save as a contact
+342340→Save as a phrase
+342341→Save caption
+342342→::Save frequently used messages as a phrase for faster chat.
+342343→  Save or block unlimited profiles
+342344→Save phrases
+342345→Save phrases for a faster chat
+342346→Saved
+342347→Saved Phrases
+342348→!!Saved contacts limit is exceeded.
+342349→Saved phrases
+342350→Schlager
+342351→Scholar
+342352→SciFi
+342353→Scottish Gaelic
+342354→Screening an incoming call
+342355→Scuba diving
+342356→Search
+342357→Search Location
+342358→Search and Display
+342359→Search failed.
+342360→Search faster and sort smarter.
+342361→ Search for a place or address
+342362→Search results loaded
+342363→Search with over 120 options
+342364→Search
+342365→See XXX content
+342366→See XXX content with PLUS
+342367→See all %d articles
+342368→See all articles
+342369→See headlines on Big Grid
+342370→,,See last logged in within your chosen radius
+342371→..See newest profiles within your chosen radius.
+342372→&&See your visitors from the last 7 days
+342373→00See your visitors from the last 7 days with PLUS
+342374→Select AM or PM
+342375→Select All
+342376→Select Date
+342377→Select Range
+342378→Select an attachment
+342379→Select an attachment.
+342380→Select and copy
+342381→Select at least one picture
+342382→Select folder
+342383→Select hour
+342384→Select location
+342385→Select minutes
+342386→Select pictures
+342387→Select target age
+342388→Select time
+342389→00Select your favourite stats to show on List View
+342390→Selected
+342391→Selected date
+342392→Send
+342393→Send Link
+342394→Send feedback email
+342395→Send location
+342396→Send log information
+342397→Send message
+342398→Send saved phrases with PLUS
+342399→Sent by %1$s at %2$s.
+342400→Sent by %s
+342401→Sent by you
+342402→Sent by you at %s
+342403→Serbian
+342404→Serbo
+342405→Croatian
+342406→Set Manually
+342407→Set as main profile picture
+342408→Set location manually
+342409→33Set your profile to anywhere and explore the world.
+342410→Settings
+342411→Share
+342412→Share QuickShare album
+342413→Share link
+342414→00Share your private album with someone for 1 hour
+342415→66Share your private pictures
+342416→ easily for just one hour.
+342417→Shaved
+342418→Shaved body
+342419→Shaved head
+342420→Sheep
+342421→Shift+
+342422→Shinto
+342423→Short
+342424→Short hair
+342425→Show all
+342426→Show dropdown menu
+342427→  Show favourite stats in Big Grid
+342428→Show headline in big grid
+342429→##Show my favourite stats on Big Grid
+342430→Show password
+342431→Show their headline on Big Grid
+342432→Show usernames
+342433→Shown on your profile.
+342434→Side (No anal)
+342435→Side Sheet
+342436→Sigh
+342437→Sign in
+342438→Sign in with Google
+342439→Sign language
+342440→Sikh
+342441→PPSimple passwords are easy to guess. Avoid using sequential keys on the keyboard.
+342442→NNSimple passwords are easy to guess. Avoid using sequential numbers or letters.
+342443→ZZSimple passwords are easy to guess. Try one that includes at least 3 different characters.
+342444→Single
+342445→Size
+342446→Size & Circumcision
+342447→Skater
+342448→Skating
+342449→Skins & Punks
+342450→Skip
+342451→Slim
+342452→Slovak
+342453→Slovenian
+342454→Small Grid
+342455→Smoker
+342456→Smoking
+342457→Smooth
+342458→Sneakers & Socks
+342459→Snooker
+342460→Social
+342461→Social me
+342462→Socially
+342463→Soft SM
+342464→Someone is using my picture
+342465→))Someone left a Footprint on your profile!
+342466→Something else
+342467→Something is broken
+342468→Something went wrong
+342469→TTSomething went wrong and I wasn't able to send your message. Please try again later.
+342470→  Something went wrong! Try again.
+342471→JJSomething went wrong. Please check your Internet connection and try again.
+342472→Sorbian
+342473→\\Sorry we cannot establish a connection right now.
+342474→If this continues, please restart the app.
+342475→ggSorry, but it's not possible to buy PLUS at this time due to minor maintenance. Please try again later.
+342476→hhSorry, but our picture system is currently unavailable due to minor maintenance. Please try again later.
+342477→ggSorry, but our search system is currently unavailable due to minor maintenance. Please try again later.
+342478→SSSorry, the Google Play Store rules don't allow us to show too much skin in our app.
+342479→CCSorry. It's not possible to report pictures that are not displayed.
+342480→Sound
+342481→Sound effects
+342482→Spam
+342483→Spanish
+342484→Speaking my language
+342485→Spontaneous
+342486→Sports
+342487→Sports gear
+342488→Start date
+342489→Start date %1$s
+342490→57Start date selection: %1$s 
+342491→ End date selection: %2$s
+342492→Start date 
+342493→ %1$s
+342494→Start date 
+342495→ End date
+342496→Start something new
+342497→Stats
+342498→Stay At Home
+342499→Stay-at-home
+342500→Still having problems?
+342501→Stocky
+342502→Straight
+342503→Straight Non
+342504→binary
+342505→Student
+342506→Submit query
+342507→@@Subscription management needs to be done through the Play Store.
+342508→Subscription purchases will be charged to your Google account. Subscriptions auto-renew under identical terms unless canceled at least 24 hours before the end of the current period. You can manage or cancel auto-renewal in your Google Account Settings after purchase. Any free trial or promotional pricing will auto-renew at the regular price after the promotional period ends. You can cancel your subscription anytime in your Google Account Settings. For more information, please visit our
+342509→Support
+342510→Support tickets failed to load
+342511→Support tickets loaded
+342512→Supporter of
+342513→Surfing
+342514→Sushi
+342515→Swedish
+342516→Swimming
+342517→Swiss
+342518→German
+342519→Switch
+342520→Switch to calendar input mode
+342521→((Switch to clock mode for the time input.
+342522→Switch to text input mode
+342523→--Switch to text input mode for the time input.
+342524→Sym+
+342525→Syncing album failed
+342526→Syncing albums failed
+342527→Syncing of messages failed.
+342528→Syncing phrases failed.
+342529→TODAY
+342530→Tagalog
+342531→Take a pause instead?
+342532→Take a tour
+342533→Take picture
+342534→Tamazight
+342535→Tamil
+342536→Taoist
+342537→**Tap on it to see what they think about you
+342538→Tap to add caption
+342539→Tap to retry
+342540→Tap to set profile picture
+342541→Tap to switch to Calendar view
+342542→Tap to switch to year view
+342543→Tapas
+342544→TasP
+342545→Tattoos
+342546→Team sports
+342547→Technical problems
+342548→Tell us a bit more
+342549→Tell us about your experience.
+342550→!!Tell us something about yourself!
+342551→Telugu
+342552→Tennis
+342553→Terms & Conditions
+342554→Terms of Use
+342555→Test Bed
+342556→Text copied to clipboard.
+342557→Thai
+342558→Thank you
+342559→Thank you for your order.
+342560→Thank you for your report!
+342561→eeThank you. A message has been sent to the team. If a reply is needed, they will contact you by email.
+342562→jjThank you. A message has been sent to the team. You can view this message and add additional details here:
+342563→Thanks for your feedback.
+342564→PTThanks very much for your message. I
+342565→m sorry, it
+342566→s not a match for me. Have fun!
+342567→99The Security Code entered is incorrect. Please try again.
+342568→::The Security Code entered was incorrect. Please try again.
+342569→[[The age you entered is below 18. You must be 18 years of age or older to join this website.
+342570→##The app needs to restart to update.
+342571→((The caption contains invalid characters.
+342572→88The dimensions of the file to be uploaded are too large.
+342573→88The dimensions of the file to be uploaded are too small.
+342574→''The email address entered is not valid.
+342575→HHThe email address you entered is incorrect. Enter a valid email address.
+342576→77The format of the file to be uploaded is not supported.
+342577→ssThe link has been sent to the email address you entered. An email should appear in your inbox within a few minutes.
+342578→mmThe list of profiles you visited could not be cleared. Please try again or contact Support if error persists.
+342579→!!The message could not be deleted.
+342580→,,The new contact folder could not be created.
+342581→The new email is not valid.
+342582→%%The operation could not be completed.
+342583→..The password must have at least 10 characters.
+342584→--The password must have at least 8 characters.
+342585→--The password reset email has been sent again.
+342586→00The password you entered is incorrect. Try again
+342587→55The person you are trying to call is in another call.
+342588→++The requested folder(s) could not be found.
+342589→))The requested profile could not be found.
+342590→22The saved search you requested could not be found.
+342591→99The security code entered is incorrect. Please try again.
+342592→00The security code has expired. Please try again.
+342593→11The size of the file to be uploaded is too large.
+342594→))The specified album is not a shared album
+342595→AAThe text entered as your "Headline" is too long (max. 200 chars).
+342596→$$The trip ends too far in the future.
+342597→$$The upload failed. Please try again.
+342598→The user is in another call.
+342599→bdThe username contains invalid characters. Only Latin letters (a..Z) and numbers (0
+342600→9) are allowed!
+342601→FFThe username is already in use; therefore, a suffix has been appended.
+342602→Theater
+342603→!!There are %d attachments selected
+342604→""There are %d attachments selected.
+342605→!!There are no attachments selected
+342606→""There are no attachments selected.
+342607→There is an update available.
+342608→//There is no QuickShare album request to revoke.
+342609→  There is one attachment selected
+342610→!!There is one attachment selected.
+342611→They're Looking For
+342612→55This QuickShare album is already shared or requested.
+342613→((This QuickShare album is already shared.
+342614→//This QuickShare feature is temporarily offline.
+342615→JJThis action is not supported. Please go to the desktop website to do this.
+342616→x|This content has been rated as 
+342617→Hardcore
+342618→ and will be hidden for some app users in order to comply with app store rules.
+342619→IMThis content has been rated as 
+342620→Non-Sexual
+342621→ and can be seen by all users.
+342622→y}This content has been rated as 
+342623→Softcore
+342624→ and might be hidden for some app users in order to comply with app store rules.
+342625→HLThis content has been rated as 
+342626→Some Skin
+342627→ and can be seen by all users.
+342628→XXThis content has been rejected and is not suitable to be shown anywhere on our platform.
+342629→aaThis content is in the process of being rated. Check back in around 10 minutes to see the result.
+342630→""This conversation has been closed.
+342631→@@This feature is momentarily unavailable. Please try again later.
+342632→22This friend request has already been responded to.
+342633→IIThis picture cannot be used as a profile picture until it has been rated.
+342634→''This picture has already been uploaded.
+342635→^^This picture hasn't been rated yet. Please wait a couple of minutes or choose another picture.
+342636→77This picture was rejected and classified as unsuitable.
+342637→This picture will be moved
+342638→((This profile can not be viewed right now
+342639→This profile has been deleted.
+342640→This profile is unavailable
+342641→((This text appears in the search results.
+342642→66This user has been saved as 'known personally' by %1s.
+342643→AAThis user has been saved as 'known personally' by more than %1$s.
+342644→AAThis user has not yet been saved as 'known personally' by anyone.
+342645→This user is taking a break
+342646→..This user shows publicly in your friends list.
+342647→This will permanently delete your account on the server and from your device. Any PLUS membership will be lost. Proceed with deleting your profile?
+342648→Ticket Closed
+342649→Tidiness
+342650→To get your blue badge and FREE unlimited contact saving and blocking you need to fulfil two conditions:
+342651→1 - You need at least %1$s to save you as 'known personally' 
+342652→2 - These %2$s have to be known by at least %3$s in total
+342653→NTo get your blue badge you need to fulfil two conditions: 
+342654→1 - Currently you're saved as 'known personally' by %1$s. You need at least %2$d 
+342655→2 - These %3$d users have to be known by at least %4$d users in total. They're currently known by %5$d 
+342656→Once you're verified we'll reward you with FREE unlimited contact saving and blocking.
+342657→CCTo send attachments you need to allow permissions in your settings.
+342658→Today
+342659→Today %1$s
+342660→Tomorrow
+342661→Too late for hiding the visit.
+342662→Top only
+342663→Trans
+342664→Trans man
+342665→Trans woman
+342666→Transaction history
+342667→Travel
+342668→??Travel dates cannot be in the past. Change start date to today?
+342669→Travel headline
+342670→Travelers arriving
+342671→Travelers only
+342672→Trumpet
+342673→Try again
+342674→//Try our new easy way of
+342675→ sharing your pictures.
+342676→??Try uploading pictures to get more attention from other Romeos.
+342677→Turkish
+342678→88Type a message and I will find someone who can help you.
+342679→Type a message
+342680→Type your message here
+342681→US English
+342682→US Football
+342683→Ukrainian
+342684→&&Unable to create comment with text %s.
+342685→Unable to like the picture.
+342686→Unable to unlike the picture.
+342687→Unblock
+342688→Unblock %s ?
+342689→Uncut
+342690→Underwear
+342691→Unemployed
+342692→Unexpected call error
+342693→Uniform
+342694→Units
+342695→Unknown
+342696→Unlimited Radar scrolling
+342697→Unlock
+342698→((Unlock over 120 search options with PLUS
+342699→Unlock this profile with PLUS
+342700→Unverified user
+342701→@@Up to 5 travel locations are allowed. Click to delete or cancel.
+342702→Update
+342703→Update Google Play services
+342704→Upgrade now
+342705→Upgrade to PLUS
+342706→**Upgrade to PLUS 
+342707→and get unlimited shares.
+342708→%%Upgrade to PLUS and see the hot pics!
+342709→Upgrade to ROMEO PLUS
+342710→&&Upgrade to unlock first class features
+342711→Upload
+342712→Upload failed.
+342713→Upload in progress...
+342714→Upload in queue
+342715→Upload picture
+342716→Upload unlimited pictures
+342717→##Upload unlimited pictures with PLUS
+342718→Use GPS location
+342719→Use Location
+342720→Use as main picture
+342721→Use: %1$s
+342722→User has been unblocked
+342723→11User has been unblocked and removed from contacts
+342724→wwUser requests to link you in their profiles. These links will be shown on both your profiles if you accept the request.
+342725→Username
+342726→Username or profile text
+342727→$&Users don
+342728→t match my age preferences
+342729→WWUsing your birth date in the password is easy to guess, please try another combination.
+342730→YYUsing your profile name in the password is easy to guess, please try another combination.
+342731→Value
+342732→Vegan
+342733→Vegetarian
+342734→Verified user
+342735→Versatile
+342736→Version %s (Build %s)
+342737→Very hairy
+342738→Very likely genuine
+342739→Vibrate
+342740→Video
+342741→Video paused
+342742→Video started
+342743→VideoChat
+342744→VideoChat (End call)
+342745→??VideoChat is temporarily unavailable. Please try again shortly.
+342746→\\VideoChat isn't compatible with this version of the app. Please download the latest version.
+342747→44VideoChat needs access to the microphone and camera.
+342748→Vietnamese
+342749→View messages
+342750→View pictures
+342751→View profile
+342752→Visit our website
+342753→Visited
+342754→Visitor
+342755→Visitors
+342756→Voice search
+342757→Volleyball
+342758→Vote failed
+342759→Voted no
+342760→Voted yes
+342761→WS only
+342762→Waiting for classification
+342763→Was this article helpful?
+342764→NNWatch your search results change as you type.
+342765→ More fun, and faster than ever.
+342766→9We do not allow hate speech on ROMEO. Hate speech is defined as a direct attack on people/person based on race, ethnicity, national origin, religious affiliation, sexual orientation, gender identity, physical appearance, and/or disability.
+342767→re committed to removing hate speech any time we become aware of it.
+342768→55We have sent you an email with a reset password link.
+342769→We think you're ready..
+342770→BBWe were unable to detect your location. Please select it manually.
+342771→>>We'll send you a link that you can use to reset your password.
+342772→We're glad you joined us!
+342773→88We're sorry but messages cannot be sent to this account.
+342774→||We're sorry, but it's temporarily not possible to cancel your subscription due to minor maintenance. Please try again later.
+342775→??We're sorry, but you can only specify a maximum of 5 languages.
+342776→Weight
+342777→Welcome %s
+342778→Welcome Tour
+342779→Welcome to ROMEO
+342780→Welcome to ROMEO!
+342781→Well Planned
+342782→Wellness
+342783→Welsh
+342784→d like to collect usage data 
+342785→ such as button taps, screen views, and time spent 
+342786→ to help us improve the app. This data may be associated with device identifiers but is not used to identify you personally. Do you allow us to collect this data?
+342787→re sorry to see you leave!
+342788→When we receive your payment, your purchase will appear in your "Transaction history" on ROMEO. Please be aware this may take a few days.
+342789→Where?
+342790→Whip
+342791→Whistle
+342792→//Who are you and what are you looking for?
+342793→%d/50
+342794→Winter
+342795→Winter sports
+342796→Without usernames
+342797→Woof! Hello handsome
+342798→Worker
+342799→World music
+342800→Wrestling
+342801→Write a message
+342802→Write a phrase
+342803→YESTERDAY
+342804→Yes vote
+342805→Yesterday
+342806→Yoga
+342807→66You and %s are now linked as friends on your profiles.
+342808→You are a PLUS member
+342809→You are banned
+342810→66You are blocked by the owner of the requested profile.
+342811→..You are currently being shown in this location
+342812→You are using a very old version of our app and unfortunately we had to stop supporting it. We hope that you are able to update to a newer version. If not, you can always use our website.
+342813→You are using an outdated version of the app that we have to stop supporting, please update for the latest features and bug fixes. Sorry for this inconvenience and thank you for being part of our community!
+342814→<<You can easily reactivate it again the next time you log in.
+342815→YYYou can only buy a new membership if you cancel the current one on %s and it has expired.
+342816→You can only select %s items!
+342817→))You can pick a location within 100km only
+342818→>>You can report a message as spam by long-pressing the message.
+342819→''You can view my private pictures 
+342820→ now.
+342821→55You can't lock more messages. Please upgrade to PLUS.
+342822→You cannot save empty phrase
+342823→))You don't have any pending link requests.
+342824→SSYou exceeded your picture upload limit for this album. Please choose another album.
+342825→You have
+342826→PLUS
+342827→&&You have <b>%1$s</b> share left today.
+342828→''You have <b>%1$s</b> shares left today.
+342829→You have PLUS thanks to a gift from %1$s. Your membership runs until %2$s.
+342830→You can only buy a new membership if your current gift has expired.
+342831→,,You have already saved or blocked this user.
+342832→BBYou have already uploaded this picture. Please choose another one.
+342833→You have an additional PLUS membership pending. Please check your history for details. You can only buy a new membership if you don't have any pending ones.
+342834→<<You have been blocked by the owner of the requested profile.
+342835→You have been saved as 'known personally' by %1$d users. These users are also known by %2$d others.
+342836→Enjoy your FREE unlimited contact saving and blocking.
+342837→You have been verified
+342838→ffYou have free PLUS. This is granted to all users in countries with restricted LGBT+ freedom or rights.
+342839→You have mail
+342840→HHYou have no shares left today. Upgrade to PLUS and get unlimited shares.
+342841→((You have reached the limit for {handle}.
+342842→//You have reached the limit of selectable items.
+342843→OOYou have reached your QuickShare limit today. 
+342844→ Get unlimited access with PLUS.
+342845→TTYou have sent too many requests for your verification email. Please try again later.
+342846→BBYou have successfully unlocked your QuickShare album for %1$d min.
+342847→%%You have to select at least one item!
+342848→ssYou need to cancel your PLUS membership directly on Play Store, unfortunately we are not able to cancel it for you.
+342849→hhYou need to enable camera and storage permissions in your settings to allow "ROMEO" to upload a picture.
+342850→FFYou reached the limits for save or block users. Please upgrade to Plus
+342851→You tried to call %1$s
+342852→55You will be seen in this location %1$s before arrival
+342853→You're not verified
+342854→You're not verified yet
+342855→wwYou've already reached your free contact limit. Upgrade to PLUS or delete an old contact before you can save a new one.
+342856→88You've already requested access to his QuickShare album.
+342857→QQYou've exceeded your picture upload limit. Upgrade to PLUS for unlimited storage.
+342858→==You've successfully requested access to his QuickShare album.
+342859→  Your PLUS membership ended on %s
+342860→SSYour PLUS membership renews automatically and can be managed directly at the Store.
+342861→**Your PLUS membership renews automatically.
+342862→hhYour PLUS membership will end on %s. You can only buy a new membership when the current one has expired.
+342863→OOYour PLUS transaction history is currently unavailable. Please try again later.
+342864→&&Your QuickShare album has no pictures.
+342865→77Your QuickShare album is already shared with this user.
+342866→Your ROMEO chats are about to get even more up-close and personal.
+342867→Look for the camera icon in the chat screen and tap to start a VideoChat!
+342868→11Your access to this QuickShare album has expired.
+342869→TTYour account data will be saved and you can easily come back anytime when you log in
+342870→JJYour account is limited from contacting Romeos until you verify your email
+342871→Your account is permanently banned and will be deleted automatically within 30 days. If you have any questions, please contact customer support.
+342872→  Your changes could not be saved.
+342873→ddYour complete ROMEO profile is just a few steps away. Would you like to continue where you left off?
+342874→Your email %s is not verified
+342875→Your last visit was hidden.
+342876→Your lifestyle
+342877→bbYour list of visitors could not be cleared. Please try again or contact Support if error persists.
+342878→;;Your main profile picture should not contain sexual content
+342879→Your membership runs until %s.
+342880→!!Your new password has been saved.
+342881→..Your passwords do not match, please try again.
+342882→pYour payment is currently being processed.
+342883→It might take a few hours to process your payment, so please do not repeat the payment process.
+342884→If you purchased PLUS, once we have received your payment, your PLUS subscription will be activated and you will receive a confirmation message.
+342885→Details of your purchase can be seen in "Transaction history" in the "Settings".
+342886→''Your picture was uploaded successfully.
+342887→[[Your picture was uploaded successfully. It will appear on your profile once it is approved.
+342888→Your profile has been rejected
+342889→Your profile has been rejected and a message explaining the rejection has been sent to you. If you have any questions please contact our Support Dept.
+342890→Your profile headline
+342891→##Your profile is currently in review
+342892→vvYour profile is currently in review with our Support admins. If you wish to know more details, please contact support.
+342893→Your profile is paused
+342894→**Your profile name has too many characters.
+342895→&&Your profile picture could not be set.
+342896→22Your profile picture has been successfully updated
+342897→,,Your search expired. Search is refreshing...
+342898→\\Your visited list is currently unavailable due to minor maintenance. Please try again later.
+342899→]]Your visitors list is currently unavailable due to minor maintenance. Please try again later.
+342900→y{You
+342901→ve already reached your free picture limit %d. Upgrade to PLUS or delete an old picture before you can add a new one.
+342902→ve opted in to tracking.
+342903→ve opted out of tracking.
+342904→,.You
+342905→ve reached the maximum amount of albums.
+342906→Zendesk
+342907→[%1$s]
+342908→[Failed to send]
+342909→a Bisexual Man
+342910→a Bisexual Trans man
+342911→a Bisexual Trans woman
+342912→a Gay Man
+342913→a Gay Trans man
+342914→a Gay Trans woman
+342915→a Man
+342916→a Man, Other orientation
+342917→a Queer Man
+342918→a Queer Trans man
+342919→a Queer Trans woman
+342920→a Queer person
+342921→a Straight Man
+342922→a Straight Trans man
+342923→a Straight Trans woman
+342924→a Straight person
+342925→a Trans man
+342926→a Trans man, Other orientation
+342927→a Trans woman
+342928→  a Trans woman, Other orientation
+342929→a;href=haveibeenpwned.com
+342930→androidx.startup
+342931→api-project-4760212605
+342932→""api-project-4760212605.appspot.com
+342933→  b802e173936742129f6de8887a6e648f
+342934→between %1$d and %2$d
+342935→button
+342936→button path
+342937→card
+342938→circle
+342939→circle_group
+342940→circus
+342941→classic
+342942→cm/kg
+342943→EEcom.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior
+342944→CCcom.google.android.material.behavior.HideBottomViewOnScrollBehavior
+342945→;;com.google.android.material.bottomsheet.BottomSheetBehavior
+342946→BBcom.google.android.material.search.SearchBar$ScrollingViewBehavior
+342947→77com.google.android.material.sidesheet.SideSheetBehavior
+342948→@@com.google.android.material.theme.MaterialComponentsViewInflater
+342949→IIcom.google.android.material.transformation.FabTransformationScrimBehavior
+342950→IIcom.google.android.material.transformation.FabTransformationSheetBehavior
+342951→contact Support
+342952→cubic-bezier(0, 0, 0.2, 1)
+342953→cubic-bezier(0, 0, 1, 1)
+342954→  cubic-bezier(0.0, 0.0, 0.2, 1.0)
+342955→  cubic-bezier(0.0, 0.0, 1.0, 1.0)
+342956→cubic-bezier(0.2, 0, 0, 1)
+342957→cubic-bezier(0.4, 0, 1, 1)
+342958→  cubic-bezier(0.4, 0.0, 0.2, 1.0)
+342959→  cubic-bezier(0.4, 0.0, 1.0, 1.0)
+342960→delete
+342961→destination title
+342962→di_du_do
+342963→digital
+342964→dinner_bell
+342965→donkey
+342966→du_di
+342967→duck
+342968→enter
+342969→for %1$s
+342970→frog
+342971→ft/lbs
+342972→goat
+342973→harp
+342974→has given you a footprint.
+342975→22has granted you access to their 
+342976→QuickShare album.
+342977→has sent you a message.
+342978→hashtag
+342979→--https://api-project-4760212605.firebaseio.com
+342980→**https://getromeoapp.com/privacy-statement/
+342981→https://getromeoapp.com/terms/
+342982→ddhttps://support.romeo.com/hc/en-us/articles/360002536237-How-do-I-install-the-UNCUT-App-for-Android-
+342983→&&https://www.planetromeofoundation.org/
+342984→ffhttps://www.planetromeofoundation.org/funded-projects/?utm_source=romeo-uncut&utm_medium=profile-badge
+342985→https://www.romeo.com
+342986→https://www.romeo.com/about
+342987→https://www.romeo.com/care
+342988→https://www.romeo.com/en/blog/
+342989→55https://www.romeo.com/en/care/gender-and-orientation/
+342990→''https://www.romeo.com/en/care/location/
+342991→((https://www.romeo.com/en/care/safer-sex/
+342992→22https://www.romeo.com/en/care/safety/#verification
+342993→https://www.romeo.com/en/jobs/
+342994→!!https://www.romeo.com/en/privacy/
+342995→&&https://www.romeo.com/en/terms-of-use/
+342996→icon
+342997→icon path
+342998→in %s
+342999→jump
+
+[showing lines 341000-342999 of 377399; use offset=343000 with limit to continue reading]

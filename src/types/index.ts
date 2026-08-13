@@ -93,6 +93,106 @@ export const INFER_CATEGORY_OPTIONS = ['compatibility', 'icebreakers', 'conversa
 export type InferCategory = (typeof INFER_CATEGORY_OPTIONS)[number];
 
 // ═══════════════════════════════════════════════════════════════
+// ENUMS — from ROMEO/Grindr analysis
+// ═══════════════════════════════════════════════════════════════
+
+// Tribes (from Grindr)
+export const TRIBE_OPTIONS = ['bear', 'clean-cut', 'daddy', 'discreet', 'geek', 'jock', 'leather', 'otter', 'rugged', 'sober', 'trans', 'twink', 'pup', 'muscle-cub', 'chub', 'chaser'] as const;
+export type Tribe = (typeof TRIBE_OPTIONS)[number];
+
+// Fetish Clothing (from ROMEO - the gold standard)
+export const FETISH_CLOTHING_OPTIONS = ['leather', 'rubber', 'lycra-sports', 'skins', 'boots', 'sneakers', 'jeans', 'underwear', 'uniform', 'worker', 'formal', 'sports', 'techno', 'skater', 'drag', 'crossdressing'] as const;
+export type FetishClothing = (typeof FETISH_CLOTHING_OPTIONS)[number];
+
+// SM Level (from ROMEO)
+export const SM_LEVEL_OPTIONS = ['sm-yes', 'sm-soft', 'sm-no', 'not-specified'] as const;
+export type SMLevel = (typeof SM_LEVEL_OPTIONS)[number];
+
+// FF Role (from ROMEO - fisting)
+export const FF_ROLE_OPTIONS = ['ff-active', 'ff-passive', 'ff-versatile', 'ff-no', 'not-specified'] as const;
+export type FFRole = (typeof FF_ROLE_OPTIONS)[number];
+
+// Safer Sex (from ROMEO)
+export const SAFER_SEX_OPTIONS = ['always-safe', 'condom', 'prep', 'prep-and-condom', 'tasp', 'lets-talk', 'needs-discussion', 'not-specified'] as const;
+export type SaferSex = (typeof SAFER_SEX_OPTIONS)[number];
+
+// Dick Size (from ROMEO)
+export const DICK_SIZE_OPTIONS = ['s', 'm', 'l', 'xl', 'xxl', 'not-specified'] as const;
+export type DickSize = (typeof DICK_SIZE_OPTIONS)[number];
+
+// Circumcision
+export const CIRCUMCISION_OPTIONS = ['cut', 'uncut', 'not-specified'] as const;
+export type Circumcision = (typeof CIRCUMCISION_OPTIONS)[number];
+
+// Hair Color (from ROMEO)
+export const HAIR_COLOR_OPTIONS = ['black', 'blond', 'brown', 'red', 'grey', 'light-brown', 'other', 'shaved'] as const;
+export type HairColor = (typeof HAIR_COLOR_OPTIONS)[number];
+
+// Hair Length
+export const HAIR_LENGTH_OPTIONS = ['short', 'average', 'long', 'punk', 'shaved'] as const;
+export type HairLength = (typeof HAIR_LENGTH_OPTIONS)[number];
+
+// Eye Color
+export const EYE_COLOR_OPTIONS = ['blue', 'brown', 'green', 'grey', 'hazel', 'other'] as const;
+export type EyeColor = (typeof EYE_COLOR_OPTIONS)[number];
+
+// Beard Style
+export const BEARD_OPTIONS = ['none', 'goatee', 'designer-stubble', 'moustache', 'full-beard', 'long-beard'] as const;
+export type Beard = (typeof BEARD_OPTIONS)[number];
+
+// Piercings Level
+export const PIERCING_OPTIONS = ['none', 'few', 'a-lot'] as const;
+export type Piercing = (typeof PIERCING_OPTIONS)[number];
+
+// Tattoo Level
+export const TATTOO_OPTIONS = ['none', 'few', 'a-lot'] as const;
+export type Tattoo = (typeof TATTOO_OPTIONS)[number];
+
+// Smoker
+export const SMOKER_OPTIONS = ['no', 'socially', 'yes'] as const;
+export type Smoker = (typeof SMOKER_OPTIONS)[number];
+
+// Going Out interests (from ROMEO)
+export const GOING_OUT_OPTIONS = ['arts', 'bar', 'cinema', 'club', 'concert', 'exhibition', 'private-parties', 'sports', 'theater', 'other'] as const;
+export type GoingOut = (typeof GOING_OUT_OPTIONS)[number];
+
+// Music Genres (from ROMEO - 20 genres)
+export const MUSIC_GENRE_OPTIONS = ['alternative', 'classical', 'country', 'dance-electronic', 'ethno', 'folk', 'gothic', 'hits', 'house-techno', 'jazz-blues', 'metal', 'musical', 'oldies', 'pop', 'punk', 'rap-hiphop', 'reggae-ska', 'rnb-soul', 'rock'] as const;
+export type MusicGenre = (typeof MUSIC_GENRE_OPTIONS)[number];
+
+// Sports (from ROMEO - 30+)
+export const SPORT_OPTIONS = ['badminton', 'baseball', 'basketball', 'biking', 'climbing', 'diving', 'football', 'golf', 'gym', 'handball', 'hiking', 'ice-hockey', 'jogging', 'martial-arts', 'motor-racing', 'rowing', 'rugby', 'sailing', 'skating', 'snooker', 'surfing', 'swimming', 'tennis', 'us-football', 'volleyball', 'winter-sports', 'wrestling', 'yoga'] as const;
+export type Sport = (typeof SPORT_OPTIONS)[number];
+
+// Food Preferences (from ROMEO)
+export const FOOD_OPTIONS = ['arab', 'asian', 'everything', 'fast-food', 'french', 'german', 'greek', 'indian', 'italian', 'local', 'mediterranean', 'mexican', 'sushi', 'tapas', 'turkish', 'vegan', 'vegetarian'] as const;
+export type Food = (typeof FOOD_OPTIONS)[number];
+
+// Travel Style
+export const TRAVEL_STYLE_OPTIONS = ['adventure', 'alpine', 'city-breaks', 'cruise', 'individual', 'sun', 'wellness', 'winter'] as const;
+export type TravelStyle = (typeof TRAVEL_STYLE_OPTIONS)[number];
+
+// Profession (from ROMEO)
+export const PROFESSION_OPTIONS = ['army', 'apprentice', 'civil-servant', 'employee', 'freelancer', 'hedonist', 'other', 'retired', 'scholar', 'student', 'worker', 'artist', 'chef', 'engineer', 'medical', 'legal', 'finance', 'education', 'tech', 'creative'] as const;
+export type Profession = (typeof PROFESSION_OPTIONS)[number];
+
+// Event Type (from Grindr + practical)
+export const EVENT_TYPE_OPTIONS = ['social', 'party', 'meetup', 'sports', 'cultural', 'live', 'exclusive', 'sale', 'upcoming'] as const;
+export type EventType = (typeof EVENT_TYPE_OPTIONS)[number];
+
+// Chat Sort Mode
+export const CHAT_SORT_OPTIONS = ['recent', 'intent', 'quality', 'unread', 'online'] as const;
+export type ChatSortMode = (typeof CHAT_SORT_OPTIONS)[number];
+
+// Dirty Sex
+export const DIRTY_SEX_OPTIONS = ['yes', 'ws-only', 'no', 'not-specified'] as const;
+export type DirtySex = (typeof DIRTY_SEX_OPTIONS)[number];
+
+// Meet At (hosting)
+export const MEET_AT_OPTIONS = ['my-place', 'your-place', 'neutral', 'not-specified'] as const;
+export type MeetAt = (typeof MEET_AT_OPTIONS)[number];
+
+// ═══════════════════════════════════════════════════════════════
 // MODELS
 // ═══════════════════════════════════════════════════════════════
 
@@ -145,6 +245,9 @@ export interface User {
   professionalStatus: string;
   verificationStatus: string;
   voucher: string | null;
+  detectedIntent?: string | null;
+  chatQualityScore?: number | null;
+  profileFields?: ProfileField[];
   _count?: {
     photos: number;
     sentMessages?: number;
@@ -307,6 +410,8 @@ export interface AppEvent {
   startDate: string;
   endDate?: string;
   imageUrl?: string;
+  type: string;
+  attendeeCount: number;
   ownerId: string;
   isPublic: boolean;
   owner?: User;
@@ -503,6 +608,27 @@ export interface PreferencesSettings {
   profileTags: string;
   profileTagCategorys: string;
   profileMeetNowTags: string;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NEW MODELS FROM ROMEO/Grindr ANALYSIS
+// ═══════════════════════════════════════════════════════════════
+
+// ProfileField - flexible key-value for kinks/sexual/interest data
+export interface ProfileField {
+  id: string;
+  userId: string;
+  key: string;
+  value: string;
+}
+
+// Chat AI Analysis result
+export interface ChatAIAnalysis {
+  intent: string;
+  quality: number;
+  summary: string;
+  suggestedReplies: string[];
+  meetupIdeas: string[];
 }
 
 // ═══════════════════════════════════════════════════════════════
