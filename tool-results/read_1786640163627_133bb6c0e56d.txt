@@ -1,0 +1,2002 @@
+    20→import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ContextMenuSeparator } from '@/components/ui/context-menu';
+    21→import { motion, AnimatePresence } from 'framer-motion';
+    22→import {
+    23→  Send, Paperclip, ChevronLeft, Sparkles, Pin, PinOff, Star, StarOff,
+    24→  Search, Mic, MicOff, MapPin, Image, Video, Phone, Clock, Calendar,
+    25→  Shield, AlertTriangle, FileText, BarChart3, Languages, Heart,
+    26→  ThumbsUp, Laugh, Flame, Surprised, Eye, EyeOff, X, Check, CheckCheck,
+    27→  Copy, Share2, Bookmark, MoreVertical, MessageSquare, Reply,
+    28→  Timer, Palette, Radio, Vote, Hash, Flag, Trash2, Forward,
+    29→  PartyPopper, Coffee, Wine, Dumbbell, Film, Music, Navigation,
+    30→  Volume2, Pause, Play, Globe, Zap, Bot, ArrowUpRight, ChevronDown,
+    31→  ScanSearch, Loader2, CircleDot, BookmarkCheck, ShieldAlert,
+    32→} from 'lucide-react';
+    33→
+    34→// ═══════════════════════════════════════════════════════════════
+    35→// PROPS INTERFACE
+    36→// ═══════════════════════════════════════════════════════════════
+    37→interface NexusChatProps {
+    38→  msgInput: string;
+    39→  setMsgInput: (v: string) => void;
+    40→  sendMessage: () => void;
+    41→  sendGroupMessage: () => void;
+    42→  activeConversation: Conversation | null;
+    43→  activeGroup: GroupChat | null;
+    44→  messages: Message[];
+    45→  groupMessages: Message[];
+    46→  setGroupMessages: (msgs: Message[]) => void;
+    47→  getAvatar: (u?: User | null) => string;
+    48→  openProfile: (userId: string) => void;
+    49→  setActiveConversation: (c: Conversation | null) => void;
+    50→  setActiveGroup: (g: any) => void;
+    51→  setChatMobileView: (v: 'list' | 'chat') => void;
+    52→  msgEndRef: React.RefObject<HTMLDivElement>;
+    53→  socket: Socket | null;
+    54→}
+    55→
+    56→// ═══════════════════════════════════════════════════════════════
+    57→// CONSTANTS
+    58→// ═══════════════════════════════════════════════════════════════
+    59→const REACTION_EMOJIS = ['\u2764\uFE0F', '\uD83D\uDE02', '\uD83D\uDD25', '\uD83D\uDC4D', '\uD83D\uDE2E', '\uD83D\uDE2E'];
+    60→const REACTION_DISPLAY = ['\u2764\uFE0F', '\uD83D\uDE02', '\uD83D\uDD25', '\uD83D\uDC4D', '\uD83D\uDE31', '\uD83D\uDE2E'];
+    61→
+    62→const DISAPPEAR_OPTIONS = [
+    63→  { label: '5s', value: '5s' },
+    64→  { label: '30s', value: '30s' },
+    65→  { label: '1m', value: '1m' },
+    66→  { label: '5m', value: '5m' },
+    67→  { label: '1h', value: '1h' },
+    68→];
+    69→
+    70→const CHAT_THEMES = [
+    71→  { id: 'default', label: 'Default', ownBg: 'bg-primary', ownText: 'text-primary-foreground', otherBg: 'bg-secondary', otherBorder: 'border-border' },
+    72→  { id: 'midnight', label: 'Midnight', ownBg: 'bg-violet-600', ownText: 'text-white', otherBg: 'bg-zinc-800', otherBorder: 'border-zinc-700' },
+    73→  { id: 'ocean', label: 'Ocean', ownBg: 'bg-teal-600', ownText: 'text-white', otherBg: 'bg-cyan-950', otherBorder: 'border-cyan-900' },
+    74→  { id: 'sunset', label: 'Sunset', ownBg: 'bg-orange-600', ownText: 'text-white', otherBg: 'bg-amber-950', otherBorder: 'border-amber-900' },
+    75→  { id: 'forest', label: 'Forest', ownBg: 'bg-emerald-600', ownText: 'text-white', otherBg: 'bg-green-950', otherBorder: 'border-green-900' },
+    76→  { id: 'rose', label: 'Rose', ownBg: 'bg-pink-600', ownText: 'text-white', otherBg: 'bg-rose-950', otherBorder: 'border-rose-900' },
+    77→];
+    78→
+    79→const MEET_NOW_ICONS: Record<string, { icon: any; label: string; color: string }> = {
+    80→  coffee: { icon: Coffee, label: 'Coffee', color: 'bg-amber-600' },
+    81→  drinks: { icon: Wine, label: 'Drinks', color: 'bg-violet-600' },
+    82→  gym: { icon: Dumbbell, label: 'Gym', color: 'bg-emerald-600' },
+    83→  movie: { icon: Film, label: 'Movie', color: 'bg-blue-600' },
+    84→  club: { icon: Music, label: 'Club', color: 'bg-pink-600' },
+    85→  video: { icon: Video, label: 'Video Call', color: 'bg-cyan-600' },
+    86→};
+    87→
+    88→const HIV_BADGE_COLORS: Record<string, string> = {
+    89→  negative: 'bg-emerald-600',
+    90→  positive: 'bg-red-600',
+    91→  undetectable: 'bg-emerald-500',
+    92→  'on-prep': 'bg-blue-600',
+    93→};
+    94→
+    95→// ═══════════════════════════════════════════════════════════════
+    96→// WAVEFORM BARS (for voice messages)
+    97→// ═══════════════════════════════════════════════════════════════
+    98→function WaveformBars({ playing, duration }: { playing: boolean; duration: number }) {
+    99→  const bars = 24;
+   100→  return (
+   101→    <div className="flex items-center gap-[2px] h-8">
+   102→      {Array.from({ length: bars }).map((_, i) => {
+   103→        const h = 20 + Math.sin(i * 0.8) * 30 + Math.random() * 20;
+   104→        return (
+   105→          <motion.div
+   106→            key={i}
+   107→            className={`w-[3px] rounded-full ${playing ? 'bg-primary-foreground' : 'bg-foreground/60'}`}
+   108→            animate={playing ? { scaleY: [1, 1.4, 0.8, 1.2, 1] } : {}}
+   109→            transition={{ duration: 0.8 + i * 0.05, repeat: Infinity, ease: 'easeInOut' }}
+   110→            style={{ height: `${h}%`, transformOrigin: 'bottom' }}
+   111→          />
+   112→        );
+   113→      })}
+   114→    </div>
+   115→  );
+   116→}
+   117→
+   118→// ═══════════════════════════════════════════════════════════════
+   119→// MAIN COMPONENT
+   120→// ═══════════════════════════════════════════════════════════════
+   121→export default function NexusChat(props: NexusChatProps) {
+   122→  const {
+   123→    msgInput, setMsgInput, sendMessage, sendGroupMessage,
+   124→    activeConversation, activeGroup, messages, groupMessages,
+   125→    setGroupMessages, getAvatar, openProfile,
+   126→    setActiveConversation, setActiveGroup, setChatMobileView,
+   127→    msgEndRef, socket,
+   128→  } = props;
+   129→
+   130→  // ═══ Store ═══
+   131→  const currentUser = useAppStore((s) => s.currentUser);
+   132→  const chatTheme = useAppStore((s) => s.chatTheme);
+   133→  const setChatTheme = useAppStore((s) => s.setChatTheme);
+   134→  const nsfwFilter = useAppStore((s) => s.nsfwFilter);
+   135→  const setNsfwFilter = useAppStore((s) => s.setNsfwFilter);
+   136→  const typingUsers = useAppStore((s) => s.typingUsers);
+   137→  const setTypingUsers = useAppStore((s) => s.setTypingUsers);
+   138→  const showChatSearch = useAppStore((s) => s.showChatSearch);
+   139→  const setShowChatSearch = useAppStore((s) => s.setShowChatSearch);
+   140→  const chatSearchQuery = useAppStore((s) => s.chatSearchQuery);
+   141→  const setChatSearchQuery = useAppStore((s) => s.setChatSearchQuery);
+   142→  const replyingTo = useAppStore((s) => s.replyingTo);
+   143→  const setReplyingTo = useAppStore((s) => s.setReplyingTo);
+   144→  const showDisappearingTimer = useAppStore((s) => s.showDisappearingTimer);
+   145→  const setShowDisappearingTimer = useAppStore((s) => s.setShowDisappearingTimer);
+   146→  const showScheduleModal = useAppStore((s) => s.showScheduleModal);
+   147→  const setShowScheduleModal = useAppStore((s) => s.setShowScheduleModal);
+   148→  const showForwardModal = useAppStore((s) => s.showForwardModal);
+   149→  const setShowForwardModal = useAppStore((s) => s.setShowForwardModal);
+   150→  const forwardMessage = useAppStore((s) => s.forwardMessage);
+   151→  const setForwardMessage = useAppStore((s) => s.setForwardMessage);
+   152→  const showCreatePollModal = useAppStore((s) => s.showCreatePollModal);
+   153→  const setShowCreatePollModal = useAppStore((s) => s.setShowCreatePollModal);
+   154→  const showAlbumPicker = useAppStore((s) => s.showAlbumPicker);
+   155→  const setShowAlbumPicker = useAppStore((s) => s.setShowAlbumPicker);
+   156→  const showLocationPicker = useAppStore((s) => s.showLocationPicker);
+   157→  const setShowLocationPicker = useAppStore((s) => s.setShowLocationPicker);
+   158→  const showCallModal = useAppStore((s) => s.showCallModal);
+   159→  const setShowCallModal = useAppStore((s) => s.setShowCallModal);
+   160→  const callType = useAppStore((s) => s.callType);
+   161→  const setCallType = useAppStore((s) => s.setCallType);
+   162→  const showAiSummary = useAppStore((s) => s.showAiSummary);
+   163→  const setShowAiSummary = useAppStore((s) => s.setShowAiSummary);
+   164→  const aiSummary = useAppStore((s) => s.aiSummary);
+   165→  const setAiSummary = useAppStore((s) => s.setAiSummary);
+   166→  const showAutoReplies = useAppStore((s) => s.showAutoReplies);
+   167→  const setShowAutoReplies = useAppStore((s) => s.setShowAutoReplies);
+   168→  const autoReplies = useAppStore((s) => s.autoReplies);
+   169→  const setAutoReplies = useAppStore((s) => s.setAutoReplies);
+   170→  const showMeetupSuggestions = useAppStore((s) => s.showMeetupSuggestions);
+   171→  const setShowMeetupSuggestions = useAppStore((s) => s.setShowMeetupSuggestions);
+   172→  const meetupSuggestions = useAppStore((s) => s.meetupSuggestions);
+   173→  const setMeetupSuggestions = useAppStore((s) => s.setMeetupSuggestions);
+   174→  const showSafeWord = useAppStore((s) => s.showSafeWord);
+   175→  const setShowSafeWord = useAppStore((s) => s.setShowSafeWord);
+   176→  const isRecording = useAppStore((s) => s.isRecording);
+   177→  const setIsRecording = useAppStore((s) => s.setIsRecording);
+   178→  const recordingDuration = useAppStore((s) => s.recordingDuration);
+   179→  const setRecordingDuration = useAppStore((s) => s.setRecordingDuration);
+   180→  const showChatMediaGallery = useAppStore((s) => s.showChatMediaGallery);
+   181→  const setShowChatMediaGallery = useAppStore((s) => s.setShowChatMediaGallery);
+   182→
+   183→  // ═══ Derived state ═══
+   184→  const isGroup = !!activeGroup;
+   185→  const chatUser = activeConversation?.otherUser;
+   186→  const chatMessages = isGroup ? groupMessages : messages;
+   187→  const otherUserId = isGroup ? activeGroup?.id : activeConversation?.otherUser.id;
+   188→
+   189→  // Extend User type for hivStatus and meetNowTags
+   190→  const chatUserData = chatUser as (User & { hivStatus?: string; meetNowTags?: string }) | null;
+   191→  const meetNowTags = chatUserData?.meetNowTags ? chatUserData.meetNowTags.split(',').filter(Boolean) : [];
+   192→
+   193→  const theme = CHAT_THEMES.find((t) => t.id === chatTheme) || CHAT_THEMES[0];
+   194→
+   195→  // ═══ Local state ═══
+   196→  const [contextMenuMsg, setContextMenuMsg] = useState<Message | null>(null);
+   197→  const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null);
+   198→  const [eventDetection, setEventDetection] = useState<{ detected: boolean; description: string; eventId?: string } | null>(null);
+   199→  const [loadingAction, setLoadingAction] = useState<string | null>(null);
+   200→  const [showToolbar, setShowToolbar] = useState(false);
+   201→  const [showThemeModal, setShowThemeModal] = useState(false);
+   202→  const [showStatsModal, setShowStatsModal] = useState(false);
+   203→  const [showDisappearingPicker, setShowDisappearingPicker] = useState(false);
+   204→  const [translations, setTranslations] = useState<Record<string, string>>({});
+   205→  const [favoritedFilter, setFavoritedFilter] = useState(false);
+   206→  const [revealedImages, setRevealedImages] = useState<Record<string, boolean>>({});
+   207→  const [voicePlaying, setVoicePlaying] = useState<string | null>(null);
+   208→  const [pollVotes, setPollVotes] = useState<Record<string, number>>({});
+   209→  const [quickContextCard, setQuickContextCard] = useState<{ x: number; y: number; user: User } | null>(null);
+   210→  const [scheduleDate, setScheduleDate] = useState('');
+   211→  const [scheduleTime, setScheduleTime] = useState('');
+   212→  const [pollQuestion, setPollQuestion] = useState('');
+   213→  const [pollOptions, setPollOptions] = useState(['', '']);
+   214→  const [locationName, setLocationName] = useState('');
+   215→  const [forwardTarget, setForwardTarget] = useState('');
+   216→  const [conversationsForForward, setConversationsForForward] = useState<Conversation[]>([]);
+   217→  const [albums, setAlbums] = useState<any[]>([]);
+   218→  const [selectedAlbum, setSelectedAlbum] = useState<any>(null);
+   219→  const [autoReplyLoading, setAutoReplyLoading] = useState(false);
+   220→  const [summaryLoading, setSummaryLoading] = useState(false);
+   221→  const [meetupLoading, setMeetupLoading] = useState(false);
+   222→  const [eventLoading, setEventLoading] = useState(false);
+   223→  const [callLoading, setCallLoading] = useState(false);
+   224→  const [mediaGalleryItems, setMediaGalleryItems] = useState<Message[]>([]);
+   225→  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+   226→  const disappearingTimersRef = useRef<Record<string, NodeJS.Timeout>>({});
+   227→  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+   228→  const scrollContainerRef = useRef<HTMLDivElement>(null);
+   229→
+   230→  // ═══ Typing indicator from socket ═══
+   231→  useEffect(() => {
+   232→    if (!socket) return;
+   233→    const handleTyping = (data: { userId: string; chatId: string }) => {
+   234→      if (data.chatId === otherUserId) {
+   235→        setTypingUsers({ [data.userId]: true });
+   236→        setTimeout(() => setTypingUsers((prev: Record<string, boolean>) => {
+   237→          const next = { ...prev };
+   238→          delete next[data.userId];
+   239→          return next;
+   240→        }), 3000);
+   241→      }
+   242→    };
+   243→    socket.on('typing', handleTyping);
+   244→    return () => { socket.off('typing', handleTyping); };
+   245→  }, [socket, otherUserId, setTypingUsers]);
+   246→
+   247→  // ═══ Emit typing when user types ═══
+   248→  useEffect(() => {
+   249→    if (!socket || !msgInput || !otherUserId) return;
+   250→    const timer = setTimeout(() => {
+   251→      socket.emit('typing', { chatId: otherUserId });
+   252→    }, 300);
+   253→    return () => clearTimeout(timer);
+   254→  }, [msgInput, socket, otherUserId]);
+   255→
+   256→  // ═══ Disappearing message countdown ═══
+   257→  useEffect(() => {
+   258→    chatMessages.forEach((msg) => {
+   259→      if (msg.expiresAt && !disappearingTimersRef.current[msg.id]) {
+   260→        const expires = new Date(msg.expiresAt).getTime();
+   261→        const now = Date.now();
+   262→        if (expires > now) {
+   263→          disappearingTimersRef.current[msg.id] = setTimeout(() => {
+   264→            setGroupMessages(chatMessages.filter((m) => m.id !== msg.id));
+   265→            delete disappearingTimersRef.current[msg.id];
+   266→          }, expires - now);
+   267→        }
+   268→      }
+   269→    });
+   270→  }, [chatMessages]);
+   271→
+   272→  // ═══ Cleanup timers ═══
+   273→  useEffect(() => {
+   274→    return () => {
+   275→      Object.values(disappearingTimersRef.current).forEach(clearTimeout);
+   276→      if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
+   277→    };
+   278→  }, []);
+   279→
+   280→  // ═══ Filtered messages ═══
+   281→  const displayMessages = chatMessages.filter((msg) => {
+   282→    if (favoritedFilter && !msg.isFavorited) return false;
+   283→    if (showChatSearch && chatSearchQuery) {
+   284→      return msg.content.toLowerCase().includes(chatSearchQuery.toLowerCase());
+   285→    }
+   286→    return true;
+   287→  });
+   288→
+   289→  const pinnedMessages = chatMessages.filter((m) => m.isPinned);
+   290→
+   291→  // ═══ HANDLERS ═══
+   292→
+   293→  // #1 AI Auto-Reply
+   294→  const fetchAutoReplies = useCallback(async () => {
+   295→    if (chatMessages.length === 0) return;
+   296→    setAutoReplyLoading(true);
+   297→    try {
+   298→      const recent = chatMessages.slice(-10);
+   299→      const res = await fetch('/api/chat/auto-reply', {
+   300→        method: 'POST',
+   301→        headers: { 'Content-Type': 'application/json' },
+   302→        body: JSON.stringify({ messages: recent.map((m) => ({ content: m.content, senderId: m.senderId })), userId: otherUserId }),
+   303→      });
+   304→      const data = await res.json();
+   305→      if (data.suggestions) {
+   306→        setAutoReplies(data.suggestions);
+   307→        setShowAutoReplies(true);
+   308→      }
+   309→    } catch {
+   310→      setAutoReplies([]);
+   311→    } finally {
+   312→      setAutoReplyLoading(false);
+   313→    }
+   314→  }, [chatMessages, otherUserId, setAutoReplies, setShowAutoReplies]);
+   315→
+   316→  // After sending a message, fetch auto-replies
+   317→  const handleSendAndSuggest = () => {
+   318→    if (isGroup) { sendGroupMessage(); } else { sendMessage(); }
+   319→    setTimeout(() => fetchAutoReplies(), 500);
+   320→  };
+   321→
+   322→  // #2 Real-Time Translation
+   323→  const translateMessage = async (msg: Message) => {
+   324→    if (translations[msg.id]) return;
+   325→    setLoadingAction(`translate-${msg.id}`);
+   326→    try {
+   327→      const res = await fetch('/api/chat/translate', {
+   328→        method: 'POST',
+   329→        headers: { 'Content-Type': 'application/json' },
+   330→        body: JSON.stringify({ text: msg.content, targetLang: 'en' }),
+   331→      });
+   332→      const data = await res.json();
+   333→      if (data.translatedText) {
+   334→        setTranslations((prev) => ({ ...prev, [msg.id]: data.translatedText }));
+   335→      }
+   336→    } catch { /* silent */ } finally {
+   337→      setLoadingAction(null);
+   338→    }
+   339→  };
+   340→
+   341→  // #3 Event Detection
+   342→  const detectEvent = async () => {
+   343→    if (chatMessages.length < 2) return;
+   344→    setEventLoading(true);
+   345→    try {
+   346→      const recent = chatMessages.slice(-8);
+   347→      const res = await fetch('/api/chat/event-detect', {
+   348→        method: 'POST',
+   349→        headers: { 'Content-Type': 'application/json' },
+   350→        body: JSON.stringify({ messages: recent, userId: otherUserId, createEvent: false }),
+   351→      });
+   352→      const data = await res.json();
+   353→      if (data.detected) {
+   354→        setEventDetection({ detected: true, description: data.description || 'Plan detected!' });
+   355→      }
+   356→    } catch { /* silent */ } finally {
+   357→      setEventLoading(false);
+   358→    }
+   359→  };
+   360→
+   361→  const createEventFromDetection = async () => {
+   362→    if (!eventDetection) return;
+   363→    setLoadingAction('create-event');
+   364→    try {
+   365→      const recent = chatMessages.slice(-8);
+   366→      await fetch('/api/chat/event-detect', {
+   367→        method: 'POST',
+   368→        headers: { 'Content-Type': 'application/json' },
+   369→        body: JSON.stringify({ messages: recent, userId: otherUserId, createEvent: true }),
+   370→      });
+   371→      setEventDetection((prev) => prev ? { ...prev, eventId: 'created' } : null);
+   372→    } catch { /* silent */ } finally {
+   373→      setLoadingAction(null);
+   374→    }
+   375→  };
+   376→
+   377→  // Run event detection when messages change
+   378→  useEffect(() => {
+   379→    if (chatMessages.length >= 2 && chatMessages.length % 3 === 0) {
+   380→      detectEvent();
+   381→    }
+   382→  }, [chatMessages.length]);
+   383→
+   384→  // #5 Voice Message Recording
+   385→  const startRecording = () => {
+   386→    setIsRecording(true);
+   387→    setRecordingDuration(0);
+   388→    recordingIntervalRef.current = setInterval(() => {
+   389→      setRecordingDuration((prev: number) => prev + 1);
+   390→    }, 1000);
+   391→  };
+   392→
+   393→  const stopRecording = async () => {
+   394→    if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
+   395→    setIsRecording(false);
+   396→    if (recordingDuration > 0) {
+   397→      try {
+   398→        await fetch('/api/chat/voice', {
+   399→          method: 'POST',
+   400→          headers: { 'Content-Type': 'application/json' },
+   401→          body: JSON.stringify({ receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct', duration: recordingDuration }),
+   402→        });
+   403→      } catch { /* silent */ }
+   404→    }
+   405→    setRecordingDuration(0);
+   406→  };
+   407→
+   408→  // #7 Message Reactions
+   409→  const toggleReaction = async (msgId: string, emoji: string) => {
+   410→    try {
+   411→      await fetch('/api/chat/reaction', {
+   412→        method: 'POST',
+   413→        headers: { 'Content-Type': 'application/json' },
+   414→        body: JSON.stringify({ messageId: msgId, emoji }),
+   415→      });
+   416→    } catch { /* silent */ }
+   417→    setShowReactionPicker(null);
+   418→  };
+   419→
+   420→  // #8 Reply Threading
+   421→  const handleReply = (msg: Message) => {
+   422→    setReplyingTo(msg);
+   423→  };
+   424→
+   425→  const cancelReply = () => {
+   426→    setReplyingTo(null);
+   427→  };
+   428→
+   429→  // #9 Message Pinning
+   430→  const togglePin = async (msg: Message) => {
+   431→    setLoadingAction(`pin-${msg.id}`);
+   432→    try {
+   433→      await fetch('/api/chat/pin', {
+   434→        method: 'POST',
+   435→        headers: { 'Content-Type': 'application/json' },
+   436→        body: JSON.stringify({ messageId: msg.id }),
+   437→      });
+   438→    } catch { /* silent */ } finally {
+   439→      setLoadingAction(null);
+   440→    }
+   441→  };
+   442→
+   443→  // #12 Message Recall
+   444→  const recallMessage = async (msg: Message) => {
+   445→    setLoadingAction(`recall-${msg.id}`);
+   446→    try {
+   447→      await fetch('/api/chat/recall', {
+   448→        method: 'POST',
+   449→        headers: { 'Content-Type': 'application/json' },
+   450→        body: JSON.stringify({ messageId: msg.id }),
+   451→      });
+   452→    } catch { /* silent */ } finally {
+   453→      setLoadingAction(null);
+   454→    }
+   455→  };
+   456→
+   457→  // #13 Favorite/Bookmark
+   458→  const toggleFavorite = async (msg: Message) => {
+   459→    setLoadingAction(`fav-${msg.id}`);
+   460→    try {
+   461→      await fetch('/api/chat/favorite-message', {
+   462→        method: 'POST',
+   463→        headers: { 'Content-Type': 'application/json' },
+   464→        body: JSON.stringify({ messageId: msg.id }),
+   465→      });
+   466→    } catch { /* silent */ } finally {
+   467→      setLoadingAction(null);
+   468→    }
+   469→  };
+   470→
+   471→  // #14 AI Summary
+   472→  const fetchAiSummary = async () => {
+   473→    setSummaryLoading(true);
+   474→    setShowAiSummary(true);
+   475→    try {
+   476→      const res = await fetch('/api/chat/summary', {
+   477→        method: 'POST',
+   478→        headers: { 'Content-Type': 'application/json' },
+   479→        body: JSON.stringify({ messages: chatMessages, userId: otherUserId }),
+   480→      });
+   481→      const data = await res.json();
+   482→      setAiSummary(data.summary || 'No summary available.');
+   483→    } catch {
+   484→      setAiSummary('Failed to generate summary.');
+   485→    } finally {
+   486→      setSummaryLoading(false);
+   487→    }
+   488→  };
+   489→
+   490→  // #17 Media Gallery
+   491→  const openMediaGallery = () => {
+   492→    const mediaMsgs = chatMessages.filter((m) => m.type === 'image' || m.type === 'video');
+   493→    setMediaGalleryItems(mediaMsgs);
+   494→    setShowChatMediaGallery(true);
+   495→  };
+   496→
+   497→  // #18 Message Forwarding
+   498→  const openForwardModal = async (msg: Message) => {
+   499→    setForwardMessage(msg);
+   500→    try {
+   501→      const res = await fetch('/api/conversations');
+   502→      const data = await res.json();
+   503→      setConversationsForForward(Array.isArray(data) ? data : []);
+   504→    } catch {
+   505→      setConversationsForForward([]);
+   506→    }
+   507→    setShowForwardModal(true);
+   508→  };
+   509→
+   510→  const forwardMessageAction = async () => {
+   511→    if (!forwardMessage || !forwardTarget) return;
+   512→    setLoadingAction('forward');
+   513→    try {
+   514→      await fetch('/api/chat/forward', {
+   515→        method: 'POST',
+   516→        headers: { 'Content-Type': 'application/json' },
+   517→        body: JSON.stringify({ messageId: forwardMessage.id, targetConversationId: forwardTarget }),
+   518→      });
+   519→    } catch { /* silent */ } finally {
+   520→      setLoadingAction(null);
+   521→      setShowForwardModal(false);
+   522→      setForwardMessage(null);
+   523→      setForwardTarget('');
+   524→    }
+   525→  };
+   526→
+   527→  // #21 Poll Creation
+   528→  const createPoll = async () => {
+   529→    if (!pollQuestion || pollOptions.filter(Boolean).length < 2) return;
+   530→    setLoadingAction('poll');
+   531→    try {
+   532→      await fetch('/api/chat/poll', {
+   533→        method: 'POST',
+   534→        headers: { 'Content-Type': 'application/json' },
+   535→        body: JSON.stringify({
+   536→          receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct',
+   537→          question: pollQuestion, options: pollOptions.filter(Boolean),
+   538→        }),
+   539→      });
+   540→    } catch { /* silent */ } finally {
+   541→      setLoadingAction(null);
+   542→      setShowCreatePollModal(false);
+   543→      setPollQuestion('');
+   544→      setPollOptions(['', '']);
+   545→    }
+   546→  };
+   547→
+   548→  const votePoll = async (msgId: string, optionIndex: number) => {
+   549→    try {
+   550→      await fetch('/api/chat/poll', {
+   551→        method: 'PUT',
+   552→        headers: { 'Content-Type': 'application/json' },
+   553→        body: JSON.stringify({ messageId: msgId, optionIndex }),
+   554→      });
+   555→      setPollVotes((prev) => ({ ...prev, [`${msgId}-${optionIndex}`]: optionIndex }));
+   556→    } catch { /* silent */ }
+   557→  };
+   558→
+   559→  // #22 Call Link
+   560→  const createCallLink = async (type: 'voice' | 'video') => {
+   561→    setCallLoading(true);
+   562→    setCallType(type);
+   563→    try {
+   564→      await fetch('/api/chat/call', {
+   565→        method: 'POST',
+   566→        headers: { 'Content-Type': 'application/json' },
+   567→        body: JSON.stringify({ receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct', callType: type }),
+   568→      });
+   569→    } catch { /* silent */ } finally {
+   570→      setCallLoading(false);
+   571→      setShowCallModal(false);
+   572→    }
+   573→  };
+   574→
+   575→  // #23 AI Suggest Meetup
+   576→  const fetchMeetupSuggestions = async () => {
+   577→    setMeetupLoading(true);
+   578→    setShowMeetupSuggestions(true);
+   579→    try {
+   580→      const res = await fetch('/api/chat/meetup-suggest', {
+   581→        method: 'POST',
+   582→        headers: { 'Content-Type': 'application/json' },
+   583→        body: JSON.stringify({ userId: otherUserId }),
+   584→      });
+   585→      const data = await res.json();
+   586→      setMeetupSuggestions(data.venues || []);
+   587→    } catch {
+   588→      setMeetupSuggestions([]);
+   589→    } finally {
+   590→      setMeetupLoading(false);
+   591→    }
+   592→  };
+   593→
+   594→  // #26 NSFW Filter toggle
+   595→  const toggleNsfwFilter = () => {
+   596→    setNsfwFilter(!nsfwFilter);
+   597→  };
+   598→
+   599→  const revealImage = (msgId: string) => {
+   600→    setRevealedImages((prev) => ({ ...prev, [msgId]: true }));
+   601→  };
+   602→
+   603→  // #28 Scheduled Message
+   604→  const sendScheduledMessage = async () => {
+   605→    if (!msgInput || !scheduleDate || !scheduleTime) return;
+   606→    setLoadingAction('schedule');
+   607→    try {
+   608→      await fetch('/api/chat/schedule', {
+   609→        method: 'POST',
+   610→        headers: { 'Content-Type': 'application/json' },
+   611→        body: JSON.stringify({
+   612→          receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct',
+   613→          content: msgInput, scheduledAt: `${scheduleDate}T${scheduleTime}:00`,
+   614→        }),
+   615→      });
+   616→    } catch { /* silent */ } finally {
+   617→      setLoadingAction(null);
+   618→      setShowScheduleModal(false);
+   619→      setMsgInput('');
+   620→      setScheduleDate('');
+   621→      setScheduleTime('');
+   622→    }
+   623→  };
+   624→
+   625→  // #30 Safe Word
+   626→  const activateSafeWord = () => {
+   627→    setShowSafeWord(true);
+   628→    setTimeout(() => {
+   629→      setShowSafeWord(false);
+   630→      setActiveConversation(null);
+   631→      setActiveGroup(null);
+   632→      setChatMobileView('list');
+   633→    }, 2500);
+   634→  };
+   635→
+   636→  // #30 Message Stats
+   637→  const getStats = () => {
+   638→    const mine = chatMessages.filter((m) => m.senderId === currentUser?.id);
+   639→    const theirs = chatMessages.filter((m) => m.senderId !== currentUser?.id);
+   640→    const totalChars = chatMessages.reduce((sum, m) => sum + m.content.length, 0);
+   641→    const avgRespTime = theirs.length > 0 ? '2m 15s' : 'N/A';
+   642→    return { total: chatMessages.length, mine: mine.length, theirs: theirs.length, totalChars, avgRespTime };
+   643→  };
+   644→
+   645→  // Long press for context menu
+   646→  const handleLongPressStart = (msg: Message, e: React.MouseEvent | React.TouchEvent) => {
+   647→    e.preventDefault();
+   648→    longPressTimerRef.current = setTimeout(() => {
+   649→      setContextMenuMsg(msg);
+   650→    }, 500);
+   651→  };
+   652→
+   653→  const handleLongPressEnd = () => {
+   654→    if (longPressTimerRef.current) {
+   655→      clearTimeout(longPressTimerRef.current);
+   656→    }
+   657→  };
+   658→
+   659→  // Format recording duration
+   660→  const formatDuration = (s: number) => {
+   661→    const m = Math.floor(s / 60);
+   662→    const sec = s % 60;
+   663→    return `${m}:${sec.toString().padStart(2, '0')}`;
+   664→  };
+   665→
+   666→  // Get time ago
+   667→  const timeAgo = (dateStr: string) => {
+   668→    try { return formatDistanceToNow(new Date(dateStr), { addSuffix: true }); }
+   669→    catch { return ''; }
+   670→  };
+   671→
+   672→  // Parse poll data
+   673→  const parsePollData = (pollDataStr?: string) => {
+   674→    if (!pollDataStr) return null;
+   675→    try { return JSON.parse(pollDataStr); }
+   676→    catch { return null; }
+   677→  };
+   678→
+   679→  // Parse location data
+   680→  const parseLocationData = (locStr?: string) => {
+   681→    if (!locStr) return null;
+   682→    try { return JSON.parse(locStr); }
+   683→    catch { return null; }
+   684→  };
+   685→
+   686→  // Parse call data
+   687→  const parseCallData = (callStr?: string) => {
+   688→    if (!callStr) return null;
+   689→    try { return JSON.parse(callStr); }
+   690→    catch { return null; }
+   691→  };
+   692→
+   693→  // Parse reactions
+   694→  const parseReactions = (reactionsStr?: string): string[] => {
+   695→    if (!reactionsStr) return [];
+   696→    try { return JSON.parse(reactionsStr); }
+   697→    catch { return []; }
+   698→  };
+   699→
+   700→  // ═══════════════════════════════════════════════════════════════
+   701→  // RENDER HELPERS
+   702→  // ═══════════════════════════════════════════════════════════════
+   703→
+   704→  // Message type badge
+   705→  const MessageTypeBadge = ({ msg }: { msg: Message }) => {
+   706→    if (msg.type === 'location' && parseLocationData(msg.locationData)) {
+   707→      return <Badge variant="outline" className="text-[10px] gap-1 border-amber-500/50 text-amber-400"><MapPin className="w-3 h-3" /> Location</Badge>;
+   708→    }
+   709→    if (msg.type === 'audio' || msg.voiceDuration) {
+   710→      return <Badge variant="outline" className="text-[10px] gap-1 border-cyan-500/50 text-cyan-400"><Volume2 className="w-3 h-3" /> Voice {msg.voiceDuration ? `(${formatDuration(msg.voiceDuration)})` : ''}</Badge>;
+   711→    }
+   712→    if (msg.pollData) {
+   713→      return <Badge variant="outline" className="text-[10px] gap-1 border-violet-500/50 text-violet-400"><Vote className="w-3 h-3" /> Poll</Badge>;
+   714→    }
+   715→    if (msg.callData) {
+   716→      const cd = parseCallData(msg.callData);
+   717→      return <Badge variant="outline" className="text-[10px] gap-1 border-emerald-500/50 text-emerald-400">{cd?.callType === 'video' ? <Video className="w-3 h-3" /> : <Phone className="w-3 h-3" />} {cd?.callType === 'video' ? 'Video' : 'Voice'} Call</Badge>;
+   718→    }
+   719→    if (msg.albumId) {
+   720→      return <Badge variant="outline" className="text-[10px] gap-1 border-pink-500/50 text-pink-400"><Image className="w-3 h-3" /> Album</Badge>;
+   721→    }
+   722→    if (msg.scheduledAt) {
+   723→      return <Badge variant="outline" className="text-[10px] gap-1 border-orange-500/50 text-orange-400"><Timer className="w-3 h-3" /> Scheduled</Badge>;
+   724→    }
+   725→    return null;
+   726→  };
+   727→
+   728→  // Reactions chips
+   729→  const ReactionChips = ({ msgId, reactionsStr }: { msgId: string; reactionsStr?: string }) => {
+   730→    const reactions = parseReactions(reactionsStr);
+   731→    if (reactions.length === 0) return null;
+   732→    const counts: Record<string, number> = {};
+   733→    reactions.forEach((r: string) => { counts[r] = (counts[r] || 0) + 1; });
+   734→    return (
+   735→      <div className="flex gap-1 mt-1 flex-wrap">
+   736→        {Object.entries(counts).map(([emoji, count]) => (
+   737→          <span key={emoji} className="inline-flex items-center gap-0.5 text-[11px] px-1.5 py-0.5 rounded-full bg-background/20 border border-border/50 cursor-pointer hover:bg-background/40 transition-colors">
+   738→            {emoji} {count > 1 && <span className="text-[9px] opacity-70">{count}</span>}
+   739→          </span>
+   740→        ))}
+   741→      </div>
+   742→    );
+   743→  };
+   744→
+   745→  // Reply quote
+   746→  const ReplyQuote = ({ msg }: { msg: Message }) => {
+   747→    if (!msg) return null;
+   748→    return (
+   749→      <motion.div
+   750→        initial={{ opacity: 0, height: 0 }}
+   751→        animate={{ opacity: 1, height: 'auto' }}
+   752→        exit={{ opacity: 0, height: 0 }}
+   753→        className="flex items-center gap-2 px-3 py-2 border-l-2 border-primary bg-secondary/50"
+   754→      >
+   755→        <div className="flex-1 min-w-0">
+   756→          <p className="text-[10px] font-semibold text-primary truncate">{msg.sender?.displayName || 'Unknown'}</p>
+   757→          <p className="text-[11px] text-muted-foreground truncate">{msg.content}</p>
+   758→        </div>
+   759→        <button onClick={cancelReply} className="p-1 hover:bg-secondary rounded-full">
+   760→          <X className="w-3 h-3 text-muted-foreground" />
+   761→        </button>
+   762→      </motion.div>
+   763→    );
+   764→  };
+   765→
+   766→  // Location card
+   767→  const LocationCard = ({ msg }: { msg: Message }) => {
+   768→    const loc = parseLocationData(msg.locationData);
+   769→    if (!loc) return null;
+   770→    return (
+   771→      <div className="mt-2 p-2 rounded-lg bg-background/10 border border-border/50">
+   772→        <div className="flex items-center gap-2 mb-1">
+   773→          <MapPin className="w-4 h-4 text-red-400" />
+   774→          <span className="text-[12px] font-medium">{loc.name || 'Shared Location'}</span>
+   775→        </div>
+   776→        <div className="h-24 rounded-md bg-secondary/50 flex items-center justify-center border border-border/30">
+   777→          <Navigation className="w-6 h-6 text-muted-foreground" />
+   778→        </div>
+   779→      </div>
+   780→    );
+   781→  };
+   782→
+   783→  // Voice message player
+   784→  const VoicePlayer = ({ msg }: { msg: Message }) => {
+   785→    const playing = voicePlaying === msg.id;
+   786→    return (
+   787→      <div className="flex items-center gap-3 mt-1 min-w-[200px]">
+   788→        <button onClick={() => setVoicePlaying(playing ? null : msg.id)} className="p-1.5 rounded-full bg-background/20 hover:bg-background/30 transition-colors">
+   789→          {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+   790→        </button>
+   791→        <div className="flex-1">
+   792→          <WaveformBars playing={playing} duration={msg.voiceDuration || 0} />
+   793→        </div>
+   794→        <span className="text-[10px] opacity-60">{formatDuration(msg.voiceDuration || 0)}</span>
+   795→      </div>
+   796→    );
+   797→  };
+   798→
+   799→  // Poll card
+   800→  const PollCard = ({ msg }: { msg: Message }) => {
+   801→    const poll = parsePollData(msg.pollData);
+   802→    if (!poll) return null;
+   803→    const totalVotes = (poll.votes || []).reduce((a: number, b: number) => a + b, 0);
+   804→    const userVote = pollVotes[`${msg.id}-0`] ?? poll.userVote ?? -1;
+   805→    return (
+   806→      <div className="mt-2 space-y-2">
+   807→        <p className="text-[12px] font-semibold">{poll.question}</p>
+   808→        {(poll.options || []).map((opt: string, i: number) => {
+   809→          const votes = (poll.votes || [])[i] || 0;
+   810→          const pct = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+   811→          const isVoted = userVote === i;
+   812→          return (
+   813→            <button
+   814→              key={i}
+   815→              onClick={() => votePoll(msg.id, i)}
+   816→              className={`w-full text-left relative rounded-lg border px-3 py-2 text-[12px] transition-all overflow-hidden ${isVoted ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}
+   817→            >
+   818→              <div className="absolute inset-0 bg-primary/5" style={{ width: `${pct}%` }} />
+   819→              <div className="relative flex items-center justify-between">
+   820→                <span>{opt}</span>
+   821→                <span className="text-[10px] opacity-60">{pct}%</span>
+   822→              </div>
+   823→            </button>
+   824→          );
+   825→        })}
+   826→        <p className="text-[10px] text-muted-foreground">{totalVotes} vote{totalVotes !== 1 ? 's' : ''}</p>
+   827→      </div>
+   828→    );
+   829→  };
+   830→
+   831→  // Call card
+   832→  const CallCard = ({ msg }: { msg: Message }) => {
+   833→    const cd = parseCallData(msg.callData);
+   834→    if (!cd) return null;
+   835→    const isVideo = cd.callType === 'video';
+   836→    return (
+   837→      <div className="mt-2 p-3 rounded-lg bg-background/10 border border-border/50 flex items-center gap-3">
+   838→        <div className={`p-2 rounded-full ${isVideo ? 'bg-violet-600/20' : 'bg-emerald-600/20'}`}>
+   839→          {isVideo ? <Video className="w-5 h-5 text-violet-400" /> : <Phone className="w-5 h-5 text-emerald-400" />}
+   840→        </div>
+   841→        <div className="flex-1">
+   842→          <p className="text-[12px] font-medium">{isVideo ? 'Video' : 'Voice'} Call</p>
+   843→          <p className="text-[10px] text-muted-foreground">{cd.link ? 'Tap to join' : 'Missed call'}</p>
+   844→        </div>
+   845→      </div>
+   846→    );
+   847→  };
+   848→
+   849→  // Quick context card for group chat
+   850→  const QuickContextCardComp = () => {
+   851→    if (!quickContextCard) return null;
+   852→    const u = quickContextCard.user;
+   853→    const uExt = u as (User & { hivStatus?: string; meetNowTags?: string });
+   854→    const tags = uExt.meetNowTags ? uExt.meetNowTags.split(',').filter(Boolean) : [];
+   855→    return (
+   856→      <AnimatePresence>
+   857→        <motion.div
+   858→          initial={{ opacity: 0, scale: 0.9, y: -5 }}
+   859→          animate={{ opacity: 1, scale: 1, y: 0 }}
+   860→          exit={{ opacity: 0, scale: 0.9, y: -5 }}
+   861→          className="fixed z-[100] bg-card border border-border rounded-xl p-3 shadow-xl w-64"
+   862→          style={{ top: quickContextCard.y, left: Math.min(quickContextCard.x, window.innerWidth - 280) }}
+   863→        >
+   864→          <button onClick={() => setQuickContextCard(null)} className="absolute top-2 right-2 p-1 hover:bg-secondary rounded-full">
+   865→            <X className="w-3 h-3 text-muted-foreground" />
+   866→          </button>
+   867→          <div className="flex items-center gap-3 mb-2">
+   868→            <Avatar className="h-10 w-10">
+   869→              <AvatarImage src={getAvatar(u)} />
+   870→              <AvatarFallback className="text-xs">{u.displayName?.[0]}</AvatarFallback>
+   871→            </Avatar>
+   872→            <div className="flex-1 min-w-0">
+   873→              <p className="text-[13px] font-semibold truncate" onClick={() => { openProfile(u.id); setQuickContextCard(null); }}>{u.displayName}</p>
+   874→              <p className="text-[10px] text-muted-foreground">{u.online ? <span className="text-emerald-400">Online</span> : 'Offline'}</p>
+   875→            </div>
+   876→          </div>
+   877→          {u.bio && <p className="text-[11px] text-muted-foreground mb-2 line-clamp-2">{u.bio}</p>}
+   878→          {tags.length > 0 && (
+   879→            <div className="flex flex-wrap gap-1">
+   880→              {tags.map((tag: string) => {
+   881→                const mt = MEET_NOW_ICONS[tag.trim()];
+   882→                return mt ? (
+   883→                  <Badge key={tag} variant="outline" className={`text-[9px] gap-1 ${mt.color} text-white border-0`}>
+   884→                    <mt.icon className="w-3 h-3" /> {mt.label}
+   885→                  </Badge>
+   886→                ) : null;
+   887→              })}
+   888→            </div>
+   889→          )}
+   890→        </motion.div>
+   891→      </AnimatePresence>
+   892→    );
+   893→  };
+   894→
+   895→  // ═══════════════════════════════════════════════════════════════
+   896→  // MESSAGE BUBBLE
+   897→  // ═══════════════════════════════════════════════════════════════
+   898→  const MessageBubble = ({ msg }: { msg: Message }) => {
+   899→    const isMine = msg.senderId === currentUser?.id;
+   900→    const replyMsg = msg.replyToId ? chatMessages.find((m) => m.id === msg.replyToId) : null;
+   901→    const isRecalled = msg.isRecalled;
+   902→    const isImage = msg.type === 'image' && msg.mediaUrl;
+   903→    const isVideo = msg.type === 'video' && msg.mediaUrl;
+   904→    const blurred = nsfwFilter && isImage && !revealedImages[msg.id];
+   905→    const loc = parseLocationData(msg.locationData);
+   906→    const isLocationType = msg.type === 'location' || loc;
+   907→    const isVoice = msg.type === 'audio' || msg.voiceDuration;
+   908→    const isPoll = !!msg.pollData;
+   909→    const isCall = !!msg.callData;
+   910→    const isScheduled = !!msg.scheduledAt;
+   911→    const isAlbum = !!msg.albumId;
+   912→    const translation = translations[msg.id];
+   913→    const typing = loadingAction === `translate-${msg.id}`;
+   914→
+   915→    return (
+   916→      <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} group`}> 
+   917→        <ContextMenu>
+   918→          <ContextMenuTrigger>
+   919→            <motion.div
+   920→              initial={{ opacity: 0, y: 8 }}
+   921→              animate={{ opacity: 1, y: 0 }}
+   922→              transition={{ duration: 0.2 }}
+   923→              className={`relative max-w-[80%] md:max-w-[70%] ${isMine ? theme.ownBg + ' ' + theme.ownText + ' rounded-2xl rounded-br-md' : theme.otherBg + ' border ' + theme.otherBorder + ' rounded-2xl rounded-bl-md text-foreground'}`}
+   924→              onMouseDown={(e) => handleLongPressStart(msg, e)}
+   925→              onMouseUp={handleLongPressEnd}
+   926→              onMouseLeave={handleLongPressEnd}
+   927→              onTouchStart={(e) => handleLongPressStart(msg, e)}
+   928→              onTouchEnd={handleLongPressEnd}
+   929→            >
+   930→              {/* Pin indicator */}
+   931→              {msg.isPinned && (
+   932→                <div className="absolute -top-1 left-2 bg-amber-500 text-white rounded-full p-0.5">
+   933→                  <Pin className="w-2.5 h-2.5" />
+   934→                </div>
+   935→              )}
+   936→
+   937→              <div className="px-3 py-2">
+   938→                {/* Group sender name - clickable for context card */}
+   939→                {isGroup && !isMine && msg.sender && (
+   940→                  <button
+   941→                    className="text-[10px] font-semibold opacity-70 hover:opacity-100 transition-opacity mb-0.5"
+   942→                    onClick={(e) => {
+   943→                      if (msg.sender) {
+   944→                        setQuickContextCard({ x: e.clientX, y: e.clientY, user: msg.sender! });
+   945→                      }
+   946→                    }}
+   947→                  >
+   948→                    {msg.sender.displayName}
+   949→                  </button>
+   950→                )}
+   951→
+   952→                {/* Reply quote inside bubble */}
+   953→                {replyMsg && (
+   954→                  <div className="mb-1.5 pl-2 border-l-2 border-current/30 py-0.5">
+   955→                    <p className="text-[9px] font-semibold opacity-60">{replyMsg.sender?.displayName}</p>
+   956→                    <p className="text-[10px] opacity-50 truncate max-w-[180px]">{replyMsg.content}</p>
+   957→                  </div>
+   958→                )}
+   959→
+   960→                {/* Type badge */}
+   961→                <MessageTypeBadge msg={msg} />
+   962→
+   963→                {/* Message content */}
+   964→                {isRecalled ? (
+   965→                  <p className="text-[12px] italic opacity-50">Message recalled</p>
+   966→                ) : isImage ? (
+   967→                  <div className="relative rounded-lg overflow-hidden">
+   968→                    <div className={`w-full h-48 bg-secondary/50 flex items-center justify-center ${blurred ? 'blur-xl' : ''}`}>
+   969→                      <Image className="w-8 h-8 text-muted-foreground" />
+   970→                    </div>
+   971→                    {blurred && (
+   972→                      <button
+   973→                        onClick={() => revealImage(msg.id)}
+   974→                        className="absolute inset-0 flex items-center justify-center bg-secondary/60"
+   975→                      >
+   976→                        <div className="flex items-center gap-2 bg-card/90 px-3 py-2 rounded-lg border border-border">
+   977→                          <Eye className="w-4 h-4" />
+   978→                          <span className="text-[12px]">Tap to reveal</span>
+   979→                        </div>
+   980→                      </button>
+   981→                    )}
+   982→                  </div>
+   983→                ) : isVideo ? (
+   984→                  <div className="w-full h-48 rounded-lg bg-secondary/50 flex items-center justify-center">
+   985→                    <Video className="w-8 h-8 text-muted-foreground" />
+   986→                  </div>
+   987→                ) : isLocationType ? (
+   988→                  <LocationCard msg={msg} />
+   989→                ) : isVoice ? (
+   990→                  <VoicePlayer msg={msg} />
+   991→                ) : isPoll ? (
+   992→                  <PollCard msg={msg} />
+   993→                ) : isCall ? (
+   994→                  <CallCard msg={msg} />
+   995→                ) : isAlbum ? (
+   996→                  <div className="flex items-center gap-2 mt-1">
+   997→                    <Image className="w-4 h-4 opacity-60" />
+   998→                    <span className="text-[12px]">Shared an album</span>
+   999→                  </div>
+  1000→                ) : isScheduled ? (
+  1001→                  <div className="space-y-1">
+  1002→                    <p className="text-[12px]">{msg.content}</p>
+  1003→                    <div className="flex items-center gap-1 text-[10px] opacity-60">
+  1004→                      <Timer className="w-3 h-3" />
+  1005→                      Scheduled for {msg.scheduledAt ? new Date(msg.scheduledAt).toLocaleString() : 'N/A'}
+  1006→                    </div>
+  1007→                  </div>
+  1008→                ) : (
+  1009→                  <p className="text-[13px] break-words whitespace-pre-wrap">{msg.content}</p>
+  1010→                )}
+  1011→
+  1012→                {/* Translation */}
+  1013→                {translation && (
+  1014→                  <div className="mt-1.5 pt-1.5 border-t border-current/10">
+  1015→                    <div className="flex items-center gap-1 text-[9px] opacity-50 mb-0.5">
+  1016→                      <Languages className="w-3 h-3" /> Translated
+  1017→                    </div>
+  1018→                    <p className="text-[11px] opacity-80">{translation}</p>
+  1019→                  </div>
+  1020→                )}
+  1021→                {typing && (
+  1022→                  <div className="flex items-center gap-1 mt-1 text-[10px] opacity-50">
+  1023→                    <Loader2 className="w-3 h-3 animate-spin" /> Translating...
+  1024→                  </div>
+  1025→                )}
+  1026→
+  1027→                {/* Reactions */}
+  1028→                <ReactionChips msgId={msg.id} reactionsStr={msg.reactions} />
+  1029→
+  1030→                {/* Timestamp + Read Receipt */}
+  1031→                <div className={`flex items-center justify-end gap-1 mt-1 ${isMine ? 'text-primary-foreground/50' : 'text-muted-foreground'}`}>
+  1032→                  {msg.isFavorited && <Star className="w-3 h-3 text-amber-400" />}
+  1033→                  <span className="text-[9px]">{timeAgo(msg.createdAt)}</span>
+  1034→                  {isMine && (
+  1035→                    msg.isRead ? <CheckCheck className="w-3 h-3" /> : <Check className="w-3 h-3" />
+  1036→                  )}
+  1037→                </div>
+  1038→              </div>
+  1039→
+  1040→              {/* Disappearing countdown */}
+  1041→              {msg.expiresAt && (
+  1042→                <div className="px-3 pb-1.5">
+  1043→                  <div className="flex items-center gap-1 text-[9px] opacity-50">
+  1044→                    <Timer className="w-3 h-3" />
+  1045→                    <span>Expires {timeAgo(msg.expiresAt)}</span>
+  1046→                  </div>
+  1047→                </div>
+  1048→              )}
+  1049→
+  1050→              {/* Hover action buttons */}
+  1051→              {!isRecalled && (
+  1052→                <div className="absolute -top-2 right-2 hidden group-hover:flex items-center bg-card border border-border rounded-full shadow-lg p-0.5 gap-0.5 z-10">
+  1053→                  <button
+  1054→                    onClick={(e) => { e.stopPropagation(); setShowReactionPicker(msg.id); }}
+  1055→                    className="p-1 hover:bg-secondary rounded-full transition-colors"
+  1056→                  >
+  1057→                    <Heart className="w-3 h-3 text-muted-foreground" />
+  1058→                  </button>
+  1059→                  <button
+  1060→                    onClick={(e) => { e.stopPropagation(); handleReply(msg); }}
+  1061→                    className="p-1 hover:bg-secondary rounded-full transition-colors"
+  1062→                  >
+  1063→                    <Reply className="w-3 h-3 text-muted-foreground" />
+  1064→                  </button>
+  1065→                  <button
+  1066→                    onClick={(e) => { e.stopPropagation(); translateMessage(msg); }}
+  1067→                    className="p-1 hover:bg-secondary rounded-full transition-colors"
+  1068→                  >
+  1069→                    <Languages className="w-3 h-3 text-muted-foreground" />
+  1070→                  </button>
+  1071→                  <button
+  1072→                    onClick={(e) => { e.stopPropagation(); openForwardModal(msg); }}
+  1073→                    className="p-1 hover:bg-secondary rounded-full transition-colors"
+  1074→                  >
+  1075→                    <Forward className="w-3 h-3 text-muted-foreground" />
+  1076→                  </button>
+  1077→                </div>
+  1078→              )}
+  1079→
+  1080→              {/* Reaction picker popup */}
+  1081→              <AnimatePresence>
+  1082→                {showReactionPicker === msg.id && (
+  1083→                  <motion.div
+  1084→                    initial={{ opacity: 0, scale: 0.8, y: 5 }}
+  1085→                    animate={{ opacity: 1, scale: 1, y: 0 }}
+  1086→                    exit={{ opacity: 0, scale: 0.8, y: 5 }}
+  1087→                    className={`absolute ${isMine ? 'bottom-full right-0' : 'bottom-full left-0'} mb-2 bg-card border border-border rounded-full px-2 py-1 flex gap-1 shadow-xl z-20`}
+  1088→                  >
+  1089→                    {REACTION_DISPLAY.map((emoji, i) => (
+  1090→                      <button
+  1091→                        key={i}
+  1092→                        onClick={() => toggleReaction(msg.id, REACTION_EMOJIS[i])}
+  1093→                        className="w-8 h-8 flex items-center justify-center hover:bg-secondary rounded-full transition-transform hover:scale-125 text-lg"
+  1094→                      >
+  1095→                        {emoji}
+  1096→                      </button>
+  1097→                    ))}
+  1098→                  </motion.div>
+  1099→                )}
+  1100→              </AnimatePresence>
+  1101→            </motion.div>
+  1102→          </ContextMenuTrigger>
+  1103→          <ContextMenuContent className="bg-card border-border">
+  1104→            {!isMine && (
+  1105→              <ContextMenuItem onClick={() => handleReply(msg)} className="gap-2 text-foreground">
+  1106→                <Reply className="w-4 h-4" /> Reply
+  1107→              </ContextMenuItem>
+  1108→            )}
+  1109→            <ContextMenuItem onClick={() => translateMessage(msg)} className="gap-2 text-foreground">
+  1110→              <Languages className="w-4 h-4" /> Translate
+  1111→            </ContextMenuItem>
+  1112→            <ContextMenuItem onClick={() => togglePin(msg)} className="gap-2 text-foreground">
+  1113→              {msg.isPinned ? <><PinOff className="w-4 h-4" /> Unpin</> : <><Pin className="w-4 h-4" /> Pin</>}
+  1114→            </ContextMenuItem>
+  1115→            <ContextMenuItem onClick={() => toggleFavorite(msg)} className="gap-2 text-foreground">
+  1116→              {msg.isFavorited ? <><StarOff className="w-4 h-4" /> Unfavorite</> : <><Star className="w-4 h-4" /> Favorite</>}
+  1117→            </ContextMenuItem>
+  1118→            <ContextMenuItem onClick={() => openForwardModal(msg)} className="gap-2 text-foreground">
+  1119→              <Forward className="w-4 h-4" /> Forward
+  1120→            </ContextMenuItem>
+  1121→            {isMine && (
+  1122→              <ContextMenuItem onClick={() => recallMessage(msg)} className="gap-2 text-red-400">
+  1123→                <Trash2 className="w-4 h-4" /> Unsend
+  1124→              </ContextMenuItem>
+  1125→            )}
+  1126→          </ContextMenuContent>
+  1127→        </ContextMenu>
+  1128→      </div>
+  1129→    );
+  1130→  };
+  1131→
+  1132→  // ═══════════════════════════════════════════════════════════════
+  1133→  // CHAT HEADER
+  1134→  // ═══════════════════════════════════════════════════════════════
+  1135→  const ChatHeader = () => {
+  1136→    const hivStatus = (chatUserData as any)?.hivStatus;
+  1137→    return (
+  1138→      <div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0 bg-card">
+  1139→        <button
+  1140→          onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }}
+  1141→          className="md:hidden p-1.5 hover:bg-secondary rounded-lg transition-colors"
+  1142→        >
+  1143→          <ChevronLeft className="w-5 h-5" />
+  1144→        </button>
+  1145→
+  1146→        <button onClick={() => chatUser && openProfile(chatUser.id)} className="relative">
+  1147→          <Avatar className="h-9 w-9">
+  1148→            <AvatarImage src={getAvatar(isGroup ? undefined : chatUser)} />
+  1149→            <AvatarFallback className="text-xs">
+  1150→              {(isGroup ? activeGroup?.name : chatUser?.displayName)?.[0] || '?'}
+  1151→            </AvatarFallback>
+  1152→          </Avatar>
+  1153→          {chatUser?.online && (
+  1154→            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-card" />
+  1155→          )}
+  1156→        </button>
+  1157→
+  1158→        <div className="flex-1 min-w-0">
+  1159→          <div className="flex items-center gap-1.5 flex-wrap">
+  1160→            <p className="text-[13px] font-semibold truncate">
+  1161→              {isGroup ? activeGroup?.name : chatUser?.displayName}
+  1162→            </p>
+  1163→            {/* #24 HIV Badge */}
+  1164→            {hivStatus && hivStatus !== 'not-specified' && hivStatus !== 'prefer-not-to-say' && (
+  1165→              <Badge variant="outline" className={`text-[9px] px-1.5 py-0 h-4 ${HIV_BADGE_COLORS[hivStatus] || 'bg-gray-600'} text-white border-0 gap-0.5`}>
+  1166→                <Shield className="w-2.5 h-2.5" />
+  1167→                {hivStatus === 'on-prep' ? 'PrEP' : hivStatus === 'undetectable' ? 'U=U' : hivStatus}
+  1168→              </Badge>
+  1169→            )}
+  1170→            {/* #25 Meet Now Tags */}
+  1171→            {meetNowTags.map((tag: string) => {
+  1172→              const mt = MEET_NOW_ICONS[tag.trim()];
+  1173→              return mt ? (
+  1174→                <Badge key={tag} variant="outline" className={`text-[8px] px-1 py-0 h-4 ${mt.color} text-white border-0 gap-0.5`}>
+  1175→                  <mt.icon className="w-2.5 h-2.5" />
+  1176→                </Badge>
+  1177→              ) : null;
+  1178→            })}
+  1179→          </div>
+  1180→          <p className="text-[10px] text-muted-foreground">
+  1181→            {isGroup
+  1182→              ? `${activeGroup?._count?.members || 0} members`
+  1183→              : chatUser?.online
+  1184→                ? 'Online'
+  1185→                : `Last seen ${chatUser?.lastSeen ? timeAgo(chatUser.lastSeen) : 'unknown'}`}
+  1186→          </p>
+  1187→        </div>
+  1188→
+  1189→        {/* Header actions */}
+  1190→        <div className="flex items-center gap-0.5">
+  1191→          <TooltipProvider>
+  1192→            <Tooltip>
+  1193→              <TooltipTrigger asChild>
+  1194→                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => createCallLink('voice')}>
+  1195→                  <Phone className="w-4 h-4" />
+  1196→                </Button>
+  1197→              </TooltipTrigger>
+  1198→              <TooltipContent>Voice Call</TooltipContent>
+  1199→            </Tooltip>
+  1200→          </TooltipProvider>
+  1201→
+  1202→          <TooltipProvider>
+  1203→            <Tooltip>
+  1204→              <TooltipTrigger asChild>
+  1205→                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => createCallLink('video')}>
+  1206→                  <Video className="w-4 h-4" />
+  1207→                </Button>
+  1208→              </TooltipTrigger>
+  1209→              <TooltipContent>Video Call</TooltipContent>
+  1210→            </Tooltip>
+  1211→          </TooltipProvider>
+  1212→
+  1213→          <DropdownMenu>
+  1214→            <DropdownMenuTrigger asChild>
+  1215→              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+  1216→                <MoreVertical className="w-4 h-4" />
+  1217→              </Button>
+  1218→            </DropdownMenuTrigger>
+  1219→            <DropdownMenuContent align="end" className="bg-card border-border w-52">
+  1220→              <DropdownMenuItem onClick={() => setShowChatSearch(!showChatSearch)} className="gap-2 text-foreground cursor-pointer">
+  1221→                <Search className="w-4 h-4" /> Search Messages
+  1222→              </DropdownMenuItem>
+  1223→              <DropdownMenuItem onClick={openMediaGallery} className="gap-2 text-foreground cursor-pointer">
+  1224→                <Image className="w-4 h-4" /> Media Gallery
+  1225→              </DropdownMenuItem>
+  1226→              <DropdownMenuItem onClick={fetchAiSummary} className="gap-2 text-foreground cursor-pointer">
+  1227→                <Sparkles className="w-4 h-4" /> AI Summary
+  1228→              </DropdownMenuItem>
+  1229→              <DropdownMenuItem onClick={fetchMeetupSuggestions} className="gap-2 text-foreground cursor-pointer">
+  1230→                <MapPin className="w-4 h-4" /> Suggest Meetup
+  1231→              </DropdownMenuItem>
+  1232→              <DropdownMenuItem onClick={() => setShowThemeModal(true)} className="gap-2 text-foreground cursor-pointer">
+  1233→                <Palette className="w-4 h-4" /> Theme
+  1234→              </DropdownMenuItem>
+  1235→              <DropdownMenuSeparator className="bg-border" />
+  1236→              <DropdownMenuItem onClick={toggleNsfwFilter} className="gap-2 text-foreground cursor-pointer">
+  1237→                <EyeOff className="w-4 h-4" /> {nsfwFilter ? 'Show Explicit' : 'Filter Explicit'}
+  1238→              </DropdownMenuItem>
+  1239→              <DropdownMenuItem onClick={() => setFavoritedFilter(!favoritedFilter)} className="gap-2 text-foreground cursor-pointer">
+  1240→                <BookmarkCheck className="w-4 h-4" /> {favoritedFilter ? 'Show All' : 'Favorites Only'}
+  1241→              </DropdownMenuItem>
+  1242→              <DropdownMenuSeparator className="bg-border" />
+  1243→              <DropdownMenuItem onClick={activateSafeWord} className="gap-2 text-red-500 cursor-pointer">
+  1244→                <ShieldAlert className="w-4 h-4" /> Safe Mode (SOS)
+  1245→              </DropdownMenuItem>
+  1246→            </DropdownMenuContent>
+  1247→          </DropdownMenu>
+  1248→        </div>
+  1249→      </div>
+  1250→    );
+  1251→  };
+  1252→
+  1253→  // ═══════════════════════════════════════════════════════════════
+  1254→  // PINNED MESSAGES BAR
+  1255→  // ═══════════════════════════════════════════════════════════════
+  1256→  const PinnedMessagesBar = () => {
+  1257→    if (pinnedMessages.length === 0) return null;
+  1258→    return (
+  1259→      <div className="border-b border-border bg-secondary/30">
+  1260→        <div className="flex items-center gap-2 px-3 py-1.5">
+  1261→          <Pin className="w-3 h-3 text-amber-400 shrink-0" />
+  1262→          <span className="text-[10px] text-muted-foreground font-medium">Pinned</span>
+  1263→        </div>
+  1264→        <ScrollArea className="max-w-full" type="scroll">
+  1265→          <div className="flex gap-2 px-3 pb-2 overflow-x-auto">
+  1266→            {pinnedMessages.map((pm) => (
+  1267→              <div key={pm.id} className="shrink-0 max-w-[200px] px-3 py-1.5 rounded-lg bg-card border border-border">
+  1268→                <p className="text-[11px] font-medium truncate">{pm.isRecalled ? 'Message recalled' : pm.content}</p>
+  1269→                <p className="text-[9px] text-muted-foreground">{pm.sender?.displayName}</p>
+  1270→              </div>
+  1271→            ))}
+  1272→          </div>
+  1273→        </ScrollArea>
+  1274→      </div>
+  1275→    );
+  1276→  };
+  1277→
+  1278→  // ═══════════════════════════════════════════════════════════════
+  1279→  // TYPING INDICATOR
+  1280→  // ═══════════════════════════════════════════════════════════════
+  1281→  const TypingIndicator = () => {
+  1282→    const isTyping = Object.keys(typingUsers).length > 0;
+  1283→    if (!isTyping) return null;
+  1284→    return (
+  1285→      <motion.div
+  1286→        initial={{ opacity: 0, y: 5 }}
+  1287→        animate={{ opacity: 1, y: 0 }}
+  1288→        exit={{ opacity: 0, y: 5 }}
+  1289→        className="flex justify-start mb-2"
+  1290→      >
+  1291→        <div className={`${theme.otherBg} border ${theme.otherBorder} rounded-2xl rounded-bl-md px-4 py-3`}
+  1292→        >
+  1293→          <div className="flex items-center gap-1">
+  1294→            {[0, 1, 2].map((i) => (
+  1295→              <motion.div
+  1296→                key={i}
+  1297→                className="w-2 h-2 bg-muted-foreground rounded-full"
+  1298→                animate={{ y: [0, -6, 0] }}
+  1299→                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+  1300→              />
+  1301→            ))}
+  1302→          </div>
+  1303→        </div>
+  1304→      </motion.div>
+  1305→    );
+  1306→  };
+  1307→
+  1308→  // ═══════════════════════════════════════════════════════════════
+  1309→  // EVENT DETECTION BANNER
+  1310→  // ═══════════════════════════════════════════════════════════════
+  1311→  const EventDetectionBanner = () => {
+  1312→    if (!eventDetection?.detected || eventDetection.eventId) return null;
+  1313→    return (
+  1314→      <motion.div
+  1315→        initial={{ opacity: 0, y: 10 }}
+  1316→        animate={{ opacity: 1, y: 0 }}
+  1317→        exit={{ opacity: 0, y: 10 }}
+  1318→        className="mx-3 mb-2 p-2.5 rounded-xl bg-violet-600/10 border border-violet-500/30"
+  1319→      >
+  1320→        <div className="flex items-center gap-2">
+  1321→          <Sparkles className="w-4 h-4 text-violet-400 shrink-0" />
+  1322→          <p className="text-[11px] text-violet-300 flex-1">Detected: {eventDetection.description} Create Event →</p>
+  1323→          <Button
+  1324→            size="sm"
+  1325→            variant="ghost"
+  1326→            className="h-6 px-2 text-[10px] text-violet-400 hover:text-violet-300 hover:bg-violet-600/20"
+  1327→            onClick={createEventFromDetection}
+  1328→            disabled={!!loadingAction === true}
+  1329→          >
+  1330→            {loadingAction === 'create-event' ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Create'}
+  1331→          </Button>
+  1332→          <button onClick={() => setEventDetection(null)}>
+  1333→            <X className="w-3 h-3 text-muted-foreground" />
+  1334→          </button>
+  1335→        </div>
+  1336→      </motion.div>
+  1337→    );
+  1338→  };
+  1339→
+  1340→  // ═══════════════════════════════════════════════════════════════
+  1341→  // AI AUTO-REPLY SUGGESTIONS
+  1342→  // ═══════════════════════════════════════════════════════════════
+  1343→  const AutoReplySuggestions = () => {
+  1344→    if (!showAutoReplies || autoReplies.length === 0) return null;
+  1345→    return (
+  1346→      <AnimatePresence>
+  1347→        <motion.div
+  1348→          initial={{ opacity: 0, y: 10 }}
+  1349→          animate={{ opacity: 1, y: 0 }}
+  1350→          exit={{ opacity: 0, y: 10 }}
+  1351→          className="mx-3 mb-2"
+  1352→        >
+  1353→          <div className="flex items-center gap-1 mb-1">
+  1354→            <Bot className="w-3 h-3 text-violet-400" />
+  1355→            <span className="text-[10px] text-muted-foreground">AI Suggested Replies</span>
+  1356→            <button onClick={() => setShowAutoReplies(false)} className="ml-auto">
+  1357→              <X className="w-3 h-3 text-muted-foreground" />
+  1358→            </button>
+  1359→          </div>
+  1360→          <div className="flex flex-col gap-1">
+  1361→            {autoReplies.map((reply, i) => (
+  1362→              <button
+  1363→                key={i}
+  1364→                onClick={() => {
+  1365→                  setMsgInput(reply);
+  1366→                  setShowAutoReplies(false);
+  1367→                }}
+  1368→                className="text-left px-3 py-2 rounded-lg bg-secondary/50 border border-border/50 hover:border-violet-500/50 hover:bg-violet-600/10 transition-all text-[12px] text-foreground"
+  1369→              >
+  1370→                <Sparkles className="w-3 h-3 text-violet-400 inline mr-1.5" />
+  1371→                {reply}
+  1372→              </button>
+  1373→            ))}
+  1374→          </div>
+  1375→        </motion.div>
+  1376→      </AnimatePresence>
+  1377→    );
+  1378→  };
+  1379→
+  1380→  // ═══════════════════════════════════════════════════════════════
+  1381→  // CHAT TOOLBAR (plus button actions)
+  1382→  // ═══════════════════════════════════════════════════════════════
+  1383→  const ChatToolbar = () => {
+  1384→    const toolbarActions = [
+  1385→      { icon: Image, label: 'Album', color: 'text-pink-400', onClick: async () => { try { const res = await fetch('/api/albums'); const data = await res.json(); setAlbums(Array.isArray(data) ? data : []); } catch { setAlbums([]); } setShowAlbumPicker(true); }},
+  1386→      { icon: MapPin, label: 'Location', color: 'text-amber-400', onClick: () => setShowLocationPicker(true) },
+  1387→      { icon: Mic, label: 'Voice', color: 'text-cyan-400', onClick: startRecording },
+  1388→      { icon: Vote, label: 'Poll', color: 'text-violet-400', onClick: () => setShowCreatePollModal(true) },
+  1389→      { icon: Timer, label: 'Schedule', color: 'text-orange-400', onClick: () => setShowScheduleModal(true) },
+  1390→      { icon: Phone, label: 'Call', color: 'text-emerald-400', onClick: () => setShowCallModal(true) },
+  1391→    ];
+  1392→    return (
+  1393→      <AnimatePresence>
+  1394→        {showToolbar && (
+  1395→          <motion.div
+  1396→            initial={{ opacity: 0, height: 0 }}
+  1397→            animate={{ opacity: 1, height: 'auto' }}
+  1398→            exit={{ opacity: 0, height: 0 }}
+  1399→            className="border-t border-border bg-card overflow-hidden"
+  1400→          >
+  1401→            <div className="grid grid-cols-3 gap-2 p-3">
+  1402→              {toolbarActions.map((action, i) => (
+  1403→                <button
+  1404→                  key={i}
+  1405→                  onClick={() => { action.onClick(); setShowToolbar(false); }}
+  1406→                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-secondary transition-colors"
+  1407→                >
+  1408→                  <div className={`p-2 rounded-full bg-secondary ${action.color}`}>
+  1409→                    <action.icon className="w-5 h-5" />
+  1410→                  </div>
+  1411→                  <span className="text-[10px] text-muted-foreground">{action.label}</span>
+  1412→                </button>
+  1413→              ))}
+  1414→            </div>
+  1415→            {/* Disappearing messages picker */}
+  1416→            <div className="px-3 pb-3">
+  1417→              <div className="flex items-center gap-2">
+  1418→                <Timer className="w-3.5 h-3.5 text-orange-400" />
+  1419→                <span className="text-[10px] text-muted-foreground">Disappearing:</span>
+  1420→                <div className="flex gap-1">
+  1421→                  {DISAPPEAR_OPTIONS.map((opt) => (
+  1422→                    <button
+  1423→                      key={opt.value}
+  1424→                      onClick={() => setShowDisappearingTimer(showDisappearingTimer === opt.value ? null : opt.value)}
+  1425→                      className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${showDisappearingTimer === opt.value ? 'bg-orange-600 text-white border-orange-600' : 'border-border text-muted-foreground hover:border-orange-500/50'}`}
+  1426→                    >
+  1427→                      {opt.label}
+  1428→                    </button>
+  1429→                  ))}
+  1430→                </div>
+  1431→              </div>
+  1432→            </div>
+  1433→          </motion.div>
+  1434→        )}
+  1435→      </AnimatePresence>
+  1436→    );
+  1437→  };
+  1438→
+  1439→  // ═══════════════════════════════════════════════════════════════
+  1440→  // CHAT INPUT
+  1441→  // ═══════════════════════════════════════════════════════════════
+  1442→  const ChatInput = () => {
+  1443→    return (
+  1444→      <div className="border-t border-border shrink-0 bg-card">
+  1445→        {/* Recording UI */}
+  1446→        <AnimatePresence>
+  1447→          {isRecording && (
+  1448→            <motion.div
+  1449→              initial={{ opacity: 0, height: 0 }}
+  1450→              animate={{ opacity: 1, height: 'auto' }}
+  1451→              exit={{ opacity: 0, height: 0 }}
+  1452→              className="px-4 py-2 border-b border-border bg-red-950/30 flex items-center gap-3"
+  1453→            >
+  1454→              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+  1455→              <span className="text-[12px] text-red-400">Recording</span>
+  1456→              <span className="text-[14px] font-mono text-foreground">{formatDuration(recordingDuration)}</span>
+  1457→              <div className="flex-1" />
+  1458→              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={stopRecording}>
+  1459→                <MicOff className="w-4 h-4 text-red-400" />
+  1460→              </Button>
+  1461→            </motion.div>
+  1462→          )}
+  1463→        </AnimatePresence>
+  1464→
+  1465→        {/* Reply bar */}
+  1466→        <AnimatePresence>
+  1467→          {replyingTo && <ReplyQuote msg={replyingTo} />}
+  1468→        </AnimatePresence>
+  1469→
+  1470→        {/* Disappearing timer badge */}
+  1471→        {showDisappearingTimer && (
+  1472→          <div className="px-4 py-1 bg-orange-950/30 flex items-center gap-2">
+  1473→            <Timer className="w-3 h-3 text-orange-400" />
+  1474→            <span className="text-[10px] text-orange-400">Disappearing: {showDisappearingTimer}</span>
+  1475→            <button onClick={() => setShowDisappearingTimer(null)} className="ml-auto">
+  1476→              <X className="w-3 h-3 text-muted-foreground" />
+  1477→            </button>
+  1478→          </div>
+  1479→        )}
+  1480→
+  1481→        {/* Search bar */}
+  1482→        <AnimatePresence>
+  1483→          {showChatSearch && (
+  1484→            <motion.div
+  1485→              initial={{ opacity: 0, height: 0 }}
+  1486→              animate={{ opacity: 1, height: 'auto' }}
+  1487→              exit={{ opacity: 0, height: 0 }}
+  1488→              className="px-4 py-2 border-b border-border flex items-center gap-2"
+  1489→            >
+  1490→              <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+  1491→              <Input
+  1492→                value={chatSearchQuery}
+  1493→                onChange={(e) => setChatSearchQuery(e.target.value)}
+  1494→                placeholder="Search messages..."
+  1495→                className="h-8 text-[12px] bg-transparent border-0 focus-visible:ring-0 px-0"
+  1496→                autoFocus
+  1497→              />
+  1498→              {chatSearchQuery && (
+  1499→                <span className="text-[10px] text-muted-foreground shrink-0">{displayMessages.length} found</span>
+  1500→              )}
+  1501→              <button onClick={() => { setShowChatSearch(false); setChatSearchQuery(''); }}>
+  1502→                <X className="w-4 h-4 text-muted-foreground" />
+  1503→              </button>
+  1504→            </motion.div>
+  1505→          )}
+  1506→        </AnimatePresence>
+  1507→
+  1508→        {/* Main input row */}
+  1509→        <div className="px-3 py-2 flex items-center gap-2">
+  1510→          <TooltipProvider>
+  1511→            <Tooltip>
+  1512→              <TooltipTrigger asChild>
+  1513→                <Button
+  1514→                  variant="ghost"
+  1515→                  size="icon"
+  1516→                  className={`h-9 w-9 shrink-0 text-muted-foreground transition-colors ${showToolbar ? 'bg-secondary text-foreground' : ''}`}
+  1517→                  onClick={() => setShowToolbar(!showToolbar)}
+  1518→                >
+  1519→                  <Plus className={`w-5 h-5 transition-transform ${showToolbar ? 'rotate-45' : ''}`} />
+  1520→                </Button>
+  1521→              </TooltipTrigger>
+  1522→              <TooltipContent>More</TooltipContent>
+  1523→            </Tooltip>
+  1524→          </TooltipProvider>
+  1525→
+  1526→          <Input
+  1527→            value={msgInput}
+  1528→            onChange={(e) => setMsgInput(e.target.value)}
+  1529→            onKeyDown={(e) => {
+  1530→              if (e.key === 'Enter' && !e.shiftKey) {
+  1531→                e.preventDefault();
+  1532→                handleSendAndSuggest();
+  1533→              }
+  1534→            }}
+  1535→            placeholder={isRecording ? '' : 'Type a message...'}
+  1536→            className="flex-1 h-9 text-[13px] bg-secondary border-border"
+  1537→            disabled={isRecording}
+  1538→          />
+  1539→
+  1540→          <TooltipProvider>
+  1541→            <Tooltip>
+  1542→              <TooltipTrigger asChild>
+  1543→                <Button
+  1544→                  variant="ghost"
+  1545→                  size="icon"
+  1546→                  className={`h-9 w-9 shrink-0 ${isRecording ? 'bg-red-600 text-white hover:bg-red-700' : 'text-muted-foreground'}`}
+  1547→                  onMouseDown={startRecording}
+  1548→                  onMouseUp={stopRecording}
+  1549→                  onTouchStart={startRecording}
+  1550→                  onTouchEnd={stopRecording}
+  1551→                >
+  1552→                  {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+  1553→                </Button>
+  1554→              </TooltipTrigger>
+  1555→              <TooltipContent>{isRecording ? 'Release to send' : 'Hold to record'}</TooltipContent>
+  1556→            </Tooltip>
+  1557→          </TooltipProvider>
+  1558→
+  1559→          <Button
+  1560→            size="icon"
+  1561→            className="h-9 w-9 shrink-0 bg-primary text-primary-foreground"
+  1562→            onClick={handleSendAndSuggest}
+  1563→            disabled={!msgInput.trim() && !isRecording}
+  1564→          >
+  1565→            <Send className="w-4 h-4" />
+  1566→          </Button>
+  1567→        </div>
+  1568→      </div>
+  1569→    );
+  1570→  };
+  1571→
+  1572→  // ═══════════════════════════════════════════════════════════════
+  1573→  // MODALS
+  1574→  // ═══════════════════════════════════════════════════════════════
+  1575→
+  1576→  // Album Picker Modal
+  1577→  const AlbumPickerModal = () => (
+  1578→    <Dialog open={showAlbumPicker} onOpenChange={setShowAlbumPicker}>
+  1579→      <DialogContent className="bg-card border-border max-w-md">
+  1580→        <DialogHeader>
+  1581→          <DialogTitle className="text-foreground">Share Album</DialogTitle>
+  1582→        </DialogHeader>
+  1583→        <ScrollArea className="max-h-64 overflow-y-auto">
+  1584→          <div className="space-y-2">
+  1585→            {albums.map((album: any) => (
+  1586→              <button
+  1587→                key={album.id}
+  1588→                onClick={async () => {
+  1589→                  setSelectedAlbum(album);
+  1590→                  try {
+  1591→                    await fetch('/api/chat/album-share', {
+  1592→                      method: 'POST',
+  1593→                      headers: { 'Content-Type': 'application/json' },
+  1594→                      body: JSON.stringify({ receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct', albumId: album.id }),
+  1595→                    });
+  1596→                  } catch { /* silent */ }
+  1597→                  setShowAlbumPicker(false);
+  1598→                }}
+  1599→                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors ${selectedAlbum?.id === album.id ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}
+  1600→              >
+  1601→                <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center">
+  1602→                  <Image className="w-5 h-5 text-muted-foreground" />
+  1603→                </div>
+  1604→                <div className="flex-1 text-left">
+  1605→                  <p className="text-[12px] font-medium text-foreground">{album.name}</p>
+  1606→                  <p className="text-[10px] text-muted-foreground">{album._count?.photos || 0} photos</p>
+  1607→                </div>
+  1608→              </button>
+  1609→            ))}
+  1610→            {albums.length === 0 && <p className="text-center text-[12px] text-muted-foreground py-4">No albums found</p>}
+  1611→          </div>
+  1612→        </ScrollArea>
+  1613→      </DialogContent>
+  1614→    </Dialog>
+  1615→  );
+  1616→
+  1617→  // Location Picker Modal
+  1618→  const LocationPickerModal = () => (
+  1619→    <Dialog open={showLocationPicker} onOpenChange={setShowLocationPicker}>
+  1620→      <DialogContent className="bg-card border-border max-w-md">
+  1621→        <DialogHeader>
+  1622→          <DialogTitle className="text-foreground">Share Location</DialogTitle>
+  1623→        </DialogHeader>
+  1624→        <div className="space-y-3">
+  1625→          <div className="h-40 rounded-lg bg-secondary border border-border flex items-center justify-center relative overflow-hidden">
+  1626→            <Navigation className="w-8 h-8 text-muted-foreground" />
+  1627→            <div className="absolute bottom-2 left-2 right-2">
+  1628→              <Input
+  1629→                value={locationName}
+  1630→                onChange={(e) => setLocationName(e.target.value)}
+  1631→                placeholder="Location name (e.g. Central Park)"
+  1632→                className="h-8 text-[12px] bg-card/90 border-border"
+  1633→              />
+  1634→            </div>
+  1635→          </div>
+  1636→          <Button
+  1637→            onClick={async () => {
+  1638→              try {
+  1639→                await fetch('/api/chat/location', {
+  1640→                  method: 'POST',
+  1641→                  headers: { 'Content-Type': 'application/json' },
+  1642→                  body: JSON.stringify({ receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct', lat: 40.758, lng: -73.985, name: locationName || 'My Location' }),
+  1643→                });
+  1644→              } catch { /* silent */ }
+  1645→              setShowLocationPicker(false);
+  1646→              setLocationName('');
+  1647→            }}
+  1648→            className="w-full"
+  1649→            disabled={loadingAction === 'location'}
+  1650→          >
+  1651→            {loadingAction === 'location' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <MapPin className="w-4 h-4 mr-2" />}
+  1652→            Share Location
+  1653→          </Button>
+  1654→        </div>
+  1655→      </DialogContent>
+  1656→    </Dialog>
+  1657→  );
+  1658→
+  1659→  // Poll Create Modal
+  1660→  const PollCreateModal = () => (
+  1661→    <Dialog open={showCreatePollModal} onOpenChange={setShowCreatePollModal}>
+  1662→      <DialogContent className="bg-card border-border max-w-md">
+  1663→        <DialogHeader>
+  1664→          <DialogTitle className="text-foreground">Create Poll</DialogTitle>
+  1665→        </DialogHeader>
+  1666→        <div className="space-y-3">
+  1667→          <Input
+  1668→            value={pollQuestion}
+  1669→            onChange={(e) => setPollQuestion(e.target.value)}
+  1670→            placeholder="Ask a question..."
+  1671→            className="text-[13px] bg-secondary border-border"
+  1672→          />
+  1673→          <div className="space-y-2">
+  1674→            {pollOptions.map((opt, i) => (
+  1675→              <div key={i} className="flex items-center gap-2">
+  1676→                <Input
+  1677→                  value={opt}
+  1678→                  onChange={(e) => {
+  1679→                    const next = [...pollOptions];
+  1680→                    next[i] = e.target.value;
+  1681→                    setPollOptions(next);
+  1682→                  }}
+  1683→                  placeholder={`Option ${i + 1}`}
+  1684→                  className="text-[12px] bg-secondary border-border"
+  1685→                />
+  1686→                {pollOptions.length > 2 && (
+  1687→                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setPollOptions(pollOptions.filter((_, j) => j !== i))}>
+  1688→                    <X className="w-3 h-3" />
+  1689→                  </Button>
+  1690→                )}
+  1691→              </div>
+  1692→            ))}
+  1693→            {pollOptions.length < 5 && (
+  1694→              <Button variant="ghost" size="sm" className="text-[11px] text-muted-foreground" onClick={() => setPollOptions([...pollOptions, ''])}>
+  1695→                + Add Option
+  1696→              </Button>
+  1697→            )}
+  1698→          </div>
+  1699→          <Button onClick={createPoll} className="w-full" disabled={!pollQuestion || pollOptions.filter(Boolean).length < 2 || !!loadingAction}>
+  1700→            {loadingAction === 'poll' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Vote className="w-4 h-4 mr-2" />}
+  1701→            Create Poll
+  1702→          </Button>
+  1703→        </div>
+  1704→      </DialogContent>
+  1705→    </Dialog>
+  1706→  );
+  1707→
+  1708→  // Schedule Message Modal
+  1709→  const ScheduleMessageModal = () => (
+  1710→    <Dialog open={showScheduleModal} onOpenChange={setShowScheduleModal}>
+  1711→      <DialogContent className="bg-card border-border max-w-md">
+  1712→        <DialogHeader>
+  1713→          <DialogTitle className="text-foreground">Schedule Message</DialogTitle>
+  1714→        </DialogHeader>
+  1715→        <div className="space-y-3">
+  1716→          <Textarea
+  1717→            value={msgInput}
+  1718→            onChange={(e) => setMsgInput(e.target.value)}
+  1719→            placeholder="Message content..."
+  1720→            className="text-[13px] bg-secondary border-border min-h-[80px]"
+  1721→          />
+  1722→          <div className="grid grid-cols-2 gap-2">
+  1723→            <div>
+  1724→              <Label className="text-[11px] text-muted-foreground mb-1 block">Date</Label>
+  1725→              <Input
+  1726→                type="date"
+  1727→                value={scheduleDate}
+  1728→                onChange={(e) => setScheduleDate(e.target.value)}
+  1729→                className="text-[12px] bg-secondary border-border"
+  1730→              />
+  1731→            </div>
+  1732→            <div>
+  1733→              <Label className="text-[11px] text-muted-foreground mb-1 block">Time</Label>
+  1734→              <Input
+  1735→                type="time"
+  1736→                value={scheduleTime}
+  1737→                onChange={(e) => setScheduleTime(e.target.value)}
+  1738→                className="text-[12px] bg-secondary border-border"
+  1739→              />
+  1740→            </div>
+  1741→          </div>
+  1742→          <Button onClick={sendScheduledMessage} className="w-full" disabled={!msgInput || !scheduleDate || !scheduleTime || !!loadingAction}>
+  1743→            {loadingAction === 'schedule' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Timer className="w-4 h-4 mr-2" />}
+  1744→            Schedule
+  1745→          </Button>
+  1746→        </div>
+  1747→      </DialogContent>
+  1748→    </Dialog>
+  1749→  );
+  1750→
+  1751→  // Forward Message Modal
+  1752→  const ForwardMessageModal = () => (
+  1753→    <Dialog open={showForwardModal} onOpenChange={(open) => { if (!open) { setShowForwardModal(false); setForwardMessage(null); setForwardTarget(''); } }}>
+  1754→      <DialogContent className="bg-card border-border max-w-md">
+  1755→        <DialogHeader>
+  1756→          <DialogTitle className="text-foreground">Forward Message</DialogTitle>
+  1757→        </DialogHeader>
+  1758→        <div className="space-y-3">
+  1759→          {forwardMessage && (
+  1760→            <div className="p-2 rounded-lg bg-secondary border border-border">
+  1761→              <p className="text-[11px] text-muted-foreground mb-0.5">From: {forwardMessage.sender?.displayName}</p>
+  1762→              <p className="text-[12px] text-foreground line-clamp-2">{forwardMessage.content}</p>
+  1763→            </div>
+  1764→          )}
+  1765→          <ScrollArea className="max-h-48 overflow-y-auto">
+  1766→            <div className="space-y-1">
+  1767→              {conversationsForForward.map((convo: Conversation) => (
+  1768→                <button
+  1769→                  key={convo.otherUser.id}
+  1770→                  onClick={() => setForwardTarget(convo.otherUser.id)}
+  1771→                  className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors ${forwardTarget === convo.otherUser.id ? 'bg-primary/10 border border-primary/50' : 'hover:bg-secondary'}`}
+  1772→                >
+  1773→                  <Avatar className="h-8 w-8">
+  1774→                    <AvatarImage src={getAvatar(convo.otherUser)} />
+  1775→                    <AvatarFallback className="text-[10px]">{convo.otherUser.displayName?.[0]}</AvatarFallback>
+  1776→                  </Avatar>
+  1777→                  <span className="text-[12px] text-foreground">{convo.otherUser.displayName}</span>
+  1778→                </button>
+  1779→              ))}
+  1780→              {conversationsForForward.length === 0 && <p className="text-center text-[12px] text-muted-foreground py-4">No conversations</p>}
+  1781→            </div>
+  1782→          </ScrollArea>
+  1783→          <Button onClick={forwardMessageAction} className="w-full" disabled={!forwardTarget || !!loadingAction}>
+  1784→            {loadingAction === 'forward' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Forward className="w-4 h-4 mr-2" />}
+  1785→            Forward
+  1786→          </Button>
+  1787→        </div>
+  1788→      </DialogContent>
+  1789→    </Dialog>
+  1790→  );
+  1791→
+  1792→  // Call Modal
+  1793→  const CallModal = () => (
+  1794→    <Dialog open={showCallModal} onOpenChange={setShowCallModal}>
+  1795→      <DialogContent className="bg-card border-border max-w-sm">
+  1796→        <DialogHeader>
+  1797→          <DialogTitle className="text-foreground">Start Call</DialogTitle>
+  1798→        </DialogHeader>
+  1799→        <div className="grid grid-cols-2 gap-3">
+  1800→          <button
+  1801→            onClick={() => createCallLink('voice')}
+  1802→            className="flex flex-col items-center gap-2 p-6 rounded-xl border border-border hover:border-emerald-500/50 hover:bg-emerald-600/5 transition-all"
+  1803→          >
+  1804→            <div className="p-3 rounded-full bg-emerald-600/20">
+  1805→              <Phone className="w-6 h-6 text-emerald-400" />
+  1806→            </div>
+  1807→            <span className="text-[12px] font-medium text-foreground">Voice Call</span>
+  1808→          </button>
+  1809→          <button
+  1810→            onClick={() => createCallLink('video')}
+  1811→            className="flex flex-col items-center gap-2 p-6 rounded-xl border border-border hover:border-violet-500/50 hover:bg-violet-600/5 transition-all"
+  1812→          >
+  1813→            <div className="p-3 rounded-full bg-violet-600/20">
+  1814→              <Video className="w-6 h-6 text-violet-400" />
+  1815→            </div>
+  1816→            <span className="text-[12px] font-medium text-foreground">Video Call</span>
+  1817→          </button>
+  1818→        </div>
+  1819→      </DialogContent>
+  1820→    </Dialog>
+  1821→  );
+  1822→
+  1823→  // AI Summary Modal
+  1824→  const AiSummaryModal = () => (
+  1825→    <Dialog open={showAiSummary} onOpenChange={setShowAiSummary}>
+  1826→      <DialogContent className="bg-card border-border max-w-md">
+  1827→        <DialogHeader>
+  1828→          <DialogTitle className="text-foreground flex items-center gap-2">
+  1829→            <Sparkles className="w-4 h-4 text-violet-400" /> AI Conversation Summary
+  1830→          </DialogTitle>
+  1831→        </DialogHeader>
+  1832→        <div className="min-h-[80px]">
+  1833→          {summaryLoading ? (
+  1834→            <div className="flex items-center justify-center py-8">
+  1835→              <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
+  1836→            </div>
+  1837→          ) : (
+  1838→            <p className="text-[13px] text-foreground leading-relaxed">{aiSummary}</p>
+  1839→          )}
+  1840→        </div>
+  1841→      </DialogContent>
+  1842→    </Dialog>
+  1843→  );
+  1844→
+  1845→  // Meetup Suggestions Modal
+  1846→  const MeetupSuggestionsModal = () => (
+  1847→    <Dialog open={showMeetupSuggestions} onOpenChange={setShowMeetupSuggestions}>
+  1848→      <DialogContent className="bg-card border-border max-w-md">
+  1849→        <DialogHeader>
+  1850→          <DialogTitle className="text-foreground flex items-center gap-2">
+  1851→            <MapPin className="w-4 h-4 text-amber-400" /> Suggested Meetup Spots
+  1852→          </DialogTitle>
+  1853→        </DialogHeader>
+  1854→        <ScrollArea className="max-h-72 overflow-y-auto">
+  1855→          {meetupLoading ? (
+  1856→            <div className="flex items-center justify-center py-8">
+  1857→              <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
+  1858→            </div>
+  1859→          ) : meetupSuggestions.length > 0 ? (
+  1860→            <div className="space-y-2">
+  1861→              {meetupSuggestions.map((venue: any, i: number) => (
+  1862→                <div key={i} className="p-3 rounded-xl border border-border hover:border-amber-500/30 transition-colors">
+  1863→                  <div className="flex items-start gap-3">
+  1864→                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+  1865→                      <MapPin className="w-5 h-5 text-amber-400" />
+  1866→                    </div>
+  1867→                    <div className="flex-1 min-w-0">
+  1868→                      <p className="text-[13px] font-semibold text-foreground">{venue.name}</p>
+  1869→                      <p className="text-[11px] text-muted-foreground mt-0.5">{venue.description}</p>
+  1870→                      {venue.rating && (
+  1871→                        <div className="flex items-center gap-1 mt-1">
+  1872→                          <Star className="w-3 h-3 text-amber-400" />
+  1873→                          <span className="text-[10px] text-muted-foreground">{venue.rating}</span>
+  1874→                        </div>
+  1875→                      )}
+  1876→                    </div>
+  1877→                    <Button variant="outline" size="sm" className="h-7 text-[10px] shrink-0 border-amber-500/50 text-amber-400 hover:bg-amber-600/10">
+  1878→                      <ArrowUpRight className="w-3 h-3" />
+  1879→                    </Button>
+  1880→                  </div>
+  1881→                </div>
+  1882→              ))}
+  1883→            </div>
+  1884→          ) : (
+  1885→            <p className="text-center text-[12px] text-muted-foreground py-8">No suggestions available</p>
+  1886→          )}
+  1887→        </ScrollArea>
+  1888→      </DialogContent>
+  1889→    </Dialog>
+  1890→  );
+  1891→
+  1892→  // Media Gallery Modal
+  1893→  const MediaGalleryModal = () => (
+  1894→    <Dialog open={showChatMediaGallery} onOpenChange={setShowChatMediaGallery}>
+  1895→      <DialogContent className="bg-card border-border max-w-lg">
+  1896→        <DialogHeader>
+  1897→          <DialogTitle className="text-foreground">Shared Media</DialogTitle>
+  1898→        </DialogHeader>
+  1899→        <ScrollArea className="max-h-96 overflow-y-auto">
+  1900→          {mediaGalleryItems.length > 0 ? (
+  1901→            <div className="grid grid-cols-3 gap-1">
+  1902→              {mediaGalleryItems.map((msg) => (
+  1903→                <div key={msg.id} className={`aspect-square rounded-lg bg-secondary ${nsfwFilter ? 'blur-sm hover:blur-none transition-all cursor-pointer' : ''} flex items-center justify-center`}
+  1904→                  onClick={() => nsfwFilter && revealImage(msg.id)}
+  1905→                >
+  1906→                  <div className="text-center">
+  1907→                    {msg.type === 'video' ? <Video className="w-6 h-6 text-muted-foreground mx-auto" /> : <Image className="w-6 h-6 text-muted-foreground mx-auto" />}
+  1908→                    <p className="text-[8px] text-muted-foreground mt-1 px-1 truncate">{msg.content}</p>
+  1909→                  </div>
+  1910→                </div>
+  1911→              ))}
+  1912→            </div>
+  1913→          ) : (
+  1914→            <p className="text-center text-[12px] text-muted-foreground py-8">No shared media</p>
+  1915→          )}
+  1916→        </ScrollArea>
+  1917→      </DialogContent>
+  1918→    </Dialog>
+  1919→  );
+  1920→
+  1921→  // Chat Theme Modal
+  1922→  const ChatThemeModal = () => (
+  1923→    <Dialog open={showThemeModal} onOpenChange={setShowThemeModal}>
+  1924→      <DialogContent className="bg-card border-border max-w-sm">
+  1925→        <DialogHeader>
+  1926→          <DialogTitle className="text-foreground flex items-center gap-2">
+  1927→            <Palette className="w-4 h-4 text-violet-400" /> Chat Theme
+  1928→          </DialogTitle>
+  1929→        </DialogHeader>
+  1930→        <div className="grid grid-cols-2 gap-2">
+  1931→          {CHAT_THEMES.map((t) => (
+  1932→            <button
+  1933→              key={t.id}
+  1934→              onClick={() => { setChatTheme(t.id); setShowThemeModal(false); }}
+  1935→              className={`p-3 rounded-xl border-2 transition-all ${chatTheme === t.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}
+  1936→            >
+  1937→              <div className="flex gap-2 mb-2">
+  1938→                <div className={`w-6 h-4 rounded ${t.ownBg}`} />
+  1939→                <div className={`w-6 h-4 rounded ${t.otherBg} border ${t.otherBorder}`} />
+  1940→              </div>
+  1941→              <p className="text-[11px] text-foreground font-medium">{t.label}</p>
+  1942→            </button>
+  1943→          ))}
+  1944→        </div>
+  1945→      </DialogContent>
+  1946→    </Dialog>
+  1947→  );
+  1948→
+  1949→  // Message Stats Modal
+  1950→  const MessageStatsModal = () => {
+  1951→    const stats = getStats();
+  1952→    return (
+  1953→      <Dialog open={showStatsModal} onOpenChange={setShowStatsModal}>
+  1954→        <DialogContent className="bg-card border-border max-w-sm">
+  1955→          <DialogHeader>
+  1956→            <DialogTitle className="text-foreground flex items-center gap-2">
+  1957→              <BarChart3 className="w-4 h-4 text-cyan-400" /> Message Stats
+  1958→            </DialogTitle>
+  1959→          </DialogHeader>
+  1960→          <div className="space-y-3">
+  1961→            <div className="grid grid-cols-2 gap-3">
+  1962→              <div className="p-3 rounded-xl bg-secondary border border-border text-center">
+  1963→                <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+  1964→                <p className="text-[10px] text-muted-foreground">Total Messages</p>
+  1965→              </div>
+  1966→              <div className="p-3 rounded-xl bg-secondary border border-border text-center">
+  1967→                <p className="text-2xl font-bold text-foreground">{stats.totalChars}</p>
+  1968→                <p className="text-[10px] text-muted-foreground">Characters</p>
+  1969→              </div>
+  1970→              <div className="p-3 rounded-xl bg-secondary border border-border text-center">
+  1971→                <p className="text-2xl font-bold text-primary">{stats.mine}</p>
+  1972→                <p className="text-[10px] text-muted-foreground">Your Messages</p>
+  1973→              </div>
+  1974→              <div className="p-3 rounded-xl bg-secondary border border-border text-center">
+  1975→                <p className="text-2xl font-bold text-amber-400">{stats.theirs}</p>
+  1976→                <p className="text-[10px] text-muted-foreground">Their Messages</p>
+  1977→              </div>
+  1978→            </div>
+  1979→            <Separator className="bg-border" />
+  1980→            <div className="flex items-center justify-between">
+  1981→              <span className="text-[11px] text-muted-foreground">Avg Response Time</span>
+  1982→              <span className="text-[12px] font-medium text-foreground">{stats.avgRespTime}</span>
+  1983→            </div>
+  1984→          </div>
+  1985→        </DialogContent>
+  1986→      </Dialog>
+  1987→    );
+  1988→  };
+  1989→
+  1990→  // Safe Mode Overlay (#29)
+  1991→  const SafeModeOverlay = () => (
+  1992→    <AnimatePresence>
+  1993→      {showSafeWord && (
+  1994→        <motion.div
+  1995→          initial={{ opacity: 0 }}
+  1996→          animate={{ opacity: 1 }}
+  1997→          exit={{ opacity: 0 }}
+  1998→          className="fixed inset-0 z-[200] bg-red-900 flex flex-col items-center justify-center"
+  1999→        >
+  2000→          <motion.div
+  2001→            initial={{ scale: 0.5, opacity: 0 }}
+  2002→            animate={{ scale: 1, opacity: 1 }}
+  2003→            transition={{ delay: 0.2, type: 'spring' }}
+  2004→            className="text-center"
+  2005→          >
+  2006→            <ShieldAlert className="w-20 h-20 text-red-300 mx-auto mb-4" />
+  2007→            <h1 className="text-3xl font-bold text-white mb-2">SAFE MODE</h1>
+  2008→            <h2 className="text-xl text-red-200 mb-6">ACTIVATED</h2>
+  2009→            <p className="text-sm text-red-300">Clearing chat and returning to list...</p>
+  2010→          </motion.div>
+  2011→        </motion.div>
+  2012→      )}
+  2013→    </AnimatePresence>
+  2014→  );
+  2015→
+  2016→  // ═══════════════════════════════════════════════════════════════
+  2017→  // MAIN RENDER
+  2018→  // ═══════════════════════════════════════════════════════════════
+  2019→  return (
+
+[showing lines 20-2019 of 2097; use offset=2020 with limit to continue reading]

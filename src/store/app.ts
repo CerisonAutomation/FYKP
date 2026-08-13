@@ -91,6 +91,61 @@ interface AppState {
   // Profile views received
   profileViews: any[];
   setProfileViews: (v: any[]) => void;
+  // Chat features
+  chatTheme: string;
+  setChatTheme: (t: string) => void;
+ nsfwFilter: boolean;
+  setNsfwFilter: (f: boolean) => void;
+ typingUsers: Record<string, boolean>;
+  setTypingUsers: (t: Record<string, boolean>) => void;
+ chatSearchQuery: string;
+  setChatSearchQuery: (q: string) => void;
+ showChatMediaGallery: boolean;
+  setShowChatMediaGallery: (s: boolean) => void;
+ showChatSearch: boolean;
+  setShowChatSearch: (s: boolean) => void;
+ replyingTo: Message | null;
+  setReplyingTo: (m: Message | null) => void;
+ showDisappearingTimer: string | null;
+  setShowDisappearingTimer: (t: string | null) => void;
+ showScheduleModal: boolean;
+  setShowScheduleModal: (s: boolean) => void;
+ showForwardModal: boolean;
+  setShowForwardModal: (s: boolean) => void;
+ forwardMessage: Message | null;
+  setForwardMessage: (m: Message | null) => void;
+ showCreatePollModal: boolean;
+  setShowCreatePollModal: (s: boolean) => void;
+ showAlbumPicker: boolean;
+  setShowAlbumPicker: (s: boolean) => void;
+ showLocationPicker: boolean;
+  setShowLocationPicker: (s: boolean) => void;
+ showCallModal: boolean;
+  setShowCallModal: (s: boolean) => void;
+ callType: 'voice' | 'video';
+  setCallType: (t: 'voice' | 'video') => void;
+ showAiSummary: boolean;
+  setShowAiSummary: (s: boolean) => void;
+ aiSummary: string;
+  setAiSummary: (s: string) => void;
+ showAutoReplies: boolean;
+  setShowAutoReplies: (s: boolean) => void;
+ autoReplies: string[];
+  setAutoReplies: (r: string[]) => void;
+ showMeetupSuggestions: boolean;
+  setShowMeetupSuggestions: (s: boolean) => void;
+ meetupSuggestions: any[];
+  setMeetupSuggestions: (s: any[]) => void;
+ showSafeWord: boolean;
+  setShowSafeWord: (s: boolean) => void;
+ isRecording: boolean;
+  setIsRecording: (r: boolean) => void;
+ recordingDuration: number;
+  setRecordingDuration: (d: number) => void;
+ messageContextAction: string | null;
+  setMessageContextAction: (a: string | null) => void;
+ contextMessageId: string | null;
+  setContextMessageId: (id: string | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -183,4 +238,59 @@ export const useAppStore = create<AppState>((set) => ({
   // Profile views received
   profileViews: [],
   setProfileViews: (v) => set({ profileViews: v }),
+  // Chat features
+  chatTheme: 'default',
+  setChatTheme: (t) => set({ chatTheme: t }),
+  nsfwFilter: false,
+  setNsfwFilter: (f) => set({ nsfwFilter: f }),
+  typingUsers: {},
+  setTypingUsers: (t) => set({ typingUsers: t }),
+  chatSearchQuery: '',
+  setChatSearchQuery: (q) => set({ chatSearchQuery: q }),
+  showChatMediaGallery: false,
+  setShowChatMediaGallery: (s) => set({ showChatMediaGallery: s }),
+  showChatSearch: false,
+  setShowChatSearch: (s) => set({ showChatSearch: s }),
+  replyingTo: null,
+  setReplyingTo: (m) => set({ replyingTo: m }),
+  showDisappearingTimer: null,
+  setShowDisappearingTimer: (t) => set({ showDisappearingTimer: t }),
+  showScheduleModal: false,
+  setShowScheduleModal: (s) => set({ showScheduleModal: s }),
+  showForwardModal: false,
+  setShowForwardModal: (s) => set({ showForwardModal: s }),
+  forwardMessage: null,
+  setForwardMessage: (m) => set({ forwardMessage: m }),
+  showCreatePollModal: false,
+  setShowCreatePollModal: (s) => set({ showCreatePollModal: s }),
+  showAlbumPicker: false,
+  setShowAlbumPicker: (s) => set({ showAlbumPicker: s }),
+  showLocationPicker: false,
+  setShowLocationPicker: (s) => set({ showLocationPicker: s }),
+  showCallModal: false,
+  setShowCallModal: (s) => set({ showCallModal: s }),
+  callType: 'voice',
+  setCallType: (t) => set({ callType: t }),
+  showAiSummary: false,
+  setShowAiSummary: (s) => set({ showAiSummary: s }),
+  aiSummary: '',
+  setAiSummary: (s) => set({ aiSummary: s }),
+  showAutoReplies: false,
+  setShowAutoReplies: (s) => set({ showAutoReplies: s }),
+  autoReplies: [],
+  setAutoReplies: (r) => set({ autoReplies: r }),
+  showMeetupSuggestions: false,
+  setShowMeetupSuggestions: (s) => set({ showMeetupSuggestions: s }),
+  meetupSuggestions: [],
+  setMeetupSuggestions: (s) => set({ meetupSuggestions: s }),
+  showSafeWord: false,
+  setShowSafeWord: (s) => set({ showSafeWord: s }),
+  isRecording: false,
+  setIsRecording: (r) => set({ isRecording: r }),
+  recordingDuration: 0,
+  setRecordingDuration: (d) => set({ recordingDuration: d }),
+  messageContextAction: null,
+  setMessageContextAction: (a) => set({ messageContextAction: a }),
+  contextMessageId: null,
+  setContextMessageId: (id) => set({ contextMessageId: id }),
 }));

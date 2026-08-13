@@ -118,22 +118,40 @@ model User {
 }
 
 model Message {
-  id        String   @id @default(cuid())
-  content   String
-  senderId  String
-  receiverId String
-  chatType  String   @default("direct")
-  groupId   String?
-  isRead    Boolean  @default(false)
-  isDeleted Boolean  @default(false)
-  type      String   @default("text")
-  mediaUrl  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(cuid())
+  content       String
+  senderId      String
+  receiverId    String
+  chatType      String    @default("direct")
+  groupId       String?
+  isRead        Boolean   @default(false)
+  isDeleted     Boolean   @default(false)
+  type          String    @default("text")
+  mediaUrl      String?
+  // ── Chat Feature Fields ──
+  replyToId     String?   // Thread: reply to specific message
+  reactions     String?   // JSON: {"❤️":["uid1"],"😂":["uid2"]}
+  isPinned      Boolean   @default(false)
+  isFavorited   Boolean   @default(false)
+  expiresAt     DateTime? // Disappearing messages
+  isRecalled    Boolean   @default(false)
+  translation   String?   // AI-translated content
+  translatedLang String?  // Target language code
+  scheduledAt   DateTime? // Scheduled send
+  albumId       String?   // Shared album
+  locationData  String?   // JSON: {lat,lng,name}
+  eventId       String?   // Event created from chat
+  voiceDuration Int?      // Voice message seconds
+  pollData      String?   // JSON: {question, options, votes}
+  callData      String?   // JSON: {type, link, duration}
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  sender   User     @relation("SentMessages", fields: [senderId], references: [id])
-  receiver User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  sender   User       @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User       @relation("ReceivedMessages", fields: [receiverId], references: [id])
   group    GroupChat? @relation(fields: [groupId], references: [id])
+  replyTo  Message?   @relation("MessageReply", fields: [replyToId], references: [id])
+  replies  Message[]  @relation("MessageReply")
 }
 
 model Like {

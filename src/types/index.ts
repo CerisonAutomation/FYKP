@@ -190,8 +190,27 @@ export interface Message {
   isRead: boolean;
   type: string;
   mediaUrl?: string;
+  // Chat features
+  replyToId?: string;
+  reactions?: string;
+  isPinned?: boolean;
+  isFavorited?: boolean;
+  expiresAt?: string;
+  isRecalled?: boolean;
+  translation?: string;
+  translatedLang?: string;
+  scheduledAt?: string;
+  albumId?: string;
+  locationData?: string;
+  eventId?: string;
+  voiceDuration?: number;
+  pollData?: string;
+  callData?: string;
   createdAt: string;
+  updatedAt?: string;
   sender?: User;
+  replyTo?: Message;
+  replies?: Message[];
 }
 
 export interface Conversation {

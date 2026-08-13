@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import NexusChat from '@/components/chat/NexusChat';
 import { io as socketIO, Socket } from 'socket.io-client';
 import { formatDistanceToNow, format, isToday, isThisWeek, isThisMonth } from 'date-fns';
 import { useAppStore } from '@/store/app';
@@ -1182,7 +1183,24 @@ export default function NexusApp() {
     return (
       <div className="h-full flex flex-col">
         {chatMobileView === 'chat' && (activeConversation || activeGroup) ? (
-          <ActiveChatView />
+          <NexusChat
+            msgInput={msgInput}
+            setMsgInput={setMsgInput}
+            sendMessage={sendMessage}
+            sendGroupMessage={sendGroupMessage}
+            activeConversation={activeConversation}
+            activeGroup={activeGroup}
+            messages={messages}
+            groupMessages={groupMessages}
+            setGroupMessages={setGroupMessages}
+            getAvatar={getAvatar}
+            openProfile={openProfile}
+            setActiveConversation={setActiveConversation}
+            setActiveGroup={setActiveGroup}
+            setChatMobileView={setChatMobileView}
+            msgEndRef={msgEndRef}
+            socket={socketRef.current}
+          />
         ) : (
           <ScrollArea className="flex-1">
             <div className="p-4 space-y-4">
