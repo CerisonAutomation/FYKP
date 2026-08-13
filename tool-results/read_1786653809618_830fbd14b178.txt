@@ -1,0 +1,502 @@
+  1200→            setChatMobileView={setChatMobileView}
+  1201→            msgEndRef={msgEndRef}
+  1202→            socket={socketRef.current}
+  1203→          />
+  1204→        ) : (
+  1205→          <ScrollArea className="flex-1">
+  1206→            <div className="p-4 space-y-4">
+  1207→              {/* Chat Requests */}
+  1208→              {chatRequests.length > 0 && (
+  1209→                <div className="space-y-2">
+  1210→                  <SectionHeader icon={Bell} label="Chat Requests" count={chatRequests.length} />
+  1211→                  {chatRequests.map(req => (
+  1212→                    <div key={req.id} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+  1213→                      <button onClick={() => openProfile(req.sender?.id || '')}><Avatar className="h-10 w-10"><AvatarImage src={getAvatar(req.sender)} /><AvatarFallback className="text-xs">{req.sender?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1214→                      <div className="flex-1 min-w-0">
+  1215→                        <p className="text-[12px] font-semibold">{req.sender?.displayName}</p>
+  1216→                        <p className="text-[11px] text-muted-foreground truncate">{req.message || 'Wants to chat with you'}</p>
+  1217→                      </div>
+  1218→                      <div className="flex gap-1.5 shrink-0">
+  1219→                        <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => handleChatRequest(req.id, 'accept')}>Accept</Button>
+  1220→                        <Button size="sm" variant="outline" className="h-7 text-[10px] border-border px-2" onClick={() => handleChatRequest(req.id, 'decline')}>Decline</Button>
+  1221→                      </div>
+  1222→                    </div>
+  1223→                  ))}
+  1224→                </div>
+  1225→              )}
+  1226→              {/* Conversations */}
+  1227→              <Tabs defaultValue="direct">
+  1228→                <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  1229→                  <TabsTrigger value="direct" className="text-[11px] flex-1 h-7">Messages</TabsTrigger>
+  1230→                  <TabsTrigger value="groups" className="text-[11px] flex-1 h-7">Groups</TabsTrigger>
+  1231→                </TabsList>
+  1232→                <TabsContent value="direct" className="mt-3 space-y-1">
+  1233→                  {conversations.length === 0 ? <EmptyState icon={MessageCircle} title="No messages yet" desc="Start a conversation from someone's profile" />
+  1234→                    : conversations.map(convo => (
+  1235→                      <button key={convo.otherUser.id} onClick={() => { setActiveConversation(convo); setChatMobileView('chat'); fetch(`/api/messages?userId=${convo.otherUser.id}`).then(r => r.json()).then(res => setMessages(res.data || [])).catch(() => {}); }}
+  1236→                        className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1237→                        <div className="relative shrink-0">
+  1238→                          <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(convo.otherUser)} /><AvatarFallback className="text-xs">{convo.otherUser.displayName?.[0]}</AvatarFallback></Avatar>
+  1239→                          {convo.otherUser.online && convo.otherUser.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+  1240→                        </div>
+  1241→                        <div className="flex-1 min-w-0">
+  1242→                          <div className="flex items-center justify-between">
+  1243→                            <p className="text-[13px] font-semibold truncate">{convo.otherUser.displayName}</p>
+  1244→                            <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(convo.lastMessage.createdAt)}</span>
+  1245→                          </div>
+  1246→                          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{convo.lastMessage.content || '...'}</p>
+  1247→                        </div>
+  1248→                        {convo.unreadCount > 0 && <span className="min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground rounded-full">{convo.unreadCount}</span>}
+  1249→                      </button>
+  1250→                    ))}
+  1251→                </TabsContent>
+  1252→                <TabsContent value="groups" className="mt-3 space-y-1">
+  1253→                  {groups.length === 0 ? <EmptyState icon={Users} title="No groups yet" desc="Create or join a group to get started" />
+  1254→                    : groups.filter((g: any) => !g.hidden).map(group => (
+  1255→                      <button key={group.id} onClick={() => { setActiveGroup(group); setGroupMessages([]); setChatMobileView('chat'); }}
+  1256→                        className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1257→                        <Avatar className="h-11 w-11"><AvatarImage src={group.avatar} /><AvatarFallback className="text-xs">{group.name?.[0]}</AvatarFallback></Avatar>
+  1258→                        <div className="flex-1 min-w-0">
+  1259→                          <p className="text-[13px] font-semibold truncate">{group.name}</p>
+  1260→                          <p className="text-[11px] text-muted-foreground">{group._count?.members || 0} members {group.geoName ? `· ${group.geoName}` : ''}</p>
+  1261→                        </div>
+  1262→                      </button>
+  1263→                    ))}
+  1264→                </TabsContent>
+  1265→              </Tabs>
+  1266→            </div>
+  1267→          </ScrollArea>
+  1268→        )}
+  1269→      </div>
+  1270→    );
+  1271→  }
+  1272→
+  1273→  function ActiveChatView() {
+  1274→    const chatUser = activeConversation?.otherUser;
+  1275→    const groupInfo = activeGroup;
+  1276→    const isGroup = !!groupInfo;
+  1277→    const chatMessages = isGroup ? groupMessages : messages;
+  1278→    return (
+  1279→      <div className="h-full flex flex-col">
+  1280→        {/* Chat header */}
+  1281→        <div className="flex items-center gap-3 px-4 py-2 border-b border-border shrink-0">
+  1282→          <button onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }} className="md:hidden p-1 hover:bg-secondary rounded-lg"><ChevronLeft className="w-5 h-5" /></button>
+  1283→          <button onClick={() => chatUser && openProfile(chatUser.id)}>
+  1284→            <Avatar className="h-9 w-9"><AvatarImage src={getAvatar(isGroup ? undefined : chatUser)} /><AvatarFallback className="text-xs">{(isGroup ? groupInfo?.name : chatUser?.displayName)?.[0]}</AvatarFallback></Avatar>
+  1285→          </button>
+  1286→          <div className="flex-1 min-w-0">
+  1287→            <p className="text-[13px] font-semibold truncate">{isGroup ? groupInfo?.name : chatUser?.displayName}</p>
+  1288→            <p className="text-[10px] text-muted-foreground">{isGroup ? `${groupInfo?._count?.members || 0} members` : chatUser?.online ? 'Online' : 'Offline'}</p>
+  1289→          </div>
+  1290→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => { setRizzTargetBio(chatUser?.bio || ''); setShowRizzModal(true); }}><Sparkles className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>AI Rizz</TooltipContent></Tooltip>
+  1291→        </div>
+  1292→        {/* Messages */}
+  1293→        <ScrollArea className="flex-1 px-4">
+  1294→          <div className="space-y-3 py-4">
+  1295→            {chatMessages.length === 0 && <p className="text-center text-xs text-muted-foreground py-8">No messages yet. Say hello!</p>}
+  1296→            {chatMessages.map(msg => {
+  1297→              const isMine = msg.senderId === currentUser?.id;
+  1298→              return (
+  1299→                <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+  1300→                  <div className={`max-w-[75%] px-3 py-2 rounded-2xl ${isMine ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-secondary border border-border rounded-bl-md'}`}>
+  1301→                    {!isMine && !isGroup && <p className="text-[10px] font-medium opacity-70">{msg.sender?.displayName}</p>}
+  1302→                    {isGroup && !isMine && <p className="text-[10px] font-medium opacity-70">{msg.sender?.displayName}</p>}
+  1303→                    <p className="text-[13px]">{msg.content}</p>
+  1304→                    <p className={`text-[9px] mt-1 ${isMine ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{timeAgo(msg.createdAt)}</p>
+  1305→                  </div>
+  1306→                </div>
+  1307→              );
+  1308→            })}
+  1309→            <div ref={msgEndRef} />
+  1310→          </div>
+  1311→        </ScrollArea>
+  1312→        {/* Input */}
+  1313→        <div className="px-4 py-3 border-t border-border shrink-0 flex gap-2">
+  1314→          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-muted-foreground"><Paperclip className="w-4 h-4" /></Button>
+  1315→          <Input value={msgInput} onChange={e => setMsgInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && isGroup ? sendGroupMessage() : e.key === 'Enter' && sendMessage()} placeholder="Type a message..." className="bg-secondary border-border h-9 text-[13px]" />
+  1316→          <Button size="icon" className="h-9 w-9 shrink-0 bg-primary text-primary-foreground" onClick={isGroup ? sendGroupMessage : sendMessage}><Send className="w-4 h-4" /></Button>
+  1317→        </div>
+  1318→      </div>
+  1319→    );
+  1320→  }
+  1321→
+  1322→  // ─── LIKES VIEW ─────────────────────────────────────────────
+  1323→  function LikesView() {
+  1324→    if (likesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1325→    return (
+  1326→      <div className="h-full flex flex-col">
+  1327→        <Tabs value={likesTab} onValueChange={(v) => setLikesTab(v as 'received' | 'sent')} className="flex flex-col h-full">
+  1328→          <div className="px-4 pt-3 shrink-0">
+  1329→            <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  1330→              <TabsTrigger value="received" className="text-[11px] flex-1 h-7">Received ({receivedLikes.length})</TabsTrigger>
+  1331→              <TabsTrigger value="sent" className="text-[11px] flex-1 h-7">Sent ({sentLikes.length})</TabsTrigger>
+  1332→            </TabsList>
+  1333→          </div>
+  1334→          <ScrollArea className="flex-1">
+  1335→            <TabsContent value="received" className="mt-3 px-4">
+  1336→              {receivedLikes.length === 0 ? <EmptyState icon={Heart} title="No likes received" desc="When someone likes you, they'll appear here" />
+  1337→                : receivedLikes.map(like => like.sender && (
+  1338→                  <div key={like.id} className="mb-2">
+  1339→                    <UserRow user={like.sender} sub={<span>{timeAgo(like.createdAt)}</span>}
+  1340→                      onClick={() => openProfile(like.sender.id)}
+  1341→                      actions={
+  1342→                        <>
+  1343→                          <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => openChat(like.sender)}>Accept</Button>
+  1344→                          <Button size="sm" variant="ghost" className="h-7 text-[10px] text-muted-foreground px-2" onClick={() => handleUnlike(like.sender.id)}><X className="w-3 h-3" /></Button>
+  1345→                        </>
+  1346→                      } />
+  1347→                  </div>
+  1348→                ))}
+  1349→            </TabsContent>
+  1350→            <TabsContent value="sent" className="mt-3 px-4">
+  1351→              {sentLikes.length === 0 ? <EmptyState icon={Heart} title="No likes sent" desc="Like someone and they'll appear here" />
+  1352→                : sentLikes.map(like => like.receiver && (
+  1353→                  <div key={like.id} className="mb-2">
+  1354→                    <UserRow user={like.receiver} sub={<span>{timeAgo(like.createdAt)}</span>} onClick={() => openProfile(like.receiver.id)}
+  1355→                      actions={<Button size="sm" variant="ghost" className="h-7 text-[10px] text-destructive px-2" onClick={() => handleUnlike(like.receiver.id)}><X className="w-3 h-3" /></Button>} />
+  1356→                  </div>
+  1357→                ))}
+  1358→            </TabsContent>
+  1359→          </ScrollArea>
+  1360→        </Tabs>
+  1361→      </div>
+  1362→    );
+  1363→  }
+  1364→
+  1365→  // ─── MORE VIEW (Page Directory) ───────────────────────────
+  1366→  function MoreView() {
+  1367→    return (
+  1368→      <ScrollArea className="h-full">
+  1369→        <div className="p-4 space-y-6">
+  1370→          <p className="text-xs text-muted-foreground">Explore all features of NEXUS</p>
+  1371→          {Object.entries(PAGE_DIRECTORY).map(([category, pages]) => (
+  1372→            <div key={category}>
+  1373→              <h3 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-3">{category}</h3>
+  1374→              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  1375→                {pages.map(page => {
+  1376→                  const Icon = page.icon;
+  1377→                  return (
+  1378→                    <button key={page.id} onClick={() => setActiveTab(page.id)}
+  1379→                      className="flex flex-col items-start gap-2 p-3 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all text-left group">
+  1380→                      <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+  1381→                        <Icon className="w-4 h-4 text-primary" />
+  1382→                      </div>
+  1383→                      <div className="flex-1 min-w-0">
+  1384→                        <p className="text-[12px] font-semibold truncate">{page.label}</p>
+  1385→                        <p className="text-[10px] text-muted-foreground truncate">{page.description}</p>
+  1386→                      </div>
+  1387→                      {page.badge && <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />}
+  1388→                    </button>
+  1389→                  );
+  1390→                })}
+  1391→              </div>
+  1392→            </div>
+  1393→          ))}
+  1394→          <div className="h-4" />
+  1395→        </div>
+  1396→      </ScrollArea>
+  1397→    );
+  1398→  }
+  1399→
+  1400→  // ─── EVENTS VIEW ───────────────────────────────────────────
+  1401→  function EventsView() {
+  1402→    if (eventsLoading) return <LoadingGrid cols={1} rows={4} />;
+  1403→    const filteredEvents = events.filter((e: any) => {
+  1404→      if (agendaFilter === 'today') return isToday(new Date(e.startDate));
+  1405→      if (agendaFilter === 'this-week') return isThisWeek(new Date(e.startDate));
+  1406→      if (agendaFilter === 'this-month') return isThisMonth(new Date(e.startDate));
+  1407→      return true;
+  1408→    });
+  1409→    return (
+  1410→      <div className="h-full flex flex-col">
+  1411→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1412→          {(['all', 'today', 'this-week', 'this-month', 'nearby', 'my-events'] as const).map(f => (
+  1413→            <button key={f} onClick={() => setAgendaFilter(f)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${agendaFilter === f ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1414→              {f.replace('-', ' ')}
+  1415→            </button>
+  1416→          ))}
+  1417→          <div className="ml-auto flex gap-1 shrink-0">
+  1418→            <button onClick={() => setAgendaView('list')} className={`p-1.5 rounded-lg ${agendaView === 'list' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><FileText className="w-4 h-4" /></button>
+  1419→            <button onClick={() => setAgendaView('calendar')} className={`p-1.5 rounded-lg ${agendaView === 'calendar' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Calendar className="w-4 h-4" /></button>
+  1420→            <button onClick={() => setAgendaView('map')} className={`p-1.5 rounded-lg ${agendaView === 'map' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><MapPinned className="w-4 h-4" /></button>
+  1421→          </div>
+  1422→        </div>
+  1423→        <ScrollArea className="flex-1">
+  1424→          <div className="p-4 space-y-3">
+  1425→            <Button className="w-full bg-primary text-primary-foreground h-9 text-xs" onClick={() => setShowCreateEvent(true)}><Plus className="w-3.5 h-3.5 mr-1.5" /> Create Event</Button>
+  1426→            {filteredEvents.length === 0 ? <EmptyState icon={Calendar} title="No events found" desc="Create one or adjust filters" />
+  1427→              : filteredEvents.map((event: any) => (
+  1428→                <Card key={event.id} className="bg-secondary border-border overflow-hidden">
+  1429→                  {event.imageUrl && <img src={event.imageUrl} alt="" className="w-full h-32 object-cover" />}
+  1430→                  <CardContent className="p-3">
+  1431→                    <div className="flex items-start justify-between gap-2">
+  1432→                      <div className="flex-1 min-w-0">
+  1433→                        <h3 className="text-sm font-semibold">{event.title}</h3>
+  1434→                        {event.description && <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{event.description}</p>}
+  1435→                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-2">
+  1436→                          <span className="flex items-center gap-0.5"><Clock className="w-3 h-3" />{fmtDate(event.startDate)}</span>
+  1437→                          {event.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{truncate(event.location, 20)}</span>}
+  1438→                        </div>
+  1439→                      </div>
+  1440→                    </div>
+  1441→                    <div className="flex gap-1.5 mt-3">
+  1442→                      {(['going', 'maybe', 'interested', 'declined'] as const).map(status => (
+  1443→                        <button key={status} onClick={() => handleRsvp(event.id, status)}
+  1444→                          className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all ${userRsvps[event.id] === status ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1445→                          {status}
+  1446→                        </button>
+  1447→                      ))}
+  1448→                    </div>
+  1449→                  </CardContent>
+  1450→                </Card>
+  1451→              ))}
+  1452→          </div>
+  1453→        </ScrollArea>
+  1454→      </div>
+  1455→    );
+  1456→  }
+  1457→
+  1458→  // ─── VIEWED ME VIEW ────────────────────────────────────────
+  1459→  function ViewedMeView() {
+  1460→    if (viewsLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1461→    return (
+  1462→      <ScrollArea className="h-full">
+  1463→        <div className="p-4 space-y-1">
+  1464→          {profileViews.length === 0 ? <EmptyState icon={Eye} title="No profile views" desc="When someone views your profile, they'll appear here" />
+  1465→            : profileViews.map(view => view.viewer && (
+  1466→              <UserRow key={view.id} user={view.viewer} sub={<span>Viewed {timeAgo(view.createdAt)}</span>} onClick={() => openProfile(view.viewer.id)}
+  1467→                actions={<Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => openChat(view.viewer)}>Chat</Button>} />
+  1468→            ))}
+  1469→        </div>
+  1470→      </ScrollArea>
+  1471→    );
+  1472→  }
+  1473→
+  1474→  // ─── SHOUTS VIEW ───────────────────────────────────────────
+  1475→  function ShoutsView() {
+  1476→    if (shoutLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}</div>;
+  1477→    return (
+  1478→      <div className="h-full flex flex-col">
+  1479→        <ScrollArea className="flex-1">
+  1480→          <div className="p-4 space-y-4">
+  1481→            {/* Compose */}
+  1482→            <div className="p-3 rounded-xl bg-secondary border border-border space-y-2">
+  1483→              <Textarea value={shoutInput} onChange={e => setShoutInput(e.target.value)} placeholder="What's on your mind?" className="bg-background border-border text-sm resize-none" rows={2} />
+  1484→              <div className="flex items-center justify-between">
+  1485→                <div className="flex gap-1">
+  1486→                  <button onClick={() => setShoutType('text')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'text' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Text</button>
+  1487→                  <button onClick={() => setShoutType('image')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'image' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Image</button>
+  1488→                  <button onClick={() => setShoutType('video')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'video' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Video</button>
+  1489→                </div>
+  1490→                <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-3" onClick={handleShout} disabled={!shoutInput.trim()}><Megaphone className="w-3 h-3 mr-1" /> Shout</Button>
+  1491→              </div>
+  1492→              {/* Canned shouts */}
+  1493→              <div className="flex flex-wrap gap-1 pt-2 border-t border-border">
+  1494→                {CANNED_SHOUTS.map(cs => (
+  1495→                  <button key={cs.value} onClick={() => setShoutInput(cs.label)} className="px-2 py-1 rounded-full text-[10px] bg-background border border-border text-muted-foreground hover:border-primary/30 transition-all">
+  1496→                    {cs.emoji} {cs.label}
+  1497→                  </button>
+  1498→                ))}
+  1499→              </div>
+  1500→            </div>
+  1501→            {/* Feed */}
+  1502→            {shouts.length === 0 ? <EmptyState icon={Megaphone} title="No shouts yet" desc="Be the first to share something!" />
+  1503→              : shouts.map((shout: any) => (
+  1504→                <Card key={shout.id} className="bg-secondary border-border">
+  1505→                  <CardContent className="p-3">
+  1506→                    <div className="flex items-center gap-2 mb-2">
+  1507→                      <button onClick={() => shout.user && openProfile(shout.user.id)}><Avatar className="h-8 w-8"><AvatarImage src={getAvatar(shout.user)} /><AvatarFallback className="text-[10px]">{shout.user?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1508→                      <div className="flex-1 min-w-0">
+  1509→                        <p className="text-[12px] font-semibold">{shout.user?.displayName}</p>
+  1510→                        <p className="text-[10px] text-muted-foreground">{timeAgo(shout.createdAt)}</p>
+  1511→                      </div>
+  1512→                      <Badge className="text-[9px] bg-muted">{shout.type}</Badge>
+  1513→                    </div>
+  1514→                    <p className="text-[13px] leading-relaxed">{shout.content}</p>
+  1515→                    {shout.mediaUrl && <img src={shout.mediaUrl} alt="" className="mt-2 rounded-lg max-h-48 w-full object-cover" />}
+  1516→                  </CardContent>
+  1517→                </Card>
+  1518→              ))}
+  1519→          </div>
+  1520→        </ScrollArea>
+  1521→      </div>
+  1522→    );
+  1523→  }
+  1524→
+  1525→
+  1526→  // ─── FANSITES VIEW ──────────────────────────────────────────
+  1527→  function FansitesView() {
+  1528→    if (fansiteLoading) return <LoadingGrid />;
+  1529→    return (
+  1530→      <ScrollArea className="h-full">
+  1531→        <div className="p-4 space-y-3">
+  1532→          {fansites.length === 0 ? <EmptyState icon={Star} title="No fansites" desc="Creator pages will appear here" />
+  1533→            : fansites.map(fs => (
+  1534→              <Card key={fs.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => { setSelectedFansite(fs); setShowFansiteSheet(true); }}>
+  1535→                <div className="flex gap-3 p-3">
+  1536→                  <Avatar className="h-14 w-14 shrink-0"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-sm">{fs.user?.displayName?.[0]}</AvatarFallback></Avatar>
+  1537→                  <div className="flex-1 min-w-0">
+  1538→                    <div className="flex items-center gap-2">
+  1539→                      <h3 className="text-sm font-semibold truncate">{fs.name}</h3>
+  1540→                      {fs.status === 'active' && <Badge className="text-[9px] bg-green-400/20 text-green-400">Active</Badge>}
+  1541→                    </div>
+  1542→                    {fs.nick && <p className="text-[11px] text-muted-foreground">@{fs.nick}</p>}
+  1543→                    {fs.description && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{fs.description}</p>}
+  1544→                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-2">
+  1545→                      <span>{fs.links?.length || 0} links</span>
+  1546→                      <span>{fs.products?.length || 0} products</span>
+  1547→                    </div>
+  1548→                  </div>
+  1549→                </div>
+  1550→              </Card>
+  1551→            ))}
+  1552→        </div>
+  1553→      </ScrollArea>
+  1554→    );
+  1555→  }
+  1556→
+  1557→  function FansiteDetail() {
+  1558→    if (!selectedFansite) return null;
+  1559→    const fs = selectedFansite;
+  1560→    return (
+  1561→      <div className="space-y-4 p-4">
+  1562→        <div className="flex items-center gap-3">
+  1563→          <Avatar className="h-14 w-14"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-sm">{fs.user?.displayName?.[0]}</AvatarFallback></Avatar>
+  1564→          <div className="flex-1 min-w-0">
+  1565→            <h3 className="text-lg font-bold">{fs.name}</h3>
+  1566→            {fs.geoName && <p className="text-xs text-muted-foreground">{fs.geoName}</p>}
+  1567→          </div>
+  1568→          <Badge className={fs.status === 'active' ? 'bg-green-400/20 text-green-400' : 'bg-muted'}>{fs.status}</Badge>
+  1569→        </div>
+  1570→        {fs.description && <p className="text-sm text-muted-foreground">{fs.description}</p>}
+  1571→        {fs.trailerImageUrl && <img src={fs.trailerImageUrl} alt="" className="w-full rounded-xl" />}
+  1572→        {/* Links */}
+  1573→        {fs.links && fs.links.length > 0 && (
+  1574→          <div className="space-y-2">
+  1575→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Links</h4>
+  1576→            {fs.links.map(link => (
+  1577→              <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2.5 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all">
+  1578→                <ExternalLink className="w-4 h-4 text-primary shrink-0" />
+  1579→                <div className="flex-1 min-w-0"><p className="text-[12px] font-medium truncate">{link.label || link.type}</p><p className="text-[10px] text-muted-foreground truncate">{link.url}</p></div>
+  1580→              </a>
+  1581→            ))}
+  1582→          </div>
+  1583→        )}
+  1584→        {/* Products */}
+  1585→        {fs.products && fs.products.length > 0 && (
+  1586→          <div className="space-y-2">
+  1587→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Products</h4>
+  1588→            {fs.products.map(product => (
+  1589→              <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1590→                <div><p className="text-[12px] font-medium">{product.period}</p>{product.until && <p className="text-[10px] text-muted-foreground">Until {product.until}</p>}</div>
+  1591→                <div className="text-right">
+  1592→                  {product.priceOld && <p className="text-[10px] text-muted-foreground line-through">${product.priceOld}</p>}
+  1593→                  <p className="text-sm font-bold text-primary">${product.price}</p>
+  1594→                </div>
+  1595→              </div>
+  1596→            ))}
+  1597→          </div>
+  1598→        )}
+  1599→      </div>
+  1600→    );
+  1601→  }
+  1602→
+  1603→  // ─── VIDEOS VIEW ───────────────────────────────────────────
+  1604→  function VideosView() {
+  1605→    if (videosLoading) return <LoadingGrid />;
+  1606→    const filtered = videoSearch ? videos.filter((v: any) => v.title.toLowerCase().includes(videoSearch.toLowerCase())) : videos;
+  1607→    return (
+  1608→      <div className="h-full flex flex-col">
+  1609→        <div className="px-4 py-2 border-b border-border shrink-0">
+  1610→          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={videoSearch} onChange={e => setVideoSearch(e.target.value)} placeholder="Search videos..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1611→        </div>
+  1612→        <ScrollArea className="flex-1">
+  1613→          <div className="p-4 grid grid-cols-2 gap-3">
+  1614→            {filtered.length === 0 ? <div className="col-span-2"><EmptyState icon={Video} title="No videos" desc="Videos from the community will appear here" /></div>
+  1615→              : filtered.map((video: any) => (
+  1616→                <button key={video.id} className="rounded-xl overflow-hidden bg-secondary border border-border text-left group">
+  1617→                  <div className="aspect-video relative bg-card">
+  1618→                    {video.thumbnailUrl ? <img src={video.thumbnailUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Video className="w-8 h-8 text-muted-foreground" /></div>}
+  1619→                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><div className="w-10 h-10 rounded-full bg-primary/80 flex items-center justify-center"><Play className="w-5 h-5 text-primary-foreground fill-current ml-0.5" /></div></div>
+  1620→                    {video.duration && <Badge className="absolute bottom-1 right-1 text-[9px] bg-black/60">{Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}</Badge>}
+  1621→                  </div>
+  1622→                  <div className="p-2"><p className="text-[11px] font-medium truncate">{video.title}</p><p className="text-[10px] text-muted-foreground">{video.user?.displayName}</p></div>
+  1623→                </button>
+  1624→              ))}
+  1625→          </div>
+  1626→        </ScrollArea>
+  1627→      </div>
+  1628→    );
+  1629→  }
+  1630→
+  1631→  function Play(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>; }
+  1632→
+  1633→  // ─── BLOGS VIEW ─────────────────────────────────────────────
+  1634→  function BlogsView() {
+  1635→    if (blogsLoading) return <LoadingGrid cols={1} rows={3} />;
+  1636→    const filtered = blogSearch ? blogs.filter((b: any) => b.title.toLowerCase().includes(blogSearch.toLowerCase())) : blogs;
+  1637→    return (
+  1638→      <div className="h-full flex flex-col">
+  1639→        <div className="px-4 py-2 border-b border-border shrink-0">
+  1640→          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={blogSearch} onChange={e => setBlogSearch(e.target.value)} placeholder="Search blogs..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1641→        </div>
+  1642→        <ScrollArea className="flex-1">
+  1643→          <div className="p-4 space-y-3">
+  1644→            {filtered.length === 0 ? <EmptyState icon={FileText} title="No blogs" desc="Articles and stories will appear here" />
+  1645→              : filtered.map((blog: any) => (
+  1646→                <Card key={blog.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedBlog(blog)}>
+  1647→                  {blog.imageUrl && <img src={blog.imageUrl} alt="" className="w-full h-36 object-cover" />}
+  1648→                  <CardContent className="p-3">
+  1649→                    <h3 className="text-sm font-semibold">{blog.title}</h3>
+  1650→                    {blog.content && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{truncate(blog.content, 120)}</p>}
+  1651→                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-2">
+  1652→                      <span>{blog.user?.displayName}</span><span>·</span><span>{timeAgo(blog.createdAt)}</span>
+  1653→                    </div>
+  1654→                  </CardContent>
+  1655→                </Card>
+  1656→              ))}
+  1657→          </div>
+  1658→        </ScrollArea>
+  1659→      </div>
+  1660→    );
+  1661→  }
+  1662→
+  1663→  function BlogDetail() {
+  1664→    if (!selectedBlog) return null;
+  1665→    return (
+  1666→      <ScrollArea className="max-h-[70vh]">
+  1667→        <div className="space-y-4 p-4">
+  1668→          {selectedBlog.imageUrl && <img src={selectedBlog.imageUrl} alt="" className="w-full rounded-xl" />}
+  1669→          <h2 className="text-xl font-bold">{selectedBlog.title}</h2>
+  1670→          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+  1671→            <span>{selectedBlog.user?.displayName}</span><span>·</span><span>{fmtDate(selectedBlog.createdAt)}</span>
+  1672→          </div>
+  1673→          <Separator className="bg-border" />
+  1674→          <div className="text-sm leading-relaxed whitespace-pre-wrap">{selectedBlog.content}</div>
+  1675→        </div>
+  1676→      </ScrollArea>
+  1677→    );
+  1678→  }
+  1679→
+  1680→  // ─── GROUPS VIEW ───────────────────────────────────────────
+  1681→  function GroupsView() {
+  1682→    const filtered = groupSearch ? groups.filter((g: any) => g.name.toLowerCase().includes(groupSearch.toLowerCase())) : groups;
+  1683→    return (
+  1684→      <div className="h-full flex flex-col">
+  1685→        <div className="px-4 py-2 border-b border-border shrink-0 flex items-center gap-2">
+  1686→          <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={groupSearch} onChange={e => setGroupSearch(e.target.value)} placeholder="Search groups..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1687→          <Button size="sm" className="h-9 text-xs bg-primary text-primary-foreground shrink-0" onClick={() => setShowCreateGroup(true)}><Plus className="w-3.5 h-3.5 mr-1" /> New</Button>
+  1688→        </div>
+  1689→        <ScrollArea className="flex-1">
+  1690→          <div className="p-4 space-y-2">
+  1691→            {filtered.length === 0 ? <EmptyState icon={Users} title="No groups" desc="Create or join a group" />
+  1692→              : filtered.filter((g: any) => !g.hidden).map((group: any) => (
+  1693→                <Card key={group.id} className="bg-secondary border-border">
+  1694→                  <CardContent className="p-3">
+  1695→                    <div className="flex items-center gap-3">
+  1696→                      <Avatar className="h-11 w-11"><AvatarImage src={group.avatar} /><AvatarFallback className="text-xs">{group.name?.[0]}</AvatarFallback></Avatar>
+  1697→                      <div className="flex-1 min-w-0">
+  1698→                        <h3 className="text-[13px] font-semibold truncate">{group.name}</h3>
+  1699→                        <p className="text-[11px] text-muted-foreground">{group._count?.members || 0} members</p>
+
+[showing lines 1200-1699 of 2811; use offset=1700 with limit to continue reading]

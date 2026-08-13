@@ -1,0 +1,502 @@
+    31→import { Slider } from '@/components/ui/slider';
+    32→import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+    33→import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+    34→import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+    35→import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+    36→import { Progress } from '@/components/ui/progress';
+    37→import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+    38→import {
+    39→  Compass, MessageCircle, Heart, Star, Calendar, User, Search,
+    40→  Bell, Settings, X, Send, Paperclip, Check, CheckCheck, Crown,
+    41→  Shield, MapPin, ChevronLeft, ChevronRight, Grid3X3, Layers,
+    42→  ThumbsUp, ThumbsDown, Eye, Image as ImageIcon, Users, Zap,
+    43→  Copy, Sparkles, LogOut, Link2, ExternalLink, Flag, Ban as Block,
+    44→  Pencil, Camera, MoreVertical, ArrowLeft, Plus, Clock, Globe,
+    45→  Map, Megaphone, Video, FileText, Bookmark, StickyNote, MapPinned,
+    46→  StarOff, ShieldCheck, MonitorSmartphone, Crosshair, Grid2X2,
+    47→  Fingerprint, Scale, HelpCircle, AlertTriangle, Gift, TrendingUp,
+    48→  Brain, Target, Lightbulb, AlertCircle, CheckCircle2, PartyPopper,
+    49→  Coffee, Music, Dumbbell, Plane, Palette, Briefcase, Info,
+    50→  Radio, ChevronDown, Tag, UserMinus, Lock, Mail, Languages,
+    51→  Volume2, VolumeX, MapPinOff, Navigation, Wifi, WifiOff,
+    52→  EyeOff, ShieldAlert, ShieldQuestion, Wallet, Gem, Rocket,
+    53→  Award, BarChart3, Share2, MessageSquare, CircleDot,
+    54→} from 'lucide-react';
+    55→
+    56→// ═══════════════════════════════════════════════════════════════
+    57→// CONSTANTS
+    58→// ═══════════════════════════════════════════════════════════════
+    59→
+    60→const RIZZ_STYLES = [
+    61→  { value: 'romantic', label: 'Romantic', icon: '💖' },
+    62→  { value: 'funny', label: 'Funny', icon: '😂' },
+    63→  { value: 'bold', label: 'Bold', icon: '🔥' },
+    64→  { value: 'nerdy', label: 'Nerdy', icon: '🤓' },
+    65→  { value: 'sweet', label: 'Sweet', icon: '🍯' },
+    66→  { value: 'flirty', label: 'Flirty', icon: '😘' },
+    67→];
+    68→
+    69→const CANNED_SHOUTS = [
+    70→  { value: 'looking-now', label: 'Looking right now', emoji: '👀' },
+    71→  { value: 'bored', label: 'Bored', emoji: '😴' },
+    72→  { value: 'wanna-chat', label: 'Wanna chat?', emoji: '💬' },
+    73→  { value: 'new-in-town', label: 'New in town', emoji: '🏙️' },
+    74→  { value: 'party-tonight', label: 'Party tonight', emoji: '🎉' },
+    75→  { value: 'netflix-chill', label: 'Netflix & Chill', emoji: '🎬' },
+    76→  { value: 'gym-buddy', label: 'Gym buddy', emoji: '💪' },
+    77→  { value: 'travel-companion', label: 'Travel companion', emoji: '✈️' },
+    78→  { value: 'coffee-date', label: 'Coffee date', emoji: '☕' },
+    79→  { value: 'video-call', label: 'Video call', emoji: '📹' },
+    80→];
+    81→
+    82→const FAQ_DATA = [
+    83→  { q: 'What is NEXUS?', a: 'NEXUS is a premium dating and social platform that connects people through smart matching, real-time chat, events, and community features. Whether you\'re looking for romance, friendship, or networking, NEXUS has you covered.' },
+    84→  { q: 'How do I verify my profile?', a: 'Go to More → Verified to submit verification. We offer age verification, photo verification, ID verification, face matching, and social media verification. Verified users get a blue badge and more visibility.' },
+    85→  { q: 'What is INFER AI Analysis?', a: 'INFER is our AI-powered profile analysis tool that provides deep insights into compatibility, icebreakers, conversation starters, red flags, green flags, date ideas, and personality analysis for any user profile.' },
+    86→  { q: 'How do boosts work?', a: 'Boosts temporarily increase your profile visibility. Standard boost lasts 30 min, Super boost lasts 1 hour, Spotlight puts you at the top of discover for 2 hours, and Mega boost lasts 24 hours with maximum visibility.' },
+    87→  { q: 'Can I hide my location?', a: 'Yes! Go to More → GEO Settings to choose from Auto GPS, Manual City, Fake Location, or Hide Location modes. You can also set a custom geo name that displays instead of your real location.' },
+    88→  { q: 'How do I create a group chat?', a: 'Go to More → Groups and tap "Create Group". You can set it as public or private, add a description, tags, and invite members. Group chats support up to 50 members.' },
+    89→  { q: 'What are fansites?', a: 'Fansites are personal creator pages where users can share content, links, and products. Creators can earn through subscriptions and product sales on their fansite.' },
+    90→  { q: 'How do I report abuse?', a: 'Go to More → Abuse & Report. You can report users, messages, or content. We take all reports seriously and investigate promptly. You can also block users directly from their profile.' },
+    91→  { q: 'What premium features are available?', a: 'Premium includes unlimited likes, see who viewed you, advanced filters, INFER AI analysis, boost discounts, priority support, and more. Check More → Advantages for full comparison.' },
+    92→  { q: 'How do I delete my account?', a: 'Go to More → Account and scroll to the bottom to find "Delete Account". This action is permanent and cannot be undone. All your data will be permanently removed.' },
+    93→];
+    94→
+    95→const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: string; icon: any; badge?: number }[]> = {
+    96→  Social: [
+    97→    { id: 'events', label: 'Events', description: 'Find and create events', icon: Calendar },
+    98→    { id: 'viewed', label: 'Viewed Me', description: 'Who checked your profile', icon: Eye },
+    99→    { id: 'shouts', label: 'Shouts', description: 'Community feed', icon: Megaphone },
+   100→    { id: 'groups', label: 'Groups', description: 'Group chats & communities', icon: Users },
+   101→    { id: 'blogs', label: 'Blogs', description: 'Articles & stories', icon: FileText },
+   102→  ],
+   103→  Content: [
+   104→    { id: 'fansites', label: 'Fansites', description: 'Creator pages', icon: Star },
+   105→    { id: 'videos', label: 'Videos', description: 'Video content', icon: Video },
+   106→    { id: 'albums', label: 'Albums', description: 'Photo albums', icon: ImageIcon },
+   107→    { id: 'banners', label: 'Banners', description: 'Promotional banners', icon: Layers },
+   108→    { id: 'sites', label: 'Sites', description: 'Connected links', icon: Link2 },
+   109→  ],
+   110→  Profile: [
+   111→    { id: 'profile', label: 'My Profile', description: 'View & edit profile', icon: User },
+   112→    { id: 'favorites', label: 'Favorites', description: 'Saved profiles', icon: Bookmark },
+   113→    { id: 'notes', label: 'Notes', description: 'Private notes on users', icon: StickyNote },
+   114→    { id: 'footprints', label: 'Footprints', description: 'Visit history', icon: FootprintsIcon },
+   115→    { id: 'infer', label: 'INFER AI', description: 'AI profile analysis', icon: Brain, badge: 1 },
+   116→  ],
+   117→  Premium: [
+   118→    { id: 'membership', label: 'Membership', description: 'Plans & pricing', icon: Crown },
+   119→    { id: 'boosts', label: 'Boosts', description: 'Increase visibility', icon: Zap },
+   120→    { id: 'verified', label: 'Verified', description: 'Get verified badge', icon: ShieldCheck },
+   121→    { id: 'professional', label: 'Professional', description: 'Pro creator status', icon: Briefcase },
+   122→    { id: 'advantages', label: 'Advantages', description: 'Premium features', icon: Gem },
+   123→  ],
+   124→  Settings: [
+   125→    { id: 'account', label: 'Account', description: 'Email, password, username', icon: Lock },
+   126→    { id: 'preferences', label: 'Preferences', description: 'All app settings', icon: Settings },
+   127→    { id: 'geo-settings', label: 'GEO Settings', description: 'Location & privacy', icon: MapPin },
+   128→  ],
+   129→  Info: [
+   130→    { id: 'legal', label: 'Legal', description: 'Terms & policies', icon: Scale },
+   131→    { id: 'faqs', label: 'FAQs', description: 'Help & answers', icon: HelpCircle },
+   132→    { id: 'abuse', label: 'Abuse', description: 'Report & block', icon: Flag },
+   133→    { id: 'affiliation', label: 'Affiliation', description: 'Referral program', icon: Gift },
+   134→  ],
+   135→};
+   136→
+   137→const SUBSCRIPTION_TIERS = [
+   138→  { tier: 'free', label: 'Free', price: 0, color: 'from-gray-500 to-gray-600', features: ['5 likes/day', 'Basic filters', 'Limited chat', 'View 10 profiles/day', 'Standard search'] },
+   139→  { tier: 'premium', label: 'Premium', price: 9.99, color: 'from-purple-500 to-pink-500', features: ['Unlimited likes', 'Advanced filters', 'Unlimited chat', 'See who viewed you', 'Boost discounts', 'INFER AI Basic', 'Priority support'], popular: true },
+   140→  { tier: 'vip', label: 'VIP', price: 24.99, color: 'from-yellow-500 to-amber-500', features: ['Everything in Premium', 'Spotlight boosts', 'INFER AI Pro', 'Anonymous browsing', 'Travel mode', 'Video calls', 'Personal manager', 'Verified badge'] },
+   141→  { tier: 'creator', label: 'Creator', price: 0, color: 'from-emerald-500 to-teal-500', features: ['Fansite page', 'Content monetization', 'Product sales', 'Subscriber analytics', 'Custom branding', 'Priority listing', 'Creator badge'] },
+   142→];
+   143→
+   144→const BOOST_TYPES = [
+   145→  { type: 'standard', label: 'Standard', duration: 30, price: 2.99, desc: '30 min visibility boost', color: 'from-blue-500 to-cyan-500' },
+   146→  { type: 'super', label: 'Super', duration: 60, price: 5.99, desc: '1 hour enhanced boost', color: 'from-purple-500 to-pink-500' },
+   147→  { type: 'spotlight', label: 'Spotlight', duration: 120, price: 9.99, desc: '2 hours top placement', color: 'from-yellow-500 to-amber-500' },
+   148→  { type: 'mega', label: 'Mega', duration: 1440, price: 19.99, desc: '24 hours max visibility', color: 'from-red-500 to-orange-500' },
+   149→];
+   150→
+   151→const INFER_CATEGORIES: { id: InferCategory; label: string; icon: any; color: string; desc: string }[] = [
+   152→  { id: 'compatibility', label: 'Compatibility', icon: Heart, color: 'text-pink-400', desc: 'Overall match score' },
+   153→  { id: 'icebreakers', label: 'Icebreakers', icon: Lightbulb, color: 'text-yellow-400', desc: 'Perfect opening lines' },
+   154→  { id: 'conversation-starters', label: 'Starters', icon: MessageSquare, color: 'text-blue-400', desc: 'Keep the chat going' },
+   155→  { id: 'profile-tips', label: 'Profile Tips', icon: Star, color: 'text-purple-400', desc: 'Optimize your profile' },
+   156→  { id: 'red-flags', label: 'Red Flags', icon: AlertCircle, color: 'text-red-400', desc: 'Warning signs to watch' },
+   157→  { id: 'green-flags', label: 'Green Flags', icon: CheckCircle2, color: 'text-green-400', desc: 'Positive indicators' },
+   158→  { id: 'date-ideas', label: 'Date Ideas', icon: PartyPopper, color: 'text-orange-400', desc: 'Creative date suggestions' },
+   159→  { id: 'personality-analysis', label: 'Personality', icon: Brain, color: 'text-cyan-400', desc: 'Deep personality insights' },
+   160→];
+   161→
+   162→const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face';
+   163→const DEFAULT_COVER = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&h=400&fit=crop';
+   164→const CURRENT_USER_ID = 'test-user-1';
+   165→
+   166→// Dynamically import Leaflet map (no SSR - requires window)
+   167→const MapLeaflet = dynamic(() => import('@/components/MapViewComponent'), { ssr: false, loading: () => <div className="w-full h-full bg-secondary/30 animate-pulse" /> });
+   168→
+   169→// ═══════════════════════════════════════════════════════════════
+   170→// HELPER COMPONENTS & FUNCTIONS
+   171→// ═══════════════════════════════════════════════════════════════
+   172→
+   173→function FootprintsIcon(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 16v-2.38C4 11.5 2.97 9.5 3 8c.07-2.48 1.52-4 4-4 2 0 3 1 4 3 1-2 2-3 4-3 2.48 0 3.93 1.52 4 4 .03 1.5-1 3.5-1 5.62V16"/><path d="M4 16c0 2 1.5 4 3 4 1.5 0 2-1 3-2s2.5-2 4-2 3 1 4 2 1.5 2 3 2c1.5 0 3-2 3-4"/></svg>; }
+   174→
+   175→function timeAgo(dateStr: string): string {
+   176→  try { return formatDistanceToNow(new Date(dateStr), { addSuffix: true }); } catch { return ''; }
+   177→}
+   178→
+   179→function fmtDate(dateStr: string): string {
+   180→  try { return format(new Date(dateStr), 'MMM d, yyyy h:mm a'); } catch { return dateStr; }
+   181→}
+   182→
+   183→function fmtDateShort(dateStr: string): string {
+   184→  try { return format(new Date(dateStr), 'MMM d'); } catch { return dateStr; }
+   185→}
+   186→
+   187→function getAvatar(user: { avatar?: string | null } | null | undefined): string {
+   188→  return user?.avatar || DEFAULT_AVATAR;
+   189→}
+   190→
+   191→function truncate(str: string | null | undefined, len: number): string {
+   192→  if (!str) return '';
+   193→  return str.length > len ? str.slice(0, len) + '...' : str;
+   194→}
+   195→
+   196→function getLastSeenText(user: User): string {
+   197→  if (user.online && user.showOnline) return 'Online now';
+   198→  if (user.lastSeen) return `Last seen ${timeAgo(user.lastSeen)}`;
+   199→  return 'Offline';
+   200→}
+   201→
+   202→function SectionHeader({ icon: Icon, label, count, action }: { icon: any; label: string; count?: number; action?: React.ReactNode }) {
+   203→  return (
+   204→    <div className="flex items-center justify-between mb-3">
+   205→      <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2">
+   206→        <Icon className="w-3.5 h-3.5" /> {label} {count !== undefined && <span className="text-foreground">({count})</span>}
+   207→      </h3>
+   208→      {action}
+   209→    </div>
+   210→  );
+   211→}
+   212→
+   213→function UserRow({ user, sub, actions, onClick }: { user: User; sub?: React.ReactNode; actions?: React.ReactNode; onClick?: () => void }) {
+   214→  return (
+   215→    <div className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+   216→      <div className="relative shrink-0">
+   217→        <button onClick={onClick} className="block">
+   218→          <Avatar className="h-11 w-11">
+   219→            <AvatarImage src={getAvatar(user)} />
+   220→            <AvatarFallback className="text-xs">{user.displayName?.[0] || '?'}</AvatarFallback>
+   221→          </Avatar>
+   222→        </button>
+   223→        {user.online && user.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+   224→      </div>
+   225→      <div className="flex-1 min-w-0">
+   226→        <button onClick={onClick} className="text-[13px] font-semibold hover:text-primary transition-colors truncate block">
+   227→          {user.displayName}{user.age != null && user.showAge !== false ? `, ${user.age}` : ''}
+   228→        </button>
+   229→        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+   230→          {user.location && <span className="flex items-center gap-0.5 truncate"><MapPin className="w-3 h-3 shrink-0" />{truncate(user.location, 20)}</span>}
+   231→          {sub}
+   232→        </div>
+   233→      </div>
+   234→      <div className="shrink-0 flex items-center gap-1">{actions}</div>
+   235→    </div>
+   236→  );
+   237→}
+   238→
+   239→function EmptyState({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) {
+   240→  return (
+   241→    <div className="flex flex-col items-center justify-center py-16 px-4">
+   242→      <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-4">
+   243→        <Icon className="w-7 h-7 text-muted-foreground" />
+   244→      </div>
+   245→      <p className="text-sm font-medium mb-1">{title}</p>
+   246→      <p className="text-xs text-muted-foreground text-center">{desc}</p>
+   247→    </div>
+   248→  );
+   249→}
+   250→
+   251→function BackHeader({ title, onBack, action }: { title: string; onBack: () => void; action?: React.ReactNode }) {
+   252→  return (
+   253→    <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
+   254→      <div className="flex items-center gap-3">
+   255→        <button onClick={onBack} className="p-1 -ml-1 hover:bg-secondary rounded-lg transition-colors"><ArrowLeft className="w-5 h-5" /></button>
+   256→        <h2 className="text-base font-semibold">{title}</h2>
+   257→      </div>
+   258→      {action}
+   259→    </div>
+   260→  );
+   261→}
+   262→
+   263→function LoadingGrid({ cols = 2, rows = 3 }: { cols?: number; rows?: number }) {
+   264→  return (
+   265→    <div className={`grid grid-cols-${cols} gap-3 p-4`}>
+   266→      {Array.from({ length: cols * rows }).map((_, i) => (
+   267→        <div key={i} className="space-y-2">
+   268→          <Skeleton className="aspect-[3/4] w-full rounded-xl" />
+   269→          <Skeleton className="h-4 w-3/4" />
+   270→          <Skeleton className="h-3 w-1/2" />
+   271→        </div>
+   272→      ))}
+   273→    </div>
+   274→  );
+   275→}
+   276→
+   277→// ═══════════════════════════════════════════════════════════════
+   278→// MAIN COMPONENT
+   279→// ═══════════════════════════════════════════════════════════════
+   280→
+   281→export default function NexusApp() {
+   282→  const store = useAppStore();
+   283→  const {
+   284→    currentUser, setCurrentUser, activeTab, setActiveTab,
+   285→    selectedUserId, setSelectedUserId, selectedGroupId, setSelectedGroupId,
+   286→    showProfileDrawer, setShowProfileDrawer, showSettings, setShowSettings,
+   287→    showRizzModal, setShowRizzModal, rizzTargetBio, setRizzTargetBio,
+   288→    conversations, setConversations, activeConversation, setActiveConversation,
+   289→    messages, setMessages, addMessage, refreshDiscover, triggerRefreshDiscover,
+   290→    discoverView, setDiscoverView, chatRequests, setChatRequests, pendingRequestCount, setPendingRequestCount,
+   291→    shouts, setShouts, addShout, favorites, setFavorites, notes, setNotes,
+   292→    blogs, setBlogs, videos, setVideos, banners, setBanners,
+   293→    userLat, setUserLat, userLng, setUserLng,
+   294→    geoMode, setGeoMode, geoName, setGeoName,
+   295→    agendaView, setAgendaView, agendaFilter, setAgendaFilter,
+   296→    mapFilter, setMapFilter, mapHidden, setMapHidden,
+   297→    inferResults, setInferResults, inferLoading, setInferLoading,
+   298→  } = store;
+   299→
+   300→  // ── Auth state ──
+   301→  const [authed, setAuthed] = useState(false);
+   302→  const [authLoading, setAuthLoading] = useState(true);
+   303→
+   304→  // ── Discover state ──
+   305→  const [discoverUsers, setDiscoverUsers] = useState<(User & { distance?: number | null })[]>([]);
+   306→  const [discoverLoading, setDiscoverLoading] = useState(true);
+   307→  const [onlineOnly, setOnlineOnly] = useState(false);
+   308→  const [ageRange, setAgeRange] = useState([18, 60]);
+   309→  const [lookingFor, setLookingFor] = useState('all');
+   310→  const [ethnicityFilter, setEthnicityFilter] = useState('all');
+   311→  const [bodyTypeFilter, setBodyTypeFilter] = useState('all');
+   312→  const [cascadeIndex, setCascadeIndex] = useState(0);
+   313→
+   314→  // ── Chat state ──
+   315→  const [chatLoading, setChatLoading] = useState(false);
+   316→  const [msgInput, setMsgInput] = useState('');
+   317→  const [groups, setGroups] = useState<GroupChat[]>([]);
+   318→  const [groupMessages, setGroupMessages] = useState<Message[]>([]);
+   319→  const [activeGroup, setActiveGroup] = useState<GroupChat | null>(null);
+   320→  const [chatMobileView, setChatMobileView] = useState<'list' | 'chat'>('list');
+   321→  const socketRef = useRef<Socket | null>(null);
+   322→  const msgEndRef = useRef<HTMLDivElement>(null);
+   323→
+   324→  // ── Likes state ──
+   325→  const [likesTab, setLikesTab] = useState<'received' | 'sent'>('received');
+   326→  const [receivedLikes, setReceivedLikes] = useState<Like[]>([]);
+   327→  const [sentLikes, setSentLikes] = useState<Like[]>([]);
+   328→  const [likesLoading, setLikesLoading] = useState(true);
+   329→
+   330→  // ── Profile views state ──
+   331→  const [profileViews, setProfileViews] = useState<ProfileViewType[]>([]);
+   332→  const [viewsLoading, setViewsLoading] = useState(false);
+   333→
+   334→  // ── Fansites state ──
+   335→  const [fansites, setFansites] = useState<Fansite[]>([]);
+   336→  const [fansiteLoading, setFansiteLoading] = useState(true);
+   337→  const [selectedFansite, setSelectedFansite] = useState<Fansite | null>(null);
+   338→  const [showFansiteSheet, setShowFansiteSheet] = useState(false);
+   339→
+   340→  // ── Events state ──
+   341→  const [events, setEvents] = useState<AppEvent[]>([]);
+   342→  const [eventsLoading, setEventsLoading] = useState(true);
+   343→  const [showCreateEvent, setShowCreateEvent] = useState(false);
+   344→  const [eventForm, setEventForm] = useState({ title: '', description: '', location: '', startDate: '', imageUrl: '' });
+   345→  const [userRsvps, setUserRsvps] = useState<Record<string, string>>({});
+   346→
+   347→  // ── Profile state ──
+   348→  const [profileUser, setProfileUser] = useState<User | null>(null);
+   349→  const [profileLoading, setProfileLoading] = useState(false);
+   350→  const [profilePhotos, setProfilePhotos] = useState<Photo[]>([]);
+   351→  const [profileAlbums, setProfileAlbums] = useState<Album[]>([]);
+   352→  const [profileGalleryIndex, setProfileGalleryIndex] = useState(0);
+   353→  const [editingProfile, setEditingProfile] = useState(false);
+   354→  const [editForm, setEditForm] = useState({ displayName: '', bio: '', lookingFor: '', aboutMe: '', height: '', weight: '', ethnicity: '', bodyType: '', relationshipStatus: '', position: '', pronouns: '', location: '' });
+   355→  const [mySubscriptions, setMySubscriptions] = useState<any[]>([]);
+   356→  const [myBoosts, setMyBoosts] = useState<any[]>([]);
+   357→  const [blockedUsers, setBlockedUsers] = useState<any[]>([]);
+   358→
+   359→  // ── Settings state ──
+   360→  const [settingsPrivacy, setSettingsPrivacy] = useState({ showOnline: true, showDistance: true, showAge: true });
+   361→  const [settingsNotifs, setSettingsNotifs] = useState({ push: true, chat: true, likes: true, views: true });
+   362→
+   363→  // ── Rizz state ──
+   364→  const [rizzStyle, setRizzStyle] = useState('sweet');
+   365→  const [rizzLoading, setRizzLoading] = useState(false);
+   366→  const [rizzResult, setRizzResult] = useState<any>(null);
+   367→
+   368→  // ── Misc state ──
+   369→  const [showBlockAlert, setShowBlockAlert] = useState(false);
+   370→  const [totalUnread, setTotalUnread] = useState(0);
+   371→
+   372→  // ── Shouts state ──
+   373→  const [shoutInput, setShoutInput] = useState('');
+   374→  const [shoutLoading, setShoutLoading] = useState(true);
+   375→
+   376→  // ── Map state ──
+   377→  const [mapUsers, setMapUsers] = useState<(User & { distance?: number })[]>([]);
+   378→  const [mapLoading, setMapLoading] = useState(false);
+   379→  const [mapRadius, setMapRadius] = useState(50);
+   380→
+   381→  // ── Videos / Blogs / Notes / Favorites loading ──
+   382→  const [videosLoading, setVideosLoading] = useState(true);
+   383→  const [blogsLoading, setBlogsLoading] = useState(true);
+   384→  const [noteContent, setNoteContent] = useState('');
+   385→  const [noteTargetId, setNoteTargetId] = useState<string | null>(null);
+   386→  const [showNoteDialog, setShowNoteDialog] = useState(false);
+   387→  const [favoritesLoading, setFavoritesLoading] = useState(true);
+   388→  const [footprints, setFootprints] = useState<any[]>([]);
+   389→  const [footprintsLoading, setFootprintsLoading] = useState(true);
+   390→  const [allBoosts, setAllBoosts] = useState<any[]>([]);
+   391→  const [boostsLoading, setBoostsLoading] = useState(true);
+   392→
+   393→  // ── Verification / Sessions ──
+   394→  const [myVerification, setMyVerification] = useState<Verification | null>(null);
+   395→  const [mySessions, setMySessions] = useState<UserSession[]>([]);
+   396→
+   397→  // ── Account settings ──
+   398→  const [accountForm, setAccountForm] = useState({ email: '', password: '', username: '', displayName: '' });
+   399→  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+   400→
+   401→  // ── Preferences ──
+   402→  const [prefs, setPrefs] = useState({
+   403→    geoMode: 'auto' as string, geoName: '', displayUnits: 'metric' as string, lang: 'en',
+   404→    ageMin: 18, ageMax: 60, showOnline: true, showDistance: true, showAge: true,
+   405→    showActivity: true, hidePicsOffline: false, soundOff: false,
+   406→    notifPushOff: false, notifEmailOff: false, notifTelegramOff: false,
+   407→    mailingInternal: true, mailingPartner: true, profileOff: false,
+   408→    privateAuto: false, noPros: false, noPub: false,
+   409→    profileTags: '', profileTagCategorys: '', profileMeetNowTags: '',
+   410→  });
+   411→
+   412→  // ── Albums ──
+   413→  const [albums, setAlbums] = useState<Album[]>([]);
+   414→  const [albumsLoading, setAlbumsLoading] = useState(true);
+   415→  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+   416→
+   417→  // ── Infer state ──
+   418→  const [inferTargetUser, setInferTargetUser] = useState<User | null>(null);
+   419→  const [inferCategory, setInferCategory] = useState<InferCategory>('compatibility');
+   420→  const [inferResultsMap, setInferResultsMap] = useState<Record<string, any>>({});
+   421→
+   422→  // ── Blog detail ──
+   423→  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
+   424→
+   425→  // ── Groups ──
+   426→  const [groupSearch, setGroupSearch] = useState('');
+   427→  const [showCreateGroup, setShowCreateGroup] = useState(false);
+   428→  const [groupForm, setGroupForm] = useState({ name: '', description: '', isPublic: true });
+   429→
+   430→  // ── Abuse ──
+   431→  const [abuseForm, setAbuseForm] = useState({ category: 'harassment', description: '', userId: '' });
+   432→
+   433→  // ── Video search ──
+   434→  const [videoSearch, setVideoSearch] = useState('');
+   435→
+   436→  // ── Blog search ──
+   437→  const [blogSearch, setBlogSearch] = useState('');
+   438→
+   439→  // ── Shout type ──
+   440→  const [shoutType, setShoutType] = useState<'text' | 'image' | 'video'>('text');
+   441→
+   442→  // ═══════════════════════════════════════════════════════════════
+   443→  // EFFECTS — Data Fetching
+   444→  // ═══════════════════════════════════════════════════════════════
+   445→
+   446→  // Auth
+   447→  useEffect(() => {
+   448→    fetch('/api/auth')
+   449→      .then(r => r.ok ? r.json() : Promise.reject())
+   450→      .then(res => { setCurrentUser(res.data); setAuthed(true); })
+   451→      .catch(() => setAuthLoading(false))
+   452→      .finally(() => setAuthLoading(false));
+   453→  }, []);
+   454→
+   455→  // Socket.io
+   456→  useEffect(() => {
+   457→    if (!authed || !currentUser) return;
+   458→    const socket = socketIO('/?XTransformPort=3001', { transports: ['websocket'], autoConnect: false });
+   459→    socket.connect();
+   460→    socket.on('connect', () => socket.emit('join', { userId: currentUser.id }));
+   461→    socket.on('new-message', (msg: Message) => addMessage(msg));
+   462→    socketRef.current = socket;
+   463→    return () => { socket.disconnect(); socketRef.current = null; };
+   464→  }, [authed, currentUser?.id]);
+   465→
+   466→  // Discover
+   467→  useEffect(() => {
+   468→    if (!authed) return;
+   469→    setDiscoverLoading(true);
+   470→    fetch('/api/discover')
+   471→      .then(r => r.json())
+   472→      .then(res => { setDiscoverUsers(res.data || []); setCascadeIndex(0); })
+   473→      .catch(() => {}).finally(() => setDiscoverLoading(false));
+   474→  }, [authed, refreshDiscover]);
+   475→
+   476→  // Conversations + Groups + Chat Requests
+   477→  useEffect(() => {
+   478→    if (!authed || (activeTab !== 'chat' && activeTab !== 'more')) return;
+   479→    setChatLoading(true);
+   480→    Promise.all([
+   481→      fetch('/api/messages/conversations').then(r => r.json()),
+   482→      fetch('/api/groups').then(r => r.json()),
+   483→      fetch('/api/chat-requests').then(r => r.json()).catch(() => ({ data: [] })),
+   484→    ]).then(([convRes, groupRes, reqRes]) => {
+   485→      const convos = convRes.data || [];
+   486→      setConversations(convos);
+   487→      setGroups(groupRes.data || []);
+   488→      setTotalUnread(convos.reduce((sum: number, c: any) => sum + (c.unreadCount || 0), 0));
+   489→      const reqs = reqRes.data || [];
+   490→      const pending = reqs.filter((r: ChatRequest) => r.status === 'pending');
+   491→      setChatRequests(pending);
+   492→      setPendingRequestCount(pending.length);
+   493→    }).catch(() => {}).finally(() => setChatLoading(false));
+   494→  }, [authed, activeTab]);
+   495→
+   496→  // Likes
+   497→  useEffect(() => {
+   498→    if (!authed || activeTab !== 'likes') return;
+   499→    setLikesLoading(true);
+   500→    Promise.all([
+   501→      fetch('/api/likes?type=received').then(r => r.json()),
+   502→      fetch('/api/likes?type=sent').then(r => r.json()),
+   503→    ]).then(([recRes, sentRes]) => {
+   504→      setReceivedLikes(recRes.data || []);
+   505→      setSentLikes(sentRes.data || []);
+   506→    }).catch(() => {}).finally(() => setLikesLoading(false));
+   507→  }, [authed, activeTab]);
+   508→
+   509→  // Profile Views
+   510→  useEffect(() => {
+   511→    if (!authed || activeTab !== 'viewed') return;
+   512→    setViewsLoading(true);
+   513→    fetch('/api/profile-views').then(r => r.json()).then(res => setProfileViews(res.data || [])).catch(() => {}).finally(() => setViewsLoading(false));
+   514→  }, [authed, activeTab]);
+   515→
+   516→  // Fansites
+   517→  useEffect(() => {
+   518→    if (!authed || activeTab !== 'fansites') return;
+   519→    setFansiteLoading(true);
+   520→    fetch('/api/fansites').then(r => r.json()).then(res => setFansites(res.data || [])).catch(() => {}).finally(() => setFansiteLoading(false));
+   521→  }, [authed, activeTab]);
+   522→
+   523→  // Events
+   524→  useEffect(() => {
+   525→    if (!authed || activeTab !== 'events') return;
+   526→    setEventsLoading(true);
+   527→    fetch('/api/events').then(r => r.json()).then(res => setEvents(res.data || [])).catch(() => {}).finally(() => setEventsLoading(false));
+   528→  }, [authed, activeTab]);
+   529→
+   530→  // Shouts
+
+[showing lines 31-530 of 2811; use offset=531 with limit to continue reading]

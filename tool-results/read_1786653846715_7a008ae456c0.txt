@@ -1,0 +1,352 @@
+   880→  // ═══════════════════════════════════════════════════════════════
+   881→  return (
+   882→    <TooltipProvider>
+   883→    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+   884→
+   885→      {/* ═══ HEADER ═══ */}
+   886→      <header className="h-14 flex items-center justify-between px-4 bg-card/80 backdrop-blur-lg border-b border-border shrink-0 z-50">
+   887→        <div className="flex items-center gap-3">
+   888→          {isMainTab(activeTab) ? (
+   889→            <span className="text-lg font-bold gradient-text tracking-wider">NEXUS</span>
+   890→          ) : (
+   891→            <button onClick={() => setActiveTab('more')} className="p-1 hover:bg-secondary rounded-lg transition-colors">
+   892→              <ArrowLeft className="w-4 h-4" />
+   893→            </button>
+   894→          )}
+   895→          {activeTab === 'chat' && activeConversation && (
+   896→            <button onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }} className="md:hidden p-1 hover:bg-secondary rounded-lg transition-colors">
+   897→              <ChevronLeft className="w-5 h-5" />
+   898→            </button>
+   899→          )}
+   900→          {!isMainTab(activeTab) && <span className="text-sm font-medium">{getPageTitle()}</span>}
+   901→        </div>
+   902→        <div className="flex items-center gap-1">
+   903→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground"><Search className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Search</TooltipContent></Tooltip>
+   904→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}><Settings className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Settings</TooltipContent></Tooltip>
+   905→          <button onClick={() => currentUser && openProfile(currentUser.id)} className="ml-1">
+   906→            <Avatar className="h-8 w-8 border-2 border-primary/50">
+   907→              <AvatarImage src={getAvatar(currentUser)} alt={currentUser?.displayName || ''} />
+   908→              <AvatarFallback className="text-xs">{currentUser?.displayName?.[0] || 'U'}</AvatarFallback>
+   909→            </Avatar>
+   910→          </button>
+   911→        </div>
+   912→      </header>
+   913→
+   914→      {/* ═══ MAIN CONTENT ═══ */}
+   915→      <main className="flex-1 overflow-hidden relative">
+   916→        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : <MoreView />}
+   917→      </main>
+   918→
+   919→      {/* ═══ BOTTOM NAV ═══ */}
+   920→      <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-0.5">
+   921→        {MAIN_TABS.map(({ tab, icon: Icon, label, badge }) => (
+   922→          <button key={tab} onClick={() => { setActiveTab(tab); setShowSettings(false); if (tab === 'chat') { setChatMobileView('list'); setActiveConversation(null); setActiveGroup(null); } }}
+   923→            className={`h-12 flex flex-col items-center justify-center gap-0.5 relative transition-colors px-1 ${activeTab === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+   924→            <Icon className="w-4 h-4" />
+   925→            <span className="text-[9px] leading-none">{label}</span>
+   926→            {activeTab === tab && <span className="absolute bottom-0 w-4 h-0.5 bg-primary rounded-full" />}
+   927→            {badge > 0 && <span className="absolute -top-0.5 right-1/2 translate-x-4 min-w-[14px] h-3.5 flex items-center justify-center text-[8px] font-bold bg-primary text-primary-foreground rounded-full px-0.5">{badge > 99 ? '99+' : badge}</span>}
+   928→          </button>
+   929→        ))}
+   930→      </nav>
+   931→
+   932→      {/* ═══ PROFILE DRAWER ═══ */}
+   933→      <Sheet open={showProfileDrawer} onOpenChange={(open) => { if (!open) closeProfile(); }}>
+   934→        <SheetContent side="right" className="w-full sm:max-w-md bg-card border-border p-0 overflow-y-auto">
+   935→          {profileLoading ? <div className="p-6 space-y-4"><Skeleton className="h-64 w-full rounded-xl" /><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-32" /></div>
+   936→            : profileUser ? <ProfileDrawerContent /> : null}
+   937→        </SheetContent>
+   938→      </Sheet>
+   939→
+   940→      {/* ═══ FANSITE DETAIL SHEET ═══ */}
+   941→      <Sheet open={showFansiteSheet} onOpenChange={setShowFansiteSheet}>
+   942→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   943→          {selectedFansite && <FansiteDetail />}
+   944→        </SheetContent>
+   945→      </Sheet>
+   946→
+   947→      {/* ═══ ALBUM DETAIL SHEET ═══ */}
+   948→      <Sheet open={!!selectedAlbum} onOpenChange={(open) => { if (!open) setSelectedAlbum(null); }}>
+   949→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   950→          {selectedAlbum && <AlbumDetail />}
+   951→        </SheetContent>
+   952→      </Sheet>
+   953→
+   954→      {/* ═══ BLOG DETAIL SHEET ═══ */}
+   955→      <Sheet open={!!selectedBlog} onOpenChange={(open) => { if (!open) setSelectedBlog(null); }}>
+   956→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   957→          {selectedBlog && <BlogDetail />}
+   958→        </SheetContent>
+   959→      </Sheet>
+   960→
+   961→      {/* ═══ RIZZ MODAL ═══ */}
+   962→      <Dialog open={showRizzModal} onOpenChange={setShowRizzModal}>
+   963→        <DialogContent className="bg-card border-border sm:max-w-md">
+   964→          <DialogHeader><DialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI Rizz Generator</DialogTitle></DialogHeader>
+   965→          <div className="space-y-4 py-2">
+   966→            <div className="flex flex-wrap gap-2">
+   967→              {RIZZ_STYLES.map(s => (
+   968→                <button key={s.value} onClick={() => setRizzStyle(s.value)}
+   969→                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${rizzStyle === s.value ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-secondary-foreground border-border hover:border-primary/50'}`}>
+   970→                  {s.icon} {s.label}
+   971→                </button>
+   972→              ))}
+   973→            </div>
+   974→            <Button onClick={handleRizz} disabled={rizzLoading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+   975→              {rizzLoading ? 'Generating...' : 'Generate Pickup Line'}
+   976→            </Button>
+   977→            {rizzResult && (
+   978→              <div className="p-4 rounded-xl bg-secondary border border-border space-y-3">
+   979→                <p className="text-sm leading-relaxed">{rizzResult.line}</p>
+   980→                {rizzResult.context && <p className="text-[11px] text-muted-foreground">{rizzResult.context}</p>}
+   981→                <div className="flex gap-2">
+   982→                  <Button variant="outline" size="sm" onClick={copyRizz} className="text-xs border-border"><Copy className="w-3 h-3 mr-1" /> Copy</Button>
+   983→                  <Button size="sm" onClick={handleSendRizz} className="text-xs bg-primary text-primary-foreground"><Send className="w-3 h-3 mr-1" /> Send</Button>
+   984→                </div>
+   985→                {rizzResult.alternatives?.length > 0 && (
+   986→                  <div className="space-y-1 pt-2 border-t border-border">
+   987→                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Alternatives</p>
+   988→                    {rizzResult.alternatives.map((alt: string, i: number) => (
+   989→                      <p key={i} className="text-xs text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => setRizzResult({ ...rizzResult, line: alt })}>{alt}</p>
+   990→                    ))}
+   991→                  </div>
+   992→                )}
+   993→              </div>
+   994→            )}
+   995→          </div>
+   996→        </DialogContent>
+   997→      </Dialog>
+   998→
+   999→      {/* ═══ NOTE DIALOG ═══ */}
+  1000→      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
+  1001→        <DialogContent className="bg-card border-border sm:max-w-sm">
+  1002→          <DialogHeader><DialogTitle className="flex items-center gap-2"><StickyNote className="w-5 h-5 text-primary" /> Add Note</DialogTitle></DialogHeader>
+  1003→          <div className="space-y-3 py-2">
+  1004→            <Textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Write a private note..." className="bg-secondary border-border text-sm" rows={3} />
+  1005→            <div className="flex gap-2">
+  1006→              <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveNote} disabled={!noteContent.trim()}>Save</Button>
+  1007→              <Button size="sm" variant="outline" className="border-border" onClick={() => { setShowNoteDialog(false); setNoteContent(''); }}>Cancel</Button>
+  1008→            </div>
+  1009→          </div>
+  1010→        </DialogContent>
+  1011→      </Dialog>
+  1012→
+  1013→      {/* ═══ BLOCK ALERT ═══ */}
+  1014→      <AlertDialog open={showBlockAlert} onOpenChange={setShowBlockAlert}>
+  1015→        <AlertDialogContent className="bg-card border-border">
+  1016→          <AlertDialogHeader>
+  1017→            <AlertDialogTitle>Block this user?</AlertDialogTitle>
+  1018→            <AlertDialogDescription>This user won't be able to see your profile or message you.</AlertDialogDescription>
+  1019→          </AlertDialogHeader>
+  1020→          <AlertDialogFooter>
+  1021→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1022→            <AlertDialogAction onClick={() => profileUser && handleBlock(profileUser.id)} className="bg-destructive text-white">Block</AlertDialogAction>
+  1023→          </AlertDialogFooter>
+  1024→        </AlertDialogContent>
+  1025→      </AlertDialog>
+  1026→
+  1027→      {/* ═══ CREATE EVENT DIALOG ═══ */}
+  1028→      <Dialog open={showCreateEvent} onOpenChange={setShowCreateEvent}>
+  1029→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1030→          <DialogHeader><DialogTitle>Create Event</DialogTitle></DialogHeader>
+  1031→          <div className="space-y-3 py-2">
+  1032→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={eventForm.title} onChange={e => setEventForm(p => ({ ...p, title: e.target.value }))} placeholder="Event name" className="bg-secondary border-border" /></div>
+  1033→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={eventForm.description} onChange={e => setEventForm(p => ({ ...p, description: e.target.value }))} placeholder="What's this about?" className="bg-secondary border-border" rows={3} /></div>
+  1034→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Location</Label><Input value={eventForm.location} onChange={e => setEventForm(p => ({ ...p, location: e.target.value }))} placeholder="Venue" className="bg-secondary border-border" /></div>
+  1035→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date & Time</Label><Input type="datetime-local" value={eventForm.startDate} onChange={e => setEventForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+  1036→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Image URL</Label><Input value={eventForm.imageUrl} onChange={e => setEventForm(p => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." className="bg-secondary border-border" /></div>
+  1037→          </div>
+  1038→          <DialogFooter>
+  1039→            <Button variant="outline" onClick={() => setShowCreateEvent(false)} className="border-border">Cancel</Button>
+  1040→            <Button onClick={handleCreateEvent} className="bg-primary text-primary-foreground" disabled={!eventForm.title || !eventForm.startDate}>Create</Button>
+  1041→          </DialogFooter>
+  1042→        </DialogContent>
+  1043→      </Dialog>
+  1044→
+  1045→      {/* ═══ CREATE GROUP DIALOG ═══ */}
+  1046→      <Dialog open={showCreateGroup} onOpenChange={setShowCreateGroup}>
+  1047→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1048→          <DialogHeader><DialogTitle>Create Group</DialogTitle></DialogHeader>
+  1049→          <div className="space-y-3 py-2">
+  1050→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Group Name</Label><Input value={groupForm.name} onChange={e => setGroupForm(p => ({ ...p, name: e.target.value }))} placeholder="Group name" className="bg-secondary border-border" /></div>
+  1051→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={groupForm.description} onChange={e => setGroupForm(p => ({ ...p, description: e.target.value }))} placeholder="About this group" className="bg-secondary border-border" rows={2} /></div>
+  1052→          </div>
+  1053→          <DialogFooter>
+  1054→            <Button variant="outline" onClick={() => setShowCreateGroup(false)} className="border-border">Cancel</Button>
+  1055→            <Button onClick={handleCreateGroup} className="bg-primary text-primary-foreground" disabled={!groupForm.name.trim()}>Create</Button>
+  1056→          </DialogFooter>
+  1057→        </DialogContent>
+  1058→      </Dialog>
+  1059→
+  1060→      {/* ═══ DELETE ACCOUNT ALERT ═══ */}
+  1061→      <AlertDialog open={showDeleteAccount} onOpenChange={setShowDeleteAccount}>
+  1062→        <AlertDialogContent className="bg-card border-border">
+  1063→          <AlertDialogHeader><AlertDialogTitle>Delete Account?</AlertDialogTitle><AlertDialogDescription>This is permanent and cannot be undone. All your data will be removed.</AlertDialogDescription></AlertDialogHeader>
+  1064→          <AlertDialogFooter>
+  1065→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1066→            <AlertDialogAction className="bg-destructive text-white" onClick={() => { setCurrentUser(null); setAuthed(false); setShowDeleteAccount(false); }}>Delete</AlertDialogAction>
+  1067→          </AlertDialogFooter>
+  1068→        </AlertDialogContent>
+  1069→      </AlertDialog>
+  1070→
+  1071→    </div>
+  1072→    </TooltipProvider>
+  1073→  );
+  1074→
+  1075→  // ═══════════════════════════════════════════════════════════════
+  1076→  // VIEW FUNCTIONS (hoisted — available throughout component)
+  1077→  // ═══════════════════════════════════════════════════════════════
+  1078→
+  1079→  // ─── DISCOVER ────────────────────────────────────────────────
+  1080→  function DiscoverView() {
+  1081→    if (discoverLoading) return <LoadingGrid />;
+  1082→    if (discoverUsers.length === 0) return <EmptyState icon={Compass} title="No profiles found" desc="Check back later for new people nearby" />;
+  1083→    return (
+  1084→      <div className="h-full flex flex-col">
+  1085→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1086→          <button onClick={() => setOnlineOnly(!onlineOnly)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${onlineOnly ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>🟢 Online</button>
+  1087→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{ageRange[0]}–{ageRange[1]}</button></PopoverTrigger>
+  1088→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Age Range</Label><Slider value={ageRange} onValueChange={setAgeRange} min={18} max={80} step={1} className="mt-2" /><div className="flex justify-between text-[11px] text-muted-foreground mt-1"><span>{ageRange[0]}</span><span>{ageRange[1]}</span></div></PopoverContent>
+  1089→          </Popover>
+  1090→          <Select value={lookingFor} onValueChange={setLookingFor}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All</SelectItem><SelectItem value="relationship">Relationship</SelectItem><SelectItem value="casual">Casual</SelectItem><SelectItem value="friends">Friends</SelectItem><SelectItem value="networking">Networking</SelectItem></SelectContent></Select>
+  1091→          <Select value={ethnicityFilter} onValueChange={setEthnicityFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Ethnicity" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Ethnicity</SelectItem><SelectItem value="white">White</SelectItem><SelectItem value="black">Black</SelectItem><SelectItem value="latino">Latino</SelectItem><SelectItem value="asian">Asian</SelectItem><SelectItem value="middle-eastern">Middle Eastern</SelectItem><SelectItem value="indian">Indian</SelectItem><SelectItem value="mixed">Mixed</SelectItem></SelectContent></Select>
+  1092→          <Select value={bodyTypeFilter} onValueChange={setBodyTypeFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Body" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Body Type</SelectItem><SelectItem value="slim">Slim</SelectItem><SelectItem value="average">Average</SelectItem><SelectItem value="athletic">Athletic</SelectItem><SelectItem value="muscular">Muscular</SelectItem><SelectItem value="curvy">Curvy</SelectItem></SelectContent></Select>
+  1093→          <div className="ml-auto flex gap-1 shrink-0">
+  1094→            <button onClick={() => setDiscoverView('grid')} className={`p-1.5 rounded-lg ${discoverView === 'grid' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Grid3X3 className="w-4 h-4" /></button>
+  1095→            <button onClick={() => setDiscoverView('cascade')} className={`p-1.5 rounded-lg ${discoverView === 'cascade' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Layers className="w-4 h-4" /></button>
+  1096→          </div>
+  1097→        </div>
+  1098→        <ScrollArea className="flex-1">
+  1099→          {discoverView === 'cascade' ? (
+  1100→            <div className="flex items-center justify-center p-6 h-full">
+  1101→              {cascadeUser ? (
+  1102→                <div key={cascadeUser.id} className="w-full max-w-sm cascade-animate">
+  1103→                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-secondary">
+  1104→                    {(cascadeUser.photos && cascadeUser.photos[0]) ? <img src={cascadeUser.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>}
+  1105→                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/60 to-transparent" />
+  1106→                    {cascadeUser.isPremium && <div className="absolute top-3 right-3"><Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge></div>}
+  1107→                    {cascadeUser.isVerified && <div className="absolute top-3 left-3"><Badge className="bg-blue-500/20 text-blue-400 text-[10px] border-blue-500/30"><ShieldCheck className="w-3 h-3" /></Badge></div>}
+  1108→                    {cascadeUser.online && cascadeUser.showOnline && <div className="absolute top-3 left-1/2 -translate-x-1/2"><span className="flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] text-green-400"><span className="w-1.5 h-1.5 bg-green-400 rounded-full online-pulse" /> Online</span></div>}
+  1109→                    <div className="absolute bottom-0 left-0 right-0 p-4">
+  1110→                      <h3 className="text-xl font-bold">{cascadeUser.displayName}{cascadeUser.age ? `, ${cascadeUser.age}` : ''}</h3>
+  1111→                      {cascadeUser.location && <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3" />{cascadeUser.location}</p>}
+  1112→                      {cascadeUser.bio && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{truncate(cascadeUser.bio, 100)}</p>}
+  1113→                      {cascadeUser.lookingFor && <Badge className="mt-2 bg-primary/20 text-primary text-[10px] border-primary/30 capitalize">{cascadeUser.lookingFor}</Badge>}
+  1114→                    </div>
+  1115→                  </div>
+  1116→                  <div className="flex gap-3 mt-4 justify-center">
+  1117→                    <button onClick={() => setCascadeIndex(i => i + 1)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+  1118→                    <button onClick={() => handleLike(cascadeUser.id)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><Heart className="w-5 h-5" /></button>
+  1119→                    <button onClick={() => openChat(cascadeUser)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><MessageCircle className="w-5 h-5" /></button>
+  1120→                    <button onClick={() => openProfile(cascadeUser.id)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Star className="w-5 h-5" /></button>
+  1121→                    <button onClick={() => { setRizzTargetBio(cascadeUser.bio || ''); setShowRizzModal(true); }} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Sparkles className="w-5 h-5" /></button>
+  1122→                  </div>
+  1123→                </div>
+  1124→              ) : <EmptyState icon={Compass} title="No more profiles" desc="Adjust your filters or check back later" />}
+  1125→            </div>
+  1126→          ) : (
+  1127→            <div className="grid grid-cols-2 gap-3 p-4">
+  1128→              {filteredDiscover.map(user => (
+  1129→                <button key={user.id} onClick={() => openProfile(user.id)} className="profile-card rounded-xl overflow-hidden bg-secondary border border-border text-left">
+  1130→                  <div className="aspect-[3/4] relative">
+  1131→                    {(user.photos && user.photos[0]) ? <img src={user.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-secondary"><User className="w-12 h-12 text-muted-foreground" /></div>}
+  1132→                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-secondary via-secondary/50 to-transparent" />
+  1133→                    {user.online && user.showOnline && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-secondary online-pulse" />}
+  1134→                    {user.isPremium && <Crown className="absolute top-2 left-2 w-3.5 h-3.5 text-yellow-400" />}
+  1135→                  </div>
+  1136→                  <div className="p-2.5 -mt-6 relative">
+  1137→                    <p className="text-[13px] font-semibold truncate">{user.displayName}{user.age ? `, ${user.age}` : ''}</p>
+  1138→                    <p className="text-[10px] text-muted-foreground truncate">{user.location || ''}</p>
+  1139→                    {user.distance != null && <p className="text-[10px] text-primary">{user.distance} km away</p>}
+  1140→                  </div>
+  1141→                </button>
+  1142→              ))}
+  1143→            </div>
+  1144→          )}
+  1145→        </ScrollArea>
+  1146→      </div>
+  1147→    );
+  1148→  }
+  1149→
+  1150→
+  1151→  // ─── MAP VIEW ───────────────────────────────────────────────
+  1152→  function MapView() {
+  1153→    const mapCenterLat = userLat || currentUser?.lat || 35.8989;
+  1154→    const mapCenterLng = userLng || currentUser?.lng || 14.5146;
+  1155→    return (
+  1156→      <div className="h-full flex flex-col">
+  1157→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1158→          <Select value={mapFilter} onValueChange={setMapFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All Users</SelectItem><SelectItem value="online">Online</SelectItem><SelectItem value="recent">Recent</SelectItem><SelectItem value="nearby">Nearby</SelectItem><SelectItem value="new">New</SelectItem><SelectItem value="verified">Verified</SelectItem><SelectItem value="premium">Premium</SelectItem></SelectContent></Select>
+  1159→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{mapRadius} km</button></PopoverTrigger>
+  1160→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Radius</Label><Slider value={[mapRadius]} onValueChange={([v]) => setMapRadius(v)} min={1} max={200} step={1} className="mt-2" /><p className="text-[11px] text-muted-foreground mt-1">{mapRadius} km</p></PopoverContent>
+  1161→          </Popover>
+  1162→          <button onClick={() => setMapHidden(!mapHidden)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 ${mapHidden ? 'bg-destructive/20 text-destructive border-destructive/30' : 'bg-secondary text-muted-foreground border-border'}`}>{mapHidden ? '👁 Hidden' : '👁 Visible'}</button>
+  1163→          <span className="ml-auto text-[11px] text-muted-foreground">{mapUsers.length} users</span>
+  1164→        </div>
+  1165→        <div className="flex-1 relative">
+  1166→          {mapLoading ? <div className="absolute inset-0 flex items-center justify-center"><Skeleton className="w-full h-full" /></div> : mapHidden ? (
+  1167→            <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/20 gap-3">
+  1168→              <MapPinOff className="w-12 h-12 text-muted-foreground" />
+  1169→              <p className="text-sm text-muted-foreground">Map hidden</p>
+  1170→              <p className="text-xs text-muted-foreground">Your location is not visible to others</p>
+  1171→            </div>
+  1172→          ) : (
+  1173→            <MapLeaflet users={mapUsers} centerLat={mapCenterLat} centerLng={mapCenterLng} radius={mapRadius} onUserClick={openProfile} />
+  1174→          )}
+  1175→        </div>
+  1176→      </div>
+  1177→    );
+  1178→  }
+  1179→
+  1180→  // ─── CHAT VIEW ─────────────────────────────────────────────
+  1181→  function ChatView() {
+  1182→    if (chatLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1183→    return (
+  1184→      <div className="h-full flex flex-col">
+  1185→        {chatMobileView === 'chat' && (activeConversation || activeGroup) ? (
+  1186→          <NexusChat
+  1187→            msgInput={msgInput}
+  1188→            setMsgInput={setMsgInput}
+  1189→            sendMessage={sendMessage}
+  1190→            sendGroupMessage={sendGroupMessage}
+  1191→            activeConversation={activeConversation}
+  1192→            activeGroup={activeGroup}
+  1193→            messages={messages}
+  1194→            groupMessages={groupMessages}
+  1195→            setGroupMessages={setGroupMessages}
+  1196→            getAvatar={getAvatar}
+  1197→            openProfile={openProfile}
+  1198→            setActiveConversation={setActiveConversation}
+  1199→            setActiveGroup={setActiveGroup}
+  1200→            setChatMobileView={setChatMobileView}
+  1201→            msgEndRef={msgEndRef}
+  1202→            socket={socketRef.current}
+  1203→          />
+  1204→        ) : (
+  1205→          <ScrollArea className="flex-1">
+  1206→            <div className="p-4 space-y-4">
+  1207→              {/* Chat Requests */}
+  1208→              {chatRequests.length > 0 && (
+  1209→                <div className="space-y-2">
+  1210→                  <SectionHeader icon={Bell} label="Chat Requests" count={chatRequests.length} />
+  1211→                  {chatRequests.map(req => (
+  1212→                    <div key={req.id} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+  1213→                      <button onClick={() => openProfile(req.sender?.id || '')}><Avatar className="h-10 w-10"><AvatarImage src={getAvatar(req.sender)} /><AvatarFallback className="text-xs">{req.sender?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1214→                      <div className="flex-1 min-w-0">
+  1215→                        <p className="text-[12px] font-semibold">{req.sender?.displayName}</p>
+  1216→                        <p className="text-[11px] text-muted-foreground truncate">{req.message || 'Wants to chat with you'}</p>
+  1217→                      </div>
+  1218→                      <div className="flex gap-1.5 shrink-0">
+  1219→                        <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => handleChatRequest(req.id, 'accept')}>Accept</Button>
+  1220→                        <Button size="sm" variant="outline" className="h-7 text-[10px] border-border px-2" onClick={() => handleChatRequest(req.id, 'decline')}>Decline</Button>
+  1221→                      </div>
+  1222→                    </div>
+  1223→                  ))}
+  1224→                </div>
+  1225→              )}
+  1226→              {/* Conversations */}
+  1227→              <Tabs defaultValue="direct">
+  1228→                <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  1229→                  <TabsTrigger value="direct" className="text-[11px] flex-1 h-7">Messages</TabsTrigger>
+
+[showing lines 880-1229 of 2811; use offset=1230 with limit to continue reading]

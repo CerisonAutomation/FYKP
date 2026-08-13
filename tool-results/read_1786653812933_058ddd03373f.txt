@@ -1,0 +1,502 @@
+  1700→                        {group.description && <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{group.description}</p>}
+  1701→                        {group.geoName && <Badge className="text-[9px] mt-1 bg-muted">{group.geoName}</Badge>}
+  1702→                      </div>
+  1703→                      <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => { setActiveGroup(group); setGroupMessages([]); setChatMobileView('chat'); setActiveTab('chat'); }}>Open</Button>
+  1704→                    </div>
+  1705→                  </CardContent>
+  1706→                </Card>
+  1707→              ))}
+  1708→          </div>
+  1709→        </ScrollArea>
+  1710→      </div>
+  1711→    );
+  1712→  }
+  1713→
+  1714→  // ─── ALBUMS VIEW ────────────────────────────────────────────
+  1715→  function AlbumsView() {
+  1716→    if (albumsLoading) return <LoadingGrid />;
+  1717→    return (
+  1718→      <ScrollArea className="h-full">
+  1719→        <div className="p-4 space-y-4">
+  1720→          {albums.length === 0 ? <EmptyState icon={ImageIcon} title="No albums" desc="Create albums to organize your photos" />
+  1721→            : albums.map(album => (
+  1722→              <Card key={album.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedAlbum(album)}>
+  1723→                <CardContent className="p-3">
+  1724→                  <div className="flex items-center gap-3">
+  1725→                    <div className="w-14 h-14 rounded-xl bg-card flex items-center justify-center overflow-hidden">
+  1726→                      {album.photos && album.photos[0] ? <img src={album.photos[0].url} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="w-6 h-6 text-muted-foreground" />}
+  1727→                    </div>
+  1728→                    <div className="flex-1 min-w-0">
+  1729→                      <h3 className="text-sm font-semibold">{album.name}</h3>
+  1730→                      <p className="text-[11px] text-muted-foreground">{album.photos?.length || 0} photos</p>
+  1731→                      {album.isPrivate && <Badge className="text-[9px] mt-1 bg-yellow-500/20 text-yellow-400"><Lock className="w-2.5 h-2.5 mr-0.5" /> Private</Badge>}
+  1732→                    </div>
+  1733→                  </div>
+  1734→                </CardContent>
+  1735→              </Card>
+  1736→            ))}
+  1737→        </div>
+  1738→      </ScrollArea>
+  1739→    );
+  1740→  }
+  1741→
+  1742→  function AlbumDetail() {
+  1743→    if (!selectedAlbum) return null;
+  1744→    return (
+  1745→      <ScrollArea className="max-h-[70vh]">
+  1746→        <div className="p-4 space-y-3">
+  1747→          <h3 className="text-lg font-bold">{selectedAlbum.name}</h3>
+  1748→          <div className="grid grid-cols-3 gap-2">
+  1749→            {(selectedAlbum.photos || []).map((photo: any) => (
+  1750→              <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-card">
+  1751→                <img src={photo.url} alt="" className="w-full h-full object-cover" />
+  1752→              </div>
+  1753→            ))}
+  1754→            {(!selectedAlbum.photos || selectedAlbum.photos.length === 0) && <p className="col-span-3 text-sm text-muted-foreground text-center py-8">No photos in this album</p>}
+  1755→          </div>
+  1756→        </div>
+  1757→      </ScrollArea>
+  1758→    );
+  1759→  }
+  1760→
+  1761→  // ─── MEMBERSHIP VIEW ───────────────────────────────────────
+  1762→  function MembershipView() {
+  1763→    return (
+  1764→      <ScrollArea className="h-full">
+  1765→        <div className="p-4 space-y-6">
+  1766→          <div className="text-center space-y-1">
+  1767→            <h2 className="text-lg font-bold gradient-text">Choose Your Plan</h2>
+  1768→            <p className="text-xs text-muted-foreground">Unlock premium features and stand out</p>
+  1769→          </div>
+  1770→          <div className="grid gap-3">
+  1771→            {SUBSCRIPTION_TIERS.map(tier => (
+  1772→              <Card key={tier.tier} className={`bg-secondary border ${tier.popular ? 'border-primary' : 'border-border'} relative overflow-hidden`}>
+  1773→                {tier.popular && <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">POPULAR</div>}
+  1774→                <CardContent className="p-4">
+  1775→                  <div className="flex items-center gap-3 mb-3">
+  1776→                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center`}><Crown className="w-5 h-5 text-white" /></div>
+  1777→                    <div><h3 className="text-base font-bold">{tier.label}</h3><p className="text-xs text-muted-foreground">{tier.price === 0 ? 'Free forever' : `$${tier.price}/month`}</p></div>
+  1778→                  </div>
+  1779→                  <ul className="space-y-1.5">
+  1780→                    {tier.features.map((f, i) => (
+  1781→                      <li key={i} className="flex items-center gap-2 text-[12px]"><Check className="w-3 h-3 text-primary shrink-0" /><span className="text-muted-foreground">{f}</span></li>
+  1782→                    ))}
+  1783→                  </ul>
+  1784→                  <Button className={`w-full mt-4 h-9 text-xs ${tier.popular ? 'bg-primary text-primary-foreground' : 'border border-border bg-card'}`} onClick={() => {}}>
+  1785→                    {tier.price === 0 ? 'Current Plan' : 'Upgrade'}
+  1786→                  </Button>
+  1787→                </CardContent>
+  1788→              </Card>
+  1789→            ))}
+  1790→          </div>
+  1791→        </div>
+  1792→      </ScrollArea>
+  1793→    );
+  1794→  }
+  1795→
+  1796→  // ─── VERIFIED VIEW ─────────────────────────────────────────
+  1797→  function VerifiedView() {
+  1798→    const verTypes = ['age', 'photo', 'id', 'face', 'social'] as const;
+  1799→    return (
+  1800→      <ScrollArea className="h-full">
+  1801→        <div className="p-4 space-y-6">
+  1802→          {/* Status */}
+  1803→          <div className="flex items-center gap-4 p-4 rounded-xl bg-secondary border border-border">
+  1804→            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+  1805→              {myVerification?.status === 'verified' ? <ShieldCheck className="w-7 h-7 text-green-400" /> : <Shield className="w-7 h-7 text-muted-foreground" />}
+  1806→            </div>
+  1807→            <div>
+  1808→              <h3 className="text-base font-bold">{myVerification?.status === 'verified' ? 'Verified ✓' : myVerification?.status === 'pending' ? 'Pending Review' : 'Not Verified'}</h3>
+  1809→              <p className="text-xs text-muted-foreground">{myVerification?.status === 'verified' ? 'Your account is verified' : 'Get verified to increase trust and visibility'}</p>
+  1810→            </div>
+  1811→          </div>
+  1812→          {/* Verification types */}
+  1813→          <div className="space-y-3">
+  1814→            <h4 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Verification Methods</h4>
+  1815→            {verTypes.map(type => (
+  1816→              <div key={type} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1817→                <div className="flex items-center gap-3">
+  1818→                  <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center"><Fingerprint className="w-4 h-4 text-primary" /></div>
+  1819→                  <div><p className="text-[12px] font-medium capitalize">{type} Verification</p><p className="text-[10px] text-muted-foreground">Verify your {type}</p></div>
+  1820→                </div>
+  1821→                <Button size="sm" variant="outline" className="h-7 text-[10px] border-border" onClick={async () => {
+  1822→                  if (!currentUser) return;
+  1823→                  try { await fetch(`/api/verification?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type }) }); } catch {}
+  1824→                }}>Submit</Button>
+  1825→              </div>
+  1826→            ))}
+  1827→          </div>
+  1828→        </div>
+  1829→      </ScrollArea>
+  1830→    );
+  1831→  }
+  1832→
+  1833→  // ─── PROFESSIONAL VIEW ─────────────────────────────────────
+  1834→  function ProfessionalView() {
+  1835→    return (
+  1836→      <ScrollArea className="h-full">
+  1837→        <div className="p-4 space-y-6">
+  1838→          <div className="flex items-center gap-4 p-4 rounded-xl bg-secondary border border-border">
+  1839→            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center"><Briefcase className="w-7 h-7 text-white" /></div>
+  1840→            <div>
+  1841→              <h3 className="text-base font-bold">Professional Account</h3>
+  1842→              <p className="text-xs text-muted-foreground">Monetize your content and grow your audience</p>
+  1843→            </div>
+  1844→          </div>
+  1845→          <Card className="bg-secondary border-border">
+  1846→            <CardContent className="p-4 space-y-3">
+  1847→              <h4 className="text-sm font-semibold">Requirements</h4>
+  1848→              <ul className="space-y-2 text-[12px] text-muted-foreground">
+  1849→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Verified account</li>
+  1850→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Active profile for 30+ days</li>
+  1851→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />10+ profile photos</li>
+  1852→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Clean community record</li>
+  1853→              </ul>
+  1854→              <Button className="w-full bg-primary text-primary-foreground text-xs" onClick={() => {}}>Apply for Professional</Button>
+  1855→            </CardContent>
+  1856→          </Card>
+  1857→        </div>
+  1858→      </ScrollArea>
+  1859→    );
+  1860→  }
+  1861→
+  1862→  // ─── FOOTPRINTS VIEW ───────────────────────────────────────
+  1863→  function FootprintsView() {
+  1864→    if (footprintsLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1865→    return (
+  1866→      <ScrollArea className="h-full">
+  1867→        <div className="p-4 space-y-1">
+  1868→          {footprints.length === 0 ? <EmptyState icon={FootprintsIcon} title="No footprints" desc="Profiles you visit will appear here" />
+  1869→            : footprints.map((fp: any) => fp.target && (
+  1870→              <UserRow key={fp.id} user={fp.target} sub={<span>Visited {timeAgo(fp.createdAt)}</span>} onClick={() => openProfile(fp.target.id)} />
+  1871→            ))}
+  1872→        </div>
+  1873→      </ScrollArea>
+  1874→    );
+  1875→  }
+  1876→
+  1877→
+  1878→  // ─── NOTES VIEW ────────────────────────────────────────────
+  1879→  function NotesView() {
+  1880→    return (
+  1881→      <ScrollArea className="h-full">
+  1882→        <div className="p-4 space-y-4">
+  1883→          <div className="flex items-center justify-between">
+  1884→            <h3 className="text-sm font-semibold">My Notes ({notes.length})</h3>
+  1885→            <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={() => { setNoteTargetId(''); setNoteContent(''); setShowNoteDialog(true); }}><Plus className="w-3.5 h-3.5 mr-1" /> Add</Button>
+  1886→          </div>
+  1887→          {notes.length === 0 ? <EmptyState icon={StickyNote} title="No notes" desc="Add notes to user profiles to remember details" />
+  1888→            : notes.map((note: any) => (
+  1889→              <Card key={note.id} className="bg-secondary border-border">
+  1890→                <CardContent className="p-3">
+  1891→                  <div className="flex items-center justify-between mb-1">
+  1892→                    <div className="flex items-center gap-2">
+  1893→                      {note.target && <button onClick={() => openProfile(note.target.id)} className="text-[12px] font-semibold hover:text-primary">{note.target.displayName}</button>}
+  1894→                      <Badge className="text-[9px] bg-muted">{note.type}</Badge>
+  1895→                    </div>
+  1896→                    <div className="flex gap-1">
+  1897→                      <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" onClick={() => handleDeleteNote(note.id)}><X className="w-3 h-3" /></Button>
+  1898→                    </div>
+  1899→                  </div>
+  1900→                  <p className="text-[12px] text-muted-foreground">{note.content}</p>
+  1901→                  <p className="text-[10px] text-muted-foreground mt-1">{timeAgo(note.createdAt)}</p>
+  1902→                </CardContent>
+  1903→              </Card>
+  1904→            ))}
+  1905→        </div>
+  1906→      </ScrollArea>
+  1907→    );
+  1908→  }
+  1909→
+  1910→  // ─── BOOSTS VIEW ────────────────────────────────────────────
+  1911→  function BoostsView() {
+  1912→    if (boostsLoading) return <LoadingGrid cols={1} rows={3} />;
+  1913→    const activeBoosts = allBoosts.filter((b: any) => b.isActive);
+  1914→    return (
+  1915→      <ScrollArea className="h-full">
+  1916→        <div className="p-4 space-y-6">
+  1917→          {/* Active boosts */}
+  1918→          <div className="space-y-3">
+  1919→            <SectionHeader icon={Zap} label="Active Boosts" count={activeBoosts.length} />
+  1920→            {activeBoosts.length === 0 ? <p className="text-xs text-muted-foreground">No active boosts</p>
+  1921→              : activeBoosts.map((boost: any) => (
+  1922→                <div key={boost.id} className="p-3 rounded-xl bg-secondary border border-border boost-glow">
+  1923→                  <div className="flex items-center justify-between mb-2">
+  1924→                    <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-primary" /><span className="text-[12px] font-semibold capitalize">{boost.type} Boost</span></div>
+  1925→                    <Badge className="bg-green-400/20 text-green-400 text-[9px]">Active</Badge>
+  1926→                  </div>
+  1927→                  <Progress value={boost.duration > 0 ? 50 : 100} className="h-1.5" />
+  1928→                  <p className="text-[10px] text-muted-foreground mt-1">Ends {timeAgo(boost.endsAt)}</p>
+  1929→                </div>
+  1930→              ))}
+  1931→          </div>
+  1932→          {/* Purchase */}
+  1933→          <div className="space-y-3">
+  1934→            <SectionHeader icon={Wallet} label="Purchase Boosts" />
+  1935→            <div className="grid gap-2">
+  1936→              {BOOST_TYPES.map(bt => (
+  1937→                <Card key={bt.type} className="bg-secondary border-border">
+  1938→                  <CardContent className="p-3">
+  1939→                    <div className="flex items-center gap-3">
+  1940→                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${bt.color} flex items-center justify-center shrink-0`}><Rocket className="w-5 h-5 text-white" /></div>
+  1941→                      <div className="flex-1 min-w-0">
+  1942→                        <h4 className="text-[12px] font-semibold">{bt.label} Boost</h4>
+  1943→                        <p className="text-[10px] text-muted-foreground">{bt.desc}</p>
+  1944→                      </div>
+  1945→                      <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground shrink-0" onClick={async () => {
+  1946→                        if (!currentUser) return;
+  1947→                        try { await fetch(`/api/boosts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: bt.type, duration: bt.duration }) }); } catch {}
+  1948→                      }}>${bt.price}</Button>
+  1949→                    </div>
+  1950→                  </CardContent>
+  1951→                </Card>
+  1952→              ))}
+  1953→            </div>
+  1954→          </div>
+  1955→          {/* History */}
+  1956→          <div className="space-y-3">
+  1957→            <SectionHeader icon={Clock} label="Boost History" count={allBoosts.length} />
+  1958→            {allBoosts.length === 0 ? <p className="text-xs text-muted-foreground">No boost history</p>
+  1959→              : allBoosts.slice(0, 10).map((boost: any) => (
+  1960→                <div key={boost.id} className="flex items-center justify-between p-2.5 rounded-lg bg-secondary/50">
+  1961→                  <div className="flex items-center gap-2">
+  1962→                    <span className="text-[12px] font-medium capitalize">{boost.type}</span>
+  1963→                    <Badge className={`text-[9px] ${boost.isActive ? 'bg-green-400/20 text-green-400' : 'bg-muted text-muted-foreground'}`}>{boost.isActive ? 'Active' : 'Expired'}</Badge>
+  1964→                  </div>
+  1965→                  <span className="text-[10px] text-muted-foreground">{timeAgo(boost.endsAt)}</span>
+  1966→                </div>
+  1967→              ))}
+  1968→          </div>
+  1969→        </div>
+  1970→      </ScrollArea>
+  1971→    );
+  1972→  }
+  1973→
+  1974→  // ─── FAVORITES VIEW ────────────────────────────────────────
+  1975→  function FavoritesView() {
+  1976→    if (favoritesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1977→    return (
+  1978→      <ScrollArea className="h-full">
+  1979→        <div className="p-4 space-y-1">
+  1980→          {favorites.length === 0 ? <EmptyState icon={Bookmark} title="No favorites" desc="Add users to favorites from their profiles" />
+  1981→            : favorites.map((fav: any) => fav.target && (
+  1982→              <div key={fav.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1983→                <button onClick={() => openProfile(fav.target.id)}>
+  1984→                  <div className="relative">
+  1985→                    <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-xs">{fav.target.displayName?.[0]}</AvatarFallback></Avatar>
+  1986→                    {fav.isSuper && <Star className="absolute -top-1 -right-1 w-4 h-4 text-yellow-400 fill-yellow-400" />}
+  1987→                  </div>
+  1988→                </button>
+  1989→                <div className="flex-1 min-w-0">
+  1990→                  <button onClick={() => openProfile(fav.target.id)} className="text-[13px] font-semibold hover:text-primary">{fav.target.displayName}</button>
+  1991→                  <p className="text-[10px] text-muted-foreground">{fav.isSuper ? '⭐ Super Favorite' : 'Favorite'} · {timeAgo(fav.createdAt)}</p>
+  1992→                </div>
+  1993→                <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/favorites?userId=${CURRENT_USER_ID}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: fav.targetId }) }); setFavorites(prev => prev.filter((f: any) => f.id !== fav.id)); } catch {} }}>Remove</Button>
+  1994→              </div>
+  1995→            ))}
+  1996→        </div>
+  1997→      </ScrollArea>
+  1998→    );
+  1999→  }
+  2000→
+  2001→  // ─── ACCOUNT VIEW ──────────────────────────────────────────
+  2002→  function AccountView() {
+  2003→    return (
+  2004→      <ScrollArea className="h-full">
+  2005→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2006→          <Card className="bg-secondary border-border">
+  2007→            <CardContent className="p-4 space-y-4">
+  2008→              <SectionHeader icon={Lock} label="Account Settings" />
+  2009→              {currentUser && <>
+  2010→                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Email</Label><Input value={currentUser.email} disabled className="bg-card border-border h-10 text-xs" /></div>
+  2011→                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Username</Label><Input value={currentUser.username} disabled className="bg-card border-border h-10 text-xs" /></div>
+  2012→                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Display Name</Label><Input value={editForm.displayName || currentUser.displayName} onChange={e => setEditForm(p => ({ ...p, displayName: e.target.value }))} className="bg-card border-border h-10 text-xs" /></div>
+  2013→                <Button className="bg-primary text-primary-foreground text-xs" onClick={handleSaveProfile}>Save Changes</Button>
+  2014→              </>}
+  2015→            </CardContent>
+  2016→          </Card>
+  2017→          <Card className="bg-secondary border-border">
+  2018→            <CardContent className="p-4 space-y-3">
+  2019→              <SectionHeader icon={Shield} label="Password" />
+  2020→              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Current Password</Label><Input type="password" placeholder="••••••••" className="bg-card border-border h-10 text-xs" /></div>
+  2021→              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">New Password</Label><Input type="password" placeholder="••••••••" className="bg-card border-border h-10 text-xs" /></div>
+  2022→              <Button variant="outline" className="border-border text-xs">Update Password</Button>
+  2023→            </CardContent>
+  2024→          </Card>
+  2025→          <Card className="bg-destructive/10 border border-destructive/20">
+  2026→            <CardContent className="p-4 space-y-3">
+  2027→              <SectionHeader icon={AlertTriangle} label="Danger Zone" />
+  2028→              <p className="text-xs text-muted-foreground">Once you delete your account, there is no going back.</p>
+  2029→              <Button variant="outline" className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 text-xs" onClick={() => setShowDeleteAccount(true)}>Delete Account</Button>
+  2030→            </CardContent>
+  2031→          </Card>
+  2032→        </div>
+  2033→      </ScrollArea>
+  2034→    );
+  2035→  }
+  2036→
+  2037→  // ─── PREFERENCES VIEW ──────────────────────────────────────
+  2038→  function PreferencesView() {
+  2039→    const togglePref = (key: string) => setPrefs(p => ({ ...p, [key]: !(p as any)[key] }));
+  2040→    return (
+  2041→      <ScrollArea className="h-full">
+  2042→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2043→          {/* Geo & Display */}
+  2044→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2045→            <SectionHeader icon={MapPin} label="Location & Display" />
+  2046→            {[
+  2047→              { key: 'showOnline', label: 'Show Online Status', desc: 'Let others see when you are online' },
+  2048→              { key: 'showDistance', label: 'Show Distance', desc: 'Display distance to other users' },
+  2049→              { key: 'showAge', label: 'Show Age', desc: 'Display your age on profile' },
+  2050→              { key: 'showActivity', label: 'Show Activity', desc: 'Show your recent activity' },
+  2051→              { key: 'hidePicsOffline', label: 'Hide Pics Offline', desc: 'Hide photos when offline' },
+  2052→            ].map(item => (
+  2053→              <div key={item.key} className="flex items-center justify-between">
+  2054→                <div><p className="text-sm">{item.label}</p><p className="text-[10px] text-muted-foreground">{item.desc}</p></div>
+  2055→                <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
+  2056→              </div>
+  2057→            ))}
+  2058→          </CardContent></Card>
+  2059→          {/* Discover Settings */}
+  2060→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2061→            <SectionHeader icon={Search} label="Discover Preferences" />
+  2062→            <div className="flex items-center justify-between"><div><p className="text-sm">Age Range</p><p className="text-[10px] text-muted-foreground">{prefs.ageMin}–{prefs.ageMax}</p></div>
+  2063→              <Slider value={[prefs.ageMin, prefs.ageMax]} onValueChange={([min, max]) => setPrefs(p => ({ ...p, ageMin: min, ageMax: max }))} min={18} max={80} step={1} className="w-32" /></div>
+  2064→            <div className="flex items-center justify-between"><div><p className="text-sm">Units</p></div>
+  2065→              <Select value={prefs.displayUnits} onValueChange={v => setPrefs(p => ({ ...p, displayUnits: v }))}><SelectTrigger className="h-8 w-24 text-[11px] bg-card border-border"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="metric">Metric</SelectItem><SelectItem value="imperial">Imperial</SelectItem></SelectContent></Select>
+  2066→            </div>
+  2067→            <div className="flex items-center justify-between"><div><p className="text-sm">Language</p></div>
+  2068→              <Select value={prefs.lang} onValueChange={v => setPrefs(p => ({ ...p, lang: v }))}><SelectTrigger className="h-8 w-24 text-[11px] bg-card border-border"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="en">English</SelectItem><SelectItem value="es">Spanish</SelectItem><SelectItem value="fr">French</SelectItem><SelectItem value="de">German</SelectItem><SelectItem value="it">Italian</SelectItem></SelectContent></Select>
+  2069→            </div>
+  2070→          </CardContent></Card>
+  2071→          {/* Sound & Notifications */}
+  2072→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2073→            <SectionHeader icon={Bell} label="Notifications" />
+  2074→            {[
+  2075→              { key: 'soundOff', label: 'Sound Off', desc: 'Mute all app sounds' },
+  2076→              { key: 'notifPushOff', label: 'Push Notifications', desc: 'Disable push notifications' },
+  2077→              { key: 'notifEmailOff', label: 'Email Notifications', desc: 'Disable email notifications' },
+  2078→              { key: 'notifTelegramOff', label: 'Telegram Notifications', desc: 'Disable Telegram alerts' },
+  2079→            ].map(item => (
+  2080→              <div key={item.key} className="flex items-center justify-between">
+  2081→                <div><p className="text-sm">{item.label}</p><p className="text-[10px] text-muted-foreground">{item.desc}</p></div>
+  2082→                <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
+  2083→              </div>
+  2084→            ))}
+  2085→          </CardContent></Card>
+  2086→          {/* Privacy */}
+  2087→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2088→            <SectionHeader icon={Shield} label="Privacy" />
+  2089→            {[
+  2090→              { key: 'mailingInternal', label: 'Internal Mailing', desc: 'Receive internal communications' },
+  2091→              { key: 'mailingPartner', label: 'Partner Mailing', desc: 'Receive partner promotions' },
+  2092→              { key: 'profileOff', label: 'Profile Off', desc: 'Hide your profile temporarily' },
+  2093→              { key: 'privateAuto', label: 'Private Auto-Reply', desc: 'Auto-reply when private' },
+  2094→              { key: 'noPros', label: 'No Professionals', desc: 'Hide professional accounts' },
+  2095→              { key: 'noPub', label: 'No Public Content', desc: 'Hide public content' },
+  2096→            ].map(item => (
+  2097→              <div key={item.key} className="flex items-center justify-between">
+  2098→                <div><p className="text-sm">{item.label}</p><p className="text-[10px] text-muted-foreground">{item.desc}</p></div>
+  2099→                <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
+  2100→              </div>
+  2101→            ))}
+  2102→          </CardContent></Card>
+  2103→        </div>
+  2104→      </ScrollArea>
+  2105→    );
+  2106→  }
+  2107→
+  2108→  // ─── GEO SETTINGS VIEW ─────────────────────────────────────
+  2109→  function GeoSettingsView() {
+  2110→    const modes = [
+  2111→      { value: 'auto', label: 'Auto GPS', icon: Crosshair, desc: 'Use device GPS for precise location' },
+  2112→      { value: 'manual', label: 'Manual City', icon: MapPin, desc: 'Set a fixed city location' },
+  2113→      { value: 'fake', label: 'Fake Location', icon: MapPinOff, desc: 'Use a custom fake location' },
+  2114→      { value: 'hide', label: 'Hide Location', icon: EyeOff, desc: 'Hide your location completely' },
+  2115→    ];
+  2116→    return (
+  2117→      <ScrollArea className="h-full">
+  2118→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2119→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2120→            <SectionHeader icon={Navigation} label="Location Mode" />
+  2121→            {modes.map(mode => {
+  2122→              const Icon = mode.icon;
+  2123→              return (
+  2124→                <button key={mode.value} onClick={() => { setGeoMode(mode.value); setPrefs(p => ({ ...p, geoMode: mode.value })); }}
+  2125→                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all ${geoMode === mode.value ? 'bg-primary/10 border-primary/30' : 'bg-card border-border hover:border-primary/20'}`}>
+  2126→                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${geoMode === mode.value ? 'bg-primary/20' : 'bg-secondary'}`}><Icon className="w-4 h-4 text-primary" /></div>
+  2127→                  <div className="text-left"><p className="text-[12px] font-semibold">{mode.label}</p><p className="text-[10px] text-muted-foreground">{mode.desc}</p></div>
+  2128→                  {geoMode === mode.value && <Check className="w-4 h-4 text-primary ml-auto" />}
+  2129→                </button>
+  2130→              );
+  2131→            })}
+  2132→          </CardContent></Card>
+  2133→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2134→            <SectionHeader icon={MapPin} label="Geo Name" />
+  2135→            <p className="text-[10px] text-muted-foreground">This name displays instead of your real location</p>
+  2136→            <Input value={geoName} onChange={e => setGeoName(e.target.value)} placeholder="e.g. 'Somewhere fun'" className="bg-card border-border h-10 text-xs" />
+  2137→          </CardContent></Card>
+  2138→          {(geoMode === 'fake') && (
+  2139→            <Card className="bg-yellow-500/10 border border-yellow-500/20"><CardContent className="p-3 flex items-center gap-3">
+  2140→              <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0" />
+  2141→              <p className="text-xs text-yellow-400">Fake location mode is active. Other users may see this as suspicious.</p>
+  2142→            </CardContent></Card>
+  2143→          )}
+  2144→          {/* Map preview */}
+  2145→          <Card className="bg-secondary border-border">
+  2146→            <CardContent className="p-3">
+  2147→              <div className="aspect-video rounded-xl bg-card relative overflow-hidden">
+  2148→                <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 50%, oklch(0.22 0.01 285) 0%, oklch(0.15 0.005 285) 100%)' }}>
+  2149→                  <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid2)" /></svg>
+  2150→                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"><div className="w-5 h-5 bg-primary rounded-full border-3 border-card shadow-lg"><div className="w-full h-full bg-primary rounded-full animate-ping opacity-30" /></div></div>
+  2151→                </div>
+  2152→              </div>
+  2153→            </CardContent>
+  2154→          </Card>
+  2155→        </div>
+  2156→      </ScrollArea>
+  2157→    );
+  2158→  }
+  2159→
+  2160→  // ─── BANNERS VIEW ──────────────────────────────────────────
+  2161→  function BannersView() {
+  2162→    return (
+  2163→      <ScrollArea className="h-full">
+  2164→        <div className="p-4 space-y-4">
+  2165→          <div className="flex items-center justify-between">
+  2166→            <h3 className="text-sm font-semibold">Active Banners ({banners.length})</h3>
+  2167→            <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={handleCreateBanner}><Plus className="w-3.5 h-3.5 mr-1" /> Create</Button>
+  2168→          </div>
+  2169→          {banners.length === 0 ? <EmptyState icon={Layers} title="No banners" desc="Create promotional banners" />
+  2170→            : banners.map((banner: any) => (
+  2171→              <Card key={banner.id} className="bg-secondary border-border overflow-hidden">
+  2172→                {banner.imageUrl && <img src={banner.imageUrl} alt="" className="w-full h-32 object-cover" />}
+  2173→                <CardContent className="p-3">
+  2174→                  <div className="flex items-center justify-between">
+  2175→                    <div><p className="text-[12px] font-semibold">{banner.title}</p><p className="text-[10px] text-muted-foreground">Position: {banner.position} · {banner.isActive ? '✓ Active' : 'Inactive'}</p></div>
+  2176→                  </div>
+  2177→                </CardContent>
+  2178→              </Card>
+  2179→            ))}
+  2180→        </div>
+  2181→      </ScrollArea>
+  2182→    );
+  2183→  }
+  2184→
+  2185→  // ─── SITES VIEW ─────────────────────────────────────────────
+  2186→  function SitesView() {
+  2187→    const mockSites = [
+  2188→      { name: 'My Twitter', url: 'https://twitter.com/myhandle', icon: '𝕏' },
+  2189→      { name: 'My Instagram', url: 'https://instagram.com/myhandle', icon: '📸' },
+  2190→      { name: 'OnlyFans', url: 'https://onlyfans.com/myhandle', icon: '🔥' },
+  2191→      { name: 'Personal Website', url: 'https://mywebsite.com', icon: '🌐' },
+  2192→    ];
+  2193→    return (
+  2194→      <ScrollArea className="h-full">
+  2195→        <div className="p-4 space-y-4">
+  2196→          <h3 className="text-sm font-semibold">Connected Sites</h3>
+  2197→          {mockSites.map(site => (
+  2198→            <a key={site.url} href={site.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all">
+  2199→              <div className="w-9 h-9 rounded-xl bg-card flex items-center justify-center text-lg">{site.icon}</div>
+
+[showing lines 1700-2199 of 2811; use offset=2200 with limit to continue reading]

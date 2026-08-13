@@ -10,8 +10,16 @@ import type {
   User, Message, Conversation, Like, Fansite, AppEvent, GroupChat,
   Photo, Album, ChatRequest, ProfileView as ProfileViewType,
   Shout, UserFavorite, UserNote, Blog, Video as VideoType,
-  Banner, Verification, UserSession, InferCategory, InferResult,
-  TabId, SUBSCRIPTION_TIER_OPTIONS,
+  Banner, Verification, UserSession, InferCategory, InferResult, TabId,
+} from '@/types';
+import {
+  TRIBE_OPTIONS, FETISH_CLOTHING_OPTIONS, SM_LEVEL_OPTIONS, FF_ROLE_OPTIONS,
+  SAFER_SEX_OPTIONS, DICK_SIZE_OPTIONS, CIRCUMCISION_OPTIONS,
+  HAIR_COLOR_OPTIONS, HAIR_LENGTH_OPTIONS, EYE_COLOR_OPTIONS, BEARD_OPTIONS,
+  PIERCING_OPTIONS, TATTOO_OPTIONS, GOING_OUT_OPTIONS,
+  MUSIC_GENRE_OPTIONS, SPORT_OPTIONS, FOOD_OPTIONS,
+  TRAVEL_STYLE_OPTIONS, PROFESSION_OPTIONS, DIRTY_SEX_OPTIONS, MEET_AT_OPTIONS,
+  EVENT_TYPE_OPTIONS, CHAT_SORT_OPTIONS,
 } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,7 +58,10 @@ import {
   Radio, ChevronDown, Tag, UserMinus, Lock, Mail, Languages,
   Volume2, VolumeX, MapPinOff, Navigation, Wifi, WifiOff,
   EyeOff, ShieldAlert, ShieldQuestion, Wallet, Gem, Rocket,
-  Award, BarChart3, Share2, MessageSquare, CircleDot,
+  Award, BarChart3, Share2, MessageSquare, CircleDot, Cherry,
+  Download, Smartphone, FlameIcon,
+  Shirt, Utensils, ScanSearch, Loader2, BookmarkCheck,
+  SortAsc, Bot, ZapIcon, HeartPulse, UsersRound, Clock3,
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════════
@@ -92,7 +103,7 @@ const FAQ_DATA = [
   { q: 'How do I delete my account?', a: 'Go to More → Account and scroll to the bottom to find "Delete Account". This action is permanent and cannot be undone. All your data will be permanently removed.' },
 ];
 
-const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: string; icon: any; badge?: number }[]> = {
+const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: string; icon: any; badge?: number; isNew?: boolean }[]> = {
   Social: [
     { id: 'events', label: 'Events', description: 'Find and create events', icon: Calendar },
     { id: 'viewed', label: 'Viewed Me', description: 'Who checked your profile', icon: Eye },
@@ -113,6 +124,7 @@ const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: st
     { id: 'notes', label: 'Notes', description: 'Private notes on users', icon: StickyNote },
     { id: 'footprints', label: 'Footprints', description: 'Visit history', icon: FootprintsIcon },
     { id: 'infer', label: 'INFER AI', description: 'AI profile analysis', icon: Brain, badge: 1 },
+    { id: 'kinks', label: 'Kinks & Bedroom', description: 'Sexual profile & kinks', icon: Cherry, isNew: true },
   ],
   Premium: [
     { id: 'membership', label: 'Membership', description: 'Plans & pricing', icon: Crown },
@@ -422,6 +434,21 @@ export default function NexusApp() {
   // ── Blog detail ──
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
 
+  // ── Kinks / Profile Data ──
+  const [kinkFields, setKinkFields] = useState<Record<string, string>>({});
+  const [kinkLoading, setKinkLoading] = useState(false);
+  const [kinkTab, setKinkTab] = useState('bedroom');
+  // ── AI Chat Analysis ──
+  const [chatSortMode, setChatSortMode] = useState('recent');
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  // ── PWA ──
+  const [pwaPrompt, setPwaPrompt] = useState<any>(null);
+  const [isOnline, setIsOnline] = useState(true);
+  // ── Enhanced Albums ──
+  const [showCreateAlbum, setShowCreateAlbum] = useState(false);
+  const [albumForm, setAlbumForm] = useState({ name: '', isPrivate: false });
+
   // ── Groups ──
   const [groupSearch, setGroupSearch] = useState('');
   const [showCreateGroup, setShowCreateGroup] = useState(false);
@@ -493,6 +520,26 @@ export default function NexusApp() {
     }).catch(() => {}).finally(() => setChatLoading(false));
   }, [authed, activeTab]);
 
+  // Kinks / Profile Data
+  useEffect(() => {
+    if (!authed || activeTab !== 'kinks') return;
+    setKinkLoading(true);
+    fetch('/api/profile-data?userId=test-user-1').then(r => r.json()).then(res => {
+      const fields: Record<string, string> = {};
+      (res.data || []).forEach((f: any) => { fields[f.key] = f.value; });
+      setKinkFields(fields);
+    }).catch(() => {}).finally(() => setKinkLoading(false));
+  }, [authed, activeTab]);
+
+  // PWA install prompt
+  useEffect(() => {
+    const handler = () => setIsOnline(true);
+    const offHandler = () => setIsOnline(false);
+    window.addEventListener('online', handler);
+    window.addEventListener('offline', offHandler);
+    return () => { window.removeEventListener('online', handler); window.removeEventListener('offline', offHandler); };
+  }, []);
+
   // Likes
   useEffect(() => {
     if (!authed || activeTab !== 'likes') return;
@@ -524,7 +571,7 @@ export default function NexusApp() {
   useEffect(() => {
     if (!authed || activeTab !== 'events') return;
     setEventsLoading(true);
-    fetch('/api/events').then(r => r.json()).then(res => setEvents(res.data || [])).catch(() => {}).finally(() => setEventsLoading(false));
+    fetch('/api/events/upcoming').then(r => r.json()).then(res => setEvents(res.data || [])).catch(() => {}).finally(() => setEventsLoading(false));
   }, [authed, activeTab]);
 
   // Shouts
@@ -913,7 +960,9 @@ export default function NexusApp() {
 
       {/* ═══ MAIN CONTENT ═══ */}
       <main className="flex-1 overflow-hidden relative">
-        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : <MoreView />}
+        {/* Offline Banner */}
+        {!isOnline && <div className="absolute top-0 inset-x-0 z-50 bg-destructive/90 text-destructive-foreground text-center text-[11px] py-1.5 font-medium"><WifiOff className="w-3 h-3 inline mr-1" />You are offline. Some features may not work.</div>}
+        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : activeTab === 'kinks' ? <KinksView /> : <MoreView />}
       </main>
 
       {/* ═══ BOTTOM NAV ═══ */}
@@ -1204,8 +1253,26 @@ export default function NexusApp() {
         ) : (
           <ScrollArea className="flex-1">
             <div className="p-4 space-y-4">
-              {/* Chat Requests */}
-              {chatRequests.length > 0 && (
+            {/* Sort & AI Controls */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              {CHAT_SORT_OPTIONS.map(mode => (
+                <button key={mode} onClick={() => setChatSortMode(mode)}
+                  className={`px-2.5 py-1 rounded-full text-[10px] font-medium border shrink-0 transition-all ${chatSortMode === mode ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+                  {mode === 'recent' && <Clock3 className="w-3 h-3 mr-1 inline" />}
+                  {mode === 'intent' && <Target className="w-3 h-3 mr-1 inline" />}
+                  {mode === 'quality' && <HeartPulse className="w-3 h-3 mr-1 inline" />}
+                  {mode === 'unread' && <MessageSquare className="w-3 h-3 mr-1 inline" />}
+                  {mode === 'online' && <Wifi className="w-3 h-3 mr-1 inline" />}
+                  {mode.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                </button>
+              ))}
+              <button onClick={async () => { setAiLoading(true); try { const res = await fetch('/api/chat/ai-analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1' }) }); const data = await res.json(); setAiAnalysis(data); } catch {} setAiLoading(false); }}
+                className="ml-auto px-2.5 py-1 rounded-full text-[10px] font-medium border bg-primary/10 text-primary border-primary/30 shrink-0" disabled={aiLoading}>
+                <Bot className="w-3 h-3 mr-1 inline" />{aiLoading ? 'Analyzing...' : 'AI Analyze All'}
+              </button>
+            </div>
+            {/* Chat Requests */}
+            {chatRequests.length > 0 && (
                 <div className="space-y-2">
                   <SectionHeader icon={Bell} label="Chat Requests" count={chatRequests.length} />
                   {chatRequests.map(req => (
@@ -2732,6 +2799,107 @@ export default function NexusApp() {
             </DropdownMenu>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // ─── KINKS & BEDROOM VIEW ─────────────────────────────
+  function KinksView() {
+    const toggleField = (key: string, value: string) => {
+      const current = kinkFields[key] || '';
+      const arr = current ? current.split(',') : [];
+      const idx = arr.indexOf(value);
+      if (idx >= 0) arr.splice(idx, 1); else arr.push(value);
+      const updated = { ...kinkFields, [key]: arr.join(',') };
+      setKinkFields(updated);
+      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1', fields: updated }) }).catch(() => {});
+    };
+    const setSingleField = (key: string, value: string) => {
+      const updated = { ...kinkFields, [key]: value };
+      setKinkFields(updated);
+      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1', fields: updated }) }).catch(() => {});
+    };
+    const ChipField = ({ label, key, options }: { label: string; key: string; options: readonly string[] }) => {
+      const current = (kinkFields[key] || '').split(',').filter(Boolean);
+      return (
+        <div className="space-y-2">
+          <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</h4>
+          <div className="flex flex-wrap gap-1.5">
+            {options.map(opt => (
+              <button key={opt} onClick={() => toggleField(key, opt)}
+                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${current.includes(opt) ? 'bg-primary/20 text-primary border-primary/40' : 'bg-secondary text-muted-foreground border-border hover:border-primary/20'}`}>
+                {opt.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    };
+    const SingleField = ({ label, key, options }: { label: string; key: string; options: readonly string[] }) => {
+      return (
+        <div className="space-y-2">
+          <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</h4>
+          <div className="flex flex-wrap gap-1.5">
+            {options.map(opt => (
+              <button key={opt} onClick={() => setSingleField(key, opt)}
+                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${kinkFields[key] === opt ? 'bg-primary/20 text-primary border-primary/40' : 'bg-secondary text-muted-foreground border-border hover:border-primary/20'}`}>
+                {opt.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    };
+    if (kinkLoading) return <LoadingGrid cols={1} rows={6} />;
+    const kinkTabs = [
+      { id: 'bedroom', label: 'Bedroom', icon: Cherry },
+      { id: 'appearance', label: 'Appearance', icon: Palette },
+      { id: 'interests', label: 'Interests', icon: Target },
+      { id: 'lifestyle', label: 'Lifestyle', icon: Briefcase },
+    ];
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+          {kinkTabs.map(t => {
+            const Icon = t.icon;
+            return <button key={t.id} onClick={() => setKinkTab(t.id)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${kinkTab === t.id ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}><Icon className="w-3 h-3 mr-1 inline" />{t.label}</button>;
+          })}
+        </div>
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-6 max-w-2xl mx-auto">
+            {kinkTab === 'bedroom' && (<>
+              <SingleField label="Position" key="position" options={['top','bottom','versatile','versatile-top','versatile-bottom','side','no']} />
+              <SingleField label="FF / Fisting" key="ff_role" options={FF_ROLE_OPTIONS} />
+              <SingleField label="S&M Level" key="sm_level" options={SM_LEVEL_OPTIONS} />
+              <ChipField label="Fetish & Clothing" key="fetishes" options={FETISH_CLOTHING_OPTIONS} />
+              <SingleField label="Safer Sex" key="safer_sex" options={SAFER_SEX_OPTIONS} />
+              <SingleField label="Dick Size" key="dick_size" options={DICK_SIZE_OPTIONS} />
+              <SingleField label="Circumcision" key="circumcision" options={CIRCUMCISION_OPTIONS} />
+              <SingleField label="Dirty Sex" key="dirty_sex" options={DIRTY_SEX_OPTIONS} />
+              <SingleField label="Meet At" key="meet_at" options={MEET_AT_OPTIONS} />
+            </>)}
+            {kinkTab === 'appearance' && (<>
+              <ChipField label="Tribes" key="tribes" options={TRIBE_OPTIONS} />
+              <SingleField label="Hair Color" key="hair_color" options={HAIR_COLOR_OPTIONS} />
+              <SingleField label="Hair Length" key="hair_length" options={HAIR_LENGTH_OPTIONS} />
+              <SingleField label="Eye Color" key="eye_color" options={EYE_COLOR_OPTIONS} />
+              <SingleField label="Beard" key="beard" options={BEARD_OPTIONS} />
+              <SingleField label="Piercings" key="piercings" options={PIERCING_OPTIONS} />
+              <SingleField label="Tattoos" key="tattoos" options={TATTOO_OPTIONS} />
+            </>)}
+            {kinkTab === 'interests' && (<>
+              <ChipField label="Going Out" key="going_out" options={GOING_OUT_OPTIONS} />
+              <ChipField label="Music Genres" key="music_genres" options={MUSIC_GENRE_OPTIONS} />
+              <ChipField label="Sports" key="sports" options={SPORT_OPTIONS} />
+              <ChipField label="Food" key="food" options={FOOD_OPTIONS} />
+            </>)}
+            {kinkTab === 'lifestyle' && (<>
+              <ChipField label="Travel Style" key="travel_style" options={TRAVEL_STYLE_OPTIONS} />
+              <ChipField label="Profession" key="profession" options={PROFESSION_OPTIONS} />
+              <SingleField label="Smoker" key="smoker" options={['no','socially','yes']} />
+            </>)}
+          </div>
+        </ScrollArea>
       </div>
     );
   }

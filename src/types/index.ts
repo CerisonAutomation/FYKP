@@ -635,4 +635,4 @@ export interface ChatAIAnalysis {
 // TABS — expanded from OMOLINK report
 // ═══════════════════════════════════════════════════════════════
 
-export type TabId = 'discover' | 'map' | 'chat' | 'likes' | 'more' | 'events' | 'viewed' | 'shouts' | 'fansites' | 'videos' | 'blogs' | 'groups' | 'albums' | 'membership' | 'verified' | 'professional' | 'footprints' | 'notes' | 'boosts' | 'favorites' | 'account' | 'preferences' | 'geo-settings' | 'banners' | 'sites' | 'legal' | 'faqs' | 'abuse' | 'advantages' | 'affiliation' | 'profile' | 'infer';
+export type TabId = 'discover' | 'map' | 'chat' | 'likes' | 'more' | 'events' | 'viewed' | 'shouts' | 'fansites' | 'videos' | 'blogs' | 'groups' | 'albums' | 'membership' | 'verified' | 'professional' | 'footprints' | 'notes' | 'boosts' | 'favorites' | 'account' | 'preferences' | 'geo-settings' | 'banners' | 'sites' | 'legal' | 'faqs' | 'abuse' | 'advantages' | 'affiliation' | 'profile' | 'infer' | 'kinks';

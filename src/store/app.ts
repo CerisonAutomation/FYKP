@@ -35,7 +35,6 @@ interface AppState {
   setChatRequests: (reqs: ChatRequest[]) => void;
   pendingRequestCount: number;
   setPendingRequestCount: (n: number) => void;
-  // New from OMOLINK
   shouts: Shout[];
   setShouts: (s: Shout[]) => void;
   addShout: (s: Shout) => void;
@@ -53,99 +52,113 @@ interface AppState {
   setUserLat: (l: number | null) => void;
   userLng: number | null;
   setUserLng: (l: number | null) => void;
-  // GEO
   geoMode: string;
   setGeoMode: (m: string) => void;
   geoName: string;
   setGeoName: (n: string) => void;
-  // Agenda/Events
   agendaView: string;
   setAgendaView: (v: string) => void;
   agendaFilter: string;
   setAgendaFilter: (f: string) => void;
-  // Map filters
   mapFilter: string;
   setMapFilter: (f: string) => void;
   mapHidden: boolean;
   setMapHidden: (h: boolean) => void;
-  // Active sub-page (for navigating within More tab)
   activeSubPage: string | null;
   setActiveSubPage: (p: string | null) => void;
-  // Infer results
   inferResults: any[];
   setInferResults: (r: any[]) => void;
   inferLoading: boolean;
   setInferLoading: (l: boolean) => void;
-  // Groups
   groups: any[];
   setGroups: (g: any[]) => void;
-  // Albums (full list)
   allAlbums: any[];
   setAllAlbums: (a: any[]) => void;
-  // Footprints
   footprints: any[];
   setFootprints: (f: any[]) => void;
-  // Boosts (all)
   allBoosts: any[];
   setAllBoosts: (b: any[]) => void;
-  // Profile views received
   profileViews: any[];
   setProfileViews: (v: any[]) => void;
   // Chat features
   chatTheme: string;
   setChatTheme: (t: string) => void;
- nsfwFilter: boolean;
+  nsfwFilter: boolean;
   setNsfwFilter: (f: boolean) => void;
- typingUsers: Record<string, boolean>;
+  typingUsers: Record<string, boolean>;
   setTypingUsers: (t: Record<string, boolean>) => void;
- chatSearchQuery: string;
+  chatSearchQuery: string;
   setChatSearchQuery: (q: string) => void;
- showChatMediaGallery: boolean;
+  showChatMediaGallery: boolean;
   setShowChatMediaGallery: (s: boolean) => void;
- showChatSearch: boolean;
+  showChatSearch: boolean;
   setShowChatSearch: (s: boolean) => void;
- replyingTo: Message | null;
+  replyingTo: Message | null;
   setReplyingTo: (m: Message | null) => void;
- showDisappearingTimer: string | null;
+  showDisappearingTimer: string | null;
   setShowDisappearingTimer: (t: string | null) => void;
- showScheduleModal: boolean;
+  showScheduleModal: boolean;
   setShowScheduleModal: (s: boolean) => void;
- showForwardModal: boolean;
+  showForwardModal: boolean;
   setShowForwardModal: (s: boolean) => void;
- forwardMessage: Message | null;
+  forwardMessage: Message | null;
   setForwardMessage: (m: Message | null) => void;
- showCreatePollModal: boolean;
+  showCreatePollModal: boolean;
   setShowCreatePollModal: (s: boolean) => void;
- showAlbumPicker: boolean;
+  showAlbumPicker: boolean;
   setShowAlbumPicker: (s: boolean) => void;
- showLocationPicker: boolean;
+  showLocationPicker: boolean;
   setShowLocationPicker: (s: boolean) => void;
- showCallModal: boolean;
+  showCallModal: boolean;
   setShowCallModal: (s: boolean) => void;
- callType: 'voice' | 'video';
+  callType: 'voice' | 'video';
   setCallType: (t: 'voice' | 'video') => void;
- showAiSummary: boolean;
+  showAiSummary: boolean;
   setShowAiSummary: (s: boolean) => void;
- aiSummary: string;
+  aiSummary: string;
   setAiSummary: (s: string) => void;
- showAutoReplies: boolean;
+  showAutoReplies: boolean;
   setShowAutoReplies: (s: boolean) => void;
- autoReplies: string[];
+  autoReplies: string[];
   setAutoReplies: (r: string[]) => void;
- showMeetupSuggestions: boolean;
+  showMeetupSuggestions: boolean;
   setShowMeetupSuggestions: (s: boolean) => void;
- meetupSuggestions: any[];
+  meetupSuggestions: any[];
   setMeetupSuggestions: (s: any[]) => void;
- showSafeWord: boolean;
+  showSafeWord: boolean;
   setShowSafeWord: (s: boolean) => void;
- isRecording: boolean;
+  isRecording: boolean;
   setIsRecording: (r: boolean) => void;
- recordingDuration: number;
+  recordingDuration: number;
   setRecordingDuration: (d: number) => void;
- messageContextAction: string | null;
+  messageContextAction: string | null;
   setMessageContextAction: (a: string | null) => void;
- contextMessageId: string | null;
+  contextMessageId: string | null;
   setContextMessageId: (id: string | null) => void;
+  // Profile fields (kinks/sexual/interests)
+  profileFields: Record<string, string>;
+  setProfileFields: (f: Record<string, string>) => void;
+  updateProfileField: (key: string, value: string) => void;
+  // Chat sort mode
+  chatSortMode: ChatSortMode;
+  setChatSortMode: (m: ChatSortMode) => void;
+  // AI analyses per conversation
+  chatAnalyses: Record<string, ChatAIAnalysis>;
+  setChatAnalyses: (a: Record<string, ChatAIAnalysis>) => void;
+  // Kinks view tab
+  kinksViewTab: string;
+  setKinksViewTab: (t: string) => void;
+  // Intent filter for discover/chat
+  intentFilter: string;
+  setIntentFilter: (f: string) => void;
+  // PWA install prompt
+  pwaInstallPrompt: any;
+  setPwaInstallPrompt: (p: any) => void;
+  isPwaInstalled: boolean;
+  setIsPwaInstalled: (i: boolean) => void;
+  // Online status
+  isOnline: boolean;
+  setIsOnline: (o: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -182,7 +195,6 @@ export const useAppStore = create<AppState>((set) => ({
   setChatRequests: (reqs) => set({ chatRequests: reqs }),
   pendingRequestCount: 0,
   setPendingRequestCount: (n) => set({ pendingRequestCount: n }),
-  // New
   shouts: [],
   setShouts: (s) => set({ shouts: s }),
   addShout: (s) => set((st) => ({ shouts: [s, ...st.shouts] })),
@@ -200,45 +212,34 @@ export const useAppStore = create<AppState>((set) => ({
   setUserLat: (l) => set({ userLat: l }),
   userLng: null,
   setUserLng: (l) => set({ userLng: l }),
-  // GEO
   geoMode: 'auto',
   setGeoMode: (m) => set({ geoMode: m }),
   geoName: '',
   setGeoName: (n) => set({ geoName: n }),
-  // Agenda/Events
   agendaView: 'list',
   setAgendaView: (v) => set({ agendaView: v }),
   agendaFilter: 'all',
   setAgendaFilter: (f) => set({ agendaFilter: f }),
-  // Map filters
   mapFilter: 'all',
   setMapFilter: (f) => set({ mapFilter: f }),
   mapHidden: false,
   setMapHidden: (h) => set({ mapHidden: h }),
-  // Active sub-page (for navigating within More tab)
   activeSubPage: null,
   setActiveSubPage: (p) => set({ activeSubPage: p }),
-  // Infer results
   inferResults: [],
   setInferResults: (r) => set({ inferResults: r }),
   inferLoading: false,
   setInferLoading: (l) => set({ inferLoading: l }),
-  // Groups
   groups: [],
   setGroups: (g) => set({ groups: g }),
-  // Albums (full list)
   allAlbums: [],
   setAllAlbums: (a) => set({ allAlbums: a }),
-  // Footprints
   footprints: [],
   setFootprints: (f) => set({ footprints: f }),
-  // Boosts (all)
   allBoosts: [],
   setAllBoosts: (b) => set({ allBoosts: b }),
-  // Profile views received
   profileViews: [],
   setProfileViews: (v) => set({ profileViews: v }),
-  // Chat features
   chatTheme: 'default',
   setChatTheme: (t) => set({ chatTheme: t }),
   nsfwFilter: false,
@@ -293,4 +294,28 @@ export const useAppStore = create<AppState>((set) => ({
   setMessageContextAction: (a) => set({ messageContextAction: a }),
   contextMessageId: null,
   setContextMessageId: (id) => set({ contextMessageId: id }),
+  // Profile fields
+  profileFields: {},
+  setProfileFields: (f) => set({ profileFields: f }),
+  updateProfileField: (key, value) => set((s) => ({ profileFields: { ...s.profileFields, [key]: value } })),
+  // Chat sort
+  chatSortMode: 'recent',
+  setChatSortMode: (m) => set({ chatSortMode: m }),
+  // AI analyses
+  chatAnalyses: {},
+  setChatAnalyses: (a) => set({ chatAnalyses: a }),
+  // Kinks view
+  kinksViewTab: 'bedroom',
+  setKinksViewTab: (t) => set({ kinksViewTab: t }),
+  // Intent filter
+  intentFilter: 'all',
+  setIntentFilter: (f) => set({ intentFilter: f }),
+  // PWA
+  pwaInstallPrompt: null,
+  setPwaInstallPrompt: (p) => set({ pwaInstallPrompt: p }),
+  isPwaInstalled: false,
+  setIsPwaInstalled: (i) => set({ isPwaInstalled: i }),
+  // Online
+  isOnline: true,
+  setIsOnline: (o) => set({ isOnline: o }),
 }));
