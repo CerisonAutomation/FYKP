@@ -150,3 +150,127 @@ Stage Summary:
 - Cascade view has 4 GRINDR-style tap buttons (Hot/Friendly/Looking/Fresh Face)
 - Likes view detects and shows MATCH badge for mutual likes
 - Zero lint errors, all API routes responding correctly
+
+---
+Task ID: 2-a
+Agent: general-purpose subagent
+Task: Update types with ALL enums from OMOLINK reverse engineering report
+
+Work Log:
+- Read existing /home/z/my-project/src/types/index.ts (393 lines, 15 enums, 18 model interfaces, TabId with 11 values)
+- Added 13 new enum option arrays and their corresponding types after DISPLAY_UNITS_OPTIONS/DisplayUnits:
+  - HIV_STATUS_OPTIONS / HIVStatus (6 values)
+  - LANG_OPTIONS / Lang (15 values)
+  - GEO_MODE_OPTIONS / GeoMode (4 values)
+  - TAG_CATEGORY_OPTIONS / TagCategory (7 values)
+  - AGENDA_VIEW_OPTIONS / AgendaView (3 values)
+  - AGENDA_FILTER_OPTIONS / AgendaFilter (7 values)
+  - MAP_FILTER_OPTIONS / MapFilter (7 values)
+  - BANNER_POSITION_OPTIONS / BannerPosition (5 values)
+  - VERIFICATION_TYPE_OPTIONS / VerificationType (5 values)
+  - MEET_NOW_TAG_OPTIONS / MeetNowTag (13 values)
+  - CANNED_SHOUT_OPTIONS / CannedShout (10 values)
+  - PROFILE_TAG_CATEGORY_OPTIONS / ProfileTagCategory (5 values)
+  - INFER_CATEGORY_OPTIONS / InferCategory (8 values)
+- Added 5 new model interfaces before TABS section:
+  - GeoLocation (lat, lng, city, region, country, accuracy)
+  - InferResult (category, title, content, confidence, details?)
+  - PageDirectory (id, label, description, icon, tabId, badge?, isNew?, isPremium?)
+  - AccountSettings (email, password, username, displayName)
+  - PreferencesSettings (geoMode, geoName, displayUnits, lang, ageMin, ageMax, 12 boolean toggles, profileTags, profileTagCategorys, profileMeetNowTags)
+- Updated TabId from 11 values to 32 values: discover, map, chat, likes, more, events, viewed, shouts, fansites, videos, blogs, groups, albums, membership, verified, professional, footprints, notes, boosts, favorites, account, preferences, geo-settings, banners, sites, legal, faqs, abuse, advantages, affiliation, profile, infer
+- All existing content preserved intact (zero deletions)
+
+Stage Summary:
+- Total enums: 15 original + 13 new = 28 enum pairs (options array + type alias)
+- Total model interfaces: 18 original + 5 new = 23 interfaces
+- TabId expanded: 11 → 32 tab identifiers covering all app pages
+- File grew from 393 to ~530 lines
+- No duplicate DISPLAY_UNITS_OPTIONS (kept existing one, skipped instruction's duplicate)
+
+---
+Task ID: 2-b
+Agent: general-purpose subagent
+Task: Update Zustand store with all missing state fields
+
+Work Log:
+- Read existing /home/z/my-project/src/store/app.ts (110 lines, 56 interface fields)
+- Added 13 new state field groups (26 properties: value + setter each) to AppState interface after userLng:
+  - GEO: geoMode/setGeoMode, geoName/setGeoName
+  - Agenda/Events: agendaView/setAgendaView, agendaFilter/setAgendaFilter
+  - Map filters: mapFilter/setMapFilter, mapHidden/setMapHidden
+  - Active sub-page: activeSubPage/setActiveSubPage
+  - Infer results: inferResults/setInferResults, inferLoading/setInferLoading
+  - Groups: groups/setGroups
+  - Albums: allAlbums/setAllAlbums
+  - Footprints: footprints/setFootprints
+  - Boosts: allBoosts/setAllBoosts
+  - Profile views: profileViews/setProfileViews
+- Added matching default implementations in create() function
+- All existing state, imports, and logic preserved intact (zero deletions)
+
+Stage Summary:
+- Interface fields: 56 original → 82 total (26 new fields added)
+- File grew from 110 lines to ~178 lines
+- Store now covers GEO, agenda, map, sub-page navigation, infer, groups, albums, footprints, boosts, and profile views state
+
+## Task 2-c: Complete NEXUS page.tsx Rewrite (2,809 lines)
+
+**Date**: 2025-01-XX  
+**Status**: Complete  
+**Summary**: Complete replacement of `/src/app/page.tsx` with ALL 32 pages for the NEXUS dating/social app.
+
+### Changes Made:
+- Replaced the entire `src/app/page.tsx` (was 2,459 lines → now 2,809 lines)
+- Added ALL missing pages from the OMOLINK report
+- Restructured bottom nav to 5 tabs: Discover, Map, Chat, Likes, More
+- Added More tab as a complete page directory grid organized by 6 categories
+
+### Pages Implemented (32 total):
+1. **Discover** — Grid/cascade with filters (online, age range, looking for, ethnicity, body type)
+2. **Map** — User map with cluster markers, radius slider, filter bar, map grid visualization
+3. **Chat** — Conversations list, group chats tab, chat requests, real-time messages, AI Rizz
+4. **Likes** — Received/sent tabs with accept/decline
+5. **More** — Complete page directory grid (6 categories: Social, Content, Profile, Premium, Settings, Info)
+6. **Events/Agenda** — Events with filters (today/week/month/nearby/my), create event, RSVP, list/calendar/map views
+7. **Viewed Me** — Profile viewers list
+8. **Shouts** — Feed with compose, canned shout options, text/image/video types
+9. **Fansites** — Grid + detail sheet with links and products
+10. **Videos** — Video grid with search, play overlay
+11. **Blogs** — Blog listing with search, blog detail sheet
+12. **Groups** — Groups list with search, create group dialog
+13. **Albums** — Album grid, album detail sheet with photos
+14. **Membership** — Subscription tiers (Free/Premium/VIP/Creator) with pricing and features
+15. **Verified** — Verification status, 5 verification types (age/photo/id/face/social)
+16. **Professional** — Professional status, requirements, apply button
+17. **Footprints** — Visit history with timestamps
+18. **Notes** — Notes list with add/delete
+19. **Boosts** — Active boosts with glow, 4 boost types for purchase, history
+20. **Favorites** — Favorites list with super favorites
+21. **Account** — Email, password, display name, delete account
+22. **Preferences** — All preference settings (20+ toggles: geo, display, discover, sound, notifications, privacy)
+23. **GEO Settings** — 4 location modes (Auto/Manual/Fake/Hide), geo name, map preview, fake location warning
+24. **Banners** — Active banners with positions, create banner
+25. **Sites** — Connected sites/links
+26. **Legal** — Terms, Privacy, Cookies with tab switching
+27. **FAQs** — 10 FAQs with expandable accordion
+28. **Abuse** — Report form with categories, blocked users management
+29. **Advantages** — Premium feature comparison table (12 features)
+30. **Affiliation** — Referral program, referral link, stats, commission structure
+31. **Profile** — Full profile with avatar, bio, about me, photos, stats, subscriptions, boosts, favorites, notes, verification, sessions, edit form, settings shortcut
+32. **INFER (AI Analysis)** — User selector, 8 category tabs (Compatibility, Icebreakers, Conversation Starters, Profile Tips, Red Flags, Green Flags, Date Ideas, Personality), confidence scores, bullet points, color coding, Full Analysis button
+
+### Architecture:
+- All views are inner functions sharing component state via closures (existing pattern)
+- Bottom nav has 5 tabs with badge counts
+- Sub-pages navigate via `setActiveTab` with back button to return to More
+- Uses shadcn/ui components (Sheet, Dialog, Tabs, Accordion, ScrollArea, Progress, etc.)
+- Dark FYK styling with gradient-text, online-pulse, boost-glow, profile-card hover effects
+- Socket.io real-time chat via io('/?XTransformPort=3001')
+- Data fetching from all existing API routes
+- Quick-login bypass (hardcoded test user data)
+
+### Verification:
+- ESLint: ✅ No errors
+- Dev server: ✅ Compiled successfully, serving on port 3000
+- All 32 pages accessible via More tab navigation

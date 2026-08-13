@@ -1,0 +1,2002 @@
+     1→'use client';
+     2→
+     3→import React, { useState, useEffect, useRef, useCallback } from 'react';
+     4→import { io as socketIO, Socket } from 'socket.io-client';
+     5→import { formatDistanceToNow, format } from 'date-fns';
+     6→import { useAppStore } from '@/store/app';
+     7→import type { User, Message, Conversation, Like, Fansite, AppEvent, GroupChat, Photo, Album, ChatRequest, ProfileView as ProfileViewType, Shout, UserFavorite, UserNote, Blog, Video as VideoType, Banner, Verification, UserSession } from '@/types';
+     8→import { Button } from '@/components/ui/button';
+     9→import { Input } from '@/components/ui/input';
+    10→import { Textarea } from '@/components/ui/textarea';
+    11→import { Label } from '@/components/ui/label';
+    12→import { Badge } from '@/components/ui/badge';
+    13→import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+    14→import { Card, CardContent } from '@/components/ui/card';
+    15→import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+    16→import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+    17→import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+    18→import { ScrollArea } from '@/components/ui/scroll-area';
+    19→import { Separator } from '@/components/ui/separator';
+    20→import { Switch } from '@/components/ui/switch';
+    21→import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+    22→import { Skeleton } from '@/components/ui/skeleton';
+    23→import { Slider } from '@/components/ui/slider';
+    24→import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+    25→import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+    26→import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+    27→import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+    28→import { Progress } from '@/components/ui/progress';
+    29→import {
+    30→  Compass, MessageCircle, Heart, Star, Calendar, User, Search,
+    31→  Bell, Settings, X, Send, Paperclip, Check, CheckCheck, Crown,
+    32→  Shield, MapPin, ChevronLeft, ChevronRight, Grid3X3, Layers,
+    33→  ThumbsUp, ThumbsDown, Eye, Image as ImageIcon, Users, Zap,
+    34→  Copy, Sparkles, LogOut, Link2, ExternalLink, Flag, Ban as Block,
+    35→  Pencil, Camera, MoreVertical, ArrowLeft, Plus, Clock, Globe,
+    36→  Map, Megaphone, Video, FileText, Bookmark, StickyNote, MapPinned,
+    37→  StarOff, ShieldCheck, MonitorSmartphone, Crosshair,
+    38→} from 'lucide-react';
+    39→
+    40→// ─── Constants ───────────────────────────────────────────────────────────────
+    41→const RIZZ_STYLES = [
+    42→  { value: 'romantic', label: 'Romantic', icon: '💖' },
+    43→  { value: 'funny', label: 'Funny', icon: '😂' },
+    44→  { value: 'bold', label: 'Bold', icon: '🔥' },
+    45→  { value: 'nerdy', label: 'Nerdy', icon: '🤓' },
+    46→  { value: 'sweet', label: 'Sweet', icon: '🍯' },
+    47→  { value: 'flirty', label: 'Flirty', icon: '😘' },
+    48→];
+    49→
+    50→const TAP_TYPES = [
+    51→  { emoji: '🔥', label: 'Hot', color: 'from-red-500 to-orange-500' },
+    52→  { emoji: '👋', label: 'Friendly', color: 'from-blue-500 to-cyan-500' },
+    53→  { emoji: '😍', label: 'Looking', color: 'from-pink-500 to-rose-500' },
+    54→  { emoji: '✨', label: 'Fresh Face', color: 'from-emerald-500 to-teal-500' },
+    55→];
+    56→
+    57→const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face';
+    58→const DEFAULT_COVER = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&h=400&fit=crop';
+    59→
+    60→// ─── Helpers ─────────────────────────────────────────────────────────────────
+    61→function timeAgo(dateStr: string): string {
+    62→  try {
+    63→    return formatDistanceToNow(new Date(dateStr), { addSuffix: true });
+    64→  } catch {
+    65→    return '';
+    66→  }
+    67→}
+    68→
+    69→function formatEventDate(dateStr: string): string {
+    70→  try {
+    71→    return format(new Date(dateStr), 'MMM d, yyyy h:mm a');
+    72→  } catch {
+    73→    return dateStr;
+    74→  }
+    75→}
+    76→
+    77→function getAvatar(user: { avatar?: string | null } | null | undefined): string {
+    78→  return user?.avatar || DEFAULT_AVATAR;
+    79→}
+    80→
+    81→function truncate(str: string | null | undefined, len: number): string {
+    82→  if (!str) return '';
+    83→  return str.length > len ? str.slice(0, len) + '...' : str;
+    84→}
+    85→
+    86→function getLastSeenText(user: User): string {
+    87→  if (user.online && user.showOnline) return 'Online now';
+    88→  if (user.lastSeen) return `Last seen ${timeAgo(user.lastSeen)}`;
+    89→  return 'Offline';
+    90→}
+    91→
+    92→// ─── Main Component ──────────────────────────────────────────────────────────
+    93→export default function NexusApp() {
+    94→  const store = useAppStore();
+    95→  const {
+    96→    currentUser, setCurrentUser, activeTab, setActiveTab,
+    97→    selectedUserId, setSelectedUserId, selectedGroupId, setSelectedGroupId,
+    98→    showProfileDrawer, setShowProfileDrawer, showSettings, setShowSettings,
+    99→    showRizzModal, setShowRizzModal, rizzTargetBio, setRizzTargetBio,
+   100→    conversations, setConversations, activeConversation, setActiveConversation,
+   101→    messages, setMessages, addMessage, refreshDiscover, triggerRefreshDiscover,
+   102→    discoverView, setDiscoverView, sidebarOpen, setSidebarOpen,
+   103→    chatRequests, setChatRequests, pendingRequestCount, setPendingRequestCount,
+   104→    shouts, setShouts, addShout, favorites, setFavorites, notes, setNotes,
+   105→    blogs, setBlogs, videos, setVideos, banners, setBanners,
+   106→    userLat, setUserLat, userLng, setUserLng,
+   107→  } = store;
+   108→
+   109→  // ── Auth state ──
+   110→  const [authed, setAuthed] = useState(false);
+   111→  const [authLoading, setAuthLoading] = useState(true);
+   112→  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+   113→  const [loginError, setLoginError] = useState('');
+   114→
+   115→  // ── Discover state ──
+   116→  const [discoverUsers, setDiscoverUsers] = useState<(User & { distance?: number | null })[]>([]);
+   117→  const [discoverLoading, setDiscoverLoading] = useState(true);
+   118→  const [onlineOnly, setOnlineOnly] = useState(false);
+   119→  const [ageRange, setAgeRange] = useState([18, 60]);
+   120→  const [lookingFor, setLookingFor] = useState('all');
+   121→  const [cascadeIndex, setCascadeIndex] = useState(0);
+   122→
+   123→  // ── Chat state ──
+   124→  const [chatLoading, setChatLoading] = useState(false);
+   125→  const [msgInput, setMsgInput] = useState('');
+   126→  const [groups, setGroups] = useState<GroupChat[]>([]);
+   127→  const [groupMessages, setGroupMessages] = useState<Message[]>([]);
+   128→  const [activeGroup, setActiveGroup] = useState<GroupChat | null>(null);
+   129→  const [chatMobileView, setChatMobileView] = useState<'list' | 'chat'>('list');
+   130→  const socketRef = useRef<Socket | null>(null);
+   131→  const msgEndRef = useRef<HTMLDivElement>(null);
+   132→  const [typing, setTyping] = useState(false);
+   133→
+   134→  // ── Likes state ──
+   135→  const [likesTab, setLikesTab] = useState<'received' | 'sent'>('received');
+   136→  const [receivedLikes, setReceivedLikes] = useState<Like[]>([]);
+   137→  const [sentLikes, setSentLikes] = useState<Like[]>([]);
+   138→  const [likesLoading, setLikesLoading] = useState(true);
+   139→
+   140→  // ── Viewed Me state ──
+   141→  const [profileViews, setProfileViews] = useState<ProfileViewType[]>([]);
+   142→  const [viewsLoading, setViewsLoading] = useState(false);
+   143→
+   144→  // ── Fansites state ──
+   145→  const [fansites, setFansites] = useState<Fansite[]>([]);
+   146→  const [fansiteLoading, setFansiteLoading] = useState(true);
+   147→  const [selectedFansite, setSelectedFansite] = useState<Fansite | null>(null);
+   148→  const [showFansiteSheet, setShowFansiteSheet] = useState(false);
+   149→
+   150→  // ── Events state ──
+   151→  const [events, setEvents] = useState<AppEvent[]>([]);
+   152→  const [eventsLoading, setEventsLoading] = useState(true);
+   153→  const [showCreateEvent, setShowCreateEvent] = useState(false);
+   154→  const [eventForm, setEventForm] = useState({ title: '', description: '', location: '', startDate: '', imageUrl: '' });
+   155→  const [userRsvps, setUserRsvps] = useState<Record<string, string>>({});
+   156→
+   157→  // ── Profile state ──
+   158→  const [profileUser, setProfileUser] = useState<User | null>(null);
+   159→  const [profileLoading, setProfileLoading] = useState(false);
+   160→  const [profilePhotos, setProfilePhotos] = useState<Photo[]>([]);
+   161→  const [profileAlbums, setProfileAlbums] = useState<Album[]>([]);
+   162→  const [profileGalleryIndex, setProfileGalleryIndex] = useState(0);
+   163→  const [editingProfile, setEditingProfile] = useState(false);
+   164→  const [editForm, setEditForm] = useState({ displayName: '', bio: '', lookingFor: '', aboutMe: '', height: '', weight: '', ethnicity: '', bodyType: '', relationshipStatus: '', position: '', pronouns: '', location: '' });
+   165→  const [mySubscriptions, setMySubscriptions] = useState<any[]>([]);
+   166→  const [myBoosts, setMyBoosts] = useState<any[]>([]);
+   167→  const [blockedUsers, setBlockedUsers] = useState<any[]>([]);
+   168→
+   169→  // ── Settings state ──
+   170→  const [settingsPrivacy, setSettingsPrivacy] = useState({ showOnline: true, showDistance: true, showAge: true });
+   171→  const [settingsNotifs, setSettingsNotifs] = useState({ push: true, chat: true, likes: true, views: true });
+   172→
+   173→  // ── Rizz state ──
+   174→  const [rizzStyle, setRizzStyle] = useState('sweet');
+   175→  const [rizzLoading, setRizzLoading] = useState(false);
+   176→  const [rizzResult, setRizzResult] = useState<any>(null);
+   177→
+   178→  // ── Misc state ──
+   179→  const [notifications] = useState(3);
+   180→  const [showBlockAlert, setShowBlockAlert] = useState(false);
+   181→  const [totalUnread, setTotalUnread] = useState(0);
+   182→
+   183→  // ── Shouts state ──
+   184→  const [shoutInput, setShoutInput] = useState('');
+   185→  const [shoutLoading, setShoutLoading] = useState(true);
+   186→
+   187→  // ── Map state ──
+   188→  const [mapUsers, setMapUsers] = useState<(User & { distance?: number })[]>([]);
+   189→  const [mapLoading, setMapLoading] = useState(false);
+   190→  const [mapRadius, setMapRadius] = useState(50);
+   191→  const [mapCenter, setMapCenter] = useState({ lat: 35.69, lng: 14.42 });
+   192→
+   193→  // ── Videos state ──
+   194→  const [videosLoading, setVideosLoading] = useState(true);
+   195→
+   196→  // ── Blogs state ──
+   197→  const [blogsLoading, setBlogsLoading] = useState(true);
+   198→
+   199→  // ── Notes / Favorites state ──
+   200→  const [noteContent, setNoteContent] = useState('');
+   201→  const [noteTargetId, setNoteTargetId] = useState<string | null>(null);
+   202→  const [showNoteDialog, setShowNoteDialog] = useState(false);
+   203→  const [favoritesLoading, setFavoritesLoading] = useState(true);
+   204→
+   205→  // ── Verification state ──
+   206→  const [myVerification, setMyVerification] = useState<Verification | null>(null);
+   207→  const [mySessions, setMySessions] = useState<UserSession[]>([]);
+   208→
+   209→  // ─── Auth ──────────────────────────────────────────────────────────────────
+   210→  useEffect(() => {
+   211→    fetch('/api/auth')
+   212→      .then(r => r.ok ? r.json() : Promise.reject())
+   213→      .then(res => {
+   214→        setCurrentUser(res.data);
+   215→        setAuthed(true);
+   216→      })
+   217→      .catch(() => setAuthLoading(false))
+   218→      .finally(() => setAuthLoading(false));
+   219→  }, []);
+   220→
+   221→  async function handleLogin(e: React.FormEvent) {
+   222→    e.preventDefault();
+   223→    setLoginError('');
+   224→    try {
+   225→      const res = await fetch('/api/auth', {
+   226→        method: 'POST',
+   227→        headers: { 'Content-Type': 'application/json' },
+   228→        body: JSON.stringify({ action: 'login', ...loginForm }),
+   229→      });
+   230→      const data = await res.json();
+   231→      if (res.ok) {
+   232→        setCurrentUser(data.data);
+   233→        setAuthed(true);
+   234→      } else {
+   235→        setLoginError(data.error || 'Login failed');
+   236→      }
+   237→    } catch {
+   238→      setLoginError('Network error');
+   239→    }
+   240→  }
+   241→
+   242→  // ─── Socket.io ─────────────────────────────────────────────────────────────
+   243→  useEffect(() => {
+   244→    if (!authed || !currentUser) return;
+   245→    const socket = socketIO('/?XTransformPort=3001', { transports: ['websocket'], autoConnect: false });
+   246→    socket.connect();
+   247→    socket.on('connect', () => {
+   248→      socket.emit('join', { userId: currentUser.id });
+   249→    });
+   250→    socket.on('new-message', (msg: Message) => {
+   251→      addMessage(msg);
+   252→    });
+   253→    socket.on('typing', () => setTyping(true));
+   254→    socketRef.current = socket;
+   255→    return () => {
+   256→      socket.disconnect();
+   257→      socketRef.current = null;
+   258→    };
+   259→  }, [authed, currentUser?.id]);
+   260→
+   261→  // ─── Fetch Discover ─────────────────────────────────────────────────────────
+   262→  useEffect(() => {
+   263→    if (!authed) return;
+   264→    setDiscoverLoading(true);
+   265→    fetch('/api/discover')
+   266→      .then(r => r.json())
+   267→      .then(res => {
+   268→        const users = res.data || [];
+   269→        setDiscoverUsers(users);
+   270→        setCascadeIndex(0);
+   271→      })
+   272→      .catch(() => {})
+   273→      .finally(() => setDiscoverLoading(false));
+   274→  }, [authed, refreshDiscover]);
+   275→
+   276→  // ─── Fetch Conversations ────────────────────────────────────────────────────
+   277→  useEffect(() => {
+   278→    if (!authed || activeTab !== 'chat') return;
+   279→    setChatLoading(true);
+   280→    Promise.all([
+   281→      fetch('/api/messages/conversations').then(r => r.json()),
+   282→      fetch('/api/groups').then(r => r.json()),
+   283→      fetch('/api/chat-requests').then(r => r.json()).catch(() => ({ data: [] })),
+   284→    ]).then(([convRes, groupRes, reqRes]) => {
+   285→      const convos = convRes.data || [];
+   286→      setConversations(convos);
+   287→      setGroups(groupRes.data || []);
+   288→      setTotalUnread(convos.reduce((sum: number, c: any) => sum + (c.unreadCount || 0), 0));
+   289→      const reqs = reqRes.data || [];
+   290→      const pending = reqs.filter((r: ChatRequest) => r.status === 'pending');
+   291→      setChatRequests(pending);
+   292→      setPendingRequestCount(pending.length);
+   293→    }).catch(() => {}).finally(() => setChatLoading(false));
+   294→  }, [authed, activeTab]);
+   295→
+   296→  // ─── Fetch Likes ────────────────────────────────────────────────────────────
+   297→  useEffect(() => {
+   298→    if (!authed || activeTab !== 'likes') return;
+   299→    setLikesLoading(true);
+   300→    Promise.all([
+   301→      fetch('/api/likes?type=received').then(r => r.json()),
+   302→      fetch('/api/likes?type=sent').then(r => r.json()),
+   303→    ]).then(([recRes, sentRes]) => {
+   304→      setReceivedLikes(recRes.data || []);
+   305→      setSentLikes(sentRes.data || []);
+   306→    }).catch(() => {}).finally(() => setLikesLoading(false));
+   307→  }, [authed, activeTab]);
+   308→
+   309→  // ─── Fetch Profile Views (Viewed Me) ────────────────────────────────────────
+   310→  useEffect(() => {
+   311→    if (!authed || activeTab !== 'viewed') return;
+   312→    setViewsLoading(true);
+   313→    fetch('/api/profile-views')
+   314→      .then(r => r.json())
+   315→      .then(res => {
+   316→        setProfileViews(res.data || []);
+   317→      })
+   318→      .catch(() => {})
+   319→      .finally(() => setViewsLoading(false));
+   320→  }, [authed, activeTab]);
+   321→
+   322→  // ─── Fetch Fansites ─────────────────────────────────────────────────────────
+   323→  useEffect(() => {
+   324→    if (!authed || activeTab !== 'fansites') return;
+   325→    setFansiteLoading(true);
+   326→    fetch('/api/fansites').then(r => r.json()).then(res => {
+   327→      setFansites(res.data || []);
+   328→    }).catch(() => {}).finally(() => setFansiteLoading(false));
+   329→  }, [authed, activeTab]);
+   330→
+   331→  // ─── Fetch Events ───────────────────────────────────────────────────────────
+   332→  useEffect(() => {
+   333→    if (!authed || activeTab !== 'events') return;
+   334→    setEventsLoading(true);
+   335→    fetch('/api/events').then(r => r.json()).then(res => {
+   336→      setEvents(res.data || []);
+   337→    }).catch(() => {}).finally(() => setEventsLoading(false));
+   338→  }, [authed, activeTab]);
+   339→
+   340→  // ─── Fetch Shouts ──────────────────────────────────────────────────────────
+   341→  useEffect(() => {
+   342→    if (!authed || activeTab !== 'shouts') return;
+   343→    setShoutLoading(true);
+   344→    fetch('/api/shouts').then(r => r.json()).then(res => {
+   345→      setShouts(res.data || []);
+   346→    }).catch(() => {}).finally(() => setShoutLoading(false));
+   347→  }, [authed, activeTab]);
+   348→
+   349→  // ─── Fetch Map / GEO ──────────────────────────────────────────────────────
+   350→  useEffect(() => {
+   351→    if (!authed || activeTab !== 'map') return;
+   352→    handleUpdateGeo();
+   353→    handleFetchMap();
+   354→  }, [authed, activeTab, mapRadius]);
+   355→
+   356→  // ─── Fetch Videos ─────────────────────────────────────────────────────────
+   357→  useEffect(() => {
+   358→    if (!authed || activeTab !== 'videos') return;
+   359→    setVideosLoading(true);
+   360→    fetch('/api/videos').then(r => r.json()).then(res => {
+   361→      setVideos(res.videos || []);
+   362→    }).catch(() => {}).finally(() => setVideosLoading(false));
+   363→  }, [authed, activeTab]);
+   364→
+   365→  // ─── Fetch Blogs ──────────────────────────────────────────────────────────
+   366→  useEffect(() => {
+   367→    if (!authed || activeTab !== 'blogs') return;
+   368→    setBlogsLoading(true);
+   369→    fetch('/api/blogs').then(r => r.json()).then(res => {
+   370→      setBlogs(res.blogs || []);
+   371→    }).catch(() => {}).finally(() => setBlogsLoading(false));
+   372→  }, [authed, activeTab]);
+   373→
+   374→  // ─── Fetch Banners ────────────────────────────────────────────────────────
+   375→  useEffect(() => {
+   376→    fetch('/api/banners').then(r => r.json()).then(res => {
+   377→      setBanners(res.data || []);
+   378→    }).catch(() => {});
+   379→  }, [authed]);
+   380→
+   381→  // ─── Fetch Profile ──────────────────────────────────────────────────────────
+   382→  useEffect(() => {
+   383→    if (!selectedUserId) return;
+   384→    setProfileLoading(true);
+   385→    Promise.all([
+   386→      fetch(`/api/users/${selectedUserId}`).then(r => r.json()),
+   387→      fetch('/api/profile-views', {
+   388→        method: 'POST',
+   389→        headers: { 'Content-Type': 'application/json' },
+   390→        body: JSON.stringify({ viewedId: selectedUserId }),
+   391→      }).catch(() => null),
+   392→    ]).then(([res]) => {
+   393→      const u = res.data;
+   394→      setProfileUser(u);
+   395→      setProfilePhotos(u.photos || []);
+   396→      setProfileAlbums(u.albums || []);
+   397→      setRizzTargetBio(u.bio || '');
+   398→    }).catch(() => {}).finally(() => setProfileLoading(false));
+   399→  }, [selectedUserId]);
+   400→
+   401→  // ─── Load my profile data ───────────────────────────────────────────────────
+   402→  useEffect(() => {
+   403→    if (!authed || !currentUser || activeTab !== 'profile') return;
+   404→    Promise.all([
+   405→      fetch(`/api/users/${currentUser.id}`).then(r => r.json()),
+   406→      fetch('/api/subscriptions').then(r => r.json()),
+   407→      fetch('/api/boosts').then(r => r.json()),
+   408→      fetch('/api/blocks').then(r => r.json()),
+   409→      fetch('/api/verification?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: null })),
+   410→      fetch('/api/sessions?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+   411→      fetch('/api/favorites?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+   412→      fetch('/api/notes?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+   413→    ]).then(([userRes, subRes, boostRes, blockRes, verRes, sessRes, favRes, noteRes]) => {
+   414→      const u = userRes.data;
+   415→      setCurrentUser(u);
+   416→      setMySubscriptions(subRes.data || []);
+   417→      setMyBoosts((boostRes.data || []).filter((b: any) => b.isActive));
+   418→      setBlockedUsers(blockRes.data || []);
+   419→      setSettingsPrivacy({ showOnline: u.showOnline ?? true, showDistance: u.showDistance ?? true, showAge: u.showAge ?? true });
+   420→      setMyVerification(verRes.data || null);
+   421→      setMySessions(sessRes.data || []);
+   422→      setFavorites(favRes.data || []);
+   423→      setNotes(noteRes.data || []);
+   424→    }).catch(() => {});
+   425→  }, [authed, activeTab]);
+   426→
+   427→  // ─── Scroll to bottom of messages ───────────────────────────────────────────
+   428→  useEffect(() => {
+   429→    msgEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+   430→  }, [messages, groupMessages]);
+   431→
+   432→  // ─── Handlers ──────────────────────────────────────────────────────────────
+   433→  const openProfile = useCallback((userId: string) => {
+   434→    setSelectedUserId(userId);
+   435→  }, [setSelectedUserId]);
+   436→
+   437→  const closeProfile = useCallback(() => {
+   438→    setShowProfileDrawer(false);
+   439→    setSelectedUserId(null);
+   440→    setProfileUser(null);
+   441→  }, [setShowProfileDrawer, setSelectedUserId]);
+   442→
+   443→  const openChat = useCallback(async (otherUser: User) => {
+   444→    const convo: Conversation = {
+   445→      otherUser,
+   446→      lastMessage: { id: '', content: '', senderId: '', receiverId: '', chatType: 'direct', isRead: true, type: 'text', createdAt: new Date().toISOString() },
+   447→      unreadCount: 0,
+   448→    };
+   449→    setActiveConversation(convo);
+   450→    setMessages([]);
+   451→    setChatMobileView('chat');
+   452→    if (currentUser) {
+   453→      fetch(`/api/messages?userId=${otherUser.id}`).then(r => r.json()).then(res => {
+   454→        setMessages(res.data || []);
+   455→      }).catch(() => {});
+   456→    }
+   457→  }, [currentUser, setActiveConversation, setMessages]);
+   458→
+   459→  const sendMessage = useCallback(() => {
+   460→    if (!msgInput.trim() || !activeConversation || !currentUser) return;
+   461→    const content = msgInput.trim();
+   462→    setMsgInput('');
+   463→    const optimisticMsg: Message = {
+   464→      id: `temp-${Date.now()}`,
+   465→      content,
+   466→      senderId: currentUser.id,
+   467→      receiverId: activeConversation.otherUser.id,
+   468→      chatType: 'direct',
+   469→      isRead: false,
+   470→      type: 'text',
+   471→      createdAt: new Date().toISOString(),
+   472→    };
+   473→    addMessage(optimisticMsg);
+   474→    fetch('/api/messages', {
+   475→      method: 'POST',
+   476→      headers: { 'Content-Type': 'application/json' },
+   477→      body: JSON.stringify({ receiverId: activeConversation.otherUser.id, content, type: 'text' }),
+   478→    }).then(r => r.json()).then(res => {
+   479→      if (res.data) {
+   480→        setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? res.data : m));
+   481→        socketRef.current?.emit('message', res.data);
+   482→      }
+   483→    }).catch(() => {});
+   484→  }, [msgInput, activeConversation, currentUser, addMessage, setMessages]);
+   485→
+   486→  const sendGroupMessage = useCallback(() => {
+   487→    if (!msgInput.trim() || !activeGroup || !currentUser) return;
+   488→    const content = msgInput.trim();
+   489→    setMsgInput('');
+   490→    const optimisticMsg: Message = {
+   491→      id: `temp-${Date.now()}`,
+   492→      content,
+   493→      senderId: currentUser.id,
+   494→      receiverId: '',
+   495→      chatType: 'group',
+   496→      isRead: false,
+   497→      type: 'text',
+   498→      createdAt: new Date().toISOString(),
+   499→      sender: currentUser,
+   500→    };
+   501→    setGroupMessages(prev => [...prev, optimisticMsg]);
+   502→    fetch(`/api/groups/${activeGroup.id}`, {
+   503→      method: 'POST',
+   504→      headers: { 'Content-Type': 'application/json' },
+   505→      body: JSON.stringify({ action: 'message', content }),
+   506→    }).then(r => r.json()).catch(() => {});
+   507→  }, [msgInput, activeGroup, currentUser]);
+   508→
+   509→  const handleLike = useCallback(async (receiverId: string) => {
+   510→    try {
+   511→      await fetch('/api/likes', {
+   512→        method: 'POST',
+   513→        headers: { 'Content-Type': 'application/json' },
+   514→        body: JSON.stringify({ receiverId }),
+   515→      });
+   516→      triggerRefreshDiscover();
+   517→    } catch {}
+   518→  }, [triggerRefreshDiscover]);
+   519→
+   520→  const handleUnlike = useCallback(async (receiverId: string) => {
+   521→    try {
+   522→      await fetch(`/api/likes?receiverId=${receiverId}`, { method: 'DELETE' });
+   523→      triggerRefreshDiscover();
+   524→    } catch {}
+   525→  }, [triggerRefreshDiscover]);
+   526→
+   527→  const handleBlock = useCallback(async (userId: string) => {
+   528→    try {
+   529→      await fetch('/api/blocks', {
+   530→        method: 'POST',
+   531→        headers: { 'Content-Type': 'application/json' },
+   532→        body: JSON.stringify({ blockedId: userId }),
+   533→      });
+   534→      setShowBlockAlert(false);
+   535→      closeProfile();
+   536→    } catch {}
+   537→  }, [closeProfile]);
+   538→
+   539→  const handleRizz = useCallback(async () => {
+   540→    setRizzLoading(true);
+   541→    setRizzResult(null);
+   542→    try {
+   543→      const res = await fetch('/api/ai-rizz', {
+   544→        method: 'POST',
+   545→        headers: { 'Content-Type': 'application/json' },
+   546→        body: JSON.stringify({ targetBio: rizzTargetBio, style: rizzStyle }),
+   547→      });
+   548→      const data = await res.json();
+   549→      setRizzResult(data.data);
+   550→    } catch {
+   551→      setRizzResult({ line: 'Failed to generate a line. Try again!', style: rizzStyle });
+   552→    } finally {
+   553→      setRizzLoading(false);
+   554→    }
+   555→  }, [rizzTargetBio, rizzStyle]);
+   556→
+   557→  const handleSendRizz = useCallback(() => {
+   558→    if (!rizzResult || !activeConversation && !profileUser) return;
+   559→    if (activeConversation) {
+   560→      setMsgInput(rizzResult.line);
+   561→      setShowRizzModal(false);
+   562→    } else if (profileUser) {
+   563→      openChat(profileUser);
+   564→      setTimeout(() => {
+   565→        setMsgInput(rizzResult.line);
+   566→        setShowRizzModal(false);
+   567→      }, 300);
+   568→    }
+   569→  }, [rizzResult, activeConversation, profileUser, openChat]);
+   570→
+   571→  const copyRizz = useCallback(() => {
+   572→    if (rizzResult?.line) {
+   573→      navigator.clipboard.writeText(rizzResult.line);
+   574→    }
+   575→  }, [rizzResult]);
+   576→
+   577→  const handleRsvp = useCallback(async (eventId: string, status: string) => {
+   578→    try {
+   579→      await fetch('/api/events', {
+   580→        method: 'POST',
+   581→        headers: { 'Content-Type': 'application/json' },
+   582→        body: JSON.stringify({ action: 'rsvp', eventId, status }),
+   583→      });
+   584→      setUserRsvps(prev => ({ ...prev, [eventId]: status }));
+   585→    } catch {}
+   586→  }, []);
+   587→
+   588→  const handleCreateEvent = useCallback(async () => {
+   589→    try {
+   590→      const res = await fetch('/api/events', {
+   591→        method: 'POST',
+   592→        headers: { 'Content-Type': 'application/json' },
+   593→        body: JSON.stringify(eventForm),
+   594→      });
+   595→      if (res.ok) {
+   596→        const data = await res.json();
+   597→        setEvents(prev => [data.data, ...prev]);
+   598→        setShowCreateEvent(false);
+   599→        setEventForm({ title: '', description: '', location: '', startDate: '', imageUrl: '' });
+   600→      }
+   601→    } catch {}
+   602→  }, [eventForm]);
+   603→
+   604→  const handleSaveProfile = useCallback(async () => {
+   605→    if (!currentUser) return;
+   606→    try {
+   607→      const payload: any = {};
+   608→      for (const [k, v] of Object.entries(editForm)) {
+   609→        if (v !== '' && v !== undefined) {
+   610→          if (k === 'height' || k === 'weight') payload[k] = parseInt(v);
+   611→          else payload[k] = v;
+   612→        }
+   613→      }
+   614→      const res = await fetch(`/api/users/${currentUser.id}`, {
+   615→        method: 'POST',
+   616→        headers: { 'Content-Type': 'application/json' },
+   617→        body: JSON.stringify(payload),
+   618→      });
+   619→      if (res.ok) {
+   620→        const data = await res.json();
+   621→        setCurrentUser(data.data);
+   622→        setEditingProfile(false);
+   623→      }
+   624→    } catch {}
+   625→  }, [currentUser, editForm, setCurrentUser]);
+   626→
+   627→  const handleSaveSettings = useCallback(async () => {
+   628→    if (!currentUser) return;
+   629→    try {
+   630→      await fetch(`/api/users/${currentUser.id}`, {
+   631→        method: 'POST',
+   632→        headers: { 'Content-Type': 'application/json' },
+   633→        body: JSON.stringify(settingsPrivacy),
+   634→      });
+   635→      setCurrentUser({ ...currentUser, ...settingsPrivacy });
+   636→    } catch {}
+   637→  }, [currentUser, settingsPrivacy, setCurrentUser]);
+   638→
+   639→  const handleChatRequest = useCallback(async (requestId: string, action: 'accept' | 'decline') => {
+   640→    try {
+   641→      await fetch('/api/chat-requests', {
+   642→        method: 'POST',
+   643→        headers: { 'Content-Type': 'application/json' },
+   644→        body: JSON.stringify({ requestId, action }),
+   645→      });
+   646→      setChatRequests(prev => prev.filter(r => r.id !== requestId));
+   647→      setPendingRequestCount(prev => Math.max(0, prev - 1));
+   648→    } catch {}
+   649→  }, [setChatRequests, setPendingRequestCount]);
+   650→
+   651→  // ─── New feature handlers ────────────────────────────────────────────────
+   652→  const handleShout = useCallback(async () => {
+   653→    if (!shoutInput.trim() || !currentUser) return;
+   654→    try {
+   655→      const res = await fetch(`/api/shouts?userId=${currentUser.id}`, {
+   656→        method: 'POST', headers: { 'Content-Type': 'application/json' },
+   657→        body: JSON.stringify({ content: shoutInput.trim(), type: 'text' }),
+   658→      });
+   659→      if (res.ok) {
+   660→        const data = await res.json();
+   661→        if (data.data) addShout(data.data);
+   662→        setShoutInput('');
+   663→      }
+   664→    } catch {}
+   665→  }, [shoutInput, currentUser, addShout]);
+   666→
+   667→  const handleFetchMap = useCallback(async () => {
+   668→    if (!currentUser) return;
+   669→    const lat = userLat || currentUser.lat || 35.69;
+   670→    const lng = userLng || currentUser.lng || 14.42;
+   671→    setMapLoading(true);
+   672→    try {
+   673→      const res = await fetch(`/api/user-map?lat=${lat}&lng=${lng}&radius=${mapRadius}&userId=${currentUser.id}`);
+   674→      const data = await res.json();
+   675→      setMapUsers(data.users || []);
+   676→      setMapCenter({ lat, lng });
+   677→    } catch {} finally { setMapLoading(false); }
+   678→  }, [currentUser, userLat, userLng, mapRadius]);
+   679→
+   680→  const handleFavorite = useCallback(async (targetId: string, isSuper: boolean = false) => {
+   681→    if (!currentUser) return;
+   682→    try {
+   683→      await fetch(`/api/favorites?userId=${currentUser.id}`, {
+   684→        method: 'POST', headers: { 'Content-Type': 'application/json' },
+   685→        body: JSON.stringify({ targetId, isSuper }),
+   686→      });
+   687→    } catch {}
+   688→  }, [currentUser]);
+   689→
+   690→  const handleSaveNote = useCallback(async () => {
+   691→    if (!currentUser || !noteTargetId || !noteContent.trim()) return;
+   692→    try {
+   693→      await fetch(`/api/notes?userId=${currentUser.id}`, {
+   694→        method: 'POST', headers: { 'Content-Type': 'application/json' },
+   695→        body: JSON.stringify({ targetId: noteTargetId, content: noteContent.trim() }),
+   696→      });
+   697→      setShowNoteDialog(false); setNoteContent(''); setNoteTargetId(null);
+   698→    } catch {}
+   699→  }, [currentUser, noteTargetId, noteContent]);
+   700→
+   701→  const handleUpdateGeo = useCallback(() => {
+   702→    if (!currentUser) return;
+   703→    if (navigator.geolocation) {
+   704→      navigator.geolocation.getCurrentPosition(
+   705→        (pos) => {
+   706→          setUserLat(pos.coords.latitude);
+   707→          setUserLng(pos.coords.longitude);
+   708→          fetch('/api/user-map?userId=' + currentUser.id, {
+   709→            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+   710→            body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+   711→          }).then(() => {
+   712→            if (activeTab === 'map') handleFetchMap();
+   713→          }).catch(() => {});
+   714→        },
+   715→        () => {},
+   716→        { enableHighAccuracy: true },
+   717→      );
+   718→    }
+   719→  }, [currentUser, activeTab, handleFetchMap, setUserLat, setUserLng]);
+   720→
+   721→
+   722→  // ─── Filtered discover users ───────────────────────────────────────────────
+   723→  const filteredDiscover = discoverUsers.filter(u => {
+   724→    if (onlineOnly && !u.online) return false;
+   725→    if (u.age && (u.age < ageRange[0] || u.age > ageRange[1])) return false;
+   726→    if (lookingFor !== 'all' && u.lookingFor !== lookingFor) return false;
+   727→    return true;
+   728→  });
+   729→
+   730→  // ─── Login Screen ──────────────────────────────────────────────────────────
+   731→  if (authLoading) {
+   732→    return (
+   733→      <div className="h-screen flex flex-col items-center justify-center bg-background gap-4">
+   734→        <div className="text-2xl font-bold gradient-text">NEXUS</div>
+   735→        <Skeleton className="h-4 w-32" />
+   736→      </div>
+   737→    );
+   738→  }
+   739→
+   740→  if (!authed) {
+   741→    return (
+   742→      <div className="h-screen flex flex-col items-center justify-center bg-background px-6">
+   743→        <div className="text-4xl font-bold gradient-text mb-2">NEXUS</div>
+   744→        <p className="text-muted-foreground text-sm mb-8">Connect. Discover. Thrive.</p>
+   745→        <Card className="w-full max-w-sm bg-card border-border">
+   746→          <CardContent className="p-6">
+   747→            <form onSubmit={handleLogin} className="space-y-4">
+   748→              <div className="space-y-2">
+   749→                <Label className="text-xs text-muted-foreground">Username</Label>
+   750→                <Input
+   751→                  placeholder="Enter username"
+   752→                  value={loginForm.username}
+   753→                  onChange={e => setLoginForm(p => ({ ...p, username: e.target.value }))}
+   754→                  className="bg-secondary border-border h-11"
+   755→                />
+   756→              </div>
+   757→              <div className="space-y-2">
+   758→                <Label className="text-xs text-muted-foreground">Password</Label>
+   759→                <Input
+   760→                  type="password"
+   761→                  placeholder="Enter password"
+   762→                  value={loginForm.password}
+   763→                  onChange={e => setLoginForm(p => ({ ...p, password: e.target.value }))}
+   764→                  className="bg-secondary border-border h-11"
+   765→                />
+   766→              </div>
+   767→              {loginError && <p className="text-destructive text-xs">{loginError}</p>}
+   768→              <Button type="submit" className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90">
+   769→                Sign In
+   770→              </Button>
+   771→            </form>
+   772→          </CardContent>
+   773→        </Card>
+   774→      </div>
+   775→    );
+   776→  }
+   777→
+   778→  // ─── Cascade card swipe ────────────────────────────────────────────────────
+   779→  const cascadeUser = filteredDiscover[cascadeIndex];
+   780→
+   781→  // ─── RENDER ────────────────────────────────────────────────────────────────
+   782→  return (
+   783→    <TooltipProvider>
+   784→    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+   785→
+   786→      {/* ═══ HEADER BAR ═══ */}
+   787→      <header className="h-14 flex items-center justify-between px-4 bg-card/80 backdrop-blur-lg border-b border-border shrink-0 z-50">
+   788→        <div className="flex items-center gap-3">
+   789→          <span className="text-lg font-bold gradient-text tracking-wider">NEXUS</span>
+   790→          {showSettings && (
+   791→            <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-secondary rounded-lg transition-colors">
+   792→              <ArrowLeft className="w-4 h-4" />
+   793→            </button>
+   794→          )}
+   795→          {activeTab === 'chat' && activeConversation && !showSettings && (
+   796→            <button onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }} className="md:hidden p-1 hover:bg-secondary rounded-lg transition-colors">
+   797→              <ChevronLeft className="w-5 h-5" />
+   798→            </button>
+   799→          )}
+   800→        </div>
+   801→        {showSettings ? (
+   802→          <span className="text-sm font-medium">Settings</span>
+   803→        ) : (
+   804→          <div className="flex items-center gap-1">
+   805→            <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground"><Search className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Search</TooltipContent></Tooltip>
+   806→            <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground relative">
+   807→              <Bell className="w-4 h-4" />
+   808→              {notifications > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />}
+   809→            </Button></TooltipTrigger><TooltipContent>Notifications</TooltipContent></Tooltip>
+   810→            <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}><Settings className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Settings</TooltipContent></Tooltip>
+   811→            <button onClick={() => { if (currentUser) openProfile(currentUser.id); }} className="ml-1">
+   812→              <Avatar className="h-8 w-8 border-2 border-primary/50">
+   813→                <AvatarImage src={getAvatar(currentUser)} alt={currentUser?.displayName || ''} />
+   814→                <AvatarFallback className="text-xs">{currentUser?.displayName?.[0] || 'U'}</AvatarFallback>
+   815→              </Avatar>
+   816→            </button>
+   817→          </div>
+   818→        )}
+   819→      </header>
+   820→
+   821→      {/* ═══ MAIN CONTENT ═══ */}
+   822→      <main className="flex-1 overflow-hidden relative">
+   823→
+   824→        {/* ─── Settings Panel ─── */}
+   825→        {showSettings && <SettingsPanel />}
+   826→
+   827→        {/* ─── Discover Tab ─── */}
+   828→        {!showSettings && activeTab === 'discover' && <DiscoverView />}
+   829→
+   830→        {/* ─── Chat Tab ─── */}
+   831→        {!showSettings && activeTab === 'chat' && <ChatView />}
+   832→
+   833→        {/* ─── Likes Tab ─── */}
+   834→        {!showSettings && activeTab === 'likes' && <LikesView />}
+   835→
+   836→        {/* ─── Viewed Me Tab ─── */}
+   837→        {!showSettings && activeTab === 'viewed' && <ViewedMeView />}
+   838→
+   839→        {/* ─── Fansites Tab ─── */}
+   840→        {!showSettings && activeTab === 'fansites' && <FansitesView />}
+   841→
+   842→        {/* ─── Videos Tab ─── */}
+   843→        {!showSettings && activeTab === 'videos' && <VideosView />}
+   844→
+   845→        {/* ─── Shouts Tab ─── */}
+   846→        {!showSettings && activeTab === 'shouts' && <ShoutsView />}
+   847→
+   848→        {/* ─── Map Tab ─── */}
+   849→        {!showSettings && activeTab === 'map' && <MapView />}
+   850→
+   851→        {/* ─── Events Tab ─── */}
+   852→        {!showSettings && activeTab === 'events' && <EventsView />}
+   853→
+   854→        {/* ─── Profile Tab ─── */}
+   855→        {!showSettings && activeTab === 'profile' && <ProfileView />}
+   856→      </main>
+   857→
+   858→      {/* ═══ BOTTOM NAV ═══ */}
+   859→      <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-0.5">
+   860→        {([
+   861→          { tab: 'discover' as const, icon: Compass, label: 'Discover', badge: 0 },
+   862→          { tab: 'map' as const, icon: MapPinned, label: 'Map', badge: 0 },
+   863→          { tab: 'chat' as const, icon: MessageCircle, label: 'Chat', badge: totalUnread + pendingRequestCount },
+   864→          { tab: 'likes' as const, icon: Heart, label: 'Likes', badge: receivedLikes.length },
+   865→          { tab: 'shouts' as const, icon: Megaphone, label: 'Shouts', badge: 0 },
+   866→          { tab: 'fansites' as const, icon: Star, label: 'Fansites', badge: 0 },
+   867→          { tab: 'videos' as const, icon: Video, label: 'Videos', badge: 0 },
+   868→          { tab: 'profile' as const, icon: User, label: 'Profile', badge: 0 },
+   869→        ]).map(({ tab, icon: Icon, label, badge }) => (
+   870→          <button
+   871→            key={tab}
+   872→            onClick={() => { setActiveTab(tab); setShowSettings(false); if (tab === 'chat') { setChatMobileView('list'); setActiveConversation(null); setActiveGroup(null); } }}
+   873→            className={`h-12 flex flex-col items-center justify-center gap-0.5 relative transition-colors px-1 ${activeTab === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+   874→          >
+   875→            <Icon className="w-4 h-4" />
+   876→            <span className="text-[9px] leading-none">{label}</span>
+   877→            {activeTab === tab && <span className="absolute bottom-0 w-4 h-0.5 bg-primary rounded-full" />}
+   878→            {badge > 0 && (
+   879→              <span className="absolute -top-0.5 right-1/2 translate-x-4 min-w-[14px] h-3.5 flex items-center justify-center text-[8px] font-bold bg-primary text-primary-foreground rounded-full px-0.5">
+   880→                {badge > 99 ? '99+' : badge}
+   881→              </span>
+   882→            )}
+   883→          </button>
+   884→        ))}
+   885→      </nav>
+   886→
+   887→      {/* ═══ PROFILE DRAWER ═══ */}
+   888→      <Sheet open={showProfileDrawer} onOpenChange={(open) => { if (!open) closeProfile(); }}>
+   889→        <SheetContent side="right" className="w-full sm:max-w-md bg-card border-border p-0 overflow-y-auto">
+   890→          {profileLoading ? (
+   891→            <div className="p-6 space-y-4">
+   892→              <Skeleton className="h-64 w-full rounded-xl" />
+   893→              <Skeleton className="h-6 w-48" />
+   894→              <Skeleton className="h-4 w-32" />
+   895→            </div>
+   896→          ) : profileUser ? (
+   897→            <ProfileDrawerContent />
+   898→          ) : null}
+   899→        </SheetContent>
+   900→      </Sheet>
+   901→
+   902→      {/* ═══ FANSITE DETAIL SHEET ═══ */}
+   903→      <Sheet open={showFansiteSheet} onOpenChange={setShowFansiteSheet}>
+   904→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   905→          {selectedFansite && <FansiteDetail />}
+   906→        </SheetContent>
+   907→      </Sheet>
+   908→
+   909→      {/* ═══ RIZZ MODAL ═══ */}
+   910→      <Dialog open={showRizzModal} onOpenChange={setShowRizzModal}>
+   911→        <DialogContent className="bg-card border-border sm:max-w-md">
+   912→          <DialogHeader>
+   913→            <DialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI Rizz Generator</DialogTitle>
+   914→          </DialogHeader>
+   915→          <div className="space-y-4 py-2">
+   916→            <div className="flex flex-wrap gap-2">
+   917→              {RIZZ_STYLES.map(s => (
+   918→                <button
+   919→                  key={s.value}
+   920→                  onClick={() => setRizzStyle(s.value)}
+   921→                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${rizzStyle === s.value ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-secondary-foreground border-border hover:border-primary/50'}`}
+   922→                >
+   923→                  {s.icon} {s.label}
+   924→                </button>
+   925→              ))}
+   926→            </div>
+   927→            <Button onClick={handleRizz} disabled={rizzLoading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+   928→              {rizzLoading ? <><Skeleton className="h-4 w-32" /> <span className="ml-2">Generating...</span></> : <>Generate Pickup Line</>}
+   929→            </Button>
+   930→            {rizzResult && (
+   931→              <div className="p-4 rounded-xl bg-secondary border border-border space-y-3">
+   932→                <p className="text-sm leading-relaxed">{rizzResult.line}</p>
+   933→                {rizzResult.context && <p className="text-[11px] text-muted-foreground">{rizzResult.context}</p>}
+   934→                <div className="flex gap-2">
+   935→                  <Button variant="outline" size="sm" onClick={copyRizz} className="text-xs border-border hover:bg-secondary">
+   936→                    <Copy className="w-3 h-3 mr-1" /> Copy
+   937→                  </Button>
+   938→                  <Button size="sm" onClick={handleSendRizz} className="text-xs bg-primary text-primary-foreground">
+   939→                    <Send className="w-3 h-3 mr-1" /> Send as Message
+   940→                  </Button>
+   941→                </div>
+   942→                {rizzResult.alternatives?.length > 0 && (
+   943→                  <div className="space-y-1 pt-2 border-t border-border">
+   944→                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Alternatives</p>
+   945→                    {rizzResult.alternatives.map((alt: string, i: number) => (
+   946→                      <p key={i} className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors" onClick={() => setRizzResult({ ...rizzResult, line: alt })}>{alt}</p>
+   947→                    ))}
+   948→                  </div>
+   949→                )}
+   950→              </div>
+   951→            )}
+   952→          </div>
+   953→        </DialogContent>
+   954→      </Dialog>
+   955→
+   956→      {/* ═══ NOTE DIALOG ═══ */}
+   957→      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
+   958→        <DialogContent className="bg-card border-border sm:max-w-sm">
+   959→          <DialogHeader>
+   960→            <DialogTitle className="flex items-center gap-2"><StickyNote className="w-5 h-5 text-primary" /> Add Note</DialogTitle>
+   961→          </DialogHeader>
+   962→          <div className="space-y-3 py-2">
+   963→            <Textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Write a private note about this user..." className="bg-secondary border-border text-sm" rows={3} />
+   964→            <div className="flex gap-2">
+   965→              <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveNote} disabled={!noteContent.trim()}>Save Note</Button>
+   966→              <Button size="sm" variant="outline" className="border-border" onClick={() => { setShowNoteDialog(false); setNoteContent(''); }}>Cancel</Button>
+   967→            </div>
+   968→          </div>
+   969→        </DialogContent>
+   970→      </Dialog>
+   971→
+   972→      {/* ═══ BLOCK ALERT ═══ */}
+   973→      <AlertDialog open={showBlockAlert} onOpenChange={setShowBlockAlert}>
+   974→        <AlertDialogContent className="bg-card border-border">
+   975→          <AlertDialogHeader>
+   976→            <AlertDialogTitle>Block this user?</AlertDialogTitle>
+   977→            <AlertDialogDescription>This user won't be able to see your profile or message you. You can unblock them later in Settings.</AlertDialogDescription>
+   978→          </AlertDialogHeader>
+   979→          <AlertDialogFooter>
+   980→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+   981→            <AlertDialogAction onClick={() => profileUser && handleBlock(profileUser.id)} className="bg-destructive text-white hover:bg-destructive/90">Block</AlertDialogAction>
+   982→          </AlertDialogFooter>
+   983→        </AlertDialogContent>
+   984→      </AlertDialog>
+   985→
+   986→      {/* ═══ CREATE EVENT DIALOG ═══ */}
+   987→      <Dialog open={showCreateEvent} onOpenChange={setShowCreateEvent}>
+   988→        <DialogContent className="bg-card border-border sm:max-w-md">
+   989→          <DialogHeader>
+   990→            <DialogTitle>Create Event</DialogTitle>
+   991→          </DialogHeader>
+   992→          <div className="space-y-3 py-2">
+   993→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={eventForm.title} onChange={e => setEventForm(p => ({ ...p, title: e.target.value }))} placeholder="Event name" className="bg-secondary border-border" /></div>
+   994→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={eventForm.description} onChange={e => setEventForm(p => ({ ...p, description: e.target.value }))} placeholder="What's this event about?" className="bg-secondary border-border" rows={3} /></div>
+   995→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Location</Label><Input value={eventForm.location} onChange={e => setEventForm(p => ({ ...p, location: e.target.value }))} placeholder="Venue / Address" className="bg-secondary border-border" /></div>
+   996→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date & Time</Label><Input type="datetime-local" value={eventForm.startDate} onChange={e => setEventForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+   997→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Image URL (optional)</Label><Input value={eventForm.imageUrl} onChange={e => setEventForm(p => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." className="bg-secondary border-border" /></div>
+   998→          </div>
+   999→          <DialogFooter>
+  1000→            <Button variant="outline" onClick={() => setShowCreateEvent(false)} className="border-border">Cancel</Button>
+  1001→            <Button onClick={handleCreateEvent} className="bg-primary text-primary-foreground" disabled={!eventForm.title || !eventForm.startDate}>Create Event</Button>
+  1002→          </DialogFooter>
+  1003→        </DialogContent>
+  1004→      </Dialog>
+  1005→
+  1006→    </div>
+  1007→    </TooltipProvider>
+  1008→  );
+  1009→
+  1010→  // ═══════════════════════════════════════════════════════════════════════════
+  1011→  // SUB-VIEWS (defined as functions within the component for shared state access)
+  1012→  // ═══════════════════════════════════════════════════════════════════════════
+  1013→
+  1014→  // ─── Discover View ─────────────────────────────────────────────────────────
+  1015→  function DiscoverView() {
+  1016→    return (
+  1017→      <div className="h-full flex flex-col">
+  1018→        {/* Filter bar */}
+  1019→        <div className="px-3 py-2 flex items-center gap-3 border-b border-border shrink-0 overflow-x-auto">
+  1020→          <button
+  1021→            onClick={() => setOnlineOnly(!onlineOnly)}
+  1022→            className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${onlineOnly ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}
+  1023→          >
+  1024→            🟢 Online Only
+  1025→          </button>
+  1026→          <Popover>
+  1027→            <PopoverTrigger asChild>
+  1028→              <button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0 hover:border-primary/50 transition-all">
+  1029→                {ageRange[0]}–{ageRange[1]} yrs
+  1030→              </button>
+  1031→            </PopoverTrigger>
+  1032→            <PopoverContent className="w-64 bg-card border-border p-3">
+  1033→              <Slider value={ageRange} onValueChange={setAgeRange} min={18} max={80} step={1} className="mt-2" />
+  1034→              <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>{ageRange[0]}</span><span>{ageRange[1]}</span></div>
+  1035→            </PopoverContent>
+  1036→          </Popover>
+  1037→          <Select value={lookingFor} onValueChange={setLookingFor}>
+  1038→            <SelectTrigger className="w-28 h-8 text-[11px] bg-secondary border-border shrink-0">
+  1039→              <SelectValue />
+  1040→            </SelectTrigger>
+  1041→            <SelectContent className="bg-card border-border">
+  1042→              <SelectItem value="all">All</SelectItem>
+  1043→              <SelectItem value="relationship">Relationship</SelectItem>
+  1044→              <SelectItem value="casual">Casual</SelectItem>
+  1045→              <SelectItem value="friends">Friends</SelectItem>
+  1046→              <SelectItem value="networking">Networking</SelectItem>
+  1047→            </SelectContent>
+  1048→          </Select>
+  1049→          <div className="ml-auto flex gap-1 shrink-0">
+  1050→            <button onClick={() => setDiscoverView('grid')} className={`p-1.5 rounded-lg transition-all ${discoverView === 'grid' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground'}`}><Grid3X3 className="w-4 h-4" /></button>
+  1051→            <button onClick={() => setDiscoverView('cascade')} className={`p-1.5 rounded-lg transition-all ${discoverView === 'cascade' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground'}`}><Layers className="w-4 h-4" /></button>
+  1052→          </div>
+  1053→        </div>
+  1054→
+  1055→        {/* Content */}
+  1056→        <div className="flex-1 overflow-y-auto p-3">
+  1057→          {discoverLoading ? (
+  1058→            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+  1059→              {Array.from({ length: 6 }).map((_, i) => (
+  1060→                <div key={i} className="space-y-2"><Skeleton className="aspect-square w-full rounded-xl" /><Skeleton className="h-4 w-24" /><Skeleton className="h-3 w-16" /></div>
+  1061→              ))}
+  1062→            </div>
+  1063→          ) : discoverView === 'grid' ? (
+  1064→            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+  1065→              {filteredDiscover.map(user => (
+  1066→                <DiscoverGridCard key={user.id} user={user} />
+  1067→              ))}
+  1068→              {filteredDiscover.length === 0 && <p className="col-span-full text-center text-muted-foreground text-sm py-12">No profiles found</p>}
+  1069→            </div>
+  1070→          ) : (
+  1071→            <div className="max-w-md mx-auto h-full flex items-center justify-center">
+  1072→              {cascadeUser ? (
+  1073→                <CascadeCard key={cascadeUser.id} user={cascadeUser} />
+  1074→              ) : (
+  1075→                <div className="text-center space-y-3">
+  1076→                  <Heart className="w-12 h-12 text-muted-foreground mx-auto" />
+  1077→                  <p className="text-muted-foreground text-sm">No more profiles to discover</p>
+  1078→                  <Button variant="outline" size="sm" onClick={triggerRefreshDiscover} className="border-border">Refresh</Button>
+  1079→                </div>
+  1080→              )}
+  1081→            </div>
+  1082→          )}
+  1083→        </div>
+  1084→      </div>
+  1085→    );
+  1086→  }
+  1087→
+  1088→  function DiscoverGridCard({ user }: { user: User & { distance?: number | null } }) {
+  1089→    const photo = user.photos?.[0];
+  1090→    return (
+  1091→      <div className="relative">
+  1092→        <button onClick={() => openProfile(user.id)} className="profile-card text-left w-full rounded-xl overflow-hidden bg-card border border-border">
+  1093→          <div className="relative aspect-square bg-secondary">
+  1094→            {photo ? (
+  1095→              <img src={photo.url} alt={user.displayName} className="w-full h-full object-cover" loading="lazy" />
+  1096→            ) : (
+  1097→              <div className="w-full h-full flex items-center justify-center text-muted-foreground"><User className="w-8 h-8" /></div>
+  1098→            )}
+  1099→            {user.online && user.showOnline && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full online-pulse" />}
+  1100→            {user.isPremium && <Crown className="absolute top-2 left-2 w-4 h-4 text-yellow-400" />}
+  1101→            {user.isVerified && <Shield className="absolute top-2 left-2 w-4 h-4 text-blue-400" style={{ left: user.isPremium ? 24 : 8 }} />}
+  1102→          </div>
+  1103→          <div className="p-2.5 space-y-0.5">
+  1104→            <div className="flex items-center gap-1.5">
+  1105→              <span className="text-[14px] font-semibold truncate">{user.displayName}</span>
+  1106→              {user.age !== null && user.age !== undefined && user.showAge !== false && <span className="text-[12px] text-muted-foreground">{user.age}</span>}
+  1107→            </div>
+  1108→            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+  1109→              {user.distance != null && user.showDistance !== false && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{user.distance} km</span>}
+  1110→              <span>{timeAgo(user.lastSeen)}</span>
+  1111→            </div>
+  1112→          </div>
+  1113→        </button>
+  1114→        {/* Quick like overlay */}
+  1115→        <button
+  1116→          onClick={(e) => { e.stopPropagation(); handleLike(user.id); }}
+  1117→          className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-card transition-all z-10"
+  1118→        >
+  1119→          <Heart className="w-4 h-4" />
+  1120→        </button>
+  1121→      </div>
+  1122→    );
+  1123→  }
+  1124→
+  1125→  function CascadeCard({ user }: { user: User & { distance?: number | null } }) {
+  1126→    const photo = user.photos?.[0];
+  1127→    return (
+  1128→      <div className="cascade-animate w-full max-w-sm rounded-2xl overflow-hidden bg-card border border-border relative">
+  1129→        <div className="relative aspect-[3/4] bg-secondary">
+  1130→          {photo ? (
+  1131→            <img src={photo.url} alt={user.displayName} className="w-full h-full object-cover" />
+  1132→          ) : (
+  1133→            <div className="w-full h-full flex items-center justify-center text-muted-foreground"><User className="w-16 h-16" /></div>
+  1134→          )}
+  1135→          {/* Gradient overlay */}
+  1136→          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+  1137→          {/* Info overlay */}
+  1138→          <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2">
+  1139→            <div className="flex items-center gap-2">
+  1140→              <h3 className="text-xl font-bold text-white">{user.displayName}{user.age != null ? `, ${user.age}` : ''}</h3>
+  1141→              {user.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+  1142→              {user.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
+  1143→            </div>
+  1144→            {user.pronouns && <p className="text-xs text-white/70">{user.pronouns}</p>}
+  1145→            {user.lookingFor && (
+  1146→              <Badge className="bg-primary/30 text-primary-foreground text-[10px] border-primary/40 w-fit">Looking for: {user.lookingFor}</Badge>
+  1147→            )}
+  1148→            <div className="flex items-center gap-3 text-xs text-white/60">
+  1149→              {user.distance != null && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{user.distance} km</span>}
+  1150→              {user.online ? <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full" />Online</span> : <span>{timeAgo(user.lastSeen)}</span>}
+  1151→            </div>
+  1152→            {user.bio && <p className="text-xs text-white/80 line-clamp-2">{truncate(user.bio, 100)}</p>}
+  1153→          </div>
+  1154→          {/* Action buttons - skip and view at top right */}
+  1155→          <div className="absolute top-3 right-3 flex gap-1.5">
+  1156→            <button onClick={() => { setCascadeIndex(i => i + 1); }} className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-black/50 transition-all">
+  1157→              <X className="w-4 h-4" />
+  1158→            </button>
+  1159→            <button onClick={() => openProfile(user.id)} className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-black/50 transition-all">
+  1160→              <Eye className="w-4 h-4" />
+  1161→            </button>
+  1162→          </div>
+  1163→        </div>
+  1164→        {/* Tap system buttons below the card */}
+  1165→        <div className="flex items-center justify-center gap-2 p-3">
+  1166→          {TAP_TYPES.map(tap => (
+  1167→            <button
+  1168→              key={tap.label}
+  1169→              onClick={() => { handleLike(user.id); setCascadeIndex(i => i + 1); }}
+  1170→              className={`flex items-center gap-1 px-3 py-2 rounded-full text-[11px] font-medium bg-gradient-to-r ${tap.color} text-white hover:scale-105 active:scale-95 transition-all shadow-lg`}
+  1171→            >
+  1172→              <span>{tap.emoji}</span>
+  1173→              <span className="hidden sm:inline">{tap.label}</span>
+  1174→            </button>
+  1175→          ))}
+  1176→        </div>
+  1177→      </div>
+  1178→    );
+  1179→  }
+  1180→
+  1181→  // ─── Chat View ─────────────────────────────────────────────────────────────
+  1182→  function ChatView() {
+  1183→    const showChatPanel = activeConversation || activeGroup;
+  1184→
+  1185→    return (
+  1186→      <div className="h-full flex">
+  1187→        {/* Conversation List - hidden on mobile when chat is open */}
+  1188→        <div className={`${showChatPanel ? 'hidden md:flex' : 'flex'} w-full md:w-80 lg:w-96 flex-col border-r border-border shrink-0`}>
+  1189→          <div className="p-3 border-b border-border shrink-0">
+  1190→            <h2 className="text-sm font-semibold">Messages</h2>
+  1191→          </div>
+  1192→          <div className="flex-1 overflow-y-auto">
+  1193→            {chatLoading ? (
+  1194→              <div className="p-3 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-full" /><div className="space-y-1 flex-1"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-20" /></div></div>)}</div>
+  1195→            ) : (
+  1196→              <>
+  1197→                {/* Chat Requests Section */}
+  1198→                {chatRequests.length > 0 && (
+  1199→                  <>
+  1200→                    <div className="px-3 py-2 border-b border-border bg-secondary/30">
+  1201→                      <span className="text-[10px] text-primary uppercase tracking-wider font-semibold">Chat Requests ({chatRequests.length})</span>
+  1202→                    </div>
+  1203→                    {chatRequests.map((req: ChatRequest) => (
+  1204→                      <div key={req.id} className="p-3 border-b border-border hover:bg-secondary/30 transition-colors">
+  1205→                        <div className="flex items-center gap-3">
+  1206→                          <div className="relative shrink-0">
+  1207→                            <Avatar className="h-11 w-11">
+  1208→                              <AvatarImage src={getAvatar(req.sender)} />
+  1209→                              <AvatarFallback>{req.sender?.displayName?.[0] || '?'}</AvatarFallback>
+  1210→                            </Avatar>
+  1211→                            {req.sender?.online && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+  1212→                          </div>
+  1213→                          <div className="flex-1 min-w-0">
+  1214→                            <div className="flex items-center justify-between">
+  1215→                              <span className="text-[13px] font-semibold truncate">{req.sender?.displayName || 'User'}</span>
+  1216→                              <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{timeAgo(req.createdAt)}</span>
+  1217→                            </div>
+  1218→                            {req.message && <p className="text-[12px] text-muted-foreground truncate mt-0.5">{req.message}</p>}
+  1219→                          </div>
+  1220→                        </div>
+  1221→                        <div className="flex gap-2 mt-2">
+  1222→                          <Button size="sm" className="flex-1 h-7 bg-primary text-primary-foreground text-[11px]" onClick={() => handleChatRequest(req.id, 'accept')}>
+  1223→                            <Check className="w-3 h-3 mr-1" /> Accept
+  1224→                          </Button>
+  1225→                          <Button size="sm" variant="outline" className="flex-1 h-7 border-border text-[11px] text-muted-foreground hover:text-destructive" onClick={() => handleChatRequest(req.id, 'decline')}>
+  1226→                            <X className="w-3 h-3 mr-1" /> Decline
+  1227→                          </Button>
+  1228→                        </div>
+  1229→                      </div>
+  1230→                    ))}
+  1231→                  </>
+  1232→                )}
+  1233→                {conversations.map((convo: Conversation) => (
+  1234→                  <button
+  1235→                    key={convo.otherUser.id}
+  1236→                    onClick={() => openChat(convo.otherUser)}
+  1237→                    className={`w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left ${activeConversation?.otherUser.id === convo.otherUser.id ? 'bg-secondary' : ''}`}
+  1238→                  >
+  1239→                    <div className="relative shrink-0">
+  1240→                      <Avatar className="h-11 w-11">
+  1241→                        <AvatarImage src={getAvatar(convo.otherUser)} />
+  1242→                        <AvatarFallback>{convo.otherUser.displayName?.[0]}</AvatarFallback>
+  1243→                      </Avatar>
+  1244→                      {convo.otherUser.online && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+  1245→                    </div>
+  1246→                    <div className="flex-1 min-w-0">
+  1247→                      <div className="flex items-center justify-between">
+  1248→                        <span className="text-[13px] font-semibold truncate">{convo.otherUser.displayName}</span>
+  1249→                        <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{timeAgo(convo.lastMessage.createdAt)}</span>
+  1250→                      </div>
+  1251→                      <p className="text-[12px] text-muted-foreground truncate">{convo.lastMessage.content}</p>
+  1252→                    </div>
+  1253→                    {convo.unreadCount > 0 && (
+  1254→                      <span className="min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground rounded-full px-1">{convo.unreadCount}</span>
+  1255→                    )}
+  1256→                  </button>
+  1257→                ))}
+  1258→
+  1259→                {/* Group Chats Section */}
+  1260→                {groups.length > 0 && (
+  1261→                  <>
+  1262→                    <div className="px-3 py-2 border-t border-border">
+  1263→                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Group Chats</span>
+  1264→                    </div>
+  1265→                    {groups.map((group: any) => (
+  1266→                      <button
+  1267→                        key={group.id}
+  1268→                        onClick={() => {
+  1269→                          setActiveGroup(group);
+  1270→                          setActiveConversation(null);
+  1271→                          setChatMobileView('chat');
+  1272→                          setGroupMessages([]);
+  1273→                          fetch(`/api/groups/${group.id}`).then(r => r.json()).then(res => {
+  1274→                            setGroupMessages(res.data?.messages || []);
+  1275→                          }).catch(() => {});
+  1276→                        }}
+  1277→                        className={`w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left ${activeGroup?.id === group.id ? 'bg-secondary' : ''}`}
+  1278→                      >
+  1279→                        <div className="relative shrink-0">
+  1280→                          <Avatar className="h-11 w-11">
+  1281→                            <AvatarImage src={group.avatar || undefined} />
+  1282→                            <AvatarFallback><Users className="w-5 h-5" /></AvatarFallback>
+  1283→                          </Avatar>
+  1284→                        </div>
+  1285→                        <div className="flex-1 min-w-0">
+  1286→                          <div className="flex items-center justify-between">
+  1287→                            <span className="text-[13px] font-semibold truncate">{group.name}</span>
+  1288→                            <span className="text-[10px] text-muted-foreground">{group._count?.members || 0} members</span>
+  1289→                          </div>
+  1290→                          <p className="text-[12px] text-muted-foreground truncate">{group.description || 'No description'}</p>
+  1291→                        </div>
+  1292→                      </button>
+  1293→                    ))}
+  1294→                  </>
+  1295→                )}
+  1296→                {conversations.length === 0 && groups.length === 0 && chatRequests.length === 0 && (
+  1297→                  <p className="text-center text-muted-foreground text-sm py-12">No conversations yet</p>
+  1298→                )}
+  1299→              </>
+  1300→            )}
+  1301→          </div>
+  1302→        </div>
+  1303→
+  1304→        {/* Chat Panel - full screen on mobile, side panel on desktop */}
+  1305→        <div className={`${!showChatPanel ? 'hidden md:flex' : 'flex'} flex-1 flex-col`}
+  1306→        >
+  1307→          {activeConversation ? (
+  1308→            <>
+  1309→              {/* Chat header */}
+  1310→              <div className="h-12 flex items-center gap-3 px-4 border-b border-border shrink-0">
+  1311→                <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(activeConversation.otherUser)} /><AvatarFallback>{activeConversation.otherUser.displayName?.[0]}</AvatarFallback></Avatar>
+  1312→                <div className="flex-1 min-w-0">
+  1313→                  <p className="text-[13px] font-semibold truncate">{activeConversation.otherUser.displayName}</p>
+  1314→                  <p className="text-[10px] text-muted-foreground">{activeConversation.otherUser.online ? 'Online' : 'Offline'}</p>
+  1315→                </div>
+  1316→                <button onClick={() => openProfile(activeConversation.otherUser.id)} className="p-1.5 hover:bg-secondary rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-muted-foreground" /></button>
+  1317→              </div>
+  1318→              {/* Messages */}
+  1319→              <div className="flex-1 overflow-y-auto p-4 space-y-2">
+  1320→                {messages.map(msg => (
+  1321→                  <div key={msg.id} className={`flex ${msg.senderId === currentUser?.id ? 'justify-end' : 'justify-start'}`}>
+  1322→                    <div className={`max-w-[75%] px-3.5 py-2 rounded-2xl text-[13px] leading-relaxed ${msg.senderId === currentUser?.id ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-secondary text-foreground rounded-bl-md'}`}>
+  1323→                      {msg.content}
+  1324→                      <div className={`flex items-center gap-1 mt-1 ${msg.senderId === currentUser?.id ? 'justify-end' : ''}`}>
+  1325→                        <span className={`text-[10px] ${msg.senderId === currentUser?.id ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{timeAgo(msg.createdAt)}</span>
+  1326→                        {msg.senderId === currentUser?.id && <CheckCheck className="w-3 h-3 text-primary-foreground/60" />}
+  1327→                      </div>
+  1328→                    </div>
+  1329→                  </div>
+  1330→                ))}
+  1331→                {messages.length === 0 && <p className="text-center text-muted-foreground text-xs py-8">Start a conversation</p>}
+  1332→                <div ref={msgEndRef} />
+  1333→              </div>
+  1334→              {/* Input */}
+  1335→              <div className="p-3 border-t border-border flex items-center gap-2 shrink-0">
+  1336→                <button className="p-2 text-muted-foreground hover:text-foreground transition-colors"><Paperclip className="w-5 h-5" /></button>
+  1337→                <Input
+  1338→                  value={msgInput}
+  1339→                  onChange={e => setMsgInput(e.target.value)}
+  1340→                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+  1341→                  placeholder="Type a message..."
+  1342→                  className="flex-1 bg-secondary border-border h-10 text-[13px]"
+  1343→                />
+  1344→                <Button onClick={sendMessage} size="icon" className="h-10 w-10 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0" disabled={!msgInput.trim()}>
+  1345→                  <Send className="w-4 h-4" />
+  1346→                </Button>
+  1347→              </div>
+  1348→            </>
+  1349→          ) : activeGroup ? (
+  1350→            <>
+  1351→              {/* Group chat header */}
+  1352→              <div className="h-12 flex items-center gap-3 px-4 border-b border-border shrink-0">
+  1353→                <Avatar className="h-8 w-8"><AvatarImage src={activeGroup.avatar || undefined} /><AvatarFallback><Users className="w-4 h-4" /></AvatarFallback></Avatar>
+  1354→                <div className="flex-1 min-w-0">
+  1355→                  <p className="text-[13px] font-semibold truncate">{activeGroup.name}</p>
+  1356→                  <p className="text-[10px] text-muted-foreground">{activeGroup._count?.members || 0} members</p>
+  1357→                </div>
+  1358→              </div>
+  1359→              {/* Group messages */}
+  1360→              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+  1361→                {groupMessages.map(msg => (
+  1362→                  <div key={msg.id} className={`flex ${msg.senderId === currentUser?.id ? 'justify-end' : 'justify-start'}`}>
+  1363→                    <div className={`max-w-[75%]`}>
+  1364→                      {msg.senderId !== currentUser?.id && msg.sender && (
+  1365→                        <p className="text-[10px] text-primary font-medium mb-0.5 ml-1">{msg.sender.displayName}</p>
+  1366→                      )}
+  1367→                      <div className={`px-3.5 py-2 rounded-2xl text-[13px] leading-relaxed ${msg.senderId === currentUser?.id ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-secondary text-foreground rounded-bl-md'}`}>
+  1368→                        {msg.content}
+  1369→                        <div className={`flex items-center gap-1 mt-1 ${msg.senderId === currentUser?.id ? 'justify-end' : ''}`}>
+  1370→                          <span className={`text-[10px] ${msg.senderId === currentUser?.id ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{timeAgo(msg.createdAt)}</span>
+  1371→                        </div>
+  1372→                      </div>
+  1373→                    </div>
+  1374→                  </div>
+  1375→                ))}
+  1376→                {groupMessages.length === 0 && <p className="text-center text-muted-foreground text-xs py-8">No messages yet</p>}
+  1377→                <div ref={msgEndRef} />
+  1378→              </div>
+  1379→              {/* Group input */}
+  1380→              <div className="p-3 border-t border-border flex items-center gap-2 shrink-0">
+  1381→                <Input
+  1382→                  value={msgInput}
+  1383→                  onChange={e => setMsgInput(e.target.value)}
+  1384→                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendGroupMessage()}
+  1385→                  placeholder={`Message ${activeGroup.name}...`}
+  1386→                  className="flex-1 bg-secondary border-border h-10 text-[13px]"
+  1387→                />
+  1388→                <Button onClick={sendGroupMessage} size="icon" className="h-10 w-10 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0" disabled={!msgInput.trim()}>
+  1389→                  <Send className="w-4 h-4" />
+  1390→                </Button>
+  1391→              </div>
+  1392→            </>
+  1393→          ) : (
+  1394→            <div className="flex-1 hidden md:flex items-center justify-center">
+  1395→              <div className="text-center space-y-2">
+  1396→                <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto" />
+  1397→                <p className="text-muted-foreground text-sm">Select a conversation to start chatting</p>
+  1398→              </div>
+  1399→            </div>
+  1400→          )}
+  1401→        </div>
+  1402→      </div>
+  1403→    );
+  1404→  }
+  1405→
+  1406→  // ─── Likes View ────────────────────────────────────────────────────────────
+  1407→  function LikesView() {
+  1408→    const likesList = likesTab === 'received' ? receivedLikes : sentLikes;
+  1409→    // Build a set of sender IDs we've sent likes to for match detection
+  1410→    const sentLikeIds = new Set(sentLikes.map((l: Like) => l.receiverId));
+  1411→    const receivedSenderIds = new Set(receivedLikes.map((l: Like) => l.senderId));
+  1412→
+  1413→    return (
+  1414→      <div className="h-full flex flex-col">
+  1415→        <div className="px-4 py-3 border-b border-border shrink-0">
+  1416→          <Tabs value={likesTab} onValueChange={(v: any) => setLikesTab(v)}>
+  1417→            <TabsList className="bg-secondary w-full h-9">
+  1418→              <TabsTrigger value="received" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Received{receivedLikes.length > 0 && ` (${receivedLikes.length})`}</TabsTrigger>
+  1419→              <TabsTrigger value="sent" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Sent</TabsTrigger>
+  1420→            </TabsList>
+  1421→          </Tabs>
+  1422→        </div>
+  1423→        <div className="flex-1 overflow-y-auto">
+  1424→          {likesLoading ? (
+  1425→            <div className="p-3 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="flex items-center gap-3 p-2"><Skeleton className="h-12 w-12 rounded-full" /><div className="space-y-1 flex-1"><Skeleton className="h-4 w-28" /><Skeleton className="h-3 w-16" /></div></div>)}</div>
+  1426→          ) : likesList.length === 0 ? (
+  1427→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+  1428→              <Heart className="w-12 h-12 text-muted-foreground" />
+  1429→              <p className="text-muted-foreground text-sm">No {likesTab} likes yet</p>
+  1430→            </div>
+  1431→          ) : (
+  1432→            <div className="p-3 space-y-1">
+  1433→              {likesList.map((like: Like) => {
+  1434→                const otherUser = likesTab === 'received' ? like.sender : like.receiver;
+  1435→                if (!otherUser) return null;
+  1436→                // Check for mutual match
+  1437→                const isMatch = likesTab === 'received' && sentLikeIds.has(otherUser.id) && receivedSenderIds.has(otherUser.id);
+  1438→                return (
+  1439→                  <div key={like.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1440→                    <div className="relative">
+  1441→                      <button onClick={() => openProfile(otherUser.id)}>
+  1442→                        <Avatar className="h-12 w-12">
+  1443→                          <AvatarImage src={getAvatar(otherUser)} />
+  1444→                          <AvatarFallback>{otherUser.displayName?.[0]}</AvatarFallback>
+  1445→                        </Avatar>
+  1446→                      </button>
+  1447→                      {otherUser.online && otherUser.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+  1448→                    </div>
+  1449→                    <div className="flex-1 min-w-0">
+  1450→                      <div className="flex items-center gap-2">
+  1451→                        <button onClick={() => openProfile(otherUser.id)} className="text-[14px] font-semibold hover:text-primary transition-colors">{otherUser.displayName}</button>
+  1452→                        {isMatch && (
+  1453→                          <Badge className="gradient-text text-[9px] bg-primary/20 border-primary/40 px-1.5 py-0">MATCH</Badge>
+  1454→                        )}
+  1455→                      </div>
+  1456→                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+  1457→                        <span>{timeAgo(like.createdAt)}</span>
+  1458→                        {!otherUser.online && otherUser.lastSeen && <span>· {getLastSeenText(otherUser)}</span>}
+  1459→                        {otherUser.location && <span>· <MapPin className="w-3 h-3 inline" /> {otherUser.location}</span>}
+  1460→                      </div>
+  1461→                    </div>
+  1462→                    {likesTab === 'received' && (
+  1463→                      <div className="flex gap-1.5 shrink-0">
+  1464→                        <Button size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90 text-xs" onClick={() => { handleLike(otherUser.id); }}>
+  1465→                          <Heart className="w-3 h-3 mr-1" /> Like Back
+  1466→                        </Button>
+  1467→                        <Button size="sm" variant="ghost" className="h-8 text-xs text-muted-foreground hover:text-foreground" onClick={() => {}}>
+  1468→                          Decline
+  1469→                        </Button>
+  1470→                      </div>
+  1471→                    )}
+  1472→                  </div>
+  1473→                );
+  1474→              })}
+  1475→            </div>
+  1476→          )}
+  1477→        </div>
+  1478→      </div>
+  1479→    );
+  1480→  }
+  1481→
+  1482→  // ─── Viewed Me View ────────────────────────────────────────────────────────
+  1483→  function ViewedMeView() {
+  1484→    return (
+  1485→      <div className="h-full flex flex-col">
+  1486→        <div className="px-4 py-3 border-b border-border shrink-0">
+  1487→          <h2 className="text-sm font-semibold">Viewed Me</h2>
+  1488→          <p className="text-[11px] text-muted-foreground">People who visited your profile</p>
+  1489→        </div>
+  1490→        <div className="flex-1 overflow-y-auto">
+  1491→          {viewsLoading ? (
+  1492→            <div className="p-3 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="flex items-center gap-3 p-2"><Skeleton className="h-12 w-12 rounded-full" /><div className="space-y-1 flex-1"><Skeleton className="h-4 w-28" /><Skeleton className="h-3 w-16" /></div></div>)}</div>
+  1493→          ) : profileViews.length === 0 ? (
+  1494→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+  1495→              <Eye className="w-12 h-12 text-muted-foreground" />
+  1496→              <p className="text-muted-foreground text-sm">No profile views yet</p>
+  1497→            </div>
+  1498→          ) : (
+  1499→            <div className="p-3 space-y-1">
+  1500→              {profileViews.map((view: ProfileViewType) => {
+  1501→                const viewer = view.viewer;
+  1502→                if (!viewer) return null;
+  1503→                return (
+  1504→                  <div key={view.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1505→                    <div className="relative">
+  1506→                      <button onClick={() => openProfile(viewer.id)}>
+  1507→                        <Avatar className="h-12 w-12">
+  1508→                          <AvatarImage src={getAvatar(viewer)} />
+  1509→                          <AvatarFallback>{viewer.displayName?.[0]}</AvatarFallback>
+  1510→                        </Avatar>
+  1511→                      </button>
+  1512→                      {viewer.online && viewer.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+  1513→                    </div>
+  1514→                    <div className="flex-1 min-w-0">
+  1515→                      <button onClick={() => openProfile(viewer.id)} className="text-[14px] font-semibold hover:text-primary transition-colors">
+  1516→                        {viewer.displayName}{viewer.age != null && viewer.showAge !== false ? `, ${viewer.age}` : ''}
+  1517→                      </button>
+  1518→                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+  1519→                        {viewer.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{viewer.location}</span>}
+  1520→                        <span>{timeAgo(view.createdAt)}</span>
+  1521→                      </div>
+  1522→                    </div>
+  1523→                    <div className="flex gap-1.5 shrink-0">
+  1524→                      <Button size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90 text-[11px]" onClick={() => { if (viewer) openChat(viewer); }}>
+  1525→                        <MessageCircle className="w-3 h-3 mr-1" /> Msg
+  1526→                      </Button>
+  1527→                      <Button size="sm" variant="outline" className="h-8 border-border text-[11px]" onClick={() => handleLike(viewer.id)}>
+  1528→                        <Heart className="w-3 h-3" />
+  1529→                      </Button>
+  1530→                    </div>
+  1531→                  </div>
+  1532→                );
+  1533→              })}
+  1534→            </div>
+  1535→          )}
+  1536→        </div>
+  1537→      </div>
+  1538→    );
+  1539→  }
+  1540→
+  1541→  // ─── Fansites View ─────────────────────────────────────────────────────────
+  1542→  function FansitesView() {
+  1543→    return (
+  1544→      <div className="h-full flex flex-col">
+  1545→        <div className="px-4 py-3 border-b border-border shrink-0">
+  1546→          <h2 className="text-sm font-semibold">Fansites</h2>
+  1547→          <p className="text-[11px] text-muted-foreground">Discover creators and subscribe</p>
+  1548→        </div>
+  1549→        <div className="flex-1 overflow-y-auto p-3">
+  1550→          {fansiteLoading ? (
+  1551→            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="space-y-2"><Skeleton className="h-40 w-full rounded-xl" /><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-24" /></div>)}</div>
+  1552→          ) : fansites.length === 0 ? (
+  1553→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+  1554→              <Star className="w-12 h-12 text-muted-foreground" />
+  1555→              <p className="text-muted-foreground text-sm">No fansites yet</p>
+  1556→            </div>
+  1557→          ) : (
+  1558→            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+  1559→              {fansites.map(fs => (
+  1560→                <button
+  1561→                  key={fs.id}
+  1562→                  onClick={() => { setSelectedFansite(fs); setShowFansiteSheet(true); }}
+  1563→                  className="profile-card text-left rounded-xl overflow-hidden bg-card border border-border"
+  1564→                >
+  1565→                  <div className="relative h-40 bg-secondary">
+  1566→                    {fs.trailerImageUrl ? (
+  1567→                      <img src={fs.trailerImageUrl} alt={fs.name} className="w-full h-full object-cover" loading="lazy" />
+  1568→                    ) : (
+  1569→                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary"><Star className="w-10 h-10 text-primary/50" /></div>
+  1570→                    )}
+  1571→                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
+  1572→                    <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
+  1573→                      <div>
+  1574→                        <p className="text-white font-semibold text-sm">{fs.name}</p>
+  1575→                        <p className="text-white/60 text-[11px]">@{fs.nick}</p>
+  1576→                      </div>
+  1577→                      {fs.user.online && <span className="w-2.5 h-2.5 bg-green-500 rounded-full online-pulse" />}
+  1578→                    </div>
+  1579→                  </div>
+  1580→                  <div className="p-3 space-y-1.5">
+  1581→                    <p className="text-[12px] text-muted-foreground line-clamp-2">{truncate(fs.description, 80)}</p>
+  1582→                    <div className="flex items-center justify-between">
+  1583→                      <div className="flex items-center gap-2">
+  1584→                        {fs.geoName && <span className="text-[11px] text-muted-foreground flex items-center gap-0.5"><MapPin className="w-3 h-3" />{fs.geoName}</span>}
+  1585→                      </div>
+  1586→                      <span className="text-[10px] text-muted-foreground">{fs.links.length} links</span>
+  1587→                    </div>
+  1588→                  </div>
+  1589→                </button>
+  1590→              ))}
+  1591→            </div>
+  1592→          )}
+  1593→        </div>
+  1594→      </div>
+  1595→    );
+  1596→  }
+  1597→
+  1598→  // ─── Fansite Detail ────────────────────────────────────────────────────────
+  1599→  function FansiteDetail() {
+  1600→    if (!selectedFansite) return null;
+  1601→    const fs = selectedFansite;
+  1602→    return (
+  1603→      <div className="space-y-4">
+  1604→        <div className="relative h-48 bg-secondary rounded-xl overflow-hidden">
+  1605→          {fs.trailerImageUrl ? <img src={fs.trailerImageUrl} alt={fs.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary"><Star className="w-16 h-16 text-primary/50" /></div>}
+  1606→          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card to-transparent" />
+  1607→          <div className="absolute bottom-3 left-4 right-4">
+  1608→            <h2 className="text-xl font-bold">{fs.name}</h2>
+  1609→            <p className="text-sm text-muted-foreground">@{fs.nick}</p>
+  1610→            {fs.geoName && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><MapPin className="w-3 h-3" />{fs.geoName}</p>}
+  1611→          </div>
+  1612→        </div>
+  1613→        <div className="flex items-center gap-3">
+  1614→          <Avatar className="h-10 w-10"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback>{fs.user.displayName?.[0]}</AvatarFallback></Avatar>
+  1615→          <div>
+  1616→            <p className="text-sm font-semibold">{fs.user.displayName}</p>
+  1617→            <p className="text-[11px] text-muted-foreground">{fs.user.online ? '🟢 Online' : 'Offline'}</p>
+  1618→          </div>
+  1619→        </div>
+  1620→        {fs.description && <p className="text-sm text-muted-foreground leading-relaxed">{fs.description}</p>}
+  1621→        {fs.links.length > 0 && (
+  1622→          <div className="space-y-2">
+  1623→            <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Links</h3>
+  1624→            {fs.links.map(link => (
+  1625→              <div key={link.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary border border-border">
+  1626→                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">{link.type?.[0] || '?'}</div>
+  1627→                <div className="flex-1 min-w-0">
+  1628→                  <p className="text-sm font-medium truncate">{link.label || link.type}</p>
+  1629→                  {link.value && <p className="text-[11px] text-muted-foreground truncate">{link.value}</p>}
+  1630→                </div>
+  1631→                {link.url && <ExternalLink className="w-4 h-4 text-muted-foreground" />}
+  1632→              </div>
+  1633→            ))}
+  1634→          </div>
+  1635→        )}
+  1636→        {fs.products.length > 0 && (
+  1637→          <div className="space-y-2">
+  1638→            <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Subscribe</h3>
+  1639→            {fs.products.map(product => (
+  1640→              <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1641→                <div>
+  1642→                  <p className="text-sm font-medium capitalize">{product.period}</p>
+  1643→                  {product.priceOld && <p className="text-[11px] text-muted-foreground line-through">${product.priceOld}</p>}
+  1644→                </div>
+  1645→                <div className="text-right">
+  1646→                  <p className="text-lg font-bold gradient-text">${product.price}</p>
+  1647→                  <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground mt-1">Subscribe</Button>
+  1648→                </div>
+  1649→              </div>
+  1650→            ))}
+  1651→          </div>
+  1652→        )}
+  1653→        {/* Actions */}
+  1654→        <div className="flex gap-2 pt-2">
+  1655→          <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { if (fs.user) openChat(fs.user); setShowFansiteSheet(false); }}>
+  1656→            <MessageCircle className="w-4 h-4 mr-2" /> Contact
+  1657→          </Button>
+  1658→          <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => {}}>
+  1659→            <Flag className="w-4 h-4 mr-2" /> Report
+  1660→          </Button>
+  1661→        </div>
+  1662→      </div>
+  1663→    );
+  1664→  }
+  1665→
+  1666→  // ─── Events View ───────────────────────────────────────────────────────────
+  1667→  function EventsView() {
+  1668→    return (
+  1669→      <div className="h-full flex flex-col">
+  1670→        <div className="px-4 py-3 border-b border-border shrink-0 flex items-center justify-between">
+  1671→          <div>
+  1672→            <h2 className="text-sm font-semibold">Events</h2>
+  1673→            <p className="text-[11px] text-muted-foreground">Upcoming near you</p>
+  1674→          </div>
+  1675→          <Button size="sm" className="h-8 bg-primary text-primary-foreground text-xs" onClick={() => setShowCreateEvent(true)}>
+  1676→            <Plus className="w-3.5 h-3.5 mr-1" /> Create
+  1677→          </Button>
+  1678→        </div>
+  1679→        <div className="flex-1 overflow-y-auto p-3 space-y-3">
+  1680→          {eventsLoading ? (
+  1681→            Array.from({ length: 3 }).map((_, i) => (
+  1682→              <div key={i} className="flex gap-3 p-3 rounded-xl bg-card border border-border"><Skeleton className="h-20 w-20 rounded-lg" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-40" /><Skeleton className="h-3 w-24" /><Skeleton className="h-3 w-32" /></div></div>
+  1683→            ))
+  1684→          ) : events.length === 0 ? (
+  1685→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+  1686→              <Calendar className="w-12 h-12 text-muted-foreground" />
+  1687→              <p className="text-muted-foreground text-sm">No upcoming events</p>
+  1688→            </div>
+  1689→          ) : (
+  1690→            events.map((event: any) => {
+  1691→              const myRsvp = userRsvps[event.id];
+  1692→              return (
+  1693→                <div key={event.id} className="profile-card rounded-xl bg-card border border-border overflow-hidden">
+  1694→                  <div className="flex gap-3 p-3">
+  1695→                    <div className="w-20 h-20 rounded-lg bg-secondary shrink-0 overflow-hidden">
+  1696→                      {event.imageUrl ? <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Calendar className="w-8 h-8 text-muted-foreground" /></div>}
+  1697→                    </div>
+  1698→                    <div className="flex-1 min-w-0 space-y-1">
+  1699→                      <h3 className="text-[14px] font-semibold truncate">{event.title}</h3>
+  1700→                      <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{formatEventDate(event.startDate)}</p>
+  1701→                      {event.location && <p className="text-[11px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{event.location}</p>}
+  1702→                      <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />{event._count?.rsvps || 0} attending</p>
+  1703→                    </div>
+  1704→                  </div>
+  1705→                  {event.description && <p className="px-3 pb-2 text-[12px] text-muted-foreground line-clamp-2">{event.description}</p>}
+  1706→                  <div className="px-3 pb-3 flex gap-2">
+  1707→                    {(['going', 'interested', 'not_going'] as const).map(status => (
+  1708→                      <button
+  1709→                        key={status}
+  1710→                        onClick={() => handleRsvp(event.id, status)}
+  1711→                        className={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+  1712→                          myRsvp === status
+  1713→                            ? 'bg-primary text-primary-foreground border-primary'
+  1714→                            : 'bg-secondary text-muted-foreground border-border hover:border-primary/50'
+  1715→                        }`}
+  1716→                      >
+  1717→                        {status === 'going' ? '✅ Going' : status === 'interested' ? '👀 Interested' : '❌ Not Going'}
+  1718→                      </button>
+  1719→                    ))}
+  1720→                  </div>
+  1721→                </div>
+  1722→              );
+  1723→            })
+  1724→          )}
+  1725→        </div>
+  1726→      </div>
+  1727→    );
+  1728→  }
+  1729→
+  1730→  // ─── Shouts View ───────────────────────────────────────────────────────────
+  1731→  function ShoutsView() {
+  1732→    return (
+  1733→      <div className="h-full flex flex-col">
+  1734→        <div className="px-4 py-3 border-b border-border shrink-0">
+  1735→          <h2 className="text-sm font-semibold">Shouts</h2>
+  1736→          <p className="text-[11px] text-muted-foreground">What's on your mind?</p>
+  1737→        </div>
+  1738→        {/* Shout composer */}
+  1739→        <div className="px-3 py-2 border-b border-border flex gap-2 shrink-0">
+  1740→          <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(currentUser)} /><AvatarFallback className="text-xs">{currentUser?.displayName?.[0]}</AvatarFallback></Avatar>
+  1741→          <div className="flex-1 flex gap-2">
+  1742→            <Input value={shoutInput} onChange={e => setShoutInput(e.target.value)} placeholder="Shout something..." className="h-8 text-xs bg-secondary border-border" onKeyDown={e => e.key === 'Enter' && handleShout()} />
+  1743→            <Button size="sm" className="h-8 bg-primary text-primary-foreground text-xs shrink-0" onClick={handleShout} disabled={!shoutInput.trim()}><Send className="w-3.5 h-3.5" /></Button>
+  1744→          </div>
+  1745→        </div>
+  1746→        <div className="flex-1 overflow-y-auto p-3 space-y-3">
+  1747→          {shoutLoading ? (
+  1748→            Array.from({ length: 4 }).map((_, i) => <div key={i} className="p-3 rounded-xl bg-card border border-border"><div className="flex gap-2"><Skeleton className="h-8 w-8 rounded-full" /><div className="flex-1 space-y-2"><Skeleton className="h-3 w-24" /><Skeleton className="h-12 w-full" /></div></div></div>)
+  1749→          ) : shouts.length === 0 ? (
+  1750→            <div className="flex flex-col items-center justify-center py-16 space-y-3"><Megaphone className="w-12 h-12 text-muted-foreground" /><p className="text-muted-foreground text-sm">No shouts yet. Be the first!</p></div>
+  1751→          ) : (
+  1752→            shouts.map((shout: any) => (
+  1753→              <div key={shout.id} className="p-3 rounded-xl bg-card border border-border">
+  1754→                <div className="flex items-center gap-2 mb-2">
+  1755→                  <button onClick={() => openProfile(shout.userId)}><Avatar className="h-7 w-7"><AvatarImage src={getAvatar(shout.user)} /><AvatarFallback className="text-[10px]">{shout.user?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1756→                  <button onClick={() => openProfile(shout.userId)} className="text-[12px] font-semibold hover:underline">{shout.user?.displayName}</button>
+  1757→                  <span className="text-[10px] text-muted-foreground">@{shout.user?.username}</span>
+  1758→                  <span className="ml-auto text-[10px] text-muted-foreground">{timeAgo(shout.createdAt)}</span>
+  1759→                </div>
+  1760→                <p className="text-sm leading-relaxed">{shout.content}</p>
+  1761→                {shout.mediaUrl && <div className="mt-2 rounded-lg overflow-hidden"><img src={shout.mediaUrl} alt="" className="w-full max-h-64 object-cover" /></div>}
+  1762→              </div>
+  1763→            ))
+  1764→          )}
+  1765→        </div>
+  1766→      </div>
+  1767→    );
+  1768→  }
+  1769→
+  1770→  // ─── Map / GEO View ─────────────────────────────────────────────────────
+  1771→  function MapView() {
+  1772→    return (
+  1773→      <div className="h-full flex flex-col">
+  1774→        <div className="px-4 py-3 border-b border-border shrink-0 flex items-center justify-between">
+  1775→          <div>
+  1776→            <h2 className="text-sm font-semibold">Nearby</h2>
+  1777→            <p className="text-[11px] text-muted-foreground">{mapUsers.length} users within {mapRadius}km</p>
+  1778→          </div>
+  1779→          <div className="flex items-center gap-2">
+  1780→            <Select value={String(mapRadius)} onValueChange={v => setMapRadius(Number(v))}>
+  1781→              <SelectTrigger className="w-20 h-7 text-[11px] bg-secondary border-border"><SelectValue /></SelectTrigger>
+  1782→              <SelectContent className="bg-card border-border">
+  1783→                {[10, 25, 50, 100, 200].map(r => <SelectItem key={r} value={String(r)}>{r}km</SelectItem>)}
+  1784→              </SelectContent>
+  1785→            </Select>
+  1786→            <Button size="sm" variant="outline" className="h-7 text-[11px] border-border" onClick={handleFetchMap}><Crosshair className="w-3 h-3" /></Button>
+  1787→          </div>
+  1788→        </div>
+  1789→        {/* Stylized map grid */}
+  1790→        <div className="flex-1 overflow-y-auto relative bg-secondary/30">
+  1791→          {/* CSS Grid Map */}
+  1792→          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 50%, rgba(59,130,246,0.08) 0%, transparent 70%)' }} />
+  1793→          <div className="relative p-3 space-y-2">
+  1794→            {/* Center marker */}
+  1795→            <div className="flex items-center justify-center py-4">
+  1796→              <div className="relative">
+  1797→                <div className="w-4 h-4 bg-primary rounded-full animate-pulse" />
+  1798→                <div className="absolute -inset-2 bg-primary/20 rounded-full" />
+  1799→                <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] text-primary font-medium">You</span>
+  1800→              </div>
+  1801→            </div>
+  1802→            {mapLoading ? (
+  1803→              Array.from({ length: 4 }).map((_, i) => <div key={i} className="flex gap-2 p-2 rounded-lg bg-card/50"><Skeleton className="h-10 w-10 rounded-full" /><Skeleton className="h-4 w-24" /></div>)
+  1804→            ) : mapUsers.length === 0 ? (
+  1805→              <div className="flex flex-col items-center py-8"><Map className="w-10 h-10 text-muted-foreground" /><p className="text-xs text-muted-foreground mt-2">No users found nearby</p></div>
+  1806→            ) : (
+  1807→              mapUsers.map((u: any) => (
+  1808→                <button key={u.id} onClick={() => openProfile(u.id)} className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-card border border-border hover:border-primary/30 transition-all text-left">
+  1809→                  <div className="relative">
+  1810→                    <Avatar className="h-10 w-10"><AvatarImage src={getAvatar(u)} /><AvatarFallback className="text-xs">{u.displayName?.[0]}</AvatarFallback></Avatar>
+  1811→                    {u.online && <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-card" />}
+  1812→                  </div>
+  1813→                  <div className="flex-1 min-w-0">
+  1814→                    <p className="text-[13px] font-semibold truncate">{u.displayName}{u.showAge !== false && u.age ? `, ${u.age}` : ''}</p>
+  1815→                    <p className="text-[11px] text-muted-foreground">@{u.username}{u.location ? ` · ${u.location}` : ''}</p>
+  1816→                  </div>
+  1817→                  <div className="text-right shrink-0">
+  1818→                    {u.distance != null && <p className="text-[12px] font-semibold text-primary">{Math.round(u.distance)}km</p>}
+  1819→                    <p className="text-[10px] text-muted-foreground">{u.online ? 'Online' : timeAgo(u.lastSeen)}</p>
+  1820→                  </div>
+  1821→                </button>
+  1822→              ))
+  1823→            )}
+  1824→          </div>
+  1825→        </div>
+  1826→      </div>
+  1827→    );
+  1828→  }
+  1829→
+  1830→  // ─── Videos View ──────────────────────────────────────────────────────────
+  1831→  function VideosView() {
+  1832→    return (
+  1833→      <div className="h-full flex flex-col">
+  1834→        <div className="px-4 py-3 border-b border-border shrink-0">
+  1835→          <h2 className="text-sm font-semibold">Videos</h2>
+  1836→          <p className="text-[11px] text-muted-foreground">Browse and share</p>
+  1837→        </div>
+  1838→        <div className="flex-1 overflow-y-auto p-3">
+  1839→          {videosLoading ? (
+  1840→            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">{Array.from({ length: 6 }).map((_, i) => <div key={i}><Skeleton className="aspect-video w-full rounded-xl" /><Skeleton className="h-4 w-32 mt-2" /></div>)}</div>
+  1841→          ) : videos.length === 0 ? (
+  1842→            <div className="flex flex-col items-center justify-center py-16 space-y-3"><Video className="w-12 h-12 text-muted-foreground" /><p className="text-muted-foreground text-sm">No videos yet</p></div>
+  1843→          ) : (
+  1844→            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+  1845→              {videos.map((video: any) => (
+  1846→                <div key={video.id} className="rounded-xl overflow-hidden bg-card border border-border group">
+  1847→                  <div className="aspect-video relative bg-secondary">
+  1848→                    {video.thumbnailUrl ? <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Video className="w-8 h-8 text-muted-foreground" /></div>}
+  1849→                    {video.duration && <span className="absolute bottom-1 right-1 text-[9px] bg-black/70 text-white px-1 rounded">{video.duration}s</span>}
+  1850→                  </div>
+  1851→                  <div className="p-2">
+  1852→                    <p className="text-[12px] font-medium truncate">{video.title}</p>
+  1853→                    <p className="text-[10px] text-muted-foreground">by {video.user?.displayName}</p>
+  1854→                  </div>
+  1855→                </div>
+  1856→              ))}
+  1857→            </div>
+  1858→          )}
+  1859→        </div>
+  1860→      </div>
+  1861→    );
+  1862→  }
+  1863→
+  1864→  // ─── Profile View (My Profile) ─────────────────────────────────────────────
+  1865→  function ProfileView() {
+  1866→    if (!currentUser) return null;
+  1867→    return (
+  1868→      <div className="h-full overflow-y-auto">
+  1869→        <div className="max-w-lg mx-auto space-y-0">
+  1870→          {/* Banner area */}
+  1871→          <div className="relative h-32 bg-gradient-to-br from-primary/30 via-secondary to-card overflow-hidden">
+  1872→            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
+  1873→          </div>
+  1874→
+  1875→          {/* Avatar overlapping banner */}
+  1876→          <div className="px-4 -mt-12 relative z-10">
+  1877→            <div className="flex items-end gap-4">
+  1878→              <div className="relative">
+  1879→                <Avatar className="h-24 w-24 border-4 border-card shadow-xl">
+  1880→                  <AvatarImage src={getAvatar(currentUser)} />
+  1881→                  <AvatarFallback className="text-2xl">{currentUser.displayName?.[0]}</AvatarFallback>
+  1882→                </Avatar>
+  1883→                <button className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground shadow-lg"><Camera className="w-4 h-4" /></button>
+  1884→              </div>
+  1885→              <div className="flex-1 pb-1">
+  1886→                <div className="flex items-center gap-2 flex-wrap">
+  1887→                  <h2 className="text-xl font-bold">{currentUser.displayName}</h2>
+  1888→                  {currentUser.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+  1889→                  {currentUser.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
+  1890→                </div>
+  1891→                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+  1892→                  <span>@{currentUser.username}</span>
+  1893→                  {currentUser.pronouns && <span>· {currentUser.pronouns}</span>}
+  1894→                </div>
+  1895→              </div>
+  1896→            </div>
+  1897→          </div>
+  1898→
+  1899→          <div className="px-4 pt-3 space-y-5 pb-6">
+  1900→            {/* Bio */}
+  1901→            {currentUser.bio && <p className="text-sm text-foreground/80 leading-relaxed">{currentUser.bio}</p>}
+  1902→            {currentUser.aboutMe && (
+  1903→              <div className="space-y-1">
+  1904→                <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">About Me</p>
+  1905→                <p className="text-sm text-muted-foreground leading-relaxed">{currentUser.aboutMe}</p>
+  1906→              </div>
+  1907→            )}
+  1908→
+  1909→            {/* Quick stats row */}
+  1910→            <div className="grid grid-cols-4 gap-2">
+  1911→              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1912→                <p className="text-base font-bold gradient-text">{currentUser._count?.photos || 0}</p>
+  1913→                <p className="text-[9px] text-muted-foreground">Photos</p>
+  1914→              </div>
+  1915→              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1916→                <p className="text-base font-bold">{currentUser._count?.receivedViews || 0}</p>
+  1917→                <p className="text-[9px] text-muted-foreground">Views</p>
+  1918→              </div>
+  1919→              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1920→                <p className="text-base font-bold gradient-text">{currentUser._count?.receivedLikes || 0}</p>
+  1921→                <p className="text-[9px] text-muted-foreground">Likes</p>
+  1922→              </div>
+  1923→              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1924→                <p className="text-base font-bold">{(currentUser._count?.sentMessages || 0) + (currentUser._count?.receivedMessages || 0)}</p>
+  1925→                <p className="text-[9px] text-muted-foreground">Messages</p>
+  1926→              </div>
+  1927→            </div>
+  1928→
+  1929→            {/* Looking for */}
+  1930→            {currentUser.lookingFor && (
+  1931→              <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/10 border border-primary/20">
+  1932→                <Heart className="w-4 h-4 text-primary" />
+  1933→                <span className="text-sm font-medium">Looking for: <span className="capitalize text-primary">{currentUser.lookingFor}</span></span>
+  1934→              </div>
+  1935→            )}
+  1936→
+  1937→            {/* Full Details grid */}
+  1938→            <div className="space-y-2">
+  1939→              <div className="flex items-center justify-between">
+  1940→                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Details</h3>
+  1941→                <Button variant="ghost" size="sm" className="text-[11px] text-primary hover:text-primary" onClick={() => {
+  1942→                  setEditingProfile(true);
+  1943→                  setEditForm({
+  1944→                    displayName: currentUser.displayName || '',
+  1945→                    bio: currentUser.bio || '',
+  1946→                    lookingFor: currentUser.lookingFor || '',
+  1947→                    aboutMe: currentUser.aboutMe || '',
+  1948→                    height: currentUser.height?.toString() || '',
+  1949→                    weight: currentUser.weight?.toString() || '',
+  1950→                    ethnicity: currentUser.ethnicity || '',
+  1951→                    bodyType: currentUser.bodyType || '',
+  1952→                    relationshipStatus: currentUser.relationshipStatus || '',
+  1953→                    position: currentUser.position || '',
+  1954→                    pronouns: currentUser.pronouns || '',
+  1955→                    location: currentUser.location || '',
+  1956→                  });
+  1957→                }}>
+  1958→                  <Pencil className="w-3 h-3 mr-1" /> Edit
+  1959→                </Button>
+  1960→              </div>
+  1961→              <div className="grid grid-cols-2 gap-2">
+  1962→                {currentUser.lookingFor && <DetailCell label="Looking for" value={currentUser.lookingFor} />}
+  1963→                {currentUser.height && <DetailCell label="Height" value={`${currentUser.height} cm`} />}
+  1964→                {currentUser.weight && <DetailCell label="Weight" value={`${currentUser.weight} kg`} />}
+  1965→                {currentUser.bodyType && <DetailCell label="Body Type" value={currentUser.bodyType} />}
+  1966→                {currentUser.ethnicity && <DetailCell label="Ethnicity" value={currentUser.ethnicity} />}
+  1967→                {currentUser.position && <DetailCell label="Position" value={currentUser.position} />}
+  1968→                {currentUser.relationshipStatus && <DetailCell label="Relationship" value={currentUser.relationshipStatus} />}
+  1969→                {currentUser.location && <DetailCell label="Location" value={currentUser.location} />}
+  1970→                {currentUser.pronouns && <DetailCell label="Pronouns" value={currentUser.pronouns} />}
+  1971→                <DetailCell label="Gender" value={currentUser.gender} />
+  1972→              </div>
+  1973→            </div>
+  1974→
+  1975→            {/* Photo Gallery */}
+  1976→            {currentUser.photos && currentUser.photos.length > 0 && (
+  1977→              <div className="space-y-2">
+  1978→                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Photos</h3>
+  1979→                <div className="grid grid-cols-3 gap-2">
+  1980→                  {currentUser.photos.map(photo => (
+  1981→                    <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-secondary relative group">
+  1982→                      <img src={photo.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+  1983→                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+  1984→                    </div>
+  1985→                  ))}
+  1986→                </div>
+  1987→              </div>
+  1988→            )}
+  1989→
+  1990→            {/* Edit Profile Form */}
+  1991→            {editingProfile && (
+  1992→              <Card className="bg-secondary border-border p-4 space-y-3">
+  1993→                <h3 className="text-sm font-semibold">Edit Profile</h3>
+  1994→                {[
+  1995→                  { key: 'displayName', label: 'Display Name' },
+  1996→                  { key: 'bio', label: 'Bio' },
+  1997→                  { key: 'aboutMe', label: 'About Me' },
+  1998→                  { key: 'location', label: 'Location' },
+  1999→                  { key: 'pronouns', label: 'Pronouns' },
+  2000→                  { key: 'lookingFor', label: 'Looking For' },
+
+[showing lines 1-2000 of 2460; use offset=2001 with limit to continue reading]

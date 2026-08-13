@@ -1,0 +1,602 @@
+  1500→              {profileViews.map((view: ProfileViewType) => {
+  1501→                const viewer = view.viewer;
+  1502→                if (!viewer) return null;
+  1503→                return (
+  1504→                  <div key={view.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1505→                    <div className="relative">
+  1506→                      <button onClick={() => openProfile(viewer.id)}>
+  1507→                        <Avatar className="h-12 w-12">
+  1508→                          <AvatarImage src={getAvatar(viewer)} />
+  1509→                          <AvatarFallback>{viewer.displayName?.[0]}</AvatarFallback>
+  1510→                        </Avatar>
+  1511→                      </button>
+  1512→                      {viewer.online && viewer.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+  1513→                    </div>
+  1514→                    <div className="flex-1 min-w-0">
+  1515→                      <button onClick={() => openProfile(viewer.id)} className="text-[14px] font-semibold hover:text-primary transition-colors">
+  1516→                        {viewer.displayName}{viewer.age != null && viewer.showAge !== false ? `, ${viewer.age}` : ''}
+  1517→                      </button>
+  1518→                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+  1519→                        {viewer.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{viewer.location}</span>}
+  1520→                        <span>{timeAgo(view.createdAt)}</span>
+  1521→                      </div>
+  1522→                    </div>
+  1523→                    <div className="flex gap-1.5 shrink-0">
+  1524→                      <Button size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90 text-[11px]" onClick={() => { if (viewer) openChat(viewer); }}>
+  1525→                        <MessageCircle className="w-3 h-3 mr-1" /> Msg
+  1526→                      </Button>
+  1527→                      <Button size="sm" variant="outline" className="h-8 border-border text-[11px]" onClick={() => handleLike(viewer.id)}>
+  1528→                        <Heart className="w-3 h-3" />
+  1529→                      </Button>
+  1530→                    </div>
+  1531→                  </div>
+  1532→                );
+  1533→              })}
+  1534→            </div>
+  1535→          )}
+  1536→        </div>
+  1537→      </div>
+  1538→    );
+  1539→  }
+  1540→
+  1541→  // ─── Fansites View ─────────────────────────────────────────────────────────
+  1542→  function FansitesView() {
+  1543→    return (
+  1544→      <div className="h-full flex flex-col">
+  1545→        <div className="px-4 py-3 border-b border-border shrink-0">
+  1546→          <h2 className="text-sm font-semibold">Fansites</h2>
+  1547→          <p className="text-[11px] text-muted-foreground">Discover creators and subscribe</p>
+  1548→        </div>
+  1549→        <div className="flex-1 overflow-y-auto p-3">
+  1550→          {fansiteLoading ? (
+  1551→            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="space-y-2"><Skeleton className="h-40 w-full rounded-xl" /><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-24" /></div>)}</div>
+  1552→          ) : fansites.length === 0 ? (
+  1553→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+  1554→              <Star className="w-12 h-12 text-muted-foreground" />
+  1555→              <p className="text-muted-foreground text-sm">No fansites yet</p>
+  1556→            </div>
+  1557→          ) : (
+  1558→            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+  1559→              {fansites.map(fs => (
+  1560→                <button
+  1561→                  key={fs.id}
+  1562→                  onClick={() => { setSelectedFansite(fs); setShowFansiteSheet(true); }}
+  1563→                  className="profile-card text-left rounded-xl overflow-hidden bg-card border border-border"
+  1564→                >
+  1565→                  <div className="relative h-40 bg-secondary">
+  1566→                    {fs.trailerImageUrl ? (
+  1567→                      <img src={fs.trailerImageUrl} alt={fs.name} className="w-full h-full object-cover" loading="lazy" />
+  1568→                    ) : (
+  1569→                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary"><Star className="w-10 h-10 text-primary/50" /></div>
+  1570→                    )}
+  1571→                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
+  1572→                    <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
+  1573→                      <div>
+  1574→                        <p className="text-white font-semibold text-sm">{fs.name}</p>
+  1575→                        <p className="text-white/60 text-[11px]">@{fs.nick}</p>
+  1576→                      </div>
+  1577→                      {fs.user.online && <span className="w-2.5 h-2.5 bg-green-500 rounded-full online-pulse" />}
+  1578→                    </div>
+  1579→                  </div>
+  1580→                  <div className="p-3 space-y-1.5">
+  1581→                    <p className="text-[12px] text-muted-foreground line-clamp-2">{truncate(fs.description, 80)}</p>
+  1582→                    <div className="flex items-center justify-between">
+  1583→                      <div className="flex items-center gap-2">
+  1584→                        {fs.geoName && <span className="text-[11px] text-muted-foreground flex items-center gap-0.5"><MapPin className="w-3 h-3" />{fs.geoName}</span>}
+  1585→                      </div>
+  1586→                      <span className="text-[10px] text-muted-foreground">{fs.links.length} links</span>
+  1587→                    </div>
+  1588→                  </div>
+  1589→                </button>
+  1590→              ))}
+  1591→            </div>
+  1592→          )}
+  1593→        </div>
+  1594→      </div>
+  1595→    );
+  1596→  }
+  1597→
+  1598→  // ─── Fansite Detail ────────────────────────────────────────────────────────
+  1599→  function FansiteDetail() {
+  1600→    if (!selectedFansite) return null;
+  1601→    const fs = selectedFansite;
+  1602→    return (
+  1603→      <div className="space-y-4">
+  1604→        <div className="relative h-48 bg-secondary rounded-xl overflow-hidden">
+  1605→          {fs.trailerImageUrl ? <img src={fs.trailerImageUrl} alt={fs.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary"><Star className="w-16 h-16 text-primary/50" /></div>}
+  1606→          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card to-transparent" />
+  1607→          <div className="absolute bottom-3 left-4 right-4">
+  1608→            <h2 className="text-xl font-bold">{fs.name}</h2>
+  1609→            <p className="text-sm text-muted-foreground">@{fs.nick}</p>
+  1610→            {fs.geoName && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><MapPin className="w-3 h-3" />{fs.geoName}</p>}
+  1611→          </div>
+  1612→        </div>
+  1613→        <div className="flex items-center gap-3">
+  1614→          <Avatar className="h-10 w-10"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback>{fs.user.displayName?.[0]}</AvatarFallback></Avatar>
+  1615→          <div>
+  1616→            <p className="text-sm font-semibold">{fs.user.displayName}</p>
+  1617→            <p className="text-[11px] text-muted-foreground">{fs.user.online ? '🟢 Online' : 'Offline'}</p>
+  1618→          </div>
+  1619→        </div>
+  1620→        {fs.description && <p className="text-sm text-muted-foreground leading-relaxed">{fs.description}</p>}
+  1621→        {fs.links.length > 0 && (
+  1622→          <div className="space-y-2">
+  1623→            <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Links</h3>
+  1624→            {fs.links.map(link => (
+  1625→              <div key={link.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary border border-border">
+  1626→                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">{link.type?.[0] || '?'}</div>
+  1627→                <div className="flex-1 min-w-0">
+  1628→                  <p className="text-sm font-medium truncate">{link.label || link.type}</p>
+  1629→                  {link.value && <p className="text-[11px] text-muted-foreground truncate">{link.value}</p>}
+  1630→                </div>
+  1631→                {link.url && <ExternalLink className="w-4 h-4 text-muted-foreground" />}
+  1632→              </div>
+  1633→            ))}
+  1634→          </div>
+  1635→        )}
+  1636→        {fs.products.length > 0 && (
+  1637→          <div className="space-y-2">
+  1638→            <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Subscribe</h3>
+  1639→            {fs.products.map(product => (
+  1640→              <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1641→                <div>
+  1642→                  <p className="text-sm font-medium capitalize">{product.period}</p>
+  1643→                  {product.priceOld && <p className="text-[11px] text-muted-foreground line-through">${product.priceOld}</p>}
+  1644→                </div>
+  1645→                <div className="text-right">
+  1646→                  <p className="text-lg font-bold gradient-text">${product.price}</p>
+  1647→                  <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground mt-1">Subscribe</Button>
+  1648→                </div>
+  1649→              </div>
+  1650→            ))}
+  1651→          </div>
+  1652→        )}
+  1653→        {/* Actions */}
+  1654→        <div className="flex gap-2 pt-2">
+  1655→          <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { if (fs.user) openChat(fs.user); setShowFansiteSheet(false); }}>
+  1656→            <MessageCircle className="w-4 h-4 mr-2" /> Contact
+  1657→          </Button>
+  1658→          <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => {}}>
+  1659→            <Flag className="w-4 h-4 mr-2" /> Report
+  1660→          </Button>
+  1661→        </div>
+  1662→      </div>
+  1663→    );
+  1664→  }
+  1665→
+  1666→  // ─── Events View ───────────────────────────────────────────────────────────
+  1667→  function EventsView() {
+  1668→    return (
+  1669→      <div className="h-full flex flex-col">
+  1670→        <div className="px-4 py-3 border-b border-border shrink-0 flex items-center justify-between">
+  1671→          <div>
+  1672→            <h2 className="text-sm font-semibold">Events</h2>
+  1673→            <p className="text-[11px] text-muted-foreground">Upcoming near you</p>
+  1674→          </div>
+  1675→          <Button size="sm" className="h-8 bg-primary text-primary-foreground text-xs" onClick={() => setShowCreateEvent(true)}>
+  1676→            <Plus className="w-3.5 h-3.5 mr-1" /> Create
+  1677→          </Button>
+  1678→        </div>
+  1679→        <div className="flex-1 overflow-y-auto p-3 space-y-3">
+  1680→          {eventsLoading ? (
+  1681→            Array.from({ length: 3 }).map((_, i) => (
+  1682→              <div key={i} className="flex gap-3 p-3 rounded-xl bg-card border border-border"><Skeleton className="h-20 w-20 rounded-lg" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-40" /><Skeleton className="h-3 w-24" /><Skeleton className="h-3 w-32" /></div></div>
+  1683→            ))
+  1684→          ) : events.length === 0 ? (
+  1685→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+  1686→              <Calendar className="w-12 h-12 text-muted-foreground" />
+  1687→              <p className="text-muted-foreground text-sm">No upcoming events</p>
+  1688→            </div>
+  1689→          ) : (
+  1690→            events.map((event: any) => {
+  1691→              const myRsvp = userRsvps[event.id];
+  1692→              return (
+  1693→                <div key={event.id} className="profile-card rounded-xl bg-card border border-border overflow-hidden">
+  1694→                  <div className="flex gap-3 p-3">
+  1695→                    <div className="w-20 h-20 rounded-lg bg-secondary shrink-0 overflow-hidden">
+  1696→                      {event.imageUrl ? <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Calendar className="w-8 h-8 text-muted-foreground" /></div>}
+  1697→                    </div>
+  1698→                    <div className="flex-1 min-w-0 space-y-1">
+  1699→                      <h3 className="text-[14px] font-semibold truncate">{event.title}</h3>
+  1700→                      <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{formatEventDate(event.startDate)}</p>
+  1701→                      {event.location && <p className="text-[11px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{event.location}</p>}
+  1702→                      <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />{event._count?.rsvps || 0} attending</p>
+  1703→                    </div>
+  1704→                  </div>
+  1705→                  {event.description && <p className="px-3 pb-2 text-[12px] text-muted-foreground line-clamp-2">{event.description}</p>}
+  1706→                  <div className="px-3 pb-3 flex gap-2">
+  1707→                    {(['going', 'interested', 'not_going'] as const).map(status => (
+  1708→                      <button
+  1709→                        key={status}
+  1710→                        onClick={() => handleRsvp(event.id, status)}
+  1711→                        className={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+  1712→                          myRsvp === status
+  1713→                            ? 'bg-primary text-primary-foreground border-primary'
+  1714→                            : 'bg-secondary text-muted-foreground border-border hover:border-primary/50'
+  1715→                        }`}
+  1716→                      >
+  1717→                        {status === 'going' ? '✅ Going' : status === 'interested' ? '👀 Interested' : '❌ Not Going'}
+  1718→                      </button>
+  1719→                    ))}
+  1720→                  </div>
+  1721→                </div>
+  1722→              );
+  1723→            })
+  1724→          )}
+  1725→        </div>
+  1726→      </div>
+  1727→    );
+  1728→  }
+  1729→
+  1730→  // ─── Shouts View ───────────────────────────────────────────────────────────
+  1731→  function ShoutsView() {
+  1732→    return (
+  1733→      <div className="h-full flex flex-col">
+  1734→        <div className="px-4 py-3 border-b border-border shrink-0">
+  1735→          <h2 className="text-sm font-semibold">Shouts</h2>
+  1736→          <p className="text-[11px] text-muted-foreground">What's on your mind?</p>
+  1737→        </div>
+  1738→        {/* Shout composer */}
+  1739→        <div className="px-3 py-2 border-b border-border flex gap-2 shrink-0">
+  1740→          <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(currentUser)} /><AvatarFallback className="text-xs">{currentUser?.displayName?.[0]}</AvatarFallback></Avatar>
+  1741→          <div className="flex-1 flex gap-2">
+  1742→            <Input value={shoutInput} onChange={e => setShoutInput(e.target.value)} placeholder="Shout something..." className="h-8 text-xs bg-secondary border-border" onKeyDown={e => e.key === 'Enter' && handleShout()} />
+  1743→            <Button size="sm" className="h-8 bg-primary text-primary-foreground text-xs shrink-0" onClick={handleShout} disabled={!shoutInput.trim()}><Send className="w-3.5 h-3.5" /></Button>
+  1744→          </div>
+  1745→        </div>
+  1746→        <div className="flex-1 overflow-y-auto p-3 space-y-3">
+  1747→          {shoutLoading ? (
+  1748→            Array.from({ length: 4 }).map((_, i) => <div key={i} className="p-3 rounded-xl bg-card border border-border"><div className="flex gap-2"><Skeleton className="h-8 w-8 rounded-full" /><div className="flex-1 space-y-2"><Skeleton className="h-3 w-24" /><Skeleton className="h-12 w-full" /></div></div></div>)
+  1749→          ) : shouts.length === 0 ? (
+  1750→            <div className="flex flex-col items-center justify-center py-16 space-y-3"><Megaphone className="w-12 h-12 text-muted-foreground" /><p className="text-muted-foreground text-sm">No shouts yet. Be the first!</p></div>
+  1751→          ) : (
+  1752→            shouts.map((shout: any) => (
+  1753→              <div key={shout.id} className="p-3 rounded-xl bg-card border border-border">
+  1754→                <div className="flex items-center gap-2 mb-2">
+  1755→                  <button onClick={() => openProfile(shout.userId)}><Avatar className="h-7 w-7"><AvatarImage src={getAvatar(shout.user)} /><AvatarFallback className="text-[10px]">{shout.user?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1756→                  <button onClick={() => openProfile(shout.userId)} className="text-[12px] font-semibold hover:underline">{shout.user?.displayName}</button>
+  1757→                  <span className="text-[10px] text-muted-foreground">@{shout.user?.username}</span>
+  1758→                  <span className="ml-auto text-[10px] text-muted-foreground">{timeAgo(shout.createdAt)}</span>
+  1759→                </div>
+  1760→                <p className="text-sm leading-relaxed">{shout.content}</p>
+  1761→                {shout.mediaUrl && <div className="mt-2 rounded-lg overflow-hidden"><img src={shout.mediaUrl} alt="" className="w-full max-h-64 object-cover" /></div>}
+  1762→              </div>
+  1763→            ))
+  1764→          )}
+  1765→        </div>
+  1766→      </div>
+  1767→    );
+  1768→  }
+  1769→
+  1770→  // ─── Map / GEO View ─────────────────────────────────────────────────────
+  1771→  function MapView() {
+  1772→    return (
+  1773→      <div className="h-full flex flex-col">
+  1774→        <div className="px-4 py-3 border-b border-border shrink-0 flex items-center justify-between">
+  1775→          <div>
+  1776→            <h2 className="text-sm font-semibold">Nearby</h2>
+  1777→            <p className="text-[11px] text-muted-foreground">{mapUsers.length} users within {mapRadius}km</p>
+  1778→          </div>
+  1779→          <div className="flex items-center gap-2">
+  1780→            <Select value={String(mapRadius)} onValueChange={v => setMapRadius(Number(v))}>
+  1781→              <SelectTrigger className="w-20 h-7 text-[11px] bg-secondary border-border"><SelectValue /></SelectTrigger>
+  1782→              <SelectContent className="bg-card border-border">
+  1783→                {[10, 25, 50, 100, 200].map(r => <SelectItem key={r} value={String(r)}>{r}km</SelectItem>)}
+  1784→              </SelectContent>
+  1785→            </Select>
+  1786→            <Button size="sm" variant="outline" className="h-7 text-[11px] border-border" onClick={handleFetchMap}><Crosshair className="w-3 h-3" /></Button>
+  1787→          </div>
+  1788→        </div>
+  1789→        {/* Stylized map grid */}
+  1790→        <div className="flex-1 overflow-y-auto relative bg-secondary/30">
+  1791→          {/* CSS Grid Map */}
+  1792→          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 50%, rgba(59,130,246,0.08) 0%, transparent 70%)' }} />
+  1793→          <div className="relative p-3 space-y-2">
+  1794→            {/* Center marker */}
+  1795→            <div className="flex items-center justify-center py-4">
+  1796→              <div className="relative">
+  1797→                <div className="w-4 h-4 bg-primary rounded-full animate-pulse" />
+  1798→                <div className="absolute -inset-2 bg-primary/20 rounded-full" />
+  1799→                <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] text-primary font-medium">You</span>
+  1800→              </div>
+  1801→            </div>
+  1802→            {mapLoading ? (
+  1803→              Array.from({ length: 4 }).map((_, i) => <div key={i} className="flex gap-2 p-2 rounded-lg bg-card/50"><Skeleton className="h-10 w-10 rounded-full" /><Skeleton className="h-4 w-24" /></div>)
+  1804→            ) : mapUsers.length === 0 ? (
+  1805→              <div className="flex flex-col items-center py-8"><Map className="w-10 h-10 text-muted-foreground" /><p className="text-xs text-muted-foreground mt-2">No users found nearby</p></div>
+  1806→            ) : (
+  1807→              mapUsers.map((u: any) => (
+  1808→                <button key={u.id} onClick={() => openProfile(u.id)} className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-card border border-border hover:border-primary/30 transition-all text-left">
+  1809→                  <div className="relative">
+  1810→                    <Avatar className="h-10 w-10"><AvatarImage src={getAvatar(u)} /><AvatarFallback className="text-xs">{u.displayName?.[0]}</AvatarFallback></Avatar>
+  1811→                    {u.online && <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-card" />}
+  1812→                  </div>
+  1813→                  <div className="flex-1 min-w-0">
+  1814→                    <p className="text-[13px] font-semibold truncate">{u.displayName}{u.showAge !== false && u.age ? `, ${u.age}` : ''}</p>
+  1815→                    <p className="text-[11px] text-muted-foreground">@{u.username}{u.location ? ` · ${u.location}` : ''}</p>
+  1816→                  </div>
+  1817→                  <div className="text-right shrink-0">
+  1818→                    {u.distance != null && <p className="text-[12px] font-semibold text-primary">{Math.round(u.distance)}km</p>}
+  1819→                    <p className="text-[10px] text-muted-foreground">{u.online ? 'Online' : timeAgo(u.lastSeen)}</p>
+  1820→                  </div>
+  1821→                </button>
+  1822→              ))
+  1823→            )}
+  1824→          </div>
+  1825→        </div>
+  1826→      </div>
+  1827→    );
+  1828→  }
+  1829→
+  1830→  // ─── Videos View ──────────────────────────────────────────────────────────
+  1831→  function VideosView() {
+  1832→    return (
+  1833→      <div className="h-full flex flex-col">
+  1834→        <div className="px-4 py-3 border-b border-border shrink-0">
+  1835→          <h2 className="text-sm font-semibold">Videos</h2>
+  1836→          <p className="text-[11px] text-muted-foreground">Browse and share</p>
+  1837→        </div>
+  1838→        <div className="flex-1 overflow-y-auto p-3">
+  1839→          {videosLoading ? (
+  1840→            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">{Array.from({ length: 6 }).map((_, i) => <div key={i}><Skeleton className="aspect-video w-full rounded-xl" /><Skeleton className="h-4 w-32 mt-2" /></div>)}</div>
+  1841→          ) : videos.length === 0 ? (
+  1842→            <div className="flex flex-col items-center justify-center py-16 space-y-3"><Video className="w-12 h-12 text-muted-foreground" /><p className="text-muted-foreground text-sm">No videos yet</p></div>
+  1843→          ) : (
+  1844→            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+  1845→              {videos.map((video: any) => (
+  1846→                <div key={video.id} className="rounded-xl overflow-hidden bg-card border border-border group">
+  1847→                  <div className="aspect-video relative bg-secondary">
+  1848→                    {video.thumbnailUrl ? <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Video className="w-8 h-8 text-muted-foreground" /></div>}
+  1849→                    {video.duration && <span className="absolute bottom-1 right-1 text-[9px] bg-black/70 text-white px-1 rounded">{video.duration}s</span>}
+  1850→                  </div>
+  1851→                  <div className="p-2">
+  1852→                    <p className="text-[12px] font-medium truncate">{video.title}</p>
+  1853→                    <p className="text-[10px] text-muted-foreground">by {video.user?.displayName}</p>
+  1854→                  </div>
+  1855→                </div>
+  1856→              ))}
+  1857→            </div>
+  1858→          )}
+  1859→        </div>
+  1860→      </div>
+  1861→    );
+  1862→  }
+  1863→
+  1864→  // ─── Profile View (My Profile) ─────────────────────────────────────────────
+  1865→  function ProfileView() {
+  1866→    if (!currentUser) return null;
+  1867→    return (
+  1868→      <div className="h-full overflow-y-auto">
+  1869→        <div className="max-w-lg mx-auto space-y-0">
+  1870→          {/* Banner area */}
+  1871→          <div className="relative h-32 bg-gradient-to-br from-primary/30 via-secondary to-card overflow-hidden">
+  1872→            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
+  1873→          </div>
+  1874→
+  1875→          {/* Avatar overlapping banner */}
+  1876→          <div className="px-4 -mt-12 relative z-10">
+  1877→            <div className="flex items-end gap-4">
+  1878→              <div className="relative">
+  1879→                <Avatar className="h-24 w-24 border-4 border-card shadow-xl">
+  1880→                  <AvatarImage src={getAvatar(currentUser)} />
+  1881→                  <AvatarFallback className="text-2xl">{currentUser.displayName?.[0]}</AvatarFallback>
+  1882→                </Avatar>
+  1883→                <button className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground shadow-lg"><Camera className="w-4 h-4" /></button>
+  1884→              </div>
+  1885→              <div className="flex-1 pb-1">
+  1886→                <div className="flex items-center gap-2 flex-wrap">
+  1887→                  <h2 className="text-xl font-bold">{currentUser.displayName}</h2>
+  1888→                  {currentUser.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+  1889→                  {currentUser.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
+  1890→                </div>
+  1891→                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+  1892→                  <span>@{currentUser.username}</span>
+  1893→                  {currentUser.pronouns && <span>· {currentUser.pronouns}</span>}
+  1894→                </div>
+  1895→              </div>
+  1896→            </div>
+  1897→          </div>
+  1898→
+  1899→          <div className="px-4 pt-3 space-y-5 pb-6">
+  1900→            {/* Bio */}
+  1901→            {currentUser.bio && <p className="text-sm text-foreground/80 leading-relaxed">{currentUser.bio}</p>}
+  1902→            {currentUser.aboutMe && (
+  1903→              <div className="space-y-1">
+  1904→                <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">About Me</p>
+  1905→                <p className="text-sm text-muted-foreground leading-relaxed">{currentUser.aboutMe}</p>
+  1906→              </div>
+  1907→            )}
+  1908→
+  1909→            {/* Quick stats row */}
+  1910→            <div className="grid grid-cols-4 gap-2">
+  1911→              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1912→                <p className="text-base font-bold gradient-text">{currentUser._count?.photos || 0}</p>
+  1913→                <p className="text-[9px] text-muted-foreground">Photos</p>
+  1914→              </div>
+  1915→              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1916→                <p className="text-base font-bold">{currentUser._count?.receivedViews || 0}</p>
+  1917→                <p className="text-[9px] text-muted-foreground">Views</p>
+  1918→              </div>
+  1919→              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1920→                <p className="text-base font-bold gradient-text">{currentUser._count?.receivedLikes || 0}</p>
+  1921→                <p className="text-[9px] text-muted-foreground">Likes</p>
+  1922→              </div>
+  1923→              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1924→                <p className="text-base font-bold">{(currentUser._count?.sentMessages || 0) + (currentUser._count?.receivedMessages || 0)}</p>
+  1925→                <p className="text-[9px] text-muted-foreground">Messages</p>
+  1926→              </div>
+  1927→            </div>
+  1928→
+  1929→            {/* Looking for */}
+  1930→            {currentUser.lookingFor && (
+  1931→              <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/10 border border-primary/20">
+  1932→                <Heart className="w-4 h-4 text-primary" />
+  1933→                <span className="text-sm font-medium">Looking for: <span className="capitalize text-primary">{currentUser.lookingFor}</span></span>
+  1934→              </div>
+  1935→            )}
+  1936→
+  1937→            {/* Full Details grid */}
+  1938→            <div className="space-y-2">
+  1939→              <div className="flex items-center justify-between">
+  1940→                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Details</h3>
+  1941→                <Button variant="ghost" size="sm" className="text-[11px] text-primary hover:text-primary" onClick={() => {
+  1942→                  setEditingProfile(true);
+  1943→                  setEditForm({
+  1944→                    displayName: currentUser.displayName || '',
+  1945→                    bio: currentUser.bio || '',
+  1946→                    lookingFor: currentUser.lookingFor || '',
+  1947→                    aboutMe: currentUser.aboutMe || '',
+  1948→                    height: currentUser.height?.toString() || '',
+  1949→                    weight: currentUser.weight?.toString() || '',
+  1950→                    ethnicity: currentUser.ethnicity || '',
+  1951→                    bodyType: currentUser.bodyType || '',
+  1952→                    relationshipStatus: currentUser.relationshipStatus || '',
+  1953→                    position: currentUser.position || '',
+  1954→                    pronouns: currentUser.pronouns || '',
+  1955→                    location: currentUser.location || '',
+  1956→                  });
+  1957→                }}>
+  1958→                  <Pencil className="w-3 h-3 mr-1" /> Edit
+  1959→                </Button>
+  1960→              </div>
+  1961→              <div className="grid grid-cols-2 gap-2">
+  1962→                {currentUser.lookingFor && <DetailCell label="Looking for" value={currentUser.lookingFor} />}
+  1963→                {currentUser.height && <DetailCell label="Height" value={`${currentUser.height} cm`} />}
+  1964→                {currentUser.weight && <DetailCell label="Weight" value={`${currentUser.weight} kg`} />}
+  1965→                {currentUser.bodyType && <DetailCell label="Body Type" value={currentUser.bodyType} />}
+  1966→                {currentUser.ethnicity && <DetailCell label="Ethnicity" value={currentUser.ethnicity} />}
+  1967→                {currentUser.position && <DetailCell label="Position" value={currentUser.position} />}
+  1968→                {currentUser.relationshipStatus && <DetailCell label="Relationship" value={currentUser.relationshipStatus} />}
+  1969→                {currentUser.location && <DetailCell label="Location" value={currentUser.location} />}
+  1970→                {currentUser.pronouns && <DetailCell label="Pronouns" value={currentUser.pronouns} />}
+  1971→                <DetailCell label="Gender" value={currentUser.gender} />
+  1972→              </div>
+  1973→            </div>
+  1974→
+  1975→            {/* Photo Gallery */}
+  1976→            {currentUser.photos && currentUser.photos.length > 0 && (
+  1977→              <div className="space-y-2">
+  1978→                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Photos</h3>
+  1979→                <div className="grid grid-cols-3 gap-2">
+  1980→                  {currentUser.photos.map(photo => (
+  1981→                    <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-secondary relative group">
+  1982→                      <img src={photo.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+  1983→                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+  1984→                    </div>
+  1985→                  ))}
+  1986→                </div>
+  1987→              </div>
+  1988→            )}
+  1989→
+  1990→            {/* Edit Profile Form */}
+  1991→            {editingProfile && (
+  1992→              <Card className="bg-secondary border-border p-4 space-y-3">
+  1993→                <h3 className="text-sm font-semibold">Edit Profile</h3>
+  1994→                {[
+  1995→                  { key: 'displayName', label: 'Display Name' },
+  1996→                  { key: 'bio', label: 'Bio' },
+  1997→                  { key: 'aboutMe', label: 'About Me' },
+  1998→                  { key: 'location', label: 'Location' },
+  1999→                  { key: 'pronouns', label: 'Pronouns' },
+  2000→                  { key: 'lookingFor', label: 'Looking For' },
+  2001→                  { key: 'ethnicity', label: 'Ethnicity' },
+  2002→                  { key: 'bodyType', label: 'Body Type' },
+  2003→                  { key: 'relationshipStatus', label: 'Relationship Status' },
+  2004→                  { key: 'position', label: 'Position' },
+  2005→                ].map(({ key, label }) => (
+  2006→                  <div key={key} className="space-y-1">
+  2007→                    <Label className="text-[11px] text-muted-foreground">{label}</Label>
+  2008→                    {(key === 'bio' || key === 'aboutMe') ? (
+  2009→                      <Textarea value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm" rows={2} />
+  2010→                    ) : (
+  2011→                      <Input value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm h-9" />
+  2012→                    )}
+  2013→                  </div>
+  2014→                ))}
+  2015→                <div className="grid grid-cols-2 gap-3">
+  2016→                  <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Height (cm)</Label><Input type="number" value={editForm.height} onChange={e => setEditForm(p => ({ ...p, height: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
+  2017→                  <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Weight (kg)</Label><Input type="number" value={editForm.weight} onChange={e => setEditForm(p => ({ ...p, weight: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
+  2018→                </div>
+  2019→                <div className="flex gap-2 pt-2">
+  2020→                  <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveProfile}>Save</Button>
+  2021→                  <Button size="sm" variant="outline" className="border-border" onClick={() => setEditingProfile(false)}>Cancel</Button>
+  2022→                </div>
+  2023→              </Card>
+  2024→            )}
+  2025→
+  2026→            {/* Albums */}
+  2027→            {currentUser.albums && currentUser.albums.length > 0 && (
+  2028→              <div className="space-y-2">
+  2029→                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Albums</h3>
+  2030→                <div className="space-y-2">
+  2031→                  {currentUser.albums.map(album => (
+  2032→                    <div key={album.id} className="p-3 rounded-xl bg-secondary border border-border">
+  2033→                      <div className="flex items-center justify-between mb-2">
+  2034→                        <p className="text-sm font-medium">{album.name}</p>
+  2035→                        {album.isPrivate && <Badge variant="secondary" className="text-[10px] bg-muted">Private</Badge>}
+  2036→                      </div>
+  2037→                      {album.photos && album.photos.length > 0 && (
+  2038→                        <div className="grid grid-cols-4 gap-1">
+  2039→                          {album.photos.slice(0, 8).map(p => (
+  2040→                            <div key={p.id} className="aspect-square rounded-lg overflow-hidden bg-card">
+  2041→                              <img src={p.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+  2042→                            </div>
+  2043→                          ))}
+  2044→                        </div>
+  2045→                      )}
+  2046→                    </div>
+  2047→                  ))}
+  2048→                </div>
+  2049→              </div>
+  2050→            )}
+  2051→
+  2052→            {/* My Fansite */}
+  2053→            {currentUser.fansite && (
+  2054→              <div className="p-4 rounded-xl bg-secondary border border-border space-y-2">
+  2055→                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><Star className="w-4 h-4" /> My Fansite</h3>
+  2056→                <p className="text-sm font-medium">{currentUser.fansite.name} <span className="text-muted-foreground">@{currentUser.fansite.nick}</span></p>
+  2057→                {currentUser.fansite.description && <p className="text-[12px] text-muted-foreground">{truncate(currentUser.fansite.description, 100)}</p>}
+  2058→                {currentUser.fansite.status === 'active' && <Badge className="bg-primary/20 text-primary text-[10px]">Active</Badge>}
+  2059→              </div>
+  2060→            )}
+  2061→
+  2062→            {/* My Subscriptions */}
+  2063→            <div className="space-y-2">
+  2064→              <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><Crown className="w-4 h-4" /> My Subscriptions</h3>
+  2065→              {mySubscriptions.length > 0 ? mySubscriptions.map((sub: any) => (
+  2066→                <div key={sub.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  2067→                  <div>
+  2068→                    <p className="text-sm font-medium capitalize">{sub.tier}</p>
+  2069→                    <p className="text-[11px] text-muted-foreground">Since {format(new Date(sub.startDate), 'MMM d, yyyy')}</p>
+  2070→                  </div>
+  2071→                  {sub.isActive ? <Badge className="bg-primary/20 text-primary text-[10px]">Active</Badge> : <Badge variant="secondary" className="text-[10px]">Expired</Badge>}
+  2072→                </div>
+  2073→              )) : <p className="text-xs text-muted-foreground">No active subscriptions</p>}
+  2074→            </div>
+  2075→
+  2076→            {/* My Boosts */}
+  2077→            {myBoosts.length > 0 && (
+  2078→              <div className="space-y-2">
+  2079→                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><Zap className="w-4 h-4" /> Active Boosts</h3>
+  2080→                {myBoosts.map((boost: any) => (
+  2081→                  <div key={boost.id} className="p-3 rounded-xl bg-secondary border border-border boost-glow">
+  2082→                    <p className="text-sm font-medium capitalize">{boost.type} Boost</p>
+  2083→                    <p className="text-[11px] text-muted-foreground">Ends {timeAgo(boost.endsAt)}</p>
+  2084→                    <Progress value={50} className="mt-2 h-1.5" />
+  2085→                  </div>
+  2086→                ))}
+  2087→              </div>
+  2088→            )}
+  2089→
+  2090→            {/* My Favorites */}
+  2091→            <div className="space-y-2">
+  2092→              <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><Bookmark className="w-4 h-4" /> My Favorites ({favorites.length})</h3>
+  2093→              {favorites.length > 0 ? favorites.slice(0, 10).map((fav: any) => (
+  2094→                <button key={fav.id} onClick={() => openProfile(fav.targetId)} className="w-full flex items-center gap-2 p-2 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all text-left">
+  2095→                  <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-[10px]">{(fav.target as any)?.displayName?.[0]}</AvatarFallback></Avatar>
+  2096→                  <div className="flex-1 min-w-0"><p className="text-[13px] font-medium truncate">{(fav.target as any)?.displayName}</p><p className="text-[10px] text-muted-foreground">{(fav.target as any)?.username}</p></div>
+  2097→                  {fav.isSuper && <Star className="w-3.5 h-3.5 text-yellow-400" />}
+  2098→                </button>
+  2099→              )) : <p className="text-xs text-muted-foreground">No favorites yet</p>}
+
+[showing lines 1500-2099 of 2460; use offset=2100 with limit to continue reading]

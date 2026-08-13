@@ -53,6 +53,44 @@ interface AppState {
   setUserLat: (l: number | null) => void;
   userLng: number | null;
   setUserLng: (l: number | null) => void;
+  // GEO
+  geoMode: string;
+  setGeoMode: (m: string) => void;
+  geoName: string;
+  setGeoName: (n: string) => void;
+  // Agenda/Events
+  agendaView: string;
+  setAgendaView: (v: string) => void;
+  agendaFilter: string;
+  setAgendaFilter: (f: string) => void;
+  // Map filters
+  mapFilter: string;
+  setMapFilter: (f: string) => void;
+  mapHidden: boolean;
+  setMapHidden: (h: boolean) => void;
+  // Active sub-page (for navigating within More tab)
+  activeSubPage: string | null;
+  setActiveSubPage: (p: string | null) => void;
+  // Infer results
+  inferResults: any[];
+  setInferResults: (r: any[]) => void;
+  inferLoading: boolean;
+  setInferLoading: (l: boolean) => void;
+  // Groups
+  groups: any[];
+  setGroups: (g: any[]) => void;
+  // Albums (full list)
+  allAlbums: any[];
+  setAllAlbums: (a: any[]) => void;
+  // Footprints
+  footprints: any[];
+  setFootprints: (f: any[]) => void;
+  // Boosts (all)
+  allBoosts: any[];
+  setAllBoosts: (b: any[]) => void;
+  // Profile views received
+  profileViews: any[];
+  setProfileViews: (v: any[]) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -107,4 +145,42 @@ export const useAppStore = create<AppState>((set) => ({
   setUserLat: (l) => set({ userLat: l }),
   userLng: null,
   setUserLng: (l) => set({ userLng: l }),
+  // GEO
+  geoMode: 'auto',
+  setGeoMode: (m) => set({ geoMode: m }),
+  geoName: '',
+  setGeoName: (n) => set({ geoName: n }),
+  // Agenda/Events
+  agendaView: 'list',
+  setAgendaView: (v) => set({ agendaView: v }),
+  agendaFilter: 'all',
+  setAgendaFilter: (f) => set({ agendaFilter: f }),
+  // Map filters
+  mapFilter: 'all',
+  setMapFilter: (f) => set({ mapFilter: f }),
+  mapHidden: false,
+  setMapHidden: (h) => set({ mapHidden: h }),
+  // Active sub-page (for navigating within More tab)
+  activeSubPage: null,
+  setActiveSubPage: (p) => set({ activeSubPage: p }),
+  // Infer results
+  inferResults: [],
+  setInferResults: (r) => set({ inferResults: r }),
+  inferLoading: false,
+  setInferLoading: (l) => set({ inferLoading: l }),
+  // Groups
+  groups: [],
+  setGroups: (g) => set({ groups: g }),
+  // Albums (full list)
+  allAlbums: [],
+  setAllAlbums: (a) => set({ allAlbums: a }),
+  // Footprints
+  footprints: [],
+  setFootprints: (f) => set({ footprints: f }),
+  // Boosts (all)
+  allBoosts: [],
+  setAllBoosts: (b) => set({ allBoosts: b }),
+  // Profile views received
+  profileViews: [],
+  setProfileViews: (v) => set({ profileViews: v }),
 }));

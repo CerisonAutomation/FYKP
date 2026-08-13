@@ -53,6 +53,45 @@ export type NoteType = (typeof NOTE_TYPE_OPTIONS)[number];
 export const DISPLAY_UNITS_OPTIONS = ['metric', 'imperial'] as const;
 export type DisplayUnits = (typeof DISPLAY_UNITS_OPTIONS)[number];
 
+export const HIV_STATUS_OPTIONS = ['negative', 'positive', 'undetectable', 'on-prep', 'not-specified', 'prefer-not-to-say'] as const;
+export type HIVStatus = (typeof HIV_STATUS_OPTIONS)[number];
+
+export const LANG_OPTIONS = ['en', 'es', 'fr', 'de', 'it', 'pt', 'nl', 'pl', 'ru', 'ar', 'zh', 'ja', 'ko', 'tr', 'el'] as const;
+export type Lang = (typeof LANG_OPTIONS)[number];
+
+export const GEO_MODE_OPTIONS = ['auto', 'manual', 'fake', 'hide'] as const;
+export type GeoMode = (typeof GEO_MODE_OPTIONS)[number];
+
+export const TAG_CATEGORY_OPTIONS = ['interests', 'lifestyle', 'appearance', 'kinks', 'fetishes', 'social', 'meet-now'] as const;
+export type TagCategory = (typeof TAG_CATEGORY_OPTIONS)[number];
+
+export const AGENDA_VIEW_OPTIONS = ['list', 'calendar', 'map'] as const;
+export type AgendaView = (typeof AGENDA_VIEW_OPTIONS)[number];
+
+export const AGENDA_FILTER_OPTIONS = ['all', 'today', 'this-week', 'this-month', 'nearby', 'my-events', 'friends-events'] as const;
+export type AgendaFilter = (typeof AGENDA_FILTER_OPTIONS)[number];
+
+export const MAP_FILTER_OPTIONS = ['all', 'online', 'recent', 'nearby', 'new', 'verified', 'premium'] as const;
+export type MapFilter = (typeof MAP_FILTER_OPTIONS)[number];
+
+export const BANNER_POSITION_OPTIONS = ['home-top', 'home-middle', 'discover-top', 'profile-sidebar', 'chat-header'] as const;
+export type BannerPosition = (typeof BANNER_POSITION_OPTIONS)[number];
+
+export const VERIFICATION_TYPE_OPTIONS = ['age', 'photo', 'id', 'face', 'social'] as const;
+export type VerificationType = (typeof VERIFICATION_TYPE_OPTIONS)[number];
+
+export const MEET_NOW_TAG_OPTIONS = ['coffee', 'drinks', 'dinner', 'movie', 'walk', 'gym', 'club', 'travel', 'chill', 'video-call', 'phone-call', 'date', 'hookup'] as const;
+export type MeetNowTag = (typeof MEET_NOW_TAG_OPTIONS)[number];
+
+export const CANNED_SHOUT_OPTIONS = ['looking-now', 'bored', 'wanna-chat', 'new-in-town', 'party-tonight', 'netflix-chill', 'gym-buddy', 'travel-companion', 'coffee-date', 'video-call'] as const;
+export type CannedShout = (typeof CANNED_SHOUT_OPTIONS)[number];
+
+export const PROFILE_TAG_CATEGORY_OPTIONS = ['interests', 'lifestyle', 'kinks', 'social', 'meet-now'] as const;
+export type ProfileTagCategory = (typeof PROFILE_TAG_CATEGORY_OPTIONS)[number];
+
+export const INFER_CATEGORY_OPTIONS = ['compatibility', 'icebreakers', 'conversation-starters', 'profile-tips', 'red-flags', 'green-flags', 'date-ideas', 'personality-analysis'] as const;
+export type InferCategory = (typeof INFER_CATEGORY_OPTIONS)[number];
+
 // ═══════════════════════════════════════════════════════════════
 // MODELS
 // ═══════════════════════════════════════════════════════════════
@@ -385,8 +424,70 @@ export interface UserSession {
   lastSeen: string;
 }
 
+export interface GeoLocation {
+  lat: number;
+  lng: number;
+  city: string;
+  region: string;
+  country: string;
+  accuracy: number;
+}
+
+export interface InferResult {
+  category: InferCategory;
+  title: string;
+  content: string;
+  confidence: number;
+  details?: Record<string, string>;
+}
+
+export interface PageDirectory {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+  tabId: TabId;
+  badge?: number;
+  isNew?: boolean;
+  isPremium?: boolean;
+}
+
+export interface AccountSettings {
+  email: string;
+  password: string;
+  username: string;
+  displayName: string;
+}
+
+export interface PreferencesSettings {
+  geoMode: GeoMode;
+  geoName: string;
+  displayUnits: DisplayUnits;
+  lang: Lang;
+  ageMin: number;
+  ageMax: number;
+  showOnline: boolean;
+  showDistance: boolean;
+  showAge: boolean;
+  showActivity: boolean;
+  hidePicsOffline: boolean;
+  soundOff: boolean;
+  notifPushOff: boolean;
+  notifEmailOff: boolean;
+  notifTelegramOff: boolean;
+  mailingInternal: boolean;
+  mailingPartner: boolean;
+  profileOff: boolean;
+  privateAuto: boolean;
+  noPros: boolean;
+  noPub: boolean;
+  profileTags: string;
+  profileTagCategorys: string;
+  profileMeetNowTags: string;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // TABS — expanded from OMOLINK report
 // ═══════════════════════════════════════════════════════════════
 
-export type TabId = 'discover' | 'map' | 'chat' | 'likes' | 'viewed' | 'shouts' | 'fansites' | 'events' | 'videos' | 'blogs' | 'profile';
+export type TabId = 'discover' | 'map' | 'chat' | 'likes' | 'more' | 'events' | 'viewed' | 'shouts' | 'fansites' | 'videos' | 'blogs' | 'groups' | 'albums' | 'membership' | 'verified' | 'professional' | 'footprints' | 'notes' | 'boosts' | 'favorites' | 'account' | 'preferences' | 'geo-settings' | 'banners' | 'sites' | 'legal' | 'faqs' | 'abuse' | 'advantages' | 'affiliation' | 'profile' | 'infer';
