@@ -116,3 +116,37 @@ Stage Summary:
 - All API endpoints responding correctly
 - Zero lint errors
 - Production-ready dark theme
+
+---
+Task ID: 6
+Agent: Main Orchestrator
+Task: Major enhancement - Viewed Me tab, enhanced profiles, chat requests, cascade taps
+
+Work Log:
+- Added ChatRequest interface to types/index.ts
+- Extended TabId to include 'viewed'
+- Updated Zustand store with chatRequests, pendingRequestCount state
+- Enhanced /api/profile-views to return viewer with full profile data + photo/like counts
+- Rewrote page.tsx (2086 lines) with 7 major enhancements:
+  1. NEW 'Viewed Me' tab - Shows who visited your profile (inferred from GRINDR's viewed_me feature)
+  2. ENHANCED Profile Drawer - Horizontal scrollable stats, 'Looking for' badge, full 2-col details grid with all fields (height, weight, bodyType, ethnicity, position, relationshipStatus, location, pronouns, gender), About Me section, photo gallery with thumbnails, action buttons
+  3. ENHANCED My Profile - Banner with gradient, overlapping avatar, 4-stat row (Photos/Views/Likes/Messages), 'Looking for' highlight, DetailCell grid for all fields, photo gallery with hover overlay, albums, fansite, subscriptions, boosts, edit form
+  4. Chat Requests in Chat Tab - Fetches pending requests, shows at top of conversation list with Accept/Decline buttons, badge on Chat nav icon includes pending count
+  5. Enhanced Discover - 4 Tap types in cascade view (🔥 Hot, 👋 Friendly, 😍 Looking, ✨ Fresh Face), grid view has quick like heart overlay
+  6. Enhanced Likes - MATCH badge for mutual likes, online status dot, last active time, location
+  7. 7-tab compact bottom nav (w-4 h-4 icons, text-[9px])
+- Profile drawer records view via POST /api/profile-views when opening
+- Fixed nav destructure bug (missing 'label' property)
+- ESLint: 0 errors
+- Browser verified: all 7 tabs render and function correctly
+
+Stage Summary:
+- 7-tab app: Discover, Chat, Likes, Viewed, Fansites, Events, Profile
+- FYK dark theme fully preserved (deep purple-black, hot pink/magenta primary)
+- Profile drawer now shows full detail grid with all user fields
+- My Profile has banner, 4-stat row, detail cells, and enhanced photo gallery
+- Viewed Me tab shows profile visitors with Message/Like actions
+- Chat Requests appear at top of conversation list with Accept/Decline
+- Cascade view has 4 GRINDR-style tap buttons (Hot/Friendly/Looking/Fresh Face)
+- Likes view detects and shows MATCH badge for mutual likes
+- Zero lint errors, all API routes responding correctly

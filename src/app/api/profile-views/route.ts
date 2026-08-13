@@ -4,7 +4,6 @@ import { db } from '@/lib/db';
 // GET /api/profile-views - who viewed me (list of profile viewers)
 export async function GET() {
   try {
-    // Demo: use the first user as "me"
     const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
     if (!me) {
       return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
@@ -22,6 +21,19 @@ export async function GET() {
             avatar: true,
             online: true,
             lastSeen: true,
+            age: true,
+            location: true,
+            isPremium: true,
+            isVerified: true,
+            pronouns: true,
+            showOnline: true,
+            showAge: true,
+            _count: {
+              select: {
+                photos: true,
+                receivedLikes: true,
+              },
+            },
           },
         },
       },
@@ -43,7 +55,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'viewedId is required' }, { status: 400 });
     }
 
-    // Demo: use the first user as "me"
     const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
     if (!me) {
       return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });

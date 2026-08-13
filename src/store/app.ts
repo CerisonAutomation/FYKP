@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { User, TabId, Message, Conversation } from '@/types';
+import type { User, TabId, Message, Conversation, ChatRequest } from '@/types';
 
 interface AppState {
   currentUser: User | null;
@@ -31,6 +31,10 @@ interface AppState {
   setDiscoverView: (view: 'grid' | 'cascade') => void;
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+  chatRequests: ChatRequest[];
+  setChatRequests: (reqs: ChatRequest[]) => void;
+  pendingRequestCount: number;
+  setPendingRequestCount: (n: number) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -63,4 +67,8 @@ export const useAppStore = create<AppState>((set) => ({
   setDiscoverView: (view) => set({ discoverView: view }),
   sidebarOpen: false,
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
+  chatRequests: [],
+  setChatRequests: (reqs) => set({ chatRequests: reqs }),
+  pendingRequestCount: 0,
+  setPendingRequestCount: (n) => set({ pendingRequestCount: n }),
 }));

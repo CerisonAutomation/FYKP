@@ -1,0 +1,543 @@
+   100→   100→  1299→                    <div className="text-right">
+   101→   101→  1300→                      <p className="text-lg font-bold gradient-text">${product.price}</p>
+   102→   102→  1301→                      <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground mt-1">Subscribe</Button>
+   103→   103→  1302→                    </div>
+   104→   104→  1303→                  </div>
+   105→   105→  1304→                ))}
+   106→   106→  1305→              </div>
+   107→   107→  1306→            </div>
+   108→   108→  1307→          )}
+   109→   109→  1308→          {/* Actions */}
+   110→   110→  1309→          <div className="flex gap-2 pt-2">
+   111→   111→  1310→            <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { if (fs.user) openChat(fs.user); setShowFansiteSheet(false); }}>
+   112→   112→  1311→              <MessageCircle className="w-4 h-4 mr-2" /> Contact
+   113→   113→  1312→            </Button>
+   114→   114→  1313→            <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => {}}>
+   115→   115→  1314→              <Flag className="w-4 h-4 mr-2" /> Report
+   116→   116→  1315→            </Button>
+   117→   117→  1316→          </div>
+   118→   118→  1317→        </div>
+   119→   119→  1318→      </div>
+   120→   120→  1319→    );
+   121→   121→  1320→  }
+   122→   122→  1321→
+   123→   123→  1322→  // ─── Events View ───────────────────────────────────────────────────────────
+   124→   124→  1323→  function EventsView() {
+   125→   125→  1324→    return (
+   126→   126→  1325→      <div className="h-full flex flex-col">
+   127→   127→  1326→        <div className="px-4 py-3 border-b border-border shrink-0 flex items-center justify-between">
+   128→   128→  1327→          <div>
+   129→   129→  1328→            <h2 className="text-sm font-semibold">Events</h2>
+   130→   130→  1329→            <p className="text-[11px] text-muted-foreground">Upcoming near you</p>
+   131→   131→  1330→          </div>
+   132→   132→  1331→          <Button size="sm" className="h-8 bg-primary text-primary-foreground text-xs" onClick={() => setShowCreateEvent(true)}>
+   133→   133→  1332→            <Plus className="w-3.5 h-3.5 mr-1" /> Create
+   134→   134→  1333→          </Button>
+   135→   135→  1334→        </div>
+   136→   136→  1335→        <div className="flex-1 overflow-y-auto p-3 space-y-3">
+   137→   137→  1336→          {eventsLoading ? (
+   138→   138→  1337→            Array.from({ length: 3 }).map((_, i) => (
+   139→   139→  1338→              <div key={i} className="flex gap-3 p-3 rounded-xl bg-card border border-border"><Skeleton className="h-20 w-20 rounded-lg" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-40" /><Skeleton className="h-3 w-24" /><Skeleton className="h-3 w-32" /></div></div>
+   140→   140→  1339→            ))
+   141→   141→  1340→          ) : events.length === 0 ? (
+   142→   142→  1341→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+   143→   143→  1342→              <Calendar className="w-12 h-12 text-muted-foreground" />
+   144→   144→  1343→              <p className="text-muted-foreground text-sm">No upcoming events</p>
+   145→   145→  1344→            </div>
+   146→   146→  1345→          ) : (
+   147→   147→  1346→            events.map((event: any) => {
+   148→   148→  1347→              const myRsvp = userRsvps[event.id];
+   149→   149→  1348→              return (
+   150→   150→  1349→                <div key={event.id} className="profile-card rounded-xl bg-card border border-border overflow-hidden">
+   151→   151→  1350→                  <div className="flex gap-3 p-3">
+   152→   152→  1351→                    <div className="w-20 h-20 rounded-lg bg-secondary shrink-0 overflow-hidden">
+   153→   153→  1352→                      {event.imageUrl ? <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Calendar className="w-8 h-8 text-muted-foreground" /></div>}
+   154→   154→  1353→                    </div>
+   155→   155→  1354→                    <div className="flex-1 min-w-0 space-y-1">
+   156→   156→  1355→                      <h3 className="text-[14px] font-semibold truncate">{event.title}</h3>
+   157→   157→  1356→                      <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{formatEventDate(event.startDate)}</p>
+   158→   158→  1357→                      {event.location && <p className="text-[11px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{event.location}</p>}
+   159→   159→  1358→                      <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />{event._count?.rsvps || 0} attending</p>
+   160→   160→  1359→                    </div>
+   161→   161→  1360→                  </div>
+   162→   162→  1361→                  {event.description && <p className="px-3 pb-2 text-[12px] text-muted-foreground line-clamp-2">{event.description}</p>}
+   163→   163→  1362→                  <div className="px-3 pb-3 flex gap-2">
+   164→   164→  1363→                    {(['going', 'interested', 'not_going'] as const).map(status => (
+   165→   165→  1364→                      <button
+   166→   166→  1365→                        key={status}
+   167→   167→  1366→                        onClick={() => handleRsvp(event.id, status)}
+   168→   168→  1367→                        className={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+   169→   169→  1368→                          myRsvp === status
+   170→   170→  1369→                            ? 'bg-primary text-primary-foreground border-primary'
+   171→   171→  1370→                            : 'bg-secondary text-muted-foreground border-border hover:border-primary/50'
+   172→   172→  1371→                        }`}
+   173→   173→  1372→                      >
+   174→   174→  1373→                        {status === 'going' ? '✅ Going' : status === 'interested' ? '👀 Interested' : '❌ Not Going'}
+   175→   175→  1374→                      </button>
+   176→   176→  1375→                    ))}
+   177→   177→  1376→                  </div>
+   178→   178→  1377→                </div>
+   179→   179→  1378→              );
+   180→   180→  1379→            })
+   181→   181→  1380→          )}
+   182→   182→  1381→        </div>
+   183→   183→  1382→      </div>
+   184→   184→  1383→    );
+   185→   185→  1384→  }
+   186→   186→  1385→
+   187→   187→  1386→  // ─── Profile View (My Profile) ─────────────────────────────────────────────
+   188→   188→  1387→  function ProfileView() {
+   189→   189→  1388→    if (!currentUser) return null;
+   190→   190→  1389→    return (
+   191→   191→  1390→      <div className="h-full overflow-y-auto">
+   192→   192→  1391→        <div className="max-w-lg mx-auto p-4 space-y-4">
+   193→   193→  1392→          {/* Profile header */}
+   194→   194→  1393→          <div className="flex items-center gap-4">
+   195→   195→  1394→            <div className="relative">
+   196→   196→  1395→              <Avatar className="h-20 w-20 border-2 border-primary/30">
+   197→   197→  1396→                <AvatarImage src={getAvatar(currentUser)} />
+   198→   198→  1397→                <AvatarFallback className="text-xl">{currentUser.displayName?.[0]}</AvatarFallback>
+   199→   199→  1398→              </Avatar>
+   200→   200→  1399→              <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-full flex items-center justify-center text-primary-foreground"><Camera className="w-3.5 h-3.5" /></button>
+   201→   201→  1400→            </div>
+   202→   202→  1401→            <div className="flex-1">
+   203→   203→  1402→              <div className="flex items-center gap-2">
+   204→   204→  1403→                <h2 className="text-xl font-bold">{currentUser.displayName}</h2>
+   205→   205→  1404→                {currentUser.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+   206→   206→  1405→                {currentUser.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
+   207→   207→  1406→              </div>
+   208→   208→  1407→              <p className="text-sm text-muted-foreground">@{currentUser.username}</p>
+   209→   209→  1408→              {currentUser.pronouns && <p className="text-xs text-muted-foreground mt-0.5">{currentUser.pronouns}</p>}
+   210→   210→  1409→            </div>
+   211→   211→  1410→            <Button variant="outline" size="sm" className="border-border text-xs" onClick={() => {
+   212→   212→  1411→              setEditingProfile(true);
+   213→   213→  1412→              setEditForm({
+   214→   214→  1413→                displayName: currentUser.displayName || '',
+   215→   215→  1414→                bio: currentUser.bio || '',
+   216→   216→  1415→                lookingFor: currentUser.lookingFor || '',
+   217→   217→  1416→                aboutMe: currentUser.aboutMe || '',
+   218→   218→  1417→                height: currentUser.height?.toString() || '',
+   219→   219→  1418→                weight: currentUser.weight?.toString() || '',
+   220→   220→  1419→                ethnicity: currentUser.ethnicity || '',
+   221→   221→  1420→                bodyType: currentUser.bodyType || '',
+   222→   222→  1421→                relationshipStatus: currentUser.relationshipStatus || '',
+   223→   223→  1422→                position: currentUser.position || '',
+   224→   224→  1423→                pronouns: currentUser.pronouns || '',
+   225→   225→  1424→                location: currentUser.location || '',
+   226→   226→  1425→              });
+   227→   227→  1426→            }}>
+   228→   228→  1427→              <Pencil className="w-3 h-3 mr-1" /> Edit
+   229→   229→  1428→            </Button>
+   230→   230→  1429→          </div>
+   231→   231→  1430→
+   232→   232→  1431→          {/* Bio */}
+   233→   233→  1432→          {currentUser.bio && <p className="text-sm text-foreground/80 leading-relaxed">{currentUser.bio}</p>}
+   234→   234→  1433→          {currentUser.aboutMe && <p className="text-sm text-muted-foreground leading-relaxed">{currentUser.aboutMe}</p>}
+   235→   235→  1434→
+   236→   236→  1435→          {/* Edit Profile Form */}
+   237→   237→  1436→          {editingProfile && (
+   238→   238→  1437→            <Card className="bg-secondary border-border p-4 space-y-3">
+   239→   239→  1438→              <h3 className="text-sm font-semibold">Edit Profile</h3>
+   240→   240→  1439→              {[
+   241→   241→  1440→                { key: 'displayName', label: 'Display Name' },
+   242→   242→  1441→                { key: 'bio', label: 'Bio' },
+   243→   243→  1442→                { key: 'aboutMe', label: 'About Me' },
+   244→   244→  1443→                { key: 'location', label: 'Location' },
+   245→   245→  1444→                { key: 'pronouns', label: 'Pronouns' },
+   246→   246→  1445→                { key: 'lookingFor', label: 'Looking For' },
+   247→   247→  1446→                { key: 'ethnicity', label: 'Ethnicity' },
+   248→   248→  1447→                { key: 'bodyType', label: 'Body Type' },
+   249→   249→  1448→                { key: 'relationshipStatus', label: 'Relationship Status' },
+   250→   250→  1449→                { key: 'position', label: 'Position' },
+   251→   251→  1450→              ].map(({ key, label }) => (
+   252→   252→  1451→                <div key={key} className="space-y-1">
+   253→   253→  1452→                  <Label className="text-[11px] text-muted-foreground">{label}</Label>
+   254→   254→  1453→                  {(key === 'bio' || key === 'aboutMe') ? (
+   255→   255→  1454→                    <Textarea value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm" rows={2} />
+   256→   256→  1455→                  ) : (
+   257→   257→  1456→                    <Input value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm h-9" />
+   258→   258→  1457→                  )}
+   259→   259→  1458→                </div>
+   260→   260→  1459→              ))}
+   261→   261→  1460→              <div className="grid grid-cols-2 gap-3">
+   262→   262→  1461→                <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Height (cm)</Label><Input type="number" value={editForm.height} onChange={e => setEditForm(p => ({ ...p, height: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
+   263→   263→  1462→                <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Weight (kg)</Label><Input type="number" value={editForm.weight} onChange={e => setEditForm(p => ({ ...p, weight: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
+   264→   264→  1463→              </div>
+   265→   265→  1464→              <div className="flex gap-2 pt-2">
+   266→   266→  1465→                <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveProfile}>Save</Button>
+   267→   267→  1466→                <Button size="sm" variant="outline" className="border-border" onClick={() => setEditingProfile(false)}>Cancel</Button>
+   268→   268→  1467→              </div>
+   269→   269→  1468→            </Card>
+   270→   270→  1469→          )}
+   271→   271→  1470→
+   272→   272→  1471→          {/* Stats */}
+   273→   273→  1472→          <div className="grid grid-cols-3 gap-3">
+   274→   274→  1473→            <div className="text-center p-3 rounded-xl bg-secondary border border-border">
+   275→   275→  1474→              <p className="text-lg font-bold gradient-text">{currentUser._count?.photos || 0}</p>
+   276→   276→  1475→              <p className="text-[10px] text-muted-foreground">Photos</p>
+   277→   277→  1476→            </div>
+   278→   278→  1477→            <div className="text-center p-3 rounded-xl bg-secondary border border-border">
+   279→   279→  1478→              <p className="text-lg font-bold">{currentUser._count?.receivedViews || 0}</p>
+   280→   280→  1479→              <p className="text-[10px] text-muted-foreground">Views</p>
+   281→   281→  1480→            </div>
+   282→   282→  1481→            <div className="text-center p-3 rounded-xl bg-secondary border border-border">
+   283→   283→  1482→              <p className="text-lg font-bold gradient-text">{currentUser._count?.receivedLikes || 0}</p>
+   284→   284→  1483→              <p className="text-[10px] text-muted-foreground">Likes</p>
+   285→   285→  1484→            </div>
+   286→   286→  1485→          </div>
+   287→   287→  1486→
+   288→   288→  1487→          {/* Photo Gallery */}
+   289→   289→  1488→          {currentUser.photos && currentUser.photos.length > 0 && (
+   290→   290→  1489→            <div className="space-y-2">
+   291→   291→  1490→              <h3 className="text-sm font-semibold flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Photos</h3>
+   292→   292→  1491→              <div className="grid grid-cols-3 gap-2">
+   293→   293→  1492→                {currentUser.photos.map(photo => (
+   294→   294→  1493→                  <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-secondary">
+   295→   295→  1494→                    <img src={photo.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+   296→   296→  1495→                  </div>
+   297→   297→  1496→                ))}
+   298→   298→  1497→              </div>
+   299→   299→  1498→            </div>
+   300→   300→  1499→          )}
+   301→   301→  1500→
+   302→   302→  1501→          {/* Albums */}
+   303→   303→  1502→          {currentUser.albums && currentUser.albums.length > 0 && (
+   304→   304→  1503→            <div className="space-y-2">
+   305→   305→  1504→              <h3 className="text-sm font-semibold flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Albums</h3>
+   306→   306→  1505→              <div className="space-y-2">
+   307→   307→  1506→                {currentUser.albums.map(album => (
+   308→   308→  1507→                  <div key={album.id} className="p-3 rounded-xl bg-secondary border border-border">
+   309→   309→  1508→                    <div className="flex items-center justify-between mb-2">
+   310→   310→  1509→                      <p className="text-sm font-medium">{album.name}</p>
+   311→   311→  1510→                      {album.isPrivate && <Badge variant="secondary" className="text-[10px] bg-muted">Private</Badge>}
+   312→   312→  1511→                    </div>
+   313→   313→  1512→                    {album.photos && album.photos.length > 0 && (
+   314→   314→  1513→                      <div className="grid grid-cols-4 gap-1">
+   315→   315→  1514→                        {album.photos.slice(0, 8).map(p => (
+   316→   316→  1515→                          <div key={p.id} className="aspect-square rounded-lg overflow-hidden bg-card">
+   317→   317→  1516→                            <img src={p.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+   318→   318→  1517→                          </div>
+   319→   319→  1518→                        ))}
+   320→   320→  1519→                      </div>
+   321→   321→  1520→                    )}
+   322→   322→  1521→                  </div>
+   323→   323→  1522→                ))}
+   324→   324→  1523→              </div>
+   325→   325→  1524→            </div>
+   326→   326→  1525→          )}
+   327→   327→  1526→
+   328→   328→  1527→          {/* My Fansite */}
+   329→   329→  1528→          {currentUser.fansite && (
+   330→   330→  1529→            <div className="p-3 rounded-xl bg-secondary border border-border space-y-2">
+   331→   331→  1530→              <h3 className="text-sm font-semibold flex items-center gap-2"><Star className="w-4 h-4" /> My Fansite</h3>
+   332→   332→  1531→              <p className="text-sm">{currentUser.fansite.name} <span className="text-muted-foreground">@{currentUser.fansite.nick}</span></p>
+   333→   333→  1532→            </div>
+   334→   334→  1533→          )}
+   335→   335→  1534→
+   336→   336→  1535→          {/* My Subscriptions */}
+   337→   337→  1536→          <div className="space-y-2">
+   338→   338→  1537→            <h3 className="text-sm font-semibold flex items-center gap-2"><Crown className="w-4 h-4" /> My Subscriptions</h3>
+   339→   339→  1538→            {mySubscriptions.length > 0 ? mySubscriptions.map((sub: any) => (
+   340→   340→  1539→              <div key={sub.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+   341→   341→  1540→                <div>
+   342→   342→  1541→                  <p className="text-sm font-medium capitalize">{sub.tier}</p>
+   343→   343→  1542→                  <p className="text-[11px] text-muted-foreground">Since {format(new Date(sub.startDate), 'MMM d, yyyy')}</p>
+   344→   344→  1543→                </div>
+   345→   345→  1544→                {sub.isActive ? <Badge className="bg-primary/20 text-primary text-[10px]">Active</Badge> : <Badge variant="secondary" className="text-[10px]">Expired</Badge>}
+   346→   346→  1545→              </div>
+   347→   347→  1546→            )) : <p className="text-xs text-muted-foreground">No active subscriptions</p>}
+   348→   348→  1547→          </div>
+   349→   349→  1548→
+   350→   350→  1549→          {/* My Boosts */}
+   351→   351→  1550→          {myBoosts.length > 0 && (
+   352→   352→  1551→            <div className="space-y-2">
+   353→   353→  1552→              <h3 className="text-sm font-semibold flex items-center gap-2"><Zap className="w-4 h-4" /> Active Boosts</h3>
+   354→   354→  1553→              {myBoosts.map((boost: any) => (
+   355→   355→  1554→                <div key={boost.id} className="p-3 rounded-xl bg-secondary border border-border boost-glow">
+   356→   356→  1555→                  <p className="text-sm font-medium capitalize">{boost.type} Boost</p>
+   357→   357→  1556→                  <p className="text-[11px] text-muted-foreground">Ends {timeAgo(boost.endsAt)}</p>
+   358→   358→  1557→                  <Progress value={50} className="mt-2 h-1.5" />
+   359→   359→  1558→                </div>
+   360→   360→  1559→              ))}
+   361→   361→  1560→            </div>
+   362→   362→  1561→          )}
+   363→   363→  1562→
+   364→   364→  1563→          {/* Settings shortcut */}
+   365→   365→  1564→          <Button variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}>
+   366→   366→  1565→            <Settings className="w-4 h-4 mr-2" /> Settings & Privacy
+   367→   367→  1566→          </Button>
+   368→   368→  1567→
+   369→   369→  1568→          <div className="h-4" />
+   370→   370→  1569→        </div>
+   371→   371→  1570→      </div>
+   372→   372→  1571→    );
+   373→   373→  1572→  }
+   374→   374→  1573→
+   375→   375→  1574→  // ─── Profile Drawer Content ────────────────────────────────────────────────
+   376→   376→  1575→  function ProfileDrawerContent() {
+   377→   377→  1576→    if (!profileUser) return null;
+   378→   378→  1577→    const u = profileUser;
+   379→   379→  1578→    const isMe = currentUser?.id === u.id;
+   380→   380→  1579→    const currentPhoto = profilePhotos[profileGalleryIndex];
+   381→   381→  1580→    return (
+   382→   382→  1581→      <div className="space-y-0">
+   383→   383→  1582→        {/* Photo gallery */}
+   384→   384→  1583→        <div className="relative bg-secondary">
+   385→   385→  1584→          <div className="aspect-square max-h-[60vh] relative">
+   386→   386→  1585→            {currentPhoto ? (
+   387→   387→  1586→              <img src={currentPhoto.url} alt={u.displayName} className="w-full h-full object-cover" />
+   388→   388→  1587→            ) : (
+   389→   389→  1588→              <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>
+   390→   390→  1589→            )}
+   391→   391→  1590→            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/50 to-transparent" />
+   392→   392→  1591→          </div>
+   393→   393→  1592→          {/* Gallery nav */}
+   394→   394→  1593→          {profilePhotos.length > 1 && (
+   395→   395→  1594→            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+   396→   396→  1595→              {profilePhotos.map((_, i) => (
+   397→   397→  1596→                <button key={i} onClick={() => setProfileGalleryIndex(i)} className={`w-2 h-2 rounded-full transition-all ${i === profileGalleryIndex ? 'bg-primary w-4' : 'bg-white/40'}`} />
+   398→   398→  1597→              ))}
+   399→   399→  1598→            </div>
+   400→   400→  1599→          )}
+   401→   401→  1600→          {profilePhotos.length > 1 && (
+   402→   402→  1601→            <>
+   403→   403→  1602→              <button onClick={() => setProfileGalleryIndex(i => (i - 1 + profilePhotos.length) % profilePhotos.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-all"><ChevronLeft className="w-5 h-5" /></button>
+   404→   404→  1603→              <button onClick={() => setProfileGalleryIndex(i => (i + 1) % profilePhotos.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-all"><ChevronRight className="w-5 h-5" /></button>
+   405→   405→  1604→            </>
+   406→   406→  1605→          )}
+   407→   407→  1606→          {/* Close button */}
+   408→   408→  1607→          <button onClick={closeProfile} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-all">
+   409→   409→  1608→            <X className="w-4 h-4" />
+   410→   410→  1609→          </button>
+   411→   411→  1610→        </div>
+   412→   412→  1611→
+   413→   413→  1612→        {/* User info */}
+   414→   414→  1613→        <div className="px-4 -mt-8 relative z-10 space-y-4">
+   415→   415→  1614→          <div className="flex items-center gap-3">
+   416→   416→  1615→            <div>
+   417→   417→  1616→              <div className="flex items-center gap-2">
+   418→   418→  1617→                <h2 className="text-xl font-bold">{u.displayName}{u.age ? `, ${u.age}` : ''}</h2>
+   419→   419→  1618→                {u.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+   420→   420→  1619→                {u.isPremium && <Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge>}
+   421→   421→  1620→              </div>
+   422→   422→  1621→              <div className="flex items-center gap-3 text-[12px] text-muted-foreground mt-1">
+   423→   423→  1622→                <span className="flex items-center gap-1">@{u.username}</span>
+   424→   424→  1623→                {u.pronouns && <span>{u.pronouns}</span>}
+   425→   425→  1624→              </div>
+   426→   426→  1625→            </div>
+   427→   427→  1626→            <div className="ml-auto">
+   428→   428→  1627→              <div className={`flex items-center gap-1.5 text-[11px] ${u.online ? 'text-green-400' : 'text-muted-foreground'}`}>
+   429→   429→  1628→                {u.online ? <span className="w-2 h-2 bg-green-400 rounded-full online-pulse" /> : null}
+   430→   430→  1629→                {getLastSeenText(u)}
+   431→   431→  1630→              </div>
+   432→   432→  1631→            </div>
+   433→   433→  1632→          </div>
+   434→   434→  1633→
+   435→   435→  1634→          {/* Stats bar */}
+   436→   436→  1635→          <div className="grid grid-cols-3 gap-3">
+   437→   437→  1636→            <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+   438→   438→  1637→              <p className="text-base font-bold gradient-text">{u._count?.photos || 0}</p>
+   439→   439→  1638→              <p className="text-[10px] text-muted-foreground">Photos</p>
+   440→   440→  1639→            </div>
+   441→   441→  1640→            <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+   442→   442→  1641→              <p className="text-base font-bold">{u._count?.receivedViews || 0}</p>
+   443→   443→  1642→              <p className="text-[10px] text-muted-foreground">Views</p>
+   444→   444→  1643→            </div>
+   445→   445→  1644→            <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+   446→   446→  1645→              <p className="text-base font-bold gradient-text">{u._count?.receivedLikes || 0}</p>
+   447→   447→  1646→              <p className="text-[10px] text-muted-foreground">Likes</p>
+   448→   448→  1647→            </div>
+   449→   449→  1648→          </div>
+   450→   450→  1649→
+   451→   451→  1650→          {/* About */}
+   452→   452→  1651→          {u.aboutMe && (
+   453→   453→  1652→            <div className="space-y-1">
+   454→   454→  1653→              <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">About</h4>
+   455→   455→  1654→              <p className="text-sm leading-relaxed">{u.aboutMe}</p>
+   456→   456→  1655→            </div>
+   457→   457→  1656→          )}
+   458→   458→  1657→
+   459→   459→  1658→          {/* Details */}
+   460→   460→  1659→          <div className="space-y-1">
+   461→   461→  1660→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Details</h4>
+   462→   462→  1661→            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+   463→   463→  1662→              {u.lookingFor && <div className="flex justify-between"><span className="text-muted-foreground">Looking for</span><span className="capitalize">{u.lookingFor}</span></div>}
+   464→   464→  1663→              {u.height && <div className="flex justify-between"><span className="text-muted-foreground">Height</span><span>{u.height} cm</span></div>}
+   465→   465→  1664→              {u.weight && <div className="flex justify-between"><span className="text-muted-foreground">Weight</span><span>{u.weight} kg</span></div>}
+   466→   466→  1665→              {u.bodyType && <div className="flex justify-between"><span className="text-muted-foreground">Body type</span><span className="capitalize">{u.bodyType}</span></div>}
+   467→   467→  1666→              {u.ethnicity && <div className="flex justify-between"><span className="text-muted-foreground">Ethnicity</span><span className="capitalize">{u.ethnicity}</span></div>}
+   468→   468→  1667→              {u.position && <div className="flex justify-between"><span className="text-muted-foreground">Position</span><span className="capitalize">{u.position}</span></div>}
+   469→   469→  1668→              {u.relationshipStatus && <div className="flex justify-between"><span className="text-muted-foreground">Relationship</span><span className="capitalize">{u.relationshipStatus}</span></div>}
+   470→   470→  1669→              {u.location && <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{u.location}</span></div>}
+   471→   471→  1670→            </div>
+   472→   472→  1671→          </div>
+   473→   473→  1672→
+   474→   474→  1673→          {/* Photo thumbnails */}
+   475→   475→  1674→          {profilePhotos.length > 1 && (
+   476→   476→  1675→            <div className="space-y-2">
+   477→   477→  1676→              <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Photos</h4>
+   478→   478→  1677→              <div className="grid grid-cols-4 gap-1.5">
+   479→   479→  1678→                {profilePhotos.map((p, i) => (
+   480→   480→  1679→                  <button key={p.id} onClick={() => setProfileGalleryIndex(i)} className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${i === profileGalleryIndex ? 'border-primary' : 'border-transparent'}`}>
+   481→   481→  1680→                    <img src={p.url} alt="" className="w-full h-full object-cover" />
+   482→   482→  1681→                  </button>
+   483→   483→  1682→                ))}
+   484→   484→  1683→              </div>
+   485→   485→  1684→            </div>
+   486→   486→  1685→          )}
+   487→   487→  1686→
+   488→   488→  1687→          {/* Action buttons */}
+   489→   489→  1688→          {!isMe && (
+   490→   490→  1689→            <div className="flex gap-2 pt-2 pb-6">
+   491→   491→  1690→              <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { openChat(u); closeProfile(); }}>
+   492→   492→  1691→                <MessageCircle className="w-4 h-4 mr-2" /> Message
+   493→   493→  1692→              </Button>
+   494→   494→  1693→              <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => handleLike(u.id)}>
+   495→   495→  1694→                <Heart className="w-4 h-4 mr-1" /> Like
+   496→   496→  1695→              </Button>
+   497→   497→  1696→              <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => { setRizzTargetBio(u.bio || ''); setShowRizzModal(true); }}>
+   498→   498→  1697→                <Sparkles className="w-4 h-4" />
+   499→   499→  1698→              </Button>
+   500→   500→  1699→              <DropdownMenu>
+   501→   501→  1700→                <DropdownMenuTrigger asChild>
+   502→   502→  1701→                  <Button variant="outline" size="icon" className="border-border hover:bg-secondary h-9 w-9"><MoreVertical className="w-4 h-4" /></Button>
+   503→   503→  1702→                </DropdownMenuTrigger>
+   504→   504→  1703→                <DropdownMenuContent className="bg-card border-border" align="end">
+   505→   505→  1704→                  <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setShowBlockAlert(true)}><Block className="w-4 h-4 mr-2" /> Block</DropdownMenuItem>
+   506→   506→  1705→                  <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => {}}><Flag className="w-4 h-4 mr-2" /> Report</DropdownMenuItem>
+   507→   507→  1706→                </DropdownMenuContent>
+   508→   508→  1707→              </DropdownMenu>
+   509→   509→  1708→            </div>
+   510→   510→  1709→          )}
+   511→   511→  1710→        </div>
+   512→   512→  1711→      </div>
+   513→   513→  1712→    );
+   514→   514→  1713→  }
+   515→   515→  1714→
+   516→   516→  1715→  // ─── Settings Panel ────────────────────────────────────────────────────────
+   517→   517→  1716→  function SettingsPanel() {
+   518→   518→  1717→    return (
+   519→   519→  1718→      <div className="h-full overflow-y-auto">
+   520→   520→  1719→        <div className="max-w-lg mx-auto p-4 space-y-6">
+   521→   521→  1720→          {/* Account */}
+   522→   522→  1721→          <div className="space-y-3">
+   523→   523→  1722→            <h3 className="text-sm font-semibold flex items-center gap-2"><User className="w-4 h-4" /> Account</h3>
+   524→   524→  1723→            <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+   525→   525→  1724→              <div className="flex items-center justify-between">
+   526→   526→  1725→                <div><p className="text-sm">Email</p><p className="text-[11px] text-muted-foreground">{currentUser?.email}</p></div>
+   527→   527→  1726→                <Badge variant="outline" className="text-[10px] border-border">Verified</Badge>
+   528→   528→  1727→              </div>
+   529→   529→  1728→              <Separator className="bg-border" />
+   530→   530→  1729→              <div className="flex items-center justify-between">
+   531→   531→  1730→                <p className="text-sm">Password</p>
+   532→   532→  1731→                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-foreground">Change</Button>
+   533→   533→  1732→              </div>
+   534→   534→  1733→            </CardContent></Card>
+   535→   535→  1734→          </div>
+   536→   536→  1735→
+   537→   537→  1736→          {/* Privacy */}
+   538→   538→  1737→          <div className="space-y-3">
+   539→   539→  1738→            <h3 className="text-sm font-semibold flex items-center gap-2"><Shield className="w-4 h-4" /> Privacy</h3>
+   540→   540→  1739→            <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-4">
+   541→   541→  1740→              <div className="flex items-center justify-between">
+   542→   542→  1741→                <div><p className="text-sm">Show Online Status</p><p className="text-[11px] text-muted-foreground">Let others see when you're online</p></div>
+   543→   543→  1742→                <Switch checked={settingsPrivacy.showOnline} onCheckedChange={v => setSettingsPrivacy(p => ({ ...p, showOnline: v }))} />
+   544→   544→  1743→              </div>
+   545→   545→  1744→              <Separator className="bg-border" />
+   546→   546→  1745→              <div className="flex items-center justify-between">
+   547→   547→  1746→                <div><p className="text-sm">Show Distance</p><p className="text-[11px] text-muted-foreground">Display your distance to others</p></div>
+   548→   548→  1747→                <Switch checked={settingsPrivacy.showDistance} onCheckedChange={v => setSettingsPrivacy(p => ({ ...p, showDistance: v }))} />
+   549→   549→  1748→              </div>
+   550→   550→  1749→              <Separator className="bg-border" />
+   551→   551→  1750→              <div className="flex items-center justify-between">
+   552→   552→  1751→                <div><p className="text-sm">Show Age</p><p className="text-[11px] text-muted-foreground">Display your age on your profile</p></div>
+   553→   553→  1752→                <Switch checked={settingsPrivacy.showAge} onCheckedChange={v => setSettingsPrivacy(p => ({ ...p, showAge: v }))} />
+   554→   554→  1753→              </div>
+   555→   555→  1754→              <Button size="sm" className="bg-primary text-primary-foreground" onClick={handleSaveSettings}>Save Privacy</Button>
+   556→   556→  1755→            </CardContent></Card>
+   557→   557→  1756→          </div>
+   558→   558→  1757→
+   559→   559→  1758→          {/* Notifications */}
+   560→   560→  1759→          <div className="space-y-3">
+   561→   561→  1760→            <h3 className="text-sm font-semibold flex items-center gap-2"><Bell className="w-4 h-4" /> Notifications</h3>
+   562→   562→  1761→            <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-4">
+   563→   563→  1762→              {([['push', 'Push Notifications', 'Receive push notifications on your device'], ['chat', 'Chat Messages', 'Get notified for new messages'], ['likes', 'Likes', 'Get notified when someone likes you'], ['views', 'Profile Views', 'Get notified when someone views your profile']] as const).map(([key, label, desc]) => (
+   564→   564→  1763→                <React.Fragment key={key}>
+   565→   565→  1764→                  <div className="flex items-center justify-between">
+   566→   566→  1765→                    <div><p className="text-sm">{label}</p><p className="text-[11px] text-muted-foreground">{desc}</p></div>
+   567→   567→  1766→                    <Switch checked={(settingsNotifs as any)[key]} onCheckedChange={v => setSettingsNotifs(p => ({ ...p, [key]: v }))} />
+   568→   568→  1767→                  </div>
+   569→   569→  1768→                  {key !== 'views' && <Separator className="bg-border" />}
+   570→   570→  1769→                </React.Fragment>
+   571→   571→  1770→              ))}
+   572→   572→  1771→            </CardContent></Card>
+   573→   573→  1772→          </div>
+   574→   574→  1773→
+   575→   575→  1774→          {/* Premium */}
+   576→   576→  1775→          <div className="space-y-3">
+   577→   577→  1776→            <h3 className="text-sm font-semibold flex items-center gap-2"><Crown className="w-4 h-4 text-yellow-400" /> Premium</h3>
+   578→   578→  1777→            <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+   579→   579→  1778→              {currentUser?.isPremium ? (
+   580→   580→  1779→                <div className="flex items-center justify-between">
+   581→   581→  1780→                  <div><p className="text-sm gradient-text font-semibold">Premium Active</p><p className="text-[11px] text-muted-foreground">Enjoy all premium features</p></div>
+   582→   582→  1781→                  <Crown className="w-6 h-6 text-yellow-400" />
+   583→   583→  1782→                </div>
+   584→   584→  1783→              ) : (
+   585→   585→  1784→                <div>
+   586→   586→  1785→                  <p className="text-sm font-medium">Upgrade to Premium</p>
+   587→   587→  1786→                  <p className="text-[11px] text-muted-foreground mt-1">Get unlimited likes, see who viewed you, and more</p>
+   588→   588→  1787→                  <Button className="mt-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-black hover:from-yellow-400 hover:to-amber-400 text-xs">
+   589→   589→  1788→                    <Crown className="w-4 h-4 mr-2" /> Go Premium
+   590→   590→  1789→                  </Button>
+   591→   591→  1790→                </div>
+   592→   592→  1791→              )}
+   593→   593→  1792→            </CardContent></Card>
+   594→   594→  1793→          </div>
+   595→   595→  1794→
+   596→   596→  1795→          {/* Blocked Users */}
+   597→   597→  1796→          <div className="space-y-3">
+   598→   598→  1797→            <h3 className="text-sm font-semibold flex items-center gap-2"><Block className="w-4 h-4" /> Blocked Users ({blockedUsers.length})</h3>
+   599→   599→  1798→            {blockedUsers.length > 0 ? (
+   600→   600→  1799→              <Card className="bg-secondary border-border"><CardContent className="p-3 space-y-2">
+   601→   601→  1800→                {blockedUsers.map((b: any) => (
+   602→   602→  1801→                  <div key={b.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-card transition-colors">
+   603→   603→  1802→                    <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(b.blocked)} /><AvatarFallback className="text-xs">{(b.blocked as any)?.displayName?.[0] || '?'}</AvatarFallback></Avatar>
+   604→   604→  1803→                    <span className="text-sm flex-1">{(b.blocked as any)?.displayName || 'User'}</span>
+   605→   605→  1804→                    <Button size="sm" variant="ghost" className="text-xs text-destructive hover:text-destructive" onClick={async () => {
+   606→   606→  1805→                      try {
+   607→   607→  1806→                        await fetch(`/api/blocks?blockedId=${(b.blocked as any)?.id}`, { method: 'DELETE' });
+   608→   608→  1807→                        setBlockedUsers(prev => prev.filter((x: any) => x.id !== b.id));
+   609→   609→  1808→                      } catch {}
+   610→   610→  1809→                    }}>Unblock</Button>
+   611→   611→  1810→                  </div>
+   612→   612→  1811→                ))}
+   613→   613→  1812→              </CardContent></Card>
+   614→   614→  1813→            ) : <p className="text-xs text-muted-foreground">No blocked users</p>}
+   615→   615→  1814→          </div>
+   616→   616→  1815→
+   617→   617→  1816→          {/* About */}
+   618→   618→  1817→          <div className="space-y-3">
+   619→   619→  1818→            <h3 className="text-sm font-semibold flex items-center gap-2"><Globe className="w-4 h-4" /> About NEXUS</h3>
+   620→   620→  1819→            <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-2">
+   621→   621→  1820→              <p className="text-sm">NEXUS v1.0.0</p>
+   622→   622→  1821→              <p className="text-[11px] text-muted-foreground">A unified dating & social platform</p>
+   623→   623→  1822→              <Separator className="bg-border" />
+   624→   624→  1823→              <div className="space-y-1 text-xs text-muted-foreground">
+   625→   625→  1824→                <p>Terms of Service</p>
+   626→   626→  1825→                <p>Privacy Policy</p>
+   627→   627→  1826→                <p>Open Source Licenses</p>
+   628→   628→  1827→              </div>
+   629→   629→  1828→            </CardContent></Card>
+   630→   630→  1829→          </div>
+   631→   631→  1830→
+   632→   632→  1831→          {/* Logout */}
+   633→   633→  1832→          <Button variant="outline" className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => { setCurrentUser(null); setAuthed(false); setShowSettings(false); }}>
+   634→   634→  1833→            <LogOut className="w-4 h-4 mr-2" /> Log Out
+   635→   635→  1834→          </Button>
+   636→   636→  1835→
+   637→   637→  1836→          <div className="h-4" />
+   638→   638→  1837→        </div>
+   639→   639→  1838→      </div>
+   640→   640→  1839→    );
+   641→   641→  1840→  }
+   642→   642→  1841→}

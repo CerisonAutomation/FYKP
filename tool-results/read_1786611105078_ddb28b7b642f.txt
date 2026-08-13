@@ -1,0 +1,502 @@
+  1201→              {fansites.map(fs => (
+  1202→                <button
+  1203→                  key={fs.id}
+  1204→                  onClick={() => { setSelectedFansite(fs); setShowFansiteSheet(true); }}
+  1205→                  className="profile-card text-left rounded-xl overflow-hidden bg-card border border-border"
+  1206→                >
+  1207→                  <div className="relative h-40 bg-secondary">
+  1208→                    {fs.trailerImageUrl ? (
+  1209→                      <img src={fs.trailerImageUrl} alt={fs.name} className="w-full h-full object-cover" loading="lazy" />
+  1210→                    ) : (
+  1211→                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary"><Star className="w-10 h-10 text-primary/50" /></div>
+  1212→                    )}
+  1213→                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
+  1214→                    <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
+  1215→                      <div>
+  1216→                        <p className="text-white font-semibold text-sm">{fs.name}</p>
+  1217→                        <p className="text-white/60 text-[11px]">@{fs.nick}</p>
+  1218→                      </div>
+  1219→                      {fs.user.online && <span className="w-2.5 h-2.5 bg-green-500 rounded-full online-pulse" />}
+  1220→                    </div>
+  1221→                  </div>
+  1222→                  <div className="p-3 space-y-1.5">
+  1223→                    <p className="text-[12px] text-muted-foreground line-clamp-2">{truncate(fs.description, 80)}</p>
+  1224→                    <div className="flex items-center justify-between">
+  1225→                      <div className="flex items-center gap-2">
+  1226→                        <Avatar className="h-5 w-5"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-[8px]">{fs.user.displayName?.[0]}</AvatarFallback></Avatar>
+  1227→                        <span className="text-[11px] text-muted-foreground">{fs.user.displayName}</span>
+  1228→                      </div>
+  1229→                      <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />{fs._count?.subscriptions || 0}</span>
+  1230→                    </div>
+  1231→                  </div>
+  1232→                </button>
+  1233→              ))}
+  1234→            </div>
+  1235→          )}
+  1236→        </div>
+  1237→      </div>
+  1238→    );
+  1239→  }
+  1240→
+  1241→  function FansiteDetail() {
+  1242→    if (!selectedFansite) return null;
+  1243→    const fs = selectedFansite;
+  1244→    return (
+  1245→      <div className="space-y-4">
+  1246→        {/* Cover */}
+  1247→        <div className="relative h-48 -mx-6 -mt-6 bg-secondary">
+  1248→          {fs.trailerImageUrl ? <img src={fs.trailerImageUrl} alt={fs.name} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/30 to-secondary flex items-center justify-center"><Star className="w-16 h-16 text-primary/40" /></div>}
+  1249→          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card to-transparent" />
+  1250→        </div>
+  1251→        {/* Info */}
+  1252→        <div className="space-y-3">
+  1253→          <div className="flex items-center gap-3">
+  1254→            <Avatar className="h-14 w-14 border-2 border-primary/30">
+  1255→              <AvatarImage src={getAvatar(fs.user)} />
+  1256→              <AvatarFallback>{fs.user.displayName?.[0]}</AvatarFallback>
+  1257→            </Avatar>
+  1258→            <div className="flex-1">
+  1259→              <div className="flex items-center gap-2">
+  1260→                <h3 className="text-lg font-bold">{fs.name}</h3>
+  1261→                {fs.user.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+  1262→              </div>
+  1263→              <p className="text-sm text-muted-foreground">@{fs.nick}</p>
+  1264→              {fs.geoName && <p className="text-[11px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{fs.geoName}</p>}
+  1265→            </div>
+  1266→          </div>
+  1267→          <p className="text-sm text-foreground/80 leading-relaxed">{fs.description || 'No description yet.'}</p>
+  1268→          {/* Stats */}
+  1269→          <div className="flex gap-4">
+  1270→            <div className="text-center"><p className="text-lg font-bold gradient-text">{fs._count?.subscriptions || 0}</p><p className="text-[10px] text-muted-foreground">Subscribers</p></div>
+  1271→            <div className="text-center"><p className="text-lg font-bold">{fs.products?.length || 0}</p><p className="text-[10px] text-muted-foreground">Tiers</p></div>
+  1272→          </div>
+  1273→          {/* Social Links */}
+  1274→          {fs.links && fs.links.length > 0 && (
+  1275→            <div className="space-y-2">
+  1276→              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Links</p>
+  1277→              <div className="flex flex-wrap gap-2">
+  1278→                {fs.links.map(link => (
+  1279→                  <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg bg-secondary border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all flex items-center gap-1.5">
+  1280→                    {link.icon ? <img src={link.icon} alt="" className="w-4 h-4" /> : <Link2 className="w-3 h-3" />}
+  1281→                    {link.label || link.type}
+  1282→                    <ExternalLink className="w-3 h-3" />
+  1283→                  </a>
+  1284→                ))}
+  1285→              </div>
+  1286→            </div>
+  1287→          )}
+  1288→          {/* Products */}
+  1289→          {fs.products && fs.products.length > 0 && (
+  1290→            <div className="space-y-2">
+  1291→              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Subscription Tiers</p>
+  1292→              <div className="space-y-2">
+  1293→                {fs.products.map(product => (
+  1294→                  <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1295→                    <div>
+  1296→                      <p className="text-sm font-medium capitalize">{product.period}</p>
+  1297→                      {product.priceOld && <p className="text-[10px] text-muted-foreground line-through">${product.priceOld}</p>}
+  1298→                    </div>
+  1299→                    <div className="text-right">
+  1300→                      <p className="text-lg font-bold gradient-text">${product.price}</p>
+  1301→                      <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground mt-1">Subscribe</Button>
+  1302→                    </div>
+  1303→                  </div>
+  1304→                ))}
+  1305→              </div>
+  1306→            </div>
+  1307→          )}
+  1308→          {/* Actions */}
+  1309→          <div className="flex gap-2 pt-2">
+  1310→            <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { if (fs.user) openChat(fs.user); setShowFansiteSheet(false); }}>
+  1311→              <MessageCircle className="w-4 h-4 mr-2" /> Contact
+  1312→            </Button>
+  1313→            <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => {}}>
+  1314→              <Flag className="w-4 h-4 mr-2" /> Report
+  1315→            </Button>
+  1316→          </div>
+  1317→        </div>
+  1318→      </div>
+  1319→    );
+  1320→  }
+  1321→
+  1322→  // ─── Events View ───────────────────────────────────────────────────────────
+  1323→  function EventsView() {
+  1324→    return (
+  1325→      <div className="h-full flex flex-col">
+  1326→        <div className="px-4 py-3 border-b border-border shrink-0 flex items-center justify-between">
+  1327→          <div>
+  1328→            <h2 className="text-sm font-semibold">Events</h2>
+  1329→            <p className="text-[11px] text-muted-foreground">Upcoming near you</p>
+  1330→          </div>
+  1331→          <Button size="sm" className="h-8 bg-primary text-primary-foreground text-xs" onClick={() => setShowCreateEvent(true)}>
+  1332→            <Plus className="w-3.5 h-3.5 mr-1" /> Create
+  1333→          </Button>
+  1334→        </div>
+  1335→        <div className="flex-1 overflow-y-auto p-3 space-y-3">
+  1336→          {eventsLoading ? (
+  1337→            Array.from({ length: 3 }).map((_, i) => (
+  1338→              <div key={i} className="flex gap-3 p-3 rounded-xl bg-card border border-border"><Skeleton className="h-20 w-20 rounded-lg" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-40" /><Skeleton className="h-3 w-24" /><Skeleton className="h-3 w-32" /></div></div>
+  1339→            ))
+  1340→          ) : events.length === 0 ? (
+  1341→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+  1342→              <Calendar className="w-12 h-12 text-muted-foreground" />
+  1343→              <p className="text-muted-foreground text-sm">No upcoming events</p>
+  1344→            </div>
+  1345→          ) : (
+  1346→            events.map((event: any) => {
+  1347→              const myRsvp = userRsvps[event.id];
+  1348→              return (
+  1349→                <div key={event.id} className="profile-card rounded-xl bg-card border border-border overflow-hidden">
+  1350→                  <div className="flex gap-3 p-3">
+  1351→                    <div className="w-20 h-20 rounded-lg bg-secondary shrink-0 overflow-hidden">
+  1352→                      {event.imageUrl ? <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Calendar className="w-8 h-8 text-muted-foreground" /></div>}
+  1353→                    </div>
+  1354→                    <div className="flex-1 min-w-0 space-y-1">
+  1355→                      <h3 className="text-[14px] font-semibold truncate">{event.title}</h3>
+  1356→                      <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{formatEventDate(event.startDate)}</p>
+  1357→                      {event.location && <p className="text-[11px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{event.location}</p>}
+  1358→                      <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />{event._count?.rsvps || 0} attending</p>
+  1359→                    </div>
+  1360→                  </div>
+  1361→                  {event.description && <p className="px-3 pb-2 text-[12px] text-muted-foreground line-clamp-2">{event.description}</p>}
+  1362→                  <div className="px-3 pb-3 flex gap-2">
+  1363→                    {(['going', 'interested', 'not_going'] as const).map(status => (
+  1364→                      <button
+  1365→                        key={status}
+  1366→                        onClick={() => handleRsvp(event.id, status)}
+  1367→                        className={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+  1368→                          myRsvp === status
+  1369→                            ? 'bg-primary text-primary-foreground border-primary'
+  1370→                            : 'bg-secondary text-muted-foreground border-border hover:border-primary/50'
+  1371→                        }`}
+  1372→                      >
+  1373→                        {status === 'going' ? '✅ Going' : status === 'interested' ? '👀 Interested' : '❌ Not Going'}
+  1374→                      </button>
+  1375→                    ))}
+  1376→                  </div>
+  1377→                </div>
+  1378→              );
+  1379→            })
+  1380→          )}
+  1381→        </div>
+  1382→      </div>
+  1383→    );
+  1384→  }
+  1385→
+  1386→  // ─── Profile View (My Profile) ─────────────────────────────────────────────
+  1387→  function ProfileView() {
+  1388→    if (!currentUser) return null;
+  1389→    return (
+  1390→      <div className="h-full overflow-y-auto">
+  1391→        <div className="max-w-lg mx-auto p-4 space-y-4">
+  1392→          {/* Profile header */}
+  1393→          <div className="flex items-center gap-4">
+  1394→            <div className="relative">
+  1395→              <Avatar className="h-20 w-20 border-2 border-primary/30">
+  1396→                <AvatarImage src={getAvatar(currentUser)} />
+  1397→                <AvatarFallback className="text-xl">{currentUser.displayName?.[0]}</AvatarFallback>
+  1398→              </Avatar>
+  1399→              <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-full flex items-center justify-center text-primary-foreground"><Camera className="w-3.5 h-3.5" /></button>
+  1400→            </div>
+  1401→            <div className="flex-1">
+  1402→              <div className="flex items-center gap-2">
+  1403→                <h2 className="text-xl font-bold">{currentUser.displayName}</h2>
+  1404→                {currentUser.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+  1405→                {currentUser.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
+  1406→              </div>
+  1407→              <p className="text-sm text-muted-foreground">@{currentUser.username}</p>
+  1408→              {currentUser.pronouns && <p className="text-xs text-muted-foreground mt-0.5">{currentUser.pronouns}</p>}
+  1409→            </div>
+  1410→            <Button variant="outline" size="sm" className="border-border text-xs" onClick={() => {
+  1411→              setEditingProfile(true);
+  1412→              setEditForm({
+  1413→                displayName: currentUser.displayName || '',
+  1414→                bio: currentUser.bio || '',
+  1415→                lookingFor: currentUser.lookingFor || '',
+  1416→                aboutMe: currentUser.aboutMe || '',
+  1417→                height: currentUser.height?.toString() || '',
+  1418→                weight: currentUser.weight?.toString() || '',
+  1419→                ethnicity: currentUser.ethnicity || '',
+  1420→                bodyType: currentUser.bodyType || '',
+  1421→                relationshipStatus: currentUser.relationshipStatus || '',
+  1422→                position: currentUser.position || '',
+  1423→                pronouns: currentUser.pronouns || '',
+  1424→                location: currentUser.location || '',
+  1425→              });
+  1426→            }}>
+  1427→              <Pencil className="w-3 h-3 mr-1" /> Edit
+  1428→            </Button>
+  1429→          </div>
+  1430→
+  1431→          {/* Bio */}
+  1432→          {currentUser.bio && <p className="text-sm text-foreground/80 leading-relaxed">{currentUser.bio}</p>}
+  1433→          {currentUser.aboutMe && <p className="text-sm text-muted-foreground leading-relaxed">{currentUser.aboutMe}</p>}
+  1434→
+  1435→          {/* Edit Profile Form */}
+  1436→          {editingProfile && (
+  1437→            <Card className="bg-secondary border-border p-4 space-y-3">
+  1438→              <h3 className="text-sm font-semibold">Edit Profile</h3>
+  1439→              {[
+  1440→                { key: 'displayName', label: 'Display Name' },
+  1441→                { key: 'bio', label: 'Bio' },
+  1442→                { key: 'aboutMe', label: 'About Me' },
+  1443→                { key: 'location', label: 'Location' },
+  1444→                { key: 'pronouns', label: 'Pronouns' },
+  1445→                { key: 'lookingFor', label: 'Looking For' },
+  1446→                { key: 'ethnicity', label: 'Ethnicity' },
+  1447→                { key: 'bodyType', label: 'Body Type' },
+  1448→                { key: 'relationshipStatus', label: 'Relationship Status' },
+  1449→                { key: 'position', label: 'Position' },
+  1450→              ].map(({ key, label }) => (
+  1451→                <div key={key} className="space-y-1">
+  1452→                  <Label className="text-[11px] text-muted-foreground">{label}</Label>
+  1453→                  {(key === 'bio' || key === 'aboutMe') ? (
+  1454→                    <Textarea value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm" rows={2} />
+  1455→                  ) : (
+  1456→                    <Input value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm h-9" />
+  1457→                  )}
+  1458→                </div>
+  1459→              ))}
+  1460→              <div className="grid grid-cols-2 gap-3">
+  1461→                <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Height (cm)</Label><Input type="number" value={editForm.height} onChange={e => setEditForm(p => ({ ...p, height: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
+  1462→                <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Weight (kg)</Label><Input type="number" value={editForm.weight} onChange={e => setEditForm(p => ({ ...p, weight: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
+  1463→              </div>
+  1464→              <div className="flex gap-2 pt-2">
+  1465→                <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveProfile}>Save</Button>
+  1466→                <Button size="sm" variant="outline" className="border-border" onClick={() => setEditingProfile(false)}>Cancel</Button>
+  1467→              </div>
+  1468→            </Card>
+  1469→          )}
+  1470→
+  1471→          {/* Stats */}
+  1472→          <div className="grid grid-cols-3 gap-3">
+  1473→            <div className="text-center p-3 rounded-xl bg-secondary border border-border">
+  1474→              <p className="text-lg font-bold gradient-text">{currentUser._count?.photos || 0}</p>
+  1475→              <p className="text-[10px] text-muted-foreground">Photos</p>
+  1476→            </div>
+  1477→            <div className="text-center p-3 rounded-xl bg-secondary border border-border">
+  1478→              <p className="text-lg font-bold">{currentUser._count?.receivedViews || 0}</p>
+  1479→              <p className="text-[10px] text-muted-foreground">Views</p>
+  1480→            </div>
+  1481→            <div className="text-center p-3 rounded-xl bg-secondary border border-border">
+  1482→              <p className="text-lg font-bold gradient-text">{currentUser._count?.receivedLikes || 0}</p>
+  1483→              <p className="text-[10px] text-muted-foreground">Likes</p>
+  1484→            </div>
+  1485→          </div>
+  1486→
+  1487→          {/* Photo Gallery */}
+  1488→          {currentUser.photos && currentUser.photos.length > 0 && (
+  1489→            <div className="space-y-2">
+  1490→              <h3 className="text-sm font-semibold flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Photos</h3>
+  1491→              <div className="grid grid-cols-3 gap-2">
+  1492→                {currentUser.photos.map(photo => (
+  1493→                  <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-secondary">
+  1494→                    <img src={photo.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+  1495→                  </div>
+  1496→                ))}
+  1497→              </div>
+  1498→            </div>
+  1499→          )}
+  1500→
+  1501→          {/* Albums */}
+  1502→          {currentUser.albums && currentUser.albums.length > 0 && (
+  1503→            <div className="space-y-2">
+  1504→              <h3 className="text-sm font-semibold flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Albums</h3>
+  1505→              <div className="space-y-2">
+  1506→                {currentUser.albums.map(album => (
+  1507→                  <div key={album.id} className="p-3 rounded-xl bg-secondary border border-border">
+  1508→                    <div className="flex items-center justify-between mb-2">
+  1509→                      <p className="text-sm font-medium">{album.name}</p>
+  1510→                      {album.isPrivate && <Badge variant="secondary" className="text-[10px] bg-muted">Private</Badge>}
+  1511→                    </div>
+  1512→                    {album.photos && album.photos.length > 0 && (
+  1513→                      <div className="grid grid-cols-4 gap-1">
+  1514→                        {album.photos.slice(0, 8).map(p => (
+  1515→                          <div key={p.id} className="aspect-square rounded-lg overflow-hidden bg-card">
+  1516→                            <img src={p.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+  1517→                          </div>
+  1518→                        ))}
+  1519→                      </div>
+  1520→                    )}
+  1521→                  </div>
+  1522→                ))}
+  1523→              </div>
+  1524→            </div>
+  1525→          )}
+  1526→
+  1527→          {/* My Fansite */}
+  1528→          {currentUser.fansite && (
+  1529→            <div className="p-3 rounded-xl bg-secondary border border-border space-y-2">
+  1530→              <h3 className="text-sm font-semibold flex items-center gap-2"><Star className="w-4 h-4" /> My Fansite</h3>
+  1531→              <p className="text-sm">{currentUser.fansite.name} <span className="text-muted-foreground">@{currentUser.fansite.nick}</span></p>
+  1532→            </div>
+  1533→          )}
+  1534→
+  1535→          {/* My Subscriptions */}
+  1536→          <div className="space-y-2">
+  1537→            <h3 className="text-sm font-semibold flex items-center gap-2"><Crown className="w-4 h-4" /> My Subscriptions</h3>
+  1538→            {mySubscriptions.length > 0 ? mySubscriptions.map((sub: any) => (
+  1539→              <div key={sub.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1540→                <div>
+  1541→                  <p className="text-sm font-medium capitalize">{sub.tier}</p>
+  1542→                  <p className="text-[11px] text-muted-foreground">Since {format(new Date(sub.startDate), 'MMM d, yyyy')}</p>
+  1543→                </div>
+  1544→                {sub.isActive ? <Badge className="bg-primary/20 text-primary text-[10px]">Active</Badge> : <Badge variant="secondary" className="text-[10px]">Expired</Badge>}
+  1545→              </div>
+  1546→            )) : <p className="text-xs text-muted-foreground">No active subscriptions</p>}
+  1547→          </div>
+  1548→
+  1549→          {/* My Boosts */}
+  1550→          {myBoosts.length > 0 && (
+  1551→            <div className="space-y-2">
+  1552→              <h3 className="text-sm font-semibold flex items-center gap-2"><Zap className="w-4 h-4" /> Active Boosts</h3>
+  1553→              {myBoosts.map((boost: any) => (
+  1554→                <div key={boost.id} className="p-3 rounded-xl bg-secondary border border-border boost-glow">
+  1555→                  <p className="text-sm font-medium capitalize">{boost.type} Boost</p>
+  1556→                  <p className="text-[11px] text-muted-foreground">Ends {timeAgo(boost.endsAt)}</p>
+  1557→                  <Progress value={50} className="mt-2 h-1.5" />
+  1558→                </div>
+  1559→              ))}
+  1560→            </div>
+  1561→          )}
+  1562→
+  1563→          {/* Settings shortcut */}
+  1564→          <Button variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}>
+  1565→            <Settings className="w-4 h-4 mr-2" /> Settings & Privacy
+  1566→          </Button>
+  1567→
+  1568→          <div className="h-4" />
+  1569→        </div>
+  1570→      </div>
+  1571→    );
+  1572→  }
+  1573→
+  1574→  // ─── Profile Drawer Content ────────────────────────────────────────────────
+  1575→  function ProfileDrawerContent() {
+  1576→    if (!profileUser) return null;
+  1577→    const u = profileUser;
+  1578→    const isMe = currentUser?.id === u.id;
+  1579→    const currentPhoto = profilePhotos[profileGalleryIndex];
+  1580→    return (
+  1581→      <div className="space-y-0">
+  1582→        {/* Photo gallery */}
+  1583→        <div className="relative bg-secondary">
+  1584→          <div className="aspect-square max-h-[60vh] relative">
+  1585→            {currentPhoto ? (
+  1586→              <img src={currentPhoto.url} alt={u.displayName} className="w-full h-full object-cover" />
+  1587→            ) : (
+  1588→              <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>
+  1589→            )}
+  1590→            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/50 to-transparent" />
+  1591→          </div>
+  1592→          {/* Gallery nav */}
+  1593→          {profilePhotos.length > 1 && (
+  1594→            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+  1595→              {profilePhotos.map((_, i) => (
+  1596→                <button key={i} onClick={() => setProfileGalleryIndex(i)} className={`w-2 h-2 rounded-full transition-all ${i === profileGalleryIndex ? 'bg-primary w-4' : 'bg-white/40'}`} />
+  1597→              ))}
+  1598→            </div>
+  1599→          )}
+  1600→          {profilePhotos.length > 1 && (
+  1601→            <>
+  1602→              <button onClick={() => setProfileGalleryIndex(i => (i - 1 + profilePhotos.length) % profilePhotos.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-all"><ChevronLeft className="w-5 h-5" /></button>
+  1603→              <button onClick={() => setProfileGalleryIndex(i => (i + 1) % profilePhotos.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-all"><ChevronRight className="w-5 h-5" /></button>
+  1604→            </>
+  1605→          )}
+  1606→          {/* Close button */}
+  1607→          <button onClick={closeProfile} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-all">
+  1608→            <X className="w-4 h-4" />
+  1609→          </button>
+  1610→        </div>
+  1611→
+  1612→        {/* User info */}
+  1613→        <div className="px-4 -mt-8 relative z-10 space-y-4">
+  1614→          <div className="flex items-center gap-3">
+  1615→            <div>
+  1616→              <div className="flex items-center gap-2">
+  1617→                <h2 className="text-xl font-bold">{u.displayName}{u.age ? `, ${u.age}` : ''}</h2>
+  1618→                {u.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+  1619→                {u.isPremium && <Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge>}
+  1620→              </div>
+  1621→              <div className="flex items-center gap-3 text-[12px] text-muted-foreground mt-1">
+  1622→                <span className="flex items-center gap-1">@{u.username}</span>
+  1623→                {u.pronouns && <span>{u.pronouns}</span>}
+  1624→              </div>
+  1625→            </div>
+  1626→            <div className="ml-auto">
+  1627→              <div className={`flex items-center gap-1.5 text-[11px] ${u.online ? 'text-green-400' : 'text-muted-foreground'}`}>
+  1628→                {u.online ? <span className="w-2 h-2 bg-green-400 rounded-full online-pulse" /> : null}
+  1629→                {getLastSeenText(u)}
+  1630→              </div>
+  1631→            </div>
+  1632→          </div>
+  1633→
+  1634→          {/* Stats bar */}
+  1635→          <div className="grid grid-cols-3 gap-3">
+  1636→            <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1637→              <p className="text-base font-bold gradient-text">{u._count?.photos || 0}</p>
+  1638→              <p className="text-[10px] text-muted-foreground">Photos</p>
+  1639→            </div>
+  1640→            <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1641→              <p className="text-base font-bold">{u._count?.receivedViews || 0}</p>
+  1642→              <p className="text-[10px] text-muted-foreground">Views</p>
+  1643→            </div>
+  1644→            <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+  1645→              <p className="text-base font-bold gradient-text">{u._count?.receivedLikes || 0}</p>
+  1646→              <p className="text-[10px] text-muted-foreground">Likes</p>
+  1647→            </div>
+  1648→          </div>
+  1649→
+  1650→          {/* About */}
+  1651→          {u.aboutMe && (
+  1652→            <div className="space-y-1">
+  1653→              <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">About</h4>
+  1654→              <p className="text-sm leading-relaxed">{u.aboutMe}</p>
+  1655→            </div>
+  1656→          )}
+  1657→
+  1658→          {/* Details */}
+  1659→          <div className="space-y-1">
+  1660→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Details</h4>
+  1661→            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+  1662→              {u.lookingFor && <div className="flex justify-between"><span className="text-muted-foreground">Looking for</span><span className="capitalize">{u.lookingFor}</span></div>}
+  1663→              {u.height && <div className="flex justify-between"><span className="text-muted-foreground">Height</span><span>{u.height} cm</span></div>}
+  1664→              {u.weight && <div className="flex justify-between"><span className="text-muted-foreground">Weight</span><span>{u.weight} kg</span></div>}
+  1665→              {u.bodyType && <div className="flex justify-between"><span className="text-muted-foreground">Body type</span><span className="capitalize">{u.bodyType}</span></div>}
+  1666→              {u.ethnicity && <div className="flex justify-between"><span className="text-muted-foreground">Ethnicity</span><span className="capitalize">{u.ethnicity}</span></div>}
+  1667→              {u.position && <div className="flex justify-between"><span className="text-muted-foreground">Position</span><span className="capitalize">{u.position}</span></div>}
+  1668→              {u.relationshipStatus && <div className="flex justify-between"><span className="text-muted-foreground">Relationship</span><span className="capitalize">{u.relationshipStatus}</span></div>}
+  1669→              {u.location && <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{u.location}</span></div>}
+  1670→            </div>
+  1671→          </div>
+  1672→
+  1673→          {/* Photo thumbnails */}
+  1674→          {profilePhotos.length > 1 && (
+  1675→            <div className="space-y-2">
+  1676→              <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Photos</h4>
+  1677→              <div className="grid grid-cols-4 gap-1.5">
+  1678→                {profilePhotos.map((p, i) => (
+  1679→                  <button key={p.id} onClick={() => setProfileGalleryIndex(i)} className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${i === profileGalleryIndex ? 'border-primary' : 'border-transparent'}`}>
+  1680→                    <img src={p.url} alt="" className="w-full h-full object-cover" />
+  1681→                  </button>
+  1682→                ))}
+  1683→              </div>
+  1684→            </div>
+  1685→          )}
+  1686→
+  1687→          {/* Action buttons */}
+  1688→          {!isMe && (
+  1689→            <div className="flex gap-2 pt-2 pb-6">
+  1690→              <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { openChat(u); closeProfile(); }}>
+  1691→                <MessageCircle className="w-4 h-4 mr-2" /> Message
+  1692→              </Button>
+  1693→              <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => handleLike(u.id)}>
+  1694→                <Heart className="w-4 h-4 mr-1" /> Like
+  1695→              </Button>
+  1696→              <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => { setRizzTargetBio(u.bio || ''); setShowRizzModal(true); }}>
+  1697→                <Sparkles className="w-4 h-4" />
+  1698→              </Button>
+  1699→              <DropdownMenu>
+  1700→                <DropdownMenuTrigger asChild>
+
+[showing lines 1201-1700 of 1841; use offset=1701 with limit to continue reading]

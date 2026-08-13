@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { io as socketIO, Socket } from 'socket.io-client';
 import { formatDistanceToNow, format } from 'date-fns';
 import { useAppStore } from '@/store/app';
-import type { User, Message, Conversation, Like, Fansite, AppEvent, GroupChat, Photo, Album } from '@/types';
+import type { User, Message, Conversation, Like, Fansite, AppEvent, GroupChat, Photo, Album, ChatRequest, ProfileView as ProfileViewType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -43,6 +43,13 @@ const RIZZ_STYLES = [
   { value: 'nerdy', label: 'Nerdy', icon: '🤓' },
   { value: 'sweet', label: 'Sweet', icon: '🍯' },
   { value: 'flirty', label: 'Flirty', icon: '😘' },
+];
+
+const TAP_TYPES = [
+  { emoji: '🔥', label: 'Hot', color: 'from-red-500 to-orange-500' },
+  { emoji: '👋', label: 'Friendly', color: 'from-blue-500 to-cyan-500' },
+  { emoji: '😍', label: 'Looking', color: 'from-pink-500 to-rose-500' },
+  { emoji: '✨', label: 'Fresh Face', color: 'from-emerald-500 to-teal-500' },
 ];
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face';
@@ -91,6 +98,7 @@ export default function NexusApp() {
     conversations, setConversations, activeConversation, setActiveConversation,
     messages, setMessages, addMessage, refreshDiscover, triggerRefreshDiscover,
     discoverView, setDiscoverView, sidebarOpen, setSidebarOpen,
+    chatRequests, setChatRequests, pendingRequestCount, setPendingRequestCount,
   } = store;
 
   // ── Auth state ──
@@ -123,6 +131,10 @@ export default function NexusApp() {
   const [receivedLikes, setReceivedLikes] = useState<Like[]>([]);
   const [sentLikes, setSentLikes] = useState<Like[]>([]);
   const [likesLoading, setLikesLoading] = useState(true);
+
+  // ── Viewed Me state ──
+  const [profileViews, setProfileViews] = useState<ProfileViewType[]>([]);
+  const [viewsLoading, setViewsLoading] = useState(false);
 
   // ── Fansites state ──
   const [fansites, setFansites] = useState<Fansite[]>([]);
@@ -237,11 +249,16 @@ export default function NexusApp() {
     Promise.all([
       fetch('/api/messages/conversations').then(r => r.json()),
       fetch('/api/groups').then(r => r.json()),
-    ]).then(([convRes, groupRes]) => {
+      fetch('/api/chat-requests').then(r => r.json()).catch(() => ({ data: [] })),
+    ]).then(([convRes, groupRes, reqRes]) => {
       const convos = convRes.data || [];
       setConversations(convos);
       setGroups(groupRes.data || []);
       setTotalUnread(convos.reduce((sum: number, c: any) => sum + (c.unreadCount || 0), 0));
+      const reqs = reqRes.data || [];
+      const pending = reqs.filter((r: ChatRequest) => r.status === 'pending');
+      setChatRequests(pending);
+      setPendingRequestCount(pending.length);
     }).catch(() => {}).finally(() => setChatLoading(false));
   }, [authed, activeTab]);
 
@@ -256,6 +273,19 @@ export default function NexusApp() {
       setReceivedLikes(recRes.data || []);
       setSentLikes(sentRes.data || []);
     }).catch(() => {}).finally(() => setLikesLoading(false));
+  }, [authed, activeTab]);
+
+  // ─── Fetch Profile Views (Viewed Me) ────────────────────────────────────────
+  useEffect(() => {
+    if (!authed || activeTab !== 'viewed') return;
+    setViewsLoading(true);
+    fetch('/api/profile-views')
+      .then(r => r.json())
+      .then(res => {
+        setProfileViews(res.data || []);
+      })
+      .catch(() => {})
+      .finally(() => setViewsLoading(false));
   }, [authed, activeTab]);
 
   // ─── Fetch Fansites ─────────────────────────────────────────────────────────
@@ -280,7 +310,14 @@ export default function NexusApp() {
   useEffect(() => {
     if (!selectedUserId) return;
     setProfileLoading(true);
-    fetch(`/api/users/${selectedUserId}`).then(r => r.json()).then(res => {
+    Promise.all([
+      fetch(`/api/users/${selectedUserId}`).then(r => r.json()),
+      fetch('/api/profile-views', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ viewedId: selectedUserId }),
+      }).catch(() => null),
+    ]).then(([res]) => {
       const u = res.data;
       setProfileUser(u);
       setProfilePhotos(u.photos || []);
@@ -324,27 +361,25 @@ export default function NexusApp() {
   }, [setShowProfileDrawer, setSelectedUserId]);
 
   const openChat = useCallback(async (otherUser: User) => {
- const convo: Conversation = {
-   otherUser,
-   lastMessage: { id: '', content: '', senderId: '', receiverId: '', chatType: 'direct', isRead: true, type: 'text', createdAt: new Date().toISOString() },
-   unreadCount: 0,
- };
- setActiveConversation(convo);
- setMessages([]);
- setChatMobileView('chat');
- // Fetch messages for this conversation
- if (currentUser) {
-   fetch(`/api/messages?userId=${otherUser.id}`).then(r => r.json()).then(res => {
-     setMessages(res.data || []);
-   }).catch(() => {});
- }
+    const convo: Conversation = {
+      otherUser,
+      lastMessage: { id: '', content: '', senderId: '', receiverId: '', chatType: 'direct', isRead: true, type: 'text', createdAt: new Date().toISOString() },
+      unreadCount: 0,
+    };
+    setActiveConversation(convo);
+    setMessages([]);
+    setChatMobileView('chat');
+    if (currentUser) {
+      fetch(`/api/messages?userId=${otherUser.id}`).then(r => r.json()).then(res => {
+        setMessages(res.data || []);
+      }).catch(() => {});
+    }
   }, [currentUser, setActiveConversation, setMessages]);
 
   const sendMessage = useCallback(() => {
     if (!msgInput.trim() || !activeConversation || !currentUser) return;
     const content = msgInput.trim();
     setMsgInput('');
-    // Optimistic add
     const optimisticMsg: Message = {
       id: `temp-${Date.now()}`,
       content,
@@ -356,14 +391,12 @@ export default function NexusApp() {
       createdAt: new Date().toISOString(),
     };
     addMessage(optimisticMsg);
-    // API call
     fetch('/api/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ receiverId: activeConversation.otherUser.id, content, type: 'text' }),
     }).then(r => r.json()).then(res => {
       if (res.data) {
-        // Replace optimistic with real
         setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? res.data : m));
         socketRef.current?.emit('message', res.data);
       }
@@ -523,6 +556,18 @@ export default function NexusApp() {
     } catch {}
   }, [currentUser, settingsPrivacy, setCurrentUser]);
 
+  const handleChatRequest = useCallback(async (requestId: string, action: 'accept' | 'decline') => {
+    try {
+      await fetch('/api/chat-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId, action }),
+      });
+      setChatRequests(prev => prev.filter(r => r.id !== requestId));
+      setPendingRequestCount(prev => Math.max(0, prev - 1));
+    } catch {}
+  }, [setChatRequests, setPendingRequestCount]);
+
   // ─── Filtered discover users ───────────────────────────────────────────────
   const filteredDiscover = discoverUsers.filter(u => {
     if (onlineOnly && !u.online) return false;
@@ -637,6 +682,9 @@ export default function NexusApp() {
         {/* ─── Likes Tab ─── */}
         {!showSettings && activeTab === 'likes' && <LikesView />}
 
+        {/* ─── Viewed Me Tab ─── */}
+        {!showSettings && activeTab === 'viewed' && <ViewedMeView />}
+
         {/* ─── Fansites Tab ─── */}
         {!showSettings && activeTab === 'fansites' && <FansitesView />}
 
@@ -648,25 +696,26 @@ export default function NexusApp() {
       </main>
 
       {/* ═══ BOTTOM NAV ═══ */}
-      <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-2">
+      <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-0.5">
         {([
-          { tab: 'discover' as const, icon: Compass, badge: 0 },
-          { tab: 'chat' as const, icon: MessageCircle, badge: totalUnread },
-          { tab: 'likes' as const, icon: Heart, badge: receivedLikes.length },
-          { tab: 'fansites' as const, icon: Star, badge: 0 },
-          { tab: 'events' as const, icon: Calendar, badge: 0 },
-          { tab: 'profile' as const, icon: User, badge: 0 },
-        ]).map(({ tab, icon: Icon, badge }) => (
+          { tab: 'discover' as const, icon: Compass, label: 'Discover', badge: 0 },
+          { tab: 'chat' as const, icon: MessageCircle, label: 'Chat', badge: totalUnread + pendingRequestCount },
+          { tab: 'likes' as const, icon: Heart, label: 'Likes', badge: receivedLikes.length },
+          { tab: 'viewed' as const, icon: Eye, label: 'Viewed', badge: 0 },
+          { tab: 'fansites' as const, icon: Star, label: 'Fansites', badge: 0 },
+          { tab: 'events' as const, icon: Calendar, label: 'Events', badge: 0 },
+          { tab: 'profile' as const, icon: User, label: 'Profile', badge: 0 },
+        ]).map(({ tab, icon: Icon, label, badge }) => (
           <button
             key={tab}
             onClick={() => { setActiveTab(tab); setShowSettings(false); if (tab === 'chat') { setChatMobileView('list'); setActiveConversation(null); setActiveGroup(null); } }}
-            className={`h-12 flex flex-col items-center justify-center gap-0.5 relative transition-colors ${activeTab === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+            className={`h-12 flex flex-col items-center justify-center gap-0.5 relative transition-colors px-1 ${activeTab === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
           >
-            <Icon className="w-5 h-5" />
-            <span className="text-[10px] leading-none">{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
-            {activeTab === tab && <span className="absolute bottom-0 w-5 h-0.5 bg-primary rounded-full" />}
+            <Icon className="w-4 h-4" />
+            <span className="text-[9px] leading-none">{label}</span>
+            {activeTab === tab && <span className="absolute bottom-0 w-4 h-0.5 bg-primary rounded-full" />}
             {badge > 0 && (
-              <span className="absolute -top-0.5 right-1/2 translate-x-4 min-w-[16px] h-4 flex items-center justify-center text-[9px] font-bold bg-primary text-primary-foreground rounded-full px-1">
+              <span className="absolute -top-0.5 right-1/2 translate-x-4 min-w-[14px] h-3.5 flex items-center justify-center text-[8px] font-bold bg-primary text-primary-foreground rounded-full px-0.5">
                 {badge > 99 ? '99+' : badge}
               </span>
             )}
@@ -862,28 +911,37 @@ export default function NexusApp() {
   function DiscoverGridCard({ user }: { user: User & { distance?: number | null } }) {
     const photo = user.photos?.[0];
     return (
-      <button onClick={() => openProfile(user.id)} className="profile-card text-left w-full rounded-xl overflow-hidden bg-card border border-border">
-        <div className="relative aspect-square bg-secondary">
-          {photo ? (
-            <img src={photo.url} alt={user.displayName} className="w-full h-full object-cover" loading="lazy" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground"><User className="w-8 h-8" /></div>
-          )}
-          {user.online && user.showOnline && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full online-pulse" />}
-          {user.isPremium && <Crown className="absolute top-2 left-2 w-4 h-4 text-yellow-400" />}
-          {user.isVerified && <Shield className="absolute top-2 left-2 w-4 h-4 text-blue-400" style={{ left: user.isPremium ? 24 : 8 }} />}
-        </div>
-        <div className="p-2.5 space-y-0.5">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[14px] font-semibold truncate">{user.displayName}</span>
-            {user.age !== null && user.age !== undefined && user.showAge !== false && <span className="text-[12px] text-muted-foreground">{user.age}</span>}
+      <div className="relative">
+        <button onClick={() => openProfile(user.id)} className="profile-card text-left w-full rounded-xl overflow-hidden bg-card border border-border">
+          <div className="relative aspect-square bg-secondary">
+            {photo ? (
+              <img src={photo.url} alt={user.displayName} className="w-full h-full object-cover" loading="lazy" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground"><User className="w-8 h-8" /></div>
+            )}
+            {user.online && user.showOnline && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full online-pulse" />}
+            {user.isPremium && <Crown className="absolute top-2 left-2 w-4 h-4 text-yellow-400" />}
+            {user.isVerified && <Shield className="absolute top-2 left-2 w-4 h-4 text-blue-400" style={{ left: user.isPremium ? 24 : 8 }} />}
           </div>
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-            {user.distance != null && user.showDistance !== false && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{user.distance} km</span>}
-            <span>{timeAgo(user.lastSeen)}</span>
+          <div className="p-2.5 space-y-0.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[14px] font-semibold truncate">{user.displayName}</span>
+              {user.age !== null && user.age !== undefined && user.showAge !== false && <span className="text-[12px] text-muted-foreground">{user.age}</span>}
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+              {user.distance != null && user.showDistance !== false && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{user.distance} km</span>}
+              <span>{timeAgo(user.lastSeen)}</span>
+            </div>
           </div>
-        </div>
-      </button>
+        </button>
+        {/* Quick like overlay */}
+        <button
+          onClick={(e) => { e.stopPropagation(); handleLike(user.id); }}
+          className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-card transition-all z-10"
+        >
+          <Heart className="w-4 h-4" />
+        </button>
+      </div>
     );
   }
 
@@ -907,27 +965,37 @@ export default function NexusApp() {
               {user.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
             </div>
             {user.pronouns && <p className="text-xs text-white/70">{user.pronouns}</p>}
+            {user.lookingFor && (
+              <Badge className="bg-primary/30 text-primary-foreground text-[10px] border-primary/40 w-fit">Looking for: {user.lookingFor}</Badge>
+            )}
             <div className="flex items-center gap-3 text-xs text-white/60">
               {user.distance != null && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{user.distance} km</span>}
               {user.online ? <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full" />Online</span> : <span>{timeAgo(user.lastSeen)}</span>}
             </div>
             {user.bio && <p className="text-xs text-white/80 line-clamp-2">{truncate(user.bio, 100)}</p>}
           </div>
-          {/* Action buttons */}
-          <div className="absolute bottom-4 right-4 flex gap-2">
-            <button onClick={() => { setCascadeIndex(i => i + 1); }} className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all">
-              <X className="w-5 h-5" />
+          {/* Action buttons - skip and view at top right */}
+          <div className="absolute top-3 right-3 flex gap-1.5">
+            <button onClick={() => { setCascadeIndex(i => i + 1); }} className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-black/50 transition-all">
+              <X className="w-4 h-4" />
             </button>
-            <button onClick={() => openProfile(user.id)} className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all">
-              <Eye className="w-5 h-5" />
-            </button>
-            <button onClick={() => { handleLike(user.id); setCascadeIndex(i => i + 1); }} className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary/90 transition-all">
-              <Heart className="w-5 h-5" />
-            </button>
-            <button onClick={() => { setRizzTargetBio(user.bio || ''); setShowRizzModal(true); }} className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-yellow-400 hover:text-yellow-300 hover:bg-white/20 transition-all">
-              <Sparkles className="w-5 h-5" />
+            <button onClick={() => openProfile(user.id)} className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-black/50 transition-all">
+              <Eye className="w-4 h-4" />
             </button>
           </div>
+        </div>
+        {/* Tap system buttons below the card */}
+        <div className="flex items-center justify-center gap-2 p-3">
+          {TAP_TYPES.map(tap => (
+            <button
+              key={tap.label}
+              onClick={() => { handleLike(user.id); setCascadeIndex(i => i + 1); }}
+              className={`flex items-center gap-1 px-3 py-2 rounded-full text-[11px] font-medium bg-gradient-to-r ${tap.color} text-white hover:scale-105 active:scale-95 transition-all shadow-lg`}
+            >
+              <span>{tap.emoji}</span>
+              <span className="hidden sm:inline">{tap.label}</span>
+            </button>
+          ))}
         </div>
       </div>
     );
@@ -949,6 +1017,42 @@ export default function NexusApp() {
               <div className="p-3 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-full" /><div className="space-y-1 flex-1"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-20" /></div></div>)}</div>
             ) : (
               <>
+                {/* Chat Requests Section */}
+                {chatRequests.length > 0 && (
+                  <>
+                    <div className="px-3 py-2 border-b border-border bg-secondary/30">
+                      <span className="text-[10px] text-primary uppercase tracking-wider font-semibold">Chat Requests ({chatRequests.length})</span>
+                    </div>
+                    {chatRequests.map((req: ChatRequest) => (
+                      <div key={req.id} className="p-3 border-b border-border hover:bg-secondary/30 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="relative shrink-0">
+                            <Avatar className="h-11 w-11">
+                              <AvatarImage src={getAvatar(req.sender)} />
+                              <AvatarFallback>{req.sender?.displayName?.[0] || '?'}</AvatarFallback>
+                            </Avatar>
+                            {req.sender?.online && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold truncate">{req.sender?.displayName || 'User'}</span>
+                              <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{timeAgo(req.createdAt)}</span>
+                            </div>
+                            {req.message && <p className="text-[12px] text-muted-foreground truncate mt-0.5">{req.message}</p>}
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-2">
+                          <Button size="sm" className="flex-1 h-7 bg-primary text-primary-foreground text-[11px]" onClick={() => handleChatRequest(req.id, 'accept')}>
+                            <Check className="w-3 h-3 mr-1" /> Accept
+                          </Button>
+                          <Button size="sm" variant="outline" className="flex-1 h-7 border-border text-[11px] text-muted-foreground hover:text-destructive" onClick={() => handleChatRequest(req.id, 'decline')}>
+                            <X className="w-3 h-3 mr-1" /> Decline
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
                 {conversations.map((convo: Conversation) => (
                   <button
                     key={convo.otherUser.id}
@@ -1012,7 +1116,7 @@ export default function NexusApp() {
                     ))}
                   </>
                 )}
-                {conversations.length === 0 && groups.length === 0 && (
+                {conversations.length === 0 && groups.length === 0 && chatRequests.length === 0 && (
                   <p className="text-center text-muted-foreground text-sm py-12">No conversations yet</p>
                 )}
               </>
@@ -1079,7 +1183,7 @@ export default function NexusApp() {
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {groupMessages.map(msg => (
                   <div key={msg.id} className={`flex ${msg.senderId === currentUser?.id ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[75%] ${msg.senderId !== currentUser?.id ? '' : ''}`}>
+                    <div className={`max-w-[75%]`}>
                       {msg.senderId !== currentUser?.id && msg.sender && (
                         <p className="text-[10px] text-primary font-medium mb-0.5 ml-1">{msg.sender.displayName}</p>
                       )}
@@ -1125,6 +1229,10 @@ export default function NexusApp() {
   // ─── Likes View ────────────────────────────────────────────────────────────
   function LikesView() {
     const likesList = likesTab === 'received' ? receivedLikes : sentLikes;
+    // Build a set of sender IDs we've sent likes to for match detection
+    const sentLikeIds = new Set(sentLikes.map((l: Like) => l.receiverId));
+    const receivedSenderIds = new Set(receivedLikes.map((l: Like) => l.senderId));
+
     return (
       <div className="h-full flex flex-col">
         <div className="px-4 py-3 border-b border-border shrink-0">
@@ -1148,17 +1256,31 @@ export default function NexusApp() {
               {likesList.map((like: Like) => {
                 const otherUser = likesTab === 'received' ? like.sender : like.receiver;
                 if (!otherUser) return null;
+                // Check for mutual match
+                const isMatch = likesTab === 'received' && sentLikeIds.has(otherUser.id) && receivedSenderIds.has(otherUser.id);
                 return (
                   <div key={like.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
-                    <button onClick={() => openProfile(otherUser.id)}>
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={getAvatar(otherUser)} />
-                        <AvatarFallback>{otherUser.displayName?.[0]}</AvatarFallback>
-                      </Avatar>
-                    </button>
+                    <div className="relative">
+                      <button onClick={() => openProfile(otherUser.id)}>
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={getAvatar(otherUser)} />
+                          <AvatarFallback>{otherUser.displayName?.[0]}</AvatarFallback>
+                        </Avatar>
+                      </button>
+                      {otherUser.online && otherUser.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <button onClick={() => openProfile(otherUser.id)} className="text-[14px] font-semibold hover:text-primary transition-colors">{otherUser.displayName}</button>
-                      <p className="text-[11px] text-muted-foreground">{timeAgo(like.createdAt)}</p>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => openProfile(otherUser.id)} className="text-[14px] font-semibold hover:text-primary transition-colors">{otherUser.displayName}</button>
+                        {isMatch && (
+                          <Badge className="gradient-text text-[9px] bg-primary/20 border-primary/40 px-1.5 py-0">MATCH</Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                        <span>{timeAgo(like.createdAt)}</span>
+                        {!otherUser.online && otherUser.lastSeen && <span>· {getLastSeenText(otherUser)}</span>}
+                        {otherUser.location && <span>· <MapPin className="w-3 h-3 inline" /> {otherUser.location}</span>}
+                      </div>
                     </div>
                     {likesTab === 'received' && (
                       <div className="flex gap-1.5 shrink-0">
@@ -1170,6 +1292,65 @@ export default function NexusApp() {
                         </Button>
                       </div>
                     )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Viewed Me View ────────────────────────────────────────────────────────
+  function ViewedMeView() {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-3 border-b border-border shrink-0">
+          <h2 className="text-sm font-semibold">Viewed Me</h2>
+          <p className="text-[11px] text-muted-foreground">People who visited your profile</p>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          {viewsLoading ? (
+            <div className="p-3 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="flex items-center gap-3 p-2"><Skeleton className="h-12 w-12 rounded-full" /><div className="space-y-1 flex-1"><Skeleton className="h-4 w-28" /><Skeleton className="h-3 w-16" /></div></div>)}</div>
+          ) : profileViews.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+              <Eye className="w-12 h-12 text-muted-foreground" />
+              <p className="text-muted-foreground text-sm">No profile views yet</p>
+            </div>
+          ) : (
+            <div className="p-3 space-y-1">
+              {profileViews.map((view: ProfileViewType) => {
+                const viewer = view.viewer;
+                if (!viewer) return null;
+                return (
+                  <div key={view.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+                    <div className="relative">
+                      <button onClick={() => openProfile(viewer.id)}>
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={getAvatar(viewer)} />
+                          <AvatarFallback>{viewer.displayName?.[0]}</AvatarFallback>
+                        </Avatar>
+                      </button>
+                      {viewer.online && viewer.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <button onClick={() => openProfile(viewer.id)} className="text-[14px] font-semibold hover:text-primary transition-colors">
+                        {viewer.displayName}{viewer.age != null && viewer.showAge !== false ? `, ${viewer.age}` : ''}
+                      </button>
+                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                        {viewer.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{viewer.location}</span>}
+                        <span>{timeAgo(view.createdAt)}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1.5 shrink-0">
+                      <Button size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90 text-[11px]" onClick={() => { if (viewer) openChat(viewer); }}>
+                        <MessageCircle className="w-3 h-3 mr-1" /> Msg
+                      </Button>
+                      <Button size="sm" variant="outline" className="h-8 border-border text-[11px]" onClick={() => handleLike(viewer.id)}>
+                        <Heart className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
@@ -1223,10 +1404,9 @@ export default function NexusApp() {
                     <p className="text-[12px] text-muted-foreground line-clamp-2">{truncate(fs.description, 80)}</p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Avatar className="h-5 w-5"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-[8px]">{fs.user.displayName?.[0]}</AvatarFallback></Avatar>
-                        <span className="text-[11px] text-muted-foreground">{fs.user.displayName}</span>
+                        {fs.geoName && <span className="text-[11px] text-muted-foreground flex items-center gap-0.5"><MapPin className="w-3 h-3" />{fs.geoName}</span>}
                       </div>
-                      <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />{fs._count?.subscriptions || 0}</span>
+                      <span className="text-[10px] text-muted-foreground">{fs.links.length} links</span>
                     </div>
                   </div>
                 </button>
@@ -1238,82 +1418,69 @@ export default function NexusApp() {
     );
   }
 
+  // ─── Fansite Detail ────────────────────────────────────────────────────────
   function FansiteDetail() {
     if (!selectedFansite) return null;
     const fs = selectedFansite;
     return (
       <div className="space-y-4">
-        {/* Cover */}
-        <div className="relative h-48 -mx-6 -mt-6 bg-secondary">
-          {fs.trailerImageUrl ? <img src={fs.trailerImageUrl} alt={fs.name} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/30 to-secondary flex items-center justify-center"><Star className="w-16 h-16 text-primary/40" /></div>}
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card to-transparent" />
+        <div className="relative h-48 bg-secondary rounded-xl overflow-hidden">
+          {fs.trailerImageUrl ? <img src={fs.trailerImageUrl} alt={fs.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary"><Star className="w-16 h-16 text-primary/50" /></div>}
+          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card to-transparent" />
+          <div className="absolute bottom-3 left-4 right-4">
+            <h2 className="text-xl font-bold">{fs.name}</h2>
+            <p className="text-sm text-muted-foreground">@{fs.nick}</p>
+            {fs.geoName && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><MapPin className="w-3 h-3" />{fs.geoName}</p>}
+          </div>
         </div>
-        {/* Info */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-14 w-14 border-2 border-primary/30">
-              <AvatarImage src={getAvatar(fs.user)} />
-              <AvatarFallback>{fs.user.displayName?.[0]}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold">{fs.name}</h3>
-                {fs.user.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
-              </div>
-              <p className="text-sm text-muted-foreground">@{fs.nick}</p>
-              {fs.geoName && <p className="text-[11px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{fs.geoName}</p>}
-            </div>
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback>{fs.user.displayName?.[0]}</AvatarFallback></Avatar>
+          <div>
+            <p className="text-sm font-semibold">{fs.user.displayName}</p>
+            <p className="text-[11px] text-muted-foreground">{fs.user.online ? '🟢 Online' : 'Offline'}</p>
           </div>
-          <p className="text-sm text-foreground/80 leading-relaxed">{fs.description || 'No description yet.'}</p>
-          {/* Stats */}
-          <div className="flex gap-4">
-            <div className="text-center"><p className="text-lg font-bold gradient-text">{fs._count?.subscriptions || 0}</p><p className="text-[10px] text-muted-foreground">Subscribers</p></div>
-            <div className="text-center"><p className="text-lg font-bold">{fs.products?.length || 0}</p><p className="text-[10px] text-muted-foreground">Tiers</p></div>
-          </div>
-          {/* Social Links */}
-          {fs.links && fs.links.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Links</p>
-              <div className="flex flex-wrap gap-2">
-                {fs.links.map(link => (
-                  <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg bg-secondary border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all flex items-center gap-1.5">
-                    {link.icon ? <img src={link.icon} alt="" className="w-4 h-4" /> : <Link2 className="w-3 h-3" />}
-                    {link.label || link.type}
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                ))}
+        </div>
+        {fs.description && <p className="text-sm text-muted-foreground leading-relaxed">{fs.description}</p>}
+        {fs.links.length > 0 && (
+          <div className="space-y-2">
+            <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Links</h3>
+            {fs.links.map(link => (
+              <div key={link.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary border border-border">
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">{link.type?.[0] || '?'}</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{link.label || link.type}</p>
+                  {link.value && <p className="text-[11px] text-muted-foreground truncate">{link.value}</p>}
+                </div>
+                {link.url && <ExternalLink className="w-4 h-4 text-muted-foreground" />}
               </div>
-            </div>
-          )}
-          {/* Products */}
-          {fs.products && fs.products.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Subscription Tiers</p>
-              <div className="space-y-2">
-                {fs.products.map(product => (
-                  <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
-                    <div>
-                      <p className="text-sm font-medium capitalize">{product.period}</p>
-                      {product.priceOld && <p className="text-[10px] text-muted-foreground line-through">${product.priceOld}</p>}
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold gradient-text">${product.price}</p>
-                      <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground mt-1">Subscribe</Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {/* Actions */}
-          <div className="flex gap-2 pt-2">
-            <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { if (fs.user) openChat(fs.user); setShowFansiteSheet(false); }}>
-              <MessageCircle className="w-4 h-4 mr-2" /> Contact
-            </Button>
-            <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => {}}>
-              <Flag className="w-4 h-4 mr-2" /> Report
-            </Button>
+            ))}
           </div>
+        )}
+        {fs.products.length > 0 && (
+          <div className="space-y-2">
+            <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Subscribe</h3>
+            {fs.products.map(product => (
+              <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+                <div>
+                  <p className="text-sm font-medium capitalize">{product.period}</p>
+                  {product.priceOld && <p className="text-[11px] text-muted-foreground line-through">${product.priceOld}</p>}
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold gradient-text">${product.price}</p>
+                  <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground mt-1">Subscribe</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {/* Actions */}
+        <div className="flex gap-2 pt-2">
+          <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { if (fs.user) openChat(fs.user); setShowFansiteSheet(false); }}>
+            <MessageCircle className="w-4 h-4 mr-2" /> Contact
+          </Button>
+          <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => {}}>
+            <Flag className="w-4 h-4 mr-2" /> Report
+          </Button>
         </div>
       </div>
     );
@@ -1388,185 +1555,245 @@ export default function NexusApp() {
     if (!currentUser) return null;
     return (
       <div className="h-full overflow-y-auto">
-        <div className="max-w-lg mx-auto p-4 space-y-4">
-          {/* Profile header */}
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Avatar className="h-20 w-20 border-2 border-primary/30">
-                <AvatarImage src={getAvatar(currentUser)} />
-                <AvatarFallback className="text-xl">{currentUser.displayName?.[0]}</AvatarFallback>
-              </Avatar>
-              <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-full flex items-center justify-center text-primary-foreground"><Camera className="w-3.5 h-3.5" /></button>
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold">{currentUser.displayName}</h2>
-                {currentUser.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
-                {currentUser.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
-              </div>
-              <p className="text-sm text-muted-foreground">@{currentUser.username}</p>
-              {currentUser.pronouns && <p className="text-xs text-muted-foreground mt-0.5">{currentUser.pronouns}</p>}
-            </div>
-            <Button variant="outline" size="sm" className="border-border text-xs" onClick={() => {
-              setEditingProfile(true);
-              setEditForm({
-                displayName: currentUser.displayName || '',
-                bio: currentUser.bio || '',
-                lookingFor: currentUser.lookingFor || '',
-                aboutMe: currentUser.aboutMe || '',
-                height: currentUser.height?.toString() || '',
-                weight: currentUser.weight?.toString() || '',
-                ethnicity: currentUser.ethnicity || '',
-                bodyType: currentUser.bodyType || '',
-                relationshipStatus: currentUser.relationshipStatus || '',
-                position: currentUser.position || '',
-                pronouns: currentUser.pronouns || '',
-                location: currentUser.location || '',
-              });
-            }}>
-              <Pencil className="w-3 h-3 mr-1" /> Edit
-            </Button>
+        <div className="max-w-lg mx-auto space-y-0">
+          {/* Banner area */}
+          <div className="relative h-32 bg-gradient-to-br from-primary/30 via-secondary to-card overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
           </div>
 
-          {/* Bio */}
-          {currentUser.bio && <p className="text-sm text-foreground/80 leading-relaxed">{currentUser.bio}</p>}
-          {currentUser.aboutMe && <p className="text-sm text-muted-foreground leading-relaxed">{currentUser.aboutMe}</p>}
-
-          {/* Edit Profile Form */}
-          {editingProfile && (
-            <Card className="bg-secondary border-border p-4 space-y-3">
-              <h3 className="text-sm font-semibold">Edit Profile</h3>
-              {[
-                { key: 'displayName', label: 'Display Name' },
-                { key: 'bio', label: 'Bio' },
-                { key: 'aboutMe', label: 'About Me' },
-                { key: 'location', label: 'Location' },
-                { key: 'pronouns', label: 'Pronouns' },
-                { key: 'lookingFor', label: 'Looking For' },
-                { key: 'ethnicity', label: 'Ethnicity' },
-                { key: 'bodyType', label: 'Body Type' },
-                { key: 'relationshipStatus', label: 'Relationship Status' },
-                { key: 'position', label: 'Position' },
-              ].map(({ key, label }) => (
-                <div key={key} className="space-y-1">
-                  <Label className="text-[11px] text-muted-foreground">{label}</Label>
-                  {(key === 'bio' || key === 'aboutMe') ? (
-                    <Textarea value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm" rows={2} />
-                  ) : (
-                    <Input value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm h-9" />
-                  )}
+          {/* Avatar overlapping banner */}
+          <div className="px-4 -mt-12 relative z-10">
+            <div className="flex items-end gap-4">
+              <div className="relative">
+                <Avatar className="h-24 w-24 border-4 border-card shadow-xl">
+                  <AvatarImage src={getAvatar(currentUser)} />
+                  <AvatarFallback className="text-2xl">{currentUser.displayName?.[0]}</AvatarFallback>
+                </Avatar>
+                <button className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground shadow-lg"><Camera className="w-4 h-4" /></button>
+              </div>
+              <div className="flex-1 pb-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-xl font-bold">{currentUser.displayName}</h2>
+                  {currentUser.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+                  {currentUser.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
                 </div>
-              ))}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Height (cm)</Label><Input type="number" value={editForm.height} onChange={e => setEditForm(p => ({ ...p, height: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
-                <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Weight (kg)</Label><Input type="number" value={editForm.weight} onChange={e => setEditForm(p => ({ ...p, weight: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>@{currentUser.username}</span>
+                  {currentUser.pronouns && <span>· {currentUser.pronouns}</span>}
+                </div>
               </div>
-              <div className="flex gap-2 pt-2">
-                <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveProfile}>Save</Button>
-                <Button size="sm" variant="outline" className="border-border" onClick={() => setEditingProfile(false)}>Cancel</Button>
-              </div>
-            </Card>
-          )}
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="text-center p-3 rounded-xl bg-secondary border border-border">
-              <p className="text-lg font-bold gradient-text">{currentUser._count?.photos || 0}</p>
-              <p className="text-[10px] text-muted-foreground">Photos</p>
-            </div>
-            <div className="text-center p-3 rounded-xl bg-secondary border border-border">
-              <p className="text-lg font-bold">{currentUser._count?.receivedViews || 0}</p>
-              <p className="text-[10px] text-muted-foreground">Views</p>
-            </div>
-            <div className="text-center p-3 rounded-xl bg-secondary border border-border">
-              <p className="text-lg font-bold gradient-text">{currentUser._count?.receivedLikes || 0}</p>
-              <p className="text-[10px] text-muted-foreground">Likes</p>
             </div>
           </div>
 
-          {/* Photo Gallery */}
-          {currentUser.photos && currentUser.photos.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Photos</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {currentUser.photos.map(photo => (
-                  <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-secondary">
-                    <img src={photo.url} alt="" className="w-full h-full object-cover" loading="lazy" />
-                  </div>
-                ))}
+          <div className="px-4 pt-3 space-y-5 pb-6">
+            {/* Bio */}
+            {currentUser.bio && <p className="text-sm text-foreground/80 leading-relaxed">{currentUser.bio}</p>}
+            {currentUser.aboutMe && (
+              <div className="space-y-1">
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">About Me</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{currentUser.aboutMe}</p>
+              </div>
+            )}
+
+            {/* Quick stats row */}
+            <div className="grid grid-cols-4 gap-2">
+              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+                <p className="text-base font-bold gradient-text">{currentUser._count?.photos || 0}</p>
+                <p className="text-[9px] text-muted-foreground">Photos</p>
+              </div>
+              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+                <p className="text-base font-bold">{currentUser._count?.receivedViews || 0}</p>
+                <p className="text-[9px] text-muted-foreground">Views</p>
+              </div>
+              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+                <p className="text-base font-bold gradient-text">{currentUser._count?.receivedLikes || 0}</p>
+                <p className="text-[9px] text-muted-foreground">Likes</p>
+              </div>
+              <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
+                <p className="text-base font-bold">{(currentUser._count?.sentMessages || 0) + (currentUser._count?.receivedMessages || 0)}</p>
+                <p className="text-[9px] text-muted-foreground">Messages</p>
               </div>
             </div>
-          )}
 
-          {/* Albums */}
-          {currentUser.albums && currentUser.albums.length > 0 && (
+            {/* Looking for */}
+            {currentUser.lookingFor && (
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/10 border border-primary/20">
+                <Heart className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium">Looking for: <span className="capitalize text-primary">{currentUser.lookingFor}</span></span>
+              </div>
+            )}
+
+            {/* Full Details grid */}
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Albums</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Details</h3>
+                <Button variant="ghost" size="sm" className="text-[11px] text-primary hover:text-primary" onClick={() => {
+                  setEditingProfile(true);
+                  setEditForm({
+                    displayName: currentUser.displayName || '',
+                    bio: currentUser.bio || '',
+                    lookingFor: currentUser.lookingFor || '',
+                    aboutMe: currentUser.aboutMe || '',
+                    height: currentUser.height?.toString() || '',
+                    weight: currentUser.weight?.toString() || '',
+                    ethnicity: currentUser.ethnicity || '',
+                    bodyType: currentUser.bodyType || '',
+                    relationshipStatus: currentUser.relationshipStatus || '',
+                    position: currentUser.position || '',
+                    pronouns: currentUser.pronouns || '',
+                    location: currentUser.location || '',
+                  });
+                }}>
+                  <Pencil className="w-3 h-3 mr-1" /> Edit
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {currentUser.lookingFor && <DetailCell label="Looking for" value={currentUser.lookingFor} />}
+                {currentUser.height && <DetailCell label="Height" value={`${currentUser.height} cm`} />}
+                {currentUser.weight && <DetailCell label="Weight" value={`${currentUser.weight} kg`} />}
+                {currentUser.bodyType && <DetailCell label="Body Type" value={currentUser.bodyType} />}
+                {currentUser.ethnicity && <DetailCell label="Ethnicity" value={currentUser.ethnicity} />}
+                {currentUser.position && <DetailCell label="Position" value={currentUser.position} />}
+                {currentUser.relationshipStatus && <DetailCell label="Relationship" value={currentUser.relationshipStatus} />}
+                {currentUser.location && <DetailCell label="Location" value={currentUser.location} />}
+                {currentUser.pronouns && <DetailCell label="Pronouns" value={currentUser.pronouns} />}
+                <DetailCell label="Gender" value={currentUser.gender} />
+              </div>
+            </div>
+
+            {/* Photo Gallery */}
+            {currentUser.photos && currentUser.photos.length > 0 && (
               <div className="space-y-2">
-                {currentUser.albums.map(album => (
-                  <div key={album.id} className="p-3 rounded-xl bg-secondary border border-border">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium">{album.name}</p>
-                      {album.isPrivate && <Badge variant="secondary" className="text-[10px] bg-muted">Private</Badge>}
+                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Photos</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  {currentUser.photos.map(photo => (
+                    <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-secondary relative group">
+                      <img src={photo.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                     </div>
-                    {album.photos && album.photos.length > 0 && (
-                      <div className="grid grid-cols-4 gap-1">
-                        {album.photos.slice(0, 8).map(p => (
-                          <div key={p.id} className="aspect-square rounded-lg overflow-hidden bg-card">
-                            <img src={p.url} alt="" className="w-full h-full object-cover" loading="lazy" />
-                          </div>
-                        ))}
-                      </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Edit Profile Form */}
+            {editingProfile && (
+              <Card className="bg-secondary border-border p-4 space-y-3">
+                <h3 className="text-sm font-semibold">Edit Profile</h3>
+                {[
+                  { key: 'displayName', label: 'Display Name' },
+                  { key: 'bio', label: 'Bio' },
+                  { key: 'aboutMe', label: 'About Me' },
+                  { key: 'location', label: 'Location' },
+                  { key: 'pronouns', label: 'Pronouns' },
+                  { key: 'lookingFor', label: 'Looking For' },
+                  { key: 'ethnicity', label: 'Ethnicity' },
+                  { key: 'bodyType', label: 'Body Type' },
+                  { key: 'relationshipStatus', label: 'Relationship Status' },
+                  { key: 'position', label: 'Position' },
+                ].map(({ key, label }) => (
+                  <div key={key} className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">{label}</Label>
+                    {(key === 'bio' || key === 'aboutMe') ? (
+                      <Textarea value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm" rows={2} />
+                    ) : (
+                      <Input value={(editForm as any)[key]} onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))} className="bg-card border-border text-sm h-9" />
                     )}
                   </div>
                 ))}
-              </div>
-            </div>
-          )}
-
-          {/* My Fansite */}
-          {currentUser.fansite && (
-            <div className="p-3 rounded-xl bg-secondary border border-border space-y-2">
-              <h3 className="text-sm font-semibold flex items-center gap-2"><Star className="w-4 h-4" /> My Fansite</h3>
-              <p className="text-sm">{currentUser.fansite.name} <span className="text-muted-foreground">@{currentUser.fansite.nick}</span></p>
-            </div>
-          )}
-
-          {/* My Subscriptions */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold flex items-center gap-2"><Crown className="w-4 h-4" /> My Subscriptions</h3>
-            {mySubscriptions.length > 0 ? mySubscriptions.map((sub: any) => (
-              <div key={sub.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
-                <div>
-                  <p className="text-sm font-medium capitalize">{sub.tier}</p>
-                  <p className="text-[11px] text-muted-foreground">Since {format(new Date(sub.startDate), 'MMM d, yyyy')}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Height (cm)</Label><Input type="number" value={editForm.height} onChange={e => setEditForm(p => ({ ...p, height: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
+                  <div className="space-y-1"><Label className="text-[11px] text-muted-foreground">Weight (kg)</Label><Input type="number" value={editForm.weight} onChange={e => setEditForm(p => ({ ...p, weight: e.target.value }))} className="bg-card border-border text-sm h-9" /></div>
                 </div>
-                {sub.isActive ? <Badge className="bg-primary/20 text-primary text-[10px]">Active</Badge> : <Badge variant="secondary" className="text-[10px]">Expired</Badge>}
-              </div>
-            )) : <p className="text-xs text-muted-foreground">No active subscriptions</p>}
-          </div>
+                <div className="flex gap-2 pt-2">
+                  <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveProfile}>Save</Button>
+                  <Button size="sm" variant="outline" className="border-border" onClick={() => setEditingProfile(false)}>Cancel</Button>
+                </div>
+              </Card>
+            )}
 
-          {/* My Boosts */}
-          {myBoosts.length > 0 && (
+            {/* Albums */}
+            {currentUser.albums && currentUser.albums.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Albums</h3>
+                <div className="space-y-2">
+                  {currentUser.albums.map(album => (
+                    <div key={album.id} className="p-3 rounded-xl bg-secondary border border-border">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-medium">{album.name}</p>
+                        {album.isPrivate && <Badge variant="secondary" className="text-[10px] bg-muted">Private</Badge>}
+                      </div>
+                      {album.photos && album.photos.length > 0 && (
+                        <div className="grid grid-cols-4 gap-1">
+                          {album.photos.slice(0, 8).map(p => (
+                            <div key={p.id} className="aspect-square rounded-lg overflow-hidden bg-card">
+                              <img src={p.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* My Fansite */}
+            {currentUser.fansite && (
+              <div className="p-4 rounded-xl bg-secondary border border-border space-y-2">
+                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><Star className="w-4 h-4" /> My Fansite</h3>
+                <p className="text-sm font-medium">{currentUser.fansite.name} <span className="text-muted-foreground">@{currentUser.fansite.nick}</span></p>
+                {currentUser.fansite.description && <p className="text-[12px] text-muted-foreground">{truncate(currentUser.fansite.description, 100)}</p>}
+                {currentUser.fansite.status === 'active' && <Badge className="bg-primary/20 text-primary text-[10px]">Active</Badge>}
+              </div>
+            )}
+
+            {/* My Subscriptions */}
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold flex items-center gap-2"><Zap className="w-4 h-4" /> Active Boosts</h3>
-              {myBoosts.map((boost: any) => (
-                <div key={boost.id} className="p-3 rounded-xl bg-secondary border border-border boost-glow">
-                  <p className="text-sm font-medium capitalize">{boost.type} Boost</p>
-                  <p className="text-[11px] text-muted-foreground">Ends {timeAgo(boost.endsAt)}</p>
-                  <Progress value={50} className="mt-2 h-1.5" />
+              <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><Crown className="w-4 h-4" /> My Subscriptions</h3>
+              {mySubscriptions.length > 0 ? mySubscriptions.map((sub: any) => (
+                <div key={sub.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+                  <div>
+                    <p className="text-sm font-medium capitalize">{sub.tier}</p>
+                    <p className="text-[11px] text-muted-foreground">Since {format(new Date(sub.startDate), 'MMM d, yyyy')}</p>
+                  </div>
+                  {sub.isActive ? <Badge className="bg-primary/20 text-primary text-[10px]">Active</Badge> : <Badge variant="secondary" className="text-[10px]">Expired</Badge>}
                 </div>
-              ))}
+              )) : <p className="text-xs text-muted-foreground">No active subscriptions</p>}
             </div>
-          )}
 
-          {/* Settings shortcut */}
-          <Button variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}>
-            <Settings className="w-4 h-4 mr-2" /> Settings & Privacy
-          </Button>
+            {/* My Boosts */}
+            {myBoosts.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><Zap className="w-4 h-4" /> Active Boosts</h3>
+                {myBoosts.map((boost: any) => (
+                  <div key={boost.id} className="p-3 rounded-xl bg-secondary border border-border boost-glow">
+                    <p className="text-sm font-medium capitalize">{boost.type} Boost</p>
+                    <p className="text-[11px] text-muted-foreground">Ends {timeAgo(boost.endsAt)}</p>
+                    <Progress value={50} className="mt-2 h-1.5" />
+                  </div>
+                ))}
+              </div>
+            )}
 
-          <div className="h-4" />
+            {/* Settings shortcut */}
+            <Button variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}>
+              <Settings className="w-4 h-4 mr-2" /> Settings & Privacy
+            </Button>
+
+            <div className="h-4" />
+          </div>
         </div>
+      </div>
+    );
+  }
+
+  // ─── Detail Cell helper ────────────────────────────────────────────────────
+  function DetailCell({ label, value }: { label: string; value: string }) {
+    return (
+      <div className="p-2.5 rounded-lg bg-secondary/50 border border-border">
+        <p className="text-[10px] text-muted-foreground">{label}</p>
+        <p className="text-[13px] font-medium capitalize mt-0.5">{value}</p>
       </div>
     );
   }
@@ -1581,7 +1808,7 @@ export default function NexusApp() {
       <div className="space-y-0">
         {/* Photo gallery */}
         <div className="relative bg-secondary">
-          <div className="aspect-square max-h-[60vh] relative">
+          <div className="aspect-square max-h-[55vh] relative">
             {currentPhoto ? (
               <img src={currentPhoto.url} alt={u.displayName} className="w-full h-full object-cover" />
             ) : (
@@ -1589,7 +1816,7 @@ export default function NexusApp() {
             )}
             <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/50 to-transparent" />
           </div>
-          {/* Gallery nav */}
+          {/* Gallery nav dots */}
           {profilePhotos.length > 1 && (
             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
               {profilePhotos.map((_, i) => (
@@ -1597,6 +1824,7 @@ export default function NexusApp() {
               ))}
             </div>
           )}
+          {/* Gallery arrows */}
           {profilePhotos.length > 1 && (
             <>
               <button onClick={() => setProfileGalleryIndex(i => (i - 1 + profilePhotos.length) % profilePhotos.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-all"><ChevronLeft className="w-5 h-5" /></button>
@@ -1611,10 +1839,11 @@ export default function NexusApp() {
 
         {/* User info */}
         <div className="px-4 -mt-8 relative z-10 space-y-4">
-          <div className="flex items-center gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold">{u.displayName}{u.age ? `, ${u.age}` : ''}</h2>
+          {/* Name + badges + online status */}
+          <div className="flex items-start gap-3">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl font-bold">{u.displayName}{u.showAge !== false && u.age ? `, ${u.age}` : ''}</h2>
                 {u.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
                 {u.isPremium && <Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge>}
               </div>
@@ -1623,7 +1852,7 @@ export default function NexusApp() {
                 {u.pronouns && <span>{u.pronouns}</span>}
               </div>
             </div>
-            <div className="ml-auto">
+            <div className="shrink-0">
               <div className={`flex items-center gap-1.5 text-[11px] ${u.online ? 'text-green-400' : 'text-muted-foreground'}`}>
                 {u.online ? <span className="w-2 h-2 bg-green-400 rounded-full online-pulse" /> : null}
                 {getLastSeenText(u)}
@@ -1631,44 +1860,60 @@ export default function NexusApp() {
             </div>
           </div>
 
-          {/* Stats bar */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
-              <p className="text-base font-bold gradient-text">{u._count?.photos || 0}</p>
-              <p className="text-[10px] text-muted-foreground">Photos</p>
+          {/* Quick stats row - horizontal scrollable */}
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+            <div className="shrink-0 text-center p-2.5 rounded-xl bg-secondary border border-border min-w-[72px]">
+              <p className="text-sm font-bold gradient-text">{u._count?.photos || 0}</p>
+              <p className="text-[9px] text-muted-foreground">Photos</p>
             </div>
-            <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
-              <p className="text-base font-bold">{u._count?.receivedViews || 0}</p>
-              <p className="text-[10px] text-muted-foreground">Views</p>
+            <div className="shrink-0 text-center p-2.5 rounded-xl bg-secondary border border-border min-w-[72px]">
+              <p className="text-sm font-bold">{u._count?.receivedViews || 0}</p>
+              <p className="text-[9px] text-muted-foreground">Views</p>
             </div>
-            <div className="text-center p-2.5 rounded-xl bg-secondary border border-border">
-              <p className="text-base font-bold gradient-text">{u._count?.receivedLikes || 0}</p>
-              <p className="text-[10px] text-muted-foreground">Likes</p>
+            <div className="shrink-0 text-center p-2.5 rounded-xl bg-secondary border border-border min-w-[72px]">
+              <p className="text-sm font-bold gradient-text">{u._count?.receivedLikes || 0}</p>
+              <p className="text-[9px] text-muted-foreground">Likes</p>
             </div>
+            {(u as any).distance != null && u.showDistance !== false && (
+              <div className="shrink-0 text-center p-2.5 rounded-xl bg-secondary border border-border min-w-[72px]">
+                <p className="text-sm font-bold">{(u as any).distance} km</p>
+                <p className="text-[9px] text-muted-foreground">Away</p>
+              </div>
+            )}
           </div>
 
-          {/* About */}
-          {u.aboutMe && (
-            <div className="space-y-1">
-              <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">About</h4>
-              <p className="text-sm leading-relaxed">{u.aboutMe}</p>
+          {/* Looking for badge */}
+          {u.lookingFor && (
+            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+              <Heart className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">Looking for: <span className="capitalize text-primary">{u.lookingFor}</span></span>
             </div>
           )}
 
-          {/* Details */}
-          <div className="space-y-1">
+          {/* Full details grid */}
+          <div className="space-y-1.5">
             <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Details</h4>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              {u.lookingFor && <div className="flex justify-between"><span className="text-muted-foreground">Looking for</span><span className="capitalize">{u.lookingFor}</span></div>}
-              {u.height && <div className="flex justify-between"><span className="text-muted-foreground">Height</span><span>{u.height} cm</span></div>}
-              {u.weight && <div className="flex justify-between"><span className="text-muted-foreground">Weight</span><span>{u.weight} kg</span></div>}
-              {u.bodyType && <div className="flex justify-between"><span className="text-muted-foreground">Body type</span><span className="capitalize">{u.bodyType}</span></div>}
-              {u.ethnicity && <div className="flex justify-between"><span className="text-muted-foreground">Ethnicity</span><span className="capitalize">{u.ethnicity}</span></div>}
-              {u.position && <div className="flex justify-between"><span className="text-muted-foreground">Position</span><span className="capitalize">{u.position}</span></div>}
-              {u.relationshipStatus && <div className="flex justify-between"><span className="text-muted-foreground">Relationship</span><span className="capitalize">{u.relationshipStatus}</span></div>}
-              {u.location && <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{u.location}</span></div>}
+              {u.lookingFor && <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Looking for</span><span className="capitalize text-[13px] font-medium">{u.lookingFor}</span></div>}
+              {u.height && <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Height</span><span className="text-[13px] font-medium">{u.height} cm</span></div>}
+              {u.weight && <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Weight</span><span className="text-[13px] font-medium">{u.weight} kg</span></div>}
+              {u.bodyType && <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Body type</span><span className="capitalize text-[13px] font-medium">{u.bodyType}</span></div>}
+              {u.ethnicity && <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Ethnicity</span><span className="capitalize text-[13px] font-medium">{u.ethnicity}</span></div>}
+              {u.position && <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Position</span><span className="capitalize text-[13px] font-medium">{u.position}</span></div>}
+              {u.relationshipStatus && <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Relationship</span><span className="capitalize text-[13px] font-medium">{u.relationshipStatus}</span></div>}
+              {u.location && <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Location</span><span className="text-[13px] font-medium">{u.location}</span></div>}
+              {u.pronouns && <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Pronouns</span><span className="text-[13px] font-medium">{u.pronouns}</span></div>}
+              <div className="flex justify-between p-2 rounded-lg bg-secondary/50"><span className="text-muted-foreground text-[12px]">Gender</span><span className="capitalize text-[13px] font-medium">{u.gender}</span></div>
             </div>
           </div>
+
+          {/* About Me section */}
+          {u.aboutMe && (
+            <div className="space-y-1">
+              <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">About Me</h4>
+              <p className="text-sm leading-relaxed">{u.aboutMe}</p>
+            </div>
+          )}
 
           {/* Photo thumbnails */}
           {profilePhotos.length > 1 && (

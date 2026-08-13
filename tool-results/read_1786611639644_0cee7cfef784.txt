@@ -1,0 +1,402 @@
+     1→   800→   800→          <Popover>
+     2→   801→   801→            <PopoverTrigger asChild>
+     3→   802→   802→              <button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0 hover:border-primary/50 transition-all">
+     4→   803→   803→                {ageRange[0]}–{ageRange[1]} yrs
+     5→   804→   804→              </button>
+     6→   805→   805→            </PopoverTrigger>
+     7→   806→   806→            <PopoverContent className="w-64 bg-card border-border p-3">
+     8→   807→   807→              <Slider value={ageRange} onValueChange={setAgeRange} min={18} max={80} step={1} className="mt-2" />
+     9→   808→   808→              <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>{ageRange[0]}</span><span>{ageRange[1]}</span></div>
+    10→   809→   809→            </PopoverContent>
+    11→   810→   810→          </Popover>
+    12→   811→   811→          <Select value={lookingFor} onValueChange={setLookingFor}>
+    13→   812→   812→            <SelectTrigger className="w-28 h-8 text-[11px] bg-secondary border-border shrink-0">
+    14→   813→   813→              <SelectValue />
+    15→   814→   814→            </SelectTrigger>
+    16→   815→   815→            <SelectContent className="bg-card border-border">
+    17→   816→   816→              <SelectItem value="all">All</SelectItem>
+    18→   817→   817→              <SelectItem value="relationship">Relationship</SelectItem>
+    19→   818→   818→              <SelectItem value="casual">Casual</SelectItem>
+    20→   819→   819→              <SelectItem value="friends">Friends</SelectItem>
+    21→   820→   820→              <SelectItem value="networking">Networking</SelectItem>
+    22→   821→   821→            </SelectContent>
+    23→   822→   822→          </Select>
+    24→   823→   823→          <div className="ml-auto flex gap-1 shrink-0">
+    25→   824→   824→            <button onClick={() => setDiscoverView('grid')} className={`p-1.5 rounded-lg transition-all ${discoverView === 'grid' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground'}`}><Grid3X3 className="w-4 h-4" /></button>
+    26→   825→   825→            <button onClick={() => setDiscoverView('cascade')} className={`p-1.5 rounded-lg transition-all ${discoverView === 'cascade' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground'}`}><Layers className="w-4 h-4" /></button>
+    27→   826→   826→          </div>
+    28→   827→   827→        </div>
+    29→   828→   828→
+    30→   829→   829→        {/* Content */}
+    31→   830→   830→        <div className="flex-1 overflow-y-auto p-3">
+    32→   831→   831→          {discoverLoading ? (
+    33→   832→   832→            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    34→   833→   833→              {Array.from({ length: 6 }).map((_, i) => (
+    35→   834→   834→                <div key={i} className="space-y-2"><Skeleton className="aspect-square w-full rounded-xl" /><Skeleton className="h-4 w-24" /><Skeleton className="h-3 w-16" /></div>
+    36→   835→   835→              ))}
+    37→   836→   836→            </div>
+    38→   837→   837→          ) : discoverView === 'grid' ? (
+    39→   838→   838→            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    40→   839→   839→              {filteredDiscover.map(user => (
+    41→   840→   840→                <DiscoverGridCard key={user.id} user={user} />
+    42→   841→   841→              ))}
+    43→   842→   842→              {filteredDiscover.length === 0 && <p className="col-span-full text-center text-muted-foreground text-sm py-12">No profiles found</p>}
+    44→   843→   843→            </div>
+    45→   844→   844→          ) : (
+    46→   845→   845→            <div className="max-w-md mx-auto h-full flex items-center justify-center">
+    47→   846→   846→              {cascadeUser ? (
+    48→   847→   847→                <CascadeCard key={cascadeUser.id} user={cascadeUser} />
+    49→   848→   848→              ) : (
+    50→   849→   849→                <div className="text-center space-y-3">
+    51→   850→   850→                  <Heart className="w-12 h-12 text-muted-foreground mx-auto" />
+    52→   851→   851→                  <p className="text-muted-foreground text-sm">No more profiles to discover</p>
+    53→   852→   852→                  <Button variant="outline" size="sm" onClick={triggerRefreshDiscover} className="border-border">Refresh</Button>
+    54→   853→   853→                </div>
+    55→   854→   854→              )}
+    56→   855→   855→            </div>
+    57→   856→   856→          )}
+    58→   857→   857→        </div>
+    59→   858→   858→      </div>
+    60→   859→   859→    );
+    61→   860→   860→  }
+    62→   861→   861→
+    63→   862→   862→  function DiscoverGridCard({ user }: { user: User & { distance?: number | null } }) {
+    64→   863→   863→    const photo = user.photos?.[0];
+    65→   864→   864→    return (
+    66→   865→   865→      <button onClick={() => openProfile(user.id)} className="profile-card text-left w-full rounded-xl overflow-hidden bg-card border border-border">
+    67→   866→   866→        <div className="relative aspect-square bg-secondary">
+    68→   867→   867→          {photo ? (
+    69→   868→   868→            <img src={photo.url} alt={user.displayName} className="w-full h-full object-cover" loading="lazy" />
+    70→   869→   869→          ) : (
+    71→   870→   870→            <div className="w-full h-full flex items-center justify-center text-muted-foreground"><User className="w-8 h-8" /></div>
+    72→   871→   871→          )}
+    73→   872→   872→          {user.online && user.showOnline && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full online-pulse" />}
+    74→   873→   873→          {user.isPremium && <Crown className="absolute top-2 left-2 w-4 h-4 text-yellow-400" />}
+    75→   874→   874→          {user.isVerified && <Shield className="absolute top-2 left-2 w-4 h-4 text-blue-400" style={{ left: user.isPremium ? 24 : 8 }} />}
+    76→   875→   875→        </div>
+    77→   876→   876→        <div className="p-2.5 space-y-0.5">
+    78→   877→   877→          <div className="flex items-center gap-1.5">
+    79→   878→   878→            <span className="text-[14px] font-semibold truncate">{user.displayName}</span>
+    80→   879→   879→            {user.age !== null && user.age !== undefined && user.showAge !== false && <span className="text-[12px] text-muted-foreground">{user.age}</span>}
+    81→   880→   880→          </div>
+    82→   881→   881→          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+    83→   882→   882→            {user.distance != null && user.showDistance !== false && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{user.distance} km</span>}
+    84→   883→   883→            <span>{timeAgo(user.lastSeen)}</span>
+    85→   884→   884→          </div>
+    86→   885→   885→        </div>
+    87→   886→   886→      </button>
+    88→   887→   887→    );
+    89→   888→   888→  }
+    90→   889→   889→
+    91→   890→   890→  function CascadeCard({ user }: { user: User & { distance?: number | null } }) {
+    92→   891→   891→    const photo = user.photos?.[0];
+    93→   892→   892→    return (
+    94→   893→   893→      <div className="cascade-animate w-full max-w-sm rounded-2xl overflow-hidden bg-card border border-border relative">
+    95→   894→   894→        <div className="relative aspect-[3/4] bg-secondary">
+    96→   895→   895→          {photo ? (
+    97→   896→   896→            <img src={photo.url} alt={user.displayName} className="w-full h-full object-cover" />
+    98→   897→   897→          ) : (
+    99→   898→   898→            <div className="w-full h-full flex items-center justify-center text-muted-foreground"><User className="w-16 h-16" /></div>
+   100→   899→   899→          )}
+   101→   900→   900→          {/* Gradient overlay */}
+   102→   901→   901→          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+   103→   902→   902→          {/* Info overlay */}
+   104→   903→   903→          <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2">
+   105→   904→   904→            <div className="flex items-center gap-2">
+   106→   905→   905→              <h3 className="text-xl font-bold text-white">{user.displayName}{user.age != null ? `, ${user.age}` : ''}</h3>
+   107→   906→   906→              {user.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+   108→   907→   907→              {user.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
+   109→   908→   908→            </div>
+   110→   909→   909→            {user.pronouns && <p className="text-xs text-white/70">{user.pronouns}</p>}
+   111→   910→   910→            <div className="flex items-center gap-3 text-xs text-white/60">
+   112→   911→   911→              {user.distance != null && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{user.distance} km</span>}
+   113→   912→   912→              {user.online ? <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full" />Online</span> : <span>{timeAgo(user.lastSeen)}</span>}
+   114→   913→   913→            </div>
+   115→   914→   914→            {user.bio && <p className="text-xs text-white/80 line-clamp-2">{truncate(user.bio, 100)}</p>}
+   116→   915→   915→          </div>
+   117→   916→   916→          {/* Action buttons */}
+   118→   917→   917→          <div className="absolute bottom-4 right-4 flex gap-2">
+   119→   918→   918→            <button onClick={() => { setCascadeIndex(i => i + 1); }} className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all">
+   120→   919→   919→              <X className="w-5 h-5" />
+   121→   920→   920→            </button>
+   122→   921→   921→            <button onClick={() => openProfile(user.id)} className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all">
+   123→   922→   922→              <Eye className="w-5 h-5" />
+   124→   923→   923→            </button>
+   125→   924→   924→            <button onClick={() => { handleLike(user.id); setCascadeIndex(i => i + 1); }} className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary/90 transition-all">
+   126→   925→   925→              <Heart className="w-5 h-5" />
+   127→   926→   926→            </button>
+   128→   927→   927→            <button onClick={() => { setRizzTargetBio(user.bio || ''); setShowRizzModal(true); }} className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-yellow-400 hover:text-yellow-300 hover:bg-white/20 transition-all">
+   129→   928→   928→              <Sparkles className="w-5 h-5" />
+   130→   929→   929→            </button>
+   131→   930→   930→          </div>
+   132→   931→   931→        </div>
+   133→   932→   932→      </div>
+   134→   933→   933→    );
+   135→   934→   934→  }
+   136→   935→   935→
+   137→   936→   936→  // ─── Chat View ─────────────────────────────────────────────────────────────
+   138→   937→   937→  function ChatView() {
+   139→   938→   938→    const showChatPanel = activeConversation || activeGroup;
+   140→   939→   939→
+   141→   940→   940→    return (
+   142→   941→   941→      <div className="h-full flex">
+   143→   942→   942→        {/* Conversation List - hidden on mobile when chat is open */}
+   144→   943→   943→        <div className={`${showChatPanel ? 'hidden md:flex' : 'flex'} w-full md:w-80 lg:w-96 flex-col border-r border-border shrink-0`}>
+   145→   944→   944→          <div className="p-3 border-b border-border shrink-0">
+   146→   945→   945→            <h2 className="text-sm font-semibold">Messages</h2>
+   147→   946→   946→          </div>
+   148→   947→   947→          <div className="flex-1 overflow-y-auto">
+   149→   948→   948→            {chatLoading ? (
+   150→   949→   949→              <div className="p-3 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-full" /><div className="space-y-1 flex-1"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-20" /></div></div>)}</div>
+   151→   950→   950→            ) : (
+   152→   951→   951→              <>
+   153→   952→   952→                {conversations.map((convo: Conversation) => (
+   154→   953→   953→                  <button
+   155→   954→   954→                    key={convo.otherUser.id}
+   156→   955→   955→                    onClick={() => openChat(convo.otherUser)}
+   157→   956→   956→                    className={`w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left ${activeConversation?.otherUser.id === convo.otherUser.id ? 'bg-secondary' : ''}`}
+   158→   957→   957→                  >
+   159→   958→   958→                    <div className="relative shrink-0">
+   160→   959→   959→                      <Avatar className="h-11 w-11">
+   161→   960→   960→                        <AvatarImage src={getAvatar(convo.otherUser)} />
+   162→   961→   961→                        <AvatarFallback>{convo.otherUser.displayName?.[0]}</AvatarFallback>
+   163→   962→   962→                      </Avatar>
+   164→   963→   963→                      {convo.otherUser.online && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+   165→   964→   964→                    </div>
+   166→   965→   965→                    <div className="flex-1 min-w-0">
+   167→   966→   966→                      <div className="flex items-center justify-between">
+   168→   967→   967→                        <span className="text-[13px] font-semibold truncate">{convo.otherUser.displayName}</span>
+   169→   968→   968→                        <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{timeAgo(convo.lastMessage.createdAt)}</span>
+   170→   969→   969→                      </div>
+   171→   970→   970→                      <p className="text-[12px] text-muted-foreground truncate">{convo.lastMessage.content}</p>
+   172→   971→   971→                    </div>
+   173→   972→   972→                    {convo.unreadCount > 0 && (
+   174→   973→   973→                      <span className="min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground rounded-full px-1">{convo.unreadCount}</span>
+   175→   974→   974→                    )}
+   176→   975→   975→                  </button>
+   177→   976→   976→                ))}
+   178→   977→   977→
+   179→   978→   978→                {/* Group Chats Section */}
+   180→   979→   979→                {groups.length > 0 && (
+   181→   980→   980→                  <>
+   182→   981→   981→                    <div className="px-3 py-2 border-t border-border">
+   183→   982→   982→                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Group Chats</span>
+   184→   983→   983→                    </div>
+   185→   984→   984→                    {groups.map((group: any) => (
+   186→   985→   985→                      <button
+   187→   986→   986→                        key={group.id}
+   188→   987→   987→                        onClick={() => {
+   189→   988→   988→                          setActiveGroup(group);
+   190→   989→   989→                          setActiveConversation(null);
+   191→   990→   990→                          setChatMobileView('chat');
+   192→   991→   991→                          setGroupMessages([]);
+   193→   992→   992→                          fetch(`/api/groups/${group.id}`).then(r => r.json()).then(res => {
+   194→   993→   993→                            setGroupMessages(res.data?.messages || []);
+   195→   994→   994→                          }).catch(() => {});
+   196→   995→   995→                        }}
+   197→   996→   996→                        className={`w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left ${activeGroup?.id === group.id ? 'bg-secondary' : ''}`}
+   198→   997→   997→                      >
+   199→   998→   998→                        <div className="relative shrink-0">
+   200→   999→   999→                          <Avatar className="h-11 w-11">
+   201→  1000→  1000→                            <AvatarImage src={group.avatar || undefined} />
+   202→  1001→  1001→                            <AvatarFallback><Users className="w-5 h-5" /></AvatarFallback>
+   203→  1002→  1002→                          </Avatar>
+   204→  1003→  1003→                        </div>
+   205→  1004→  1004→                        <div className="flex-1 min-w-0">
+   206→  1005→  1005→                          <div className="flex items-center justify-between">
+   207→  1006→  1006→                            <span className="text-[13px] font-semibold truncate">{group.name}</span>
+   208→  1007→  1007→                            <span className="text-[10px] text-muted-foreground">{group._count?.members || 0} members</span>
+   209→  1008→  1008→                          </div>
+   210→  1009→  1009→                          <p className="text-[12px] text-muted-foreground truncate">{group.description || 'No description'}</p>
+   211→  1010→  1010→                        </div>
+   212→  1011→  1011→                      </button>
+   213→  1012→  1012→                    ))}
+   214→  1013→  1013→                  </>
+   215→  1014→  1014→                )}
+   216→  1015→  1015→                {conversations.length === 0 && groups.length === 0 && (
+   217→  1016→  1016→                  <p className="text-center text-muted-foreground text-sm py-12">No conversations yet</p>
+   218→  1017→  1017→                )}
+   219→  1018→  1018→              </>
+   220→  1019→  1019→            )}
+   221→  1020→  1020→          </div>
+   222→  1021→  1021→        </div>
+   223→  1022→  1022→
+   224→  1023→  1023→        {/* Chat Panel - full screen on mobile, side panel on desktop */}
+   225→  1024→  1024→        <div className={`${!showChatPanel ? 'hidden md:flex' : 'flex'} flex-1 flex-col`}
+   226→  1025→  1025→        >
+   227→  1026→  1026→          {activeConversation ? (
+   228→  1027→  1027→            <>
+   229→  1028→  1028→              {/* Chat header */}
+   230→  1029→  1029→              <div className="h-12 flex items-center gap-3 px-4 border-b border-border shrink-0">
+   231→  1030→  1030→                <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(activeConversation.otherUser)} /><AvatarFallback>{activeConversation.otherUser.displayName?.[0]}</AvatarFallback></Avatar>
+   232→  1031→  1031→                <div className="flex-1 min-w-0">
+   233→  1032→  1032→                  <p className="text-[13px] font-semibold truncate">{activeConversation.otherUser.displayName}</p>
+   234→  1033→  1033→                  <p className="text-[10px] text-muted-foreground">{activeConversation.otherUser.online ? 'Online' : 'Offline'}</p>
+   235→  1034→  1034→                </div>
+   236→  1035→  1035→                <button onClick={() => openProfile(activeConversation.otherUser.id)} className="p-1.5 hover:bg-secondary rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-muted-foreground" /></button>
+   237→  1036→  1036→              </div>
+   238→  1037→  1037→              {/* Messages */}
+   239→  1038→  1038→              <div className="flex-1 overflow-y-auto p-4 space-y-2">
+   240→  1039→  1039→                {messages.map(msg => (
+   241→  1040→  1040→                  <div key={msg.id} className={`flex ${msg.senderId === currentUser?.id ? 'justify-end' : 'justify-start'}`}>
+   242→  1041→  1041→                    <div className={`max-w-[75%] px-3.5 py-2 rounded-2xl text-[13px] leading-relaxed ${msg.senderId === currentUser?.id ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-secondary text-foreground rounded-bl-md'}`}>
+   243→  1042→  1042→                      {msg.content}
+   244→  1043→  1043→                      <div className={`flex items-center gap-1 mt-1 ${msg.senderId === currentUser?.id ? 'justify-end' : ''}`}>
+   245→  1044→  1044→                        <span className={`text-[10px] ${msg.senderId === currentUser?.id ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{timeAgo(msg.createdAt)}</span>
+   246→  1045→  1045→                        {msg.senderId === currentUser?.id && <CheckCheck className="w-3 h-3 text-primary-foreground/60" />}
+   247→  1046→  1046→                      </div>
+   248→  1047→  1047→                    </div>
+   249→  1048→  1048→                  </div>
+   250→  1049→  1049→                ))}
+   251→  1050→  1050→                {messages.length === 0 && <p className="text-center text-muted-foreground text-xs py-8">Start a conversation</p>}
+   252→  1051→  1051→                <div ref={msgEndRef} />
+   253→  1052→  1052→              </div>
+   254→  1053→  1053→              {/* Input */}
+   255→  1054→  1054→              <div className="p-3 border-t border-border flex items-center gap-2 shrink-0">
+   256→  1055→  1055→                <button className="p-2 text-muted-foreground hover:text-foreground transition-colors"><Paperclip className="w-5 h-5" /></button>
+   257→  1056→  1056→                <Input
+   258→  1057→  1057→                  value={msgInput}
+   259→  1058→  1058→                  onChange={e => setMsgInput(e.target.value)}
+   260→  1059→  1059→                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+   261→  1060→  1060→                  placeholder="Type a message..."
+   262→  1061→  1061→                  className="flex-1 bg-secondary border-border h-10 text-[13px]"
+   263→  1062→  1062→                />
+   264→  1063→  1063→                <Button onClick={sendMessage} size="icon" className="h-10 w-10 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0" disabled={!msgInput.trim()}>
+   265→  1064→  1064→                  <Send className="w-4 h-4" />
+   266→  1065→  1065→                </Button>
+   267→  1066→  1066→              </div>
+   268→  1067→  1067→            </>
+   269→  1068→  1068→          ) : activeGroup ? (
+   270→  1069→  1069→            <>
+   271→  1070→  1070→              {/* Group chat header */}
+   272→  1071→  1071→              <div className="h-12 flex items-center gap-3 px-4 border-b border-border shrink-0">
+   273→  1072→  1072→                <Avatar className="h-8 w-8"><AvatarImage src={activeGroup.avatar || undefined} /><AvatarFallback><Users className="w-4 h-4" /></AvatarFallback></Avatar>
+   274→  1073→  1073→                <div className="flex-1 min-w-0">
+   275→  1074→  1074→                  <p className="text-[13px] font-semibold truncate">{activeGroup.name}</p>
+   276→  1075→  1075→                  <p className="text-[10px] text-muted-foreground">{activeGroup._count?.members || 0} members</p>
+   277→  1076→  1076→                </div>
+   278→  1077→  1077→              </div>
+   279→  1078→  1078→              {/* Group messages */}
+   280→  1079→  1079→              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+   281→  1080→  1080→                {groupMessages.map(msg => (
+   282→  1081→  1081→                  <div key={msg.id} className={`flex ${msg.senderId === currentUser?.id ? 'justify-end' : 'justify-start'}`}>
+   283→  1082→  1082→                    <div className={`max-w-[75%] ${msg.senderId !== currentUser?.id ? '' : ''}`}>
+   284→  1083→  1083→                      {msg.senderId !== currentUser?.id && msg.sender && (
+   285→  1084→  1084→                        <p className="text-[10px] text-primary font-medium mb-0.5 ml-1">{msg.sender.displayName}</p>
+   286→  1085→  1085→                      )}
+   287→  1086→  1086→                      <div className={`px-3.5 py-2 rounded-2xl text-[13px] leading-relaxed ${msg.senderId === currentUser?.id ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-secondary text-foreground rounded-bl-md'}`}>
+   288→  1087→  1087→                        {msg.content}
+   289→  1088→  1088→                        <div className={`flex items-center gap-1 mt-1 ${msg.senderId === currentUser?.id ? 'justify-end' : ''}`}>
+   290→  1089→  1089→                          <span className={`text-[10px] ${msg.senderId === currentUser?.id ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{timeAgo(msg.createdAt)}</span>
+   291→  1090→  1090→                        </div>
+   292→  1091→  1091→                      </div>
+   293→  1092→  1092→                    </div>
+   294→  1093→  1093→                  </div>
+   295→  1094→  1094→                ))}
+   296→  1095→  1095→                {groupMessages.length === 0 && <p className="text-center text-muted-foreground text-xs py-8">No messages yet</p>}
+   297→  1096→  1096→                <div ref={msgEndRef} />
+   298→  1097→  1097→              </div>
+   299→  1098→  1098→              {/* Group input */}
+   300→  1099→  1099→              <div className="p-3 border-t border-border flex items-center gap-2 shrink-0">
+   301→  1100→  1100→                <Input
+   302→  1101→  1101→                  value={msgInput}
+   303→  1102→  1102→                  onChange={e => setMsgInput(e.target.value)}
+   304→  1103→  1103→                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendGroupMessage()}
+   305→  1104→  1104→                  placeholder={`Message ${activeGroup.name}...`}
+   306→  1105→  1105→                  className="flex-1 bg-secondary border-border h-10 text-[13px]"
+   307→  1106→  1106→                />
+   308→  1107→  1107→                <Button onClick={sendGroupMessage} size="icon" className="h-10 w-10 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0" disabled={!msgInput.trim()}>
+   309→  1108→  1108→                  <Send className="w-4 h-4" />
+   310→  1109→  1109→                </Button>
+   311→  1110→  1110→              </div>
+   312→  1111→  1111→            </>
+   313→  1112→  1112→          ) : (
+   314→  1113→  1113→            <div className="flex-1 hidden md:flex items-center justify-center">
+   315→  1114→  1114→              <div className="text-center space-y-2">
+   316→  1115→  1115→                <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto" />
+   317→  1116→  1116→                <p className="text-muted-foreground text-sm">Select a conversation to start chatting</p>
+   318→  1117→  1117→              </div>
+   319→  1118→  1118→            </div>
+   320→  1119→  1119→          )}
+   321→  1120→  1120→        </div>
+   322→  1121→  1121→      </div>
+   323→  1122→  1122→    );
+   324→  1123→  1123→  }
+   325→  1124→  1124→
+   326→  1125→  1125→  // ─── Likes View ────────────────────────────────────────────────────────────
+   327→  1126→  1126→  function LikesView() {
+   328→  1127→  1127→    const likesList = likesTab === 'received' ? receivedLikes : sentLikes;
+   329→  1128→  1128→    return (
+   330→  1129→  1129→      <div className="h-full flex flex-col">
+   331→  1130→  1130→        <div className="px-4 py-3 border-b border-border shrink-0">
+   332→  1131→  1131→          <Tabs value={likesTab} onValueChange={(v: any) => setLikesTab(v)}>
+   333→  1132→  1132→            <TabsList className="bg-secondary w-full h-9">
+   334→  1133→  1133→              <TabsTrigger value="received" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Received{receivedLikes.length > 0 && ` (${receivedLikes.length})`}</TabsTrigger>
+   335→  1134→  1134→              <TabsTrigger value="sent" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Sent</TabsTrigger>
+   336→  1135→  1135→            </TabsList>
+   337→  1136→  1136→          </Tabs>
+   338→  1137→  1137→        </div>
+   339→  1138→  1138→        <div className="flex-1 overflow-y-auto">
+   340→  1139→  1139→          {likesLoading ? (
+   341→  1140→  1140→            <div className="p-3 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="flex items-center gap-3 p-2"><Skeleton className="h-12 w-12 rounded-full" /><div className="space-y-1 flex-1"><Skeleton className="h-4 w-28" /><Skeleton className="h-3 w-16" /></div></div>)}</div>
+   342→  1141→  1141→          ) : likesList.length === 0 ? (
+   343→  1142→  1142→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+   344→  1143→  1143→              <Heart className="w-12 h-12 text-muted-foreground" />
+   345→  1144→  1144→              <p className="text-muted-foreground text-sm">No {likesTab} likes yet</p>
+   346→  1145→  1145→            </div>
+   347→  1146→  1146→          ) : (
+   348→  1147→  1147→            <div className="p-3 space-y-1">
+   349→  1148→  1148→              {likesList.map((like: Like) => {
+   350→  1149→  1149→                const otherUser = likesTab === 'received' ? like.sender : like.receiver;
+   351→  1150→  1150→                if (!otherUser) return null;
+   352→  1151→  1151→                return (
+   353→  1152→  1152→                  <div key={like.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+   354→  1153→  1153→                    <button onClick={() => openProfile(otherUser.id)}>
+   355→  1154→  1154→                      <Avatar className="h-12 w-12">
+   356→  1155→  1155→                        <AvatarImage src={getAvatar(otherUser)} />
+   357→  1156→  1156→                        <AvatarFallback>{otherUser.displayName?.[0]}</AvatarFallback>
+   358→  1157→  1157→                      </Avatar>
+   359→  1158→  1158→                    </button>
+   360→  1159→  1159→                    <div className="flex-1 min-w-0">
+   361→  1160→  1160→                      <button onClick={() => openProfile(otherUser.id)} className="text-[14px] font-semibold hover:text-primary transition-colors">{otherUser.displayName}</button>
+   362→  1161→  1161→                      <p className="text-[11px] text-muted-foreground">{timeAgo(like.createdAt)}</p>
+   363→  1162→  1162→                    </div>
+   364→  1163→  1163→                    {likesTab === 'received' && (
+   365→  1164→  1164→                      <div className="flex gap-1.5 shrink-0">
+   366→  1165→  1165→                        <Button size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90 text-xs" onClick={() => { handleLike(otherUser.id); }}>
+   367→  1166→  1166→                          <Heart className="w-3 h-3 mr-1" /> Like Back
+   368→  1167→  1167→                        </Button>
+   369→  1168→  1168→                        <Button size="sm" variant="ghost" className="h-8 text-xs text-muted-foreground hover:text-foreground" onClick={() => {}}>
+   370→  1169→  1169→                          Decline
+   371→  1170→  1170→                        </Button>
+   372→  1171→  1171→                      </div>
+   373→  1172→  1172→                    )}
+   374→  1173→  1173→                  </div>
+   375→  1174→  1174→                );
+   376→  1175→  1175→              })}
+   377→  1176→  1176→            </div>
+   378→  1177→  1177→          )}
+   379→  1178→  1178→        </div>
+   380→  1179→  1179→      </div>
+   381→  1180→  1180→    );
+   382→  1181→  1181→  }
+   383→  1182→  1182→
+   384→  1183→  1183→  // ─── Fansites View ─────────────────────────────────────────────────────────
+   385→  1184→  1184→  function FansitesView() {
+   386→  1185→  1185→    return (
+   387→  1186→  1186→      <div className="h-full flex flex-col">
+   388→  1187→  1187→        <div className="px-4 py-3 border-b border-border shrink-0">
+   389→  1188→  1188→          <h2 className="text-sm font-semibold">Fansites</h2>
+   390→  1189→  1189→          <p className="text-[11px] text-muted-foreground">Discover creators and subscribe</p>
+   391→  1190→  1190→        </div>
+   392→  1191→  1191→        <div className="flex-1 overflow-y-auto p-3">
+   393→  1192→  1192→          {fansiteLoading ? (
+   394→  1193→  1193→            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="space-y-2"><Skeleton className="h-40 w-full rounded-xl" /><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-24" /></div>)}</div>
+   395→  1194→  1194→          ) : fansites.length === 0 ? (
+   396→  1195→  1195→            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+   397→  1196→  1196→              <Star className="w-12 h-12 text-muted-foreground" />
+   398→  1197→  1197→              <p className="text-muted-foreground text-sm">No fansites yet</p>
+   399→  1198→  1198→            </div>
+   400→  1199→  1199→          ) : (
+
+[showing lines 1-400 of 402; use offset=401 with limit to continue reading]

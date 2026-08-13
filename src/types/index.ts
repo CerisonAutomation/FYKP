@@ -184,4 +184,15 @@ export interface Subscription {
   isActive: boolean;
 }
 
-export type TabId = 'discover' | 'chat' | 'likes' | 'fansites' | 'events' | 'profile';
+export interface ChatRequest {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  status: string;
+  message?: string;
+  createdAt: string;
+  sender?: User;
+  receiver?: User;
+}
+
+export type TabId = 'discover' | 'chat' | 'likes' | 'viewed' | 'fansites' | 'events' | 'profile';
