@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { io as socketIO, Socket } from 'socket.io-client';
 import { formatDistanceToNow, format, isToday, isThisWeek, isThisMonth } from 'date-fns';
 import { useAppStore } from '@/store/app';
@@ -160,6 +161,9 @@ const INFER_CATEGORIES: { id: InferCategory; label: string; icon: any; color: st
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face';
 const DEFAULT_COVER = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&h=400&fit=crop';
 const CURRENT_USER_ID = 'test-user-1';
+
+// Dynamically import Leaflet map (no SSR - requires window)
+const MapLeaflet = dynamic(() => import('@/components/MapViewComponent'), { ssr: false, loading: () => <div className="w-full h-full bg-secondary/30 animate-pulse" /> });
 
 // ═══════════════════════════════════════════════════════════════
 // HELPER COMPONENTS & FUNCTIONS
@@ -1145,6 +1149,8 @@ export default function NexusApp() {
 
   // ─── MAP VIEW ───────────────────────────────────────────────
   function MapView() {
+    const mapCenterLat = userLat || currentUser?.lat || 35.8989;
+    const mapCenterLng = userLng || currentUser?.lng || 14.5146;
     return (
       <div className="h-full flex flex-col">
         <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
@@ -1155,38 +1161,15 @@ export default function NexusApp() {
           <button onClick={() => setMapHidden(!mapHidden)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 ${mapHidden ? 'bg-destructive/20 text-destructive border-destructive/30' : 'bg-secondary text-muted-foreground border-border'}`}>{mapHidden ? '👁 Hidden' : '👁 Visible'}</button>
           <span className="ml-auto text-[11px] text-muted-foreground">{mapUsers.length} users</span>
         </div>
-        <div className="flex-1 relative bg-secondary/30">
-          {mapLoading ? <div className="absolute inset-0 flex items-center justify-center"><Skeleton className="w-full h-full" /></div> : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full h-full relative overflow-hidden" style={{ background: 'radial-gradient(circle at 50% 50%, oklch(0.22 0.01 285) 0%, oklch(0.15 0.005 285) 100%)' }}>
-                {/* Map grid lines */}
-                <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)"/></svg>
-                {/* Center marker */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-                  <div className="w-4 h-4 bg-primary rounded-full border-2 border-card shadow-lg"><div className="w-full h-full bg-primary rounded-full animate-ping opacity-50" /></div>
-                </div>
-                {/* User markers */}
-                {mapUsers.slice(0, 30).map((user, i) => {
-                  const angle = (i * 137.5 * Math.PI / 180);
-                  const dist = 20 + Math.random() * 35;
-                  const x = 50 + dist * Math.cos(angle);
-                  const y = 50 + dist * Math.sin(angle);
-                  return (
-                    <button key={user.id} onClick={() => openProfile(user.id)} className="absolute transform -translate-x-1/2 -translate-y-1/2 group" style={{ left: `${Math.min(Math.max(x, 5), 95)}%`, top: `${Math.min(Math.max(y, 5), 95)}%` }}>
-                      <div className="relative">
-                        <Avatar className="h-8 w-8 border-2 border-card shadow-lg group-hover:scale-125 transition-transform">
-                          <AvatarImage src={getAvatar(user)} /><AvatarFallback className="text-[8px]">{user.displayName?.[0]}</AvatarFallback>
-                        </Avatar>
-                        {user.online && user.showOnline && <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-card online-pulse" />}
-                        {user.distance != null && <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[8px] text-muted-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">{user.distance}km</span>}
-                      </div>
-                    </button>
-                  );
-                })}
-                {/* Radius circle */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/20" style={{ width: `${Math.min(mapRadius * 1.5, 80)}%`, height: `${Math.min(mapRadius * 1.5, 80)}%` }} />
-              </div>
+        <div className="flex-1 relative">
+          {mapLoading ? <div className="absolute inset-0 flex items-center justify-center"><Skeleton className="w-full h-full" /></div> : mapHidden ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/20 gap-3">
+              <MapPinOff className="w-12 h-12 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">Map hidden</p>
+              <p className="text-xs text-muted-foreground">Your location is not visible to others</p>
             </div>
+          ) : (
+            <MapLeaflet users={mapUsers} centerLat={mapCenterLat} centerLng={mapCenterLng} radius={mapRadius} onUserClick={openProfile} />
           )}
         </div>
       </div>
