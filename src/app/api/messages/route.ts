@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { receiverId, content, type, mediaUrl } = body;
+    const { receiverId, content, type, mediaUrl, expiresAt } = body;
 
     if (!receiverId || !content) {
       return NextResponse.json({ error: 'receiverId and content are required' }, { status: 400 });
@@ -81,6 +81,7 @@ export async function POST(request: NextRequest) {
         receiverId,
         type: type || 'text',
         mediaUrl: mediaUrl || null,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
       },
       include: {
         sender: {

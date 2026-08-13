@@ -1,0 +1,502 @@
+  1500→                        <h3 className="text-sm font-semibold">{event.title}</h3>
+  1501→                        {event.description && <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{event.description}</p>}
+  1502→                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-2">
+  1503→                          <span className="flex items-center gap-0.5"><Clock className="w-3 h-3" />{fmtDate(event.startDate)}</span>
+  1504→                          {event.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{truncate(event.location, 20)}</span>}
+  1505→                        </div>
+  1506→                      </div>
+  1507→                    </div>
+  1508→                    <div className="flex gap-1.5 mt-3">
+  1509→                      {(['going', 'maybe', 'interested', 'declined'] as const).map(status => (
+  1510→                        <button key={status} onClick={() => handleRsvp(event.id, status)}
+  1511→                          className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all ${userRsvps[event.id] === status ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1512→                          {status}
+  1513→                        </button>
+  1514→                      ))}
+  1515→                    </div>
+  1516→                  </CardContent>
+  1517→                </Card>
+  1518→              ))}
+  1519→          </div>
+  1520→        </ScrollArea>
+  1521→      </div>
+  1522→    );
+  1523→  }
+  1524→
+  1525→  // ─── VIEWED ME VIEW ────────────────────────────────────────
+  1526→  function ViewedMeView() {
+  1527→    if (viewsLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1528→    return (
+  1529→      <ScrollArea className="h-full">
+  1530→        <div className="p-4 space-y-1">
+  1531→          {profileViews.length === 0 ? <EmptyState icon={Eye} title="No profile views" desc="When someone views your profile, they'll appear here" />
+  1532→            : profileViews.map(view => view.viewer && (
+  1533→              <UserRow key={view.id} user={view.viewer} sub={<span>Viewed {timeAgo(view.createdAt)}</span>} onClick={() => openProfile(view.viewer.id)}
+  1534→                actions={<Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => openChat(view.viewer)}>Chat</Button>} />
+  1535→            ))}
+  1536→        </div>
+  1537→      </ScrollArea>
+  1538→    );
+  1539→  }
+  1540→
+  1541→  // ─── SHOUTS VIEW ───────────────────────────────────────────
+  1542→  function ShoutsView() {
+  1543→    if (shoutLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}</div>;
+  1544→    return (
+  1545→      <div className="h-full flex flex-col">
+  1546→        <ScrollArea className="flex-1">
+  1547→          <div className="p-4 space-y-4">
+  1548→            {/* Compose */}
+  1549→            <div className="p-3 rounded-xl bg-secondary border border-border space-y-2">
+  1550→              <Textarea value={shoutInput} onChange={e => setShoutInput(e.target.value)} placeholder="What's on your mind?" className="bg-background border-border text-sm resize-none" rows={2} />
+  1551→              <div className="flex items-center justify-between">
+  1552→                <div className="flex gap-1">
+  1553→                  <button onClick={() => setShoutType('text')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'text' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Text</button>
+  1554→                  <button onClick={() => setShoutType('image')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'image' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Image</button>
+  1555→                  <button onClick={() => setShoutType('video')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'video' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Video</button>
+  1556→                </div>
+  1557→                <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-3" onClick={handleShout} disabled={!shoutInput.trim()}><Megaphone className="w-3 h-3 mr-1" /> Shout</Button>
+  1558→              </div>
+  1559→              {/* Canned shouts */}
+  1560→              <div className="flex flex-wrap gap-1 pt-2 border-t border-border">
+  1561→                {CANNED_SHOUTS.map(cs => (
+  1562→                  <button key={cs.value} onClick={() => setShoutInput(cs.label)} className="px-2 py-1 rounded-full text-[10px] bg-background border border-border text-muted-foreground hover:border-primary/30 transition-all">
+  1563→                    {cs.emoji} {cs.label}
+  1564→                  </button>
+  1565→                ))}
+  1566→              </div>
+  1567→            </div>
+  1568→            {/* Feed */}
+  1569→            {shouts.length === 0 ? <EmptyState icon={Megaphone} title="No shouts yet" desc="Be the first to share something!" />
+  1570→              : shouts.map((shout: any) => (
+  1571→                <Card key={shout.id} className="bg-secondary border-border">
+  1572→                  <CardContent className="p-3">
+  1573→                    <div className="flex items-center gap-2 mb-2">
+  1574→                      <button onClick={() => shout.user && openProfile(shout.user.id)}><Avatar className="h-8 w-8"><AvatarImage src={getAvatar(shout.user)} /><AvatarFallback className="text-[10px]">{shout.user?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1575→                      <div className="flex-1 min-w-0">
+  1576→                        <p className="text-[12px] font-semibold">{shout.user?.displayName}</p>
+  1577→                        <p className="text-[10px] text-muted-foreground">{timeAgo(shout.createdAt)}</p>
+  1578→                      </div>
+  1579→                      <Badge className="text-[9px] bg-muted">{shout.type}</Badge>
+  1580→                    </div>
+  1581→                    <p className="text-[13px] leading-relaxed">{shout.content}</p>
+  1582→                    {shout.mediaUrl && <img src={shout.mediaUrl} alt="" className="mt-2 rounded-lg max-h-48 w-full object-cover" />}
+  1583→                  </CardContent>
+  1584→                </Card>
+  1585→              ))}
+  1586→          </div>
+  1587→        </ScrollArea>
+  1588→      </div>
+  1589→    );
+  1590→  }
+  1591→
+  1592→
+  1593→  // ─── FANSITES VIEW ──────────────────────────────────────────
+  1594→  function FansitesView() {
+  1595→    if (fansiteLoading) return <LoadingGrid />;
+  1596→    return (
+  1597→      <ScrollArea className="h-full">
+  1598→        <div className="p-4 space-y-3">
+  1599→          {fansites.length === 0 ? <EmptyState icon={Star} title="No fansites" desc="Creator pages will appear here" />
+  1600→            : fansites.map(fs => (
+  1601→              <Card key={fs.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => { setSelectedFansite(fs); setShowFansiteSheet(true); }}>
+  1602→                <div className="flex gap-3 p-3">
+  1603→                  <Avatar className="h-14 w-14 shrink-0"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-sm">{fs.user?.displayName?.[0]}</AvatarFallback></Avatar>
+  1604→                  <div className="flex-1 min-w-0">
+  1605→                    <div className="flex items-center gap-2">
+  1606→                      <h3 className="text-sm font-semibold truncate">{fs.name}</h3>
+  1607→                      {fs.status === 'active' && <Badge className="text-[9px] bg-green-400/20 text-green-400">Active</Badge>}
+  1608→                    </div>
+  1609→                    {fs.nick && <p className="text-[11px] text-muted-foreground">@{fs.nick}</p>}
+  1610→                    {fs.description && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{fs.description}</p>}
+  1611→                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-2">
+  1612→                      <span>{fs.links?.length || 0} links</span>
+  1613→                      <span>{fs.products?.length || 0} products</span>
+  1614→                    </div>
+  1615→                  </div>
+  1616→                </div>
+  1617→              </Card>
+  1618→            ))}
+  1619→        </div>
+  1620→      </ScrollArea>
+  1621→    );
+  1622→  }
+  1623→
+  1624→  function FansiteDetail() {
+  1625→    if (!selectedFansite) return null;
+  1626→    const fs = selectedFansite;
+  1627→    return (
+  1628→      <div className="space-y-4 p-4">
+  1629→        <div className="flex items-center gap-3">
+  1630→          <Avatar className="h-14 w-14"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-sm">{fs.user?.displayName?.[0]}</AvatarFallback></Avatar>
+  1631→          <div className="flex-1 min-w-0">
+  1632→            <h3 className="text-lg font-bold">{fs.name}</h3>
+  1633→            {fs.geoName && <p className="text-xs text-muted-foreground">{fs.geoName}</p>}
+  1634→          </div>
+  1635→          <Badge className={fs.status === 'active' ? 'bg-green-400/20 text-green-400' : 'bg-muted'}>{fs.status}</Badge>
+  1636→        </div>
+  1637→        {fs.description && <p className="text-sm text-muted-foreground">{fs.description}</p>}
+  1638→        {fs.trailerImageUrl && <img src={fs.trailerImageUrl} alt="" className="w-full rounded-xl" />}
+  1639→        {/* Links */}
+  1640→        {fs.links && fs.links.length > 0 && (
+  1641→          <div className="space-y-2">
+  1642→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Links</h4>
+  1643→            {fs.links.map(link => (
+  1644→              <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2.5 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all">
+  1645→                <ExternalLink className="w-4 h-4 text-primary shrink-0" />
+  1646→                <div className="flex-1 min-w-0"><p className="text-[12px] font-medium truncate">{link.label || link.type}</p><p className="text-[10px] text-muted-foreground truncate">{link.url}</p></div>
+  1647→              </a>
+  1648→            ))}
+  1649→          </div>
+  1650→        )}
+  1651→        {/* Products */}
+  1652→        {fs.products && fs.products.length > 0 && (
+  1653→          <div className="space-y-2">
+  1654→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Products</h4>
+  1655→            {fs.products.map(product => (
+  1656→              <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1657→                <div><p className="text-[12px] font-medium">{product.period}</p>{product.until && <p className="text-[10px] text-muted-foreground">Until {product.until}</p>}</div>
+  1658→                <div className="text-right">
+  1659→                  {product.priceOld && <p className="text-[10px] text-muted-foreground line-through">${product.priceOld}</p>}
+  1660→                  <p className="text-sm font-bold text-primary">${product.price}</p>
+  1661→                </div>
+  1662→              </div>
+  1663→            ))}
+  1664→          </div>
+  1665→        )}
+  1666→      </div>
+  1667→    );
+  1668→  }
+  1669→
+  1670→  // ─── VIDEOS VIEW ───────────────────────────────────────────
+  1671→  function VideosView() {
+  1672→    if (videosLoading) return <LoadingGrid />;
+  1673→    const filtered = videoSearch ? videos.filter((v: any) => v.title.toLowerCase().includes(videoSearch.toLowerCase())) : videos;
+  1674→    return (
+  1675→      <div className="h-full flex flex-col">
+  1676→        <div className="px-4 py-2 border-b border-border shrink-0">
+  1677→          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={videoSearch} onChange={e => setVideoSearch(e.target.value)} placeholder="Search videos..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1678→        </div>
+  1679→        <ScrollArea className="flex-1">
+  1680→          <div className="p-4 grid grid-cols-2 gap-3">
+  1681→            {filtered.length === 0 ? <div className="col-span-2"><EmptyState icon={Video} title="No videos" desc="Videos from the community will appear here" /></div>
+  1682→              : filtered.map((video: any) => (
+  1683→                <button key={video.id} className="rounded-xl overflow-hidden bg-secondary border border-border text-left group">
+  1684→                  <div className="aspect-video relative bg-card">
+  1685→                    {video.thumbnailUrl ? <img src={video.thumbnailUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Video className="w-8 h-8 text-muted-foreground" /></div>}
+  1686→                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><div className="w-10 h-10 rounded-full bg-primary/80 flex items-center justify-center"><Play className="w-5 h-5 text-primary-foreground fill-current ml-0.5" /></div></div>
+  1687→                    {video.duration && <Badge className="absolute bottom-1 right-1 text-[9px] bg-black/60">{Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}</Badge>}
+  1688→                  </div>
+  1689→                  <div className="p-2"><p className="text-[11px] font-medium truncate">{video.title}</p><p className="text-[10px] text-muted-foreground">{video.user?.displayName}</p></div>
+  1690→                </button>
+  1691→              ))}
+  1692→          </div>
+  1693→        </ScrollArea>
+  1694→      </div>
+  1695→    );
+  1696→  }
+  1697→
+  1698→  function Play(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>; }
+  1699→
+  1700→  // ─── BLOGS VIEW ─────────────────────────────────────────────
+  1701→  function BlogsView() {
+  1702→    if (blogsLoading) return <LoadingGrid cols={1} rows={3} />;
+  1703→    const filtered = blogSearch ? blogs.filter((b: any) => b.title.toLowerCase().includes(blogSearch.toLowerCase())) : blogs;
+  1704→    return (
+  1705→      <div className="h-full flex flex-col">
+  1706→        <div className="px-4 py-2 border-b border-border shrink-0">
+  1707→          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={blogSearch} onChange={e => setBlogSearch(e.target.value)} placeholder="Search blogs..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1708→        </div>
+  1709→        <ScrollArea className="flex-1">
+  1710→          <div className="p-4 space-y-3">
+  1711→            {filtered.length === 0 ? <EmptyState icon={FileText} title="No blogs" desc="Articles and stories will appear here" />
+  1712→              : filtered.map((blog: any) => (
+  1713→                <Card key={blog.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedBlog(blog)}>
+  1714→                  {blog.imageUrl && <img src={blog.imageUrl} alt="" className="w-full h-36 object-cover" />}
+  1715→                  <CardContent className="p-3">
+  1716→                    <h3 className="text-sm font-semibold">{blog.title}</h3>
+  1717→                    {blog.content && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{truncate(blog.content, 120)}</p>}
+  1718→                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-2">
+  1719→                      <span>{blog.user?.displayName}</span><span>·</span><span>{timeAgo(blog.createdAt)}</span>
+  1720→                    </div>
+  1721→                  </CardContent>
+  1722→                </Card>
+  1723→              ))}
+  1724→          </div>
+  1725→        </ScrollArea>
+  1726→      </div>
+  1727→    );
+  1728→  }
+  1729→
+  1730→  function BlogDetail() {
+  1731→    if (!selectedBlog) return null;
+  1732→    return (
+  1733→      <ScrollArea className="max-h-[70vh]">
+  1734→        <div className="space-y-4 p-4">
+  1735→          {selectedBlog.imageUrl && <img src={selectedBlog.imageUrl} alt="" className="w-full rounded-xl" />}
+  1736→          <h2 className="text-xl font-bold">{selectedBlog.title}</h2>
+  1737→          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+  1738→            <span>{selectedBlog.user?.displayName}</span><span>·</span><span>{fmtDate(selectedBlog.createdAt)}</span>
+  1739→          </div>
+  1740→          <Separator className="bg-border" />
+  1741→          <div className="text-sm leading-relaxed whitespace-pre-wrap">{selectedBlog.content}</div>
+  1742→        </div>
+  1743→      </ScrollArea>
+  1744→    );
+  1745→  }
+  1746→
+  1747→  // ─── GROUPS VIEW ───────────────────────────────────────────
+  1748→  function GroupsView() {
+  1749→    const filtered = groupSearch ? groups.filter((g: any) => g.name.toLowerCase().includes(groupSearch.toLowerCase())) : groups;
+  1750→    return (
+  1751→      <div className="h-full flex flex-col">
+  1752→        <div className="px-4 py-2 border-b border-border shrink-0 flex items-center gap-2">
+  1753→          <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={groupSearch} onChange={e => setGroupSearch(e.target.value)} placeholder="Search groups..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1754→          <Button size="sm" className="h-9 text-xs bg-primary text-primary-foreground shrink-0" onClick={() => setShowCreateGroup(true)}><Plus className="w-3.5 h-3.5 mr-1" /> New</Button>
+  1755→        </div>
+  1756→        <ScrollArea className="flex-1">
+  1757→          <div className="p-4 space-y-2">
+  1758→            {filtered.length === 0 ? <EmptyState icon={Users} title="No groups" desc="Create or join a group" />
+  1759→              : filtered.filter((g: any) => !g.hidden).map((group: any) => (
+  1760→                <Card key={group.id} className="bg-secondary border-border">
+  1761→                  <CardContent className="p-3">
+  1762→                    <div className="flex items-center gap-3">
+  1763→                      <Avatar className="h-11 w-11"><AvatarImage src={group.avatar} /><AvatarFallback className="text-xs">{group.name?.[0]}</AvatarFallback></Avatar>
+  1764→                      <div className="flex-1 min-w-0">
+  1765→                        <h3 className="text-[13px] font-semibold truncate">{group.name}</h3>
+  1766→                        <p className="text-[11px] text-muted-foreground">{group._count?.members || 0} members</p>
+  1767→                        {group.description && <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{group.description}</p>}
+  1768→                        {group.geoName && <Badge className="text-[9px] mt-1 bg-muted">{group.geoName}</Badge>}
+  1769→                      </div>
+  1770→                      <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => { setActiveGroup(group); setGroupMessages([]); setChatMobileView('chat'); setActiveTab('chat'); }}>Open</Button>
+  1771→                    </div>
+  1772→                  </CardContent>
+  1773→                </Card>
+  1774→              ))}
+  1775→          </div>
+  1776→        </ScrollArea>
+  1777→      </div>
+  1778→    );
+  1779→  }
+  1780→
+  1781→  // ─── ALBUMS VIEW ────────────────────────────────────────────
+  1782→  function AlbumsView() {
+  1783→    if (albumsLoading) return <LoadingGrid />;
+  1784→    return (
+  1785→      <ScrollArea className="h-full">
+  1786→        <div className="p-4 space-y-4">
+  1787→          {albums.length === 0 ? <EmptyState icon={ImageIcon} title="No albums" desc="Create albums to organize your photos" />
+  1788→            : albums.map(album => (
+  1789→              <Card key={album.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedAlbum(album)}>
+  1790→                <CardContent className="p-3">
+  1791→                  <div className="flex items-center gap-3">
+  1792→                    <div className="w-14 h-14 rounded-xl bg-card flex items-center justify-center overflow-hidden">
+  1793→                      {album.photos && album.photos[0] ? <img src={album.photos[0].url} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="w-6 h-6 text-muted-foreground" />}
+  1794→                    </div>
+  1795→                    <div className="flex-1 min-w-0">
+  1796→                      <h3 className="text-sm font-semibold">{album.name}</h3>
+  1797→                      <p className="text-[11px] text-muted-foreground">{album.photos?.length || 0} photos</p>
+  1798→                      {album.isPrivate && <Badge className="text-[9px] mt-1 bg-yellow-500/20 text-yellow-400"><Lock className="w-2.5 h-2.5 mr-0.5" /> Private</Badge>}
+  1799→                    </div>
+  1800→                  </div>
+  1801→                </CardContent>
+  1802→              </Card>
+  1803→            ))}
+  1804→        </div>
+  1805→      </ScrollArea>
+  1806→    );
+  1807→  }
+  1808→
+  1809→  function AlbumDetail() {
+  1810→    if (!selectedAlbum) return null;
+  1811→    return (
+  1812→      <ScrollArea className="max-h-[70vh]">
+  1813→        <div className="p-4 space-y-3">
+  1814→          <h3 className="text-lg font-bold">{selectedAlbum.name}</h3>
+  1815→          <div className="grid grid-cols-3 gap-2">
+  1816→            {(selectedAlbum.photos || []).map((photo: any) => (
+  1817→              <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-card">
+  1818→                <img src={photo.url} alt="" className="w-full h-full object-cover" />
+  1819→              </div>
+  1820→            ))}
+  1821→            {(!selectedAlbum.photos || selectedAlbum.photos.length === 0) && <p className="col-span-3 text-sm text-muted-foreground text-center py-8">No photos in this album</p>}
+  1822→          </div>
+  1823→        </div>
+  1824→      </ScrollArea>
+  1825→    );
+  1826→  }
+  1827→
+  1828→  // ─── MEMBERSHIP VIEW ───────────────────────────────────────
+  1829→  function MembershipView() {
+  1830→    return (
+  1831→      <ScrollArea className="h-full">
+  1832→        <div className="p-4 space-y-6">
+  1833→          <div className="text-center space-y-1">
+  1834→            <h2 className="text-lg font-bold gradient-text">Choose Your Plan</h2>
+  1835→            <p className="text-xs text-muted-foreground">Unlock premium features and stand out</p>
+  1836→          </div>
+  1837→          <div className="grid gap-3">
+  1838→            {SUBSCRIPTION_TIERS.map(tier => (
+  1839→              <Card key={tier.tier} className={`bg-secondary border ${tier.popular ? 'border-primary' : 'border-border'} relative overflow-hidden`}>
+  1840→                {tier.popular && <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">POPULAR</div>}
+  1841→                <CardContent className="p-4">
+  1842→                  <div className="flex items-center gap-3 mb-3">
+  1843→                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center`}><Crown className="w-5 h-5 text-white" /></div>
+  1844→                    <div><h3 className="text-base font-bold">{tier.label}</h3><p className="text-xs text-muted-foreground">{tier.price === 0 ? 'Free forever' : `$${tier.price}/month`}</p></div>
+  1845→                  </div>
+  1846→                  <ul className="space-y-1.5">
+  1847→                    {tier.features.map((f, i) => (
+  1848→                      <li key={i} className="flex items-center gap-2 text-[12px]"><Check className="w-3 h-3 text-primary shrink-0" /><span className="text-muted-foreground">{f}</span></li>
+  1849→                    ))}
+  1850→                  </ul>
+  1851→                  <Button className={`w-full mt-4 h-9 text-xs ${tier.popular ? 'bg-primary text-primary-foreground' : 'border border-border bg-card'}`} onClick={() => {}}>
+  1852→                    {tier.price === 0 ? 'Current Plan' : 'Upgrade'}
+  1853→                  </Button>
+  1854→                </CardContent>
+  1855→              </Card>
+  1856→            ))}
+  1857→          </div>
+  1858→        </div>
+  1859→      </ScrollArea>
+  1860→    );
+  1861→  }
+  1862→
+  1863→  // ─── VERIFIED VIEW ─────────────────────────────────────────
+  1864→  function VerifiedView() {
+  1865→    const verTypes = ['age', 'photo', 'id', 'face', 'social'] as const;
+  1866→    return (
+  1867→      <ScrollArea className="h-full">
+  1868→        <div className="p-4 space-y-6">
+  1869→          {/* Status */}
+  1870→          <div className="flex items-center gap-4 p-4 rounded-xl bg-secondary border border-border">
+  1871→            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+  1872→              {myVerification?.status === 'verified' ? <ShieldCheck className="w-7 h-7 text-green-400" /> : <Shield className="w-7 h-7 text-muted-foreground" />}
+  1873→            </div>
+  1874→            <div>
+  1875→              <h3 className="text-base font-bold">{myVerification?.status === 'verified' ? 'Verified ✓' : myVerification?.status === 'pending' ? 'Pending Review' : 'Not Verified'}</h3>
+  1876→              <p className="text-xs text-muted-foreground">{myVerification?.status === 'verified' ? 'Your account is verified' : 'Get verified to increase trust and visibility'}</p>
+  1877→            </div>
+  1878→          </div>
+  1879→          {/* Verification types */}
+  1880→          <div className="space-y-3">
+  1881→            <h4 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Verification Methods</h4>
+  1882→            {verTypes.map(type => (
+  1883→              <div key={type} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1884→                <div className="flex items-center gap-3">
+  1885→                  <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center"><Fingerprint className="w-4 h-4 text-primary" /></div>
+  1886→                  <div><p className="text-[12px] font-medium capitalize">{type} Verification</p><p className="text-[10px] text-muted-foreground">Verify your {type}</p></div>
+  1887→                </div>
+  1888→                <Button size="sm" variant="outline" className="h-7 text-[10px] border-border" onClick={async () => {
+  1889→                  if (!currentUser) return;
+  1890→                  try { await fetch(`/api/verification?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type }) }); } catch {}
+  1891→                }}>Submit</Button>
+  1892→              </div>
+  1893→            ))}
+  1894→          </div>
+  1895→        </div>
+  1896→      </ScrollArea>
+  1897→    );
+  1898→  }
+  1899→
+  1900→  // ─── PROFESSIONAL VIEW ─────────────────────────────────────
+  1901→  function ProfessionalView() {
+  1902→    return (
+  1903→      <ScrollArea className="h-full">
+  1904→        <div className="p-4 space-y-6">
+  1905→          <div className="flex items-center gap-4 p-4 rounded-xl bg-secondary border border-border">
+  1906→            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center"><Briefcase className="w-7 h-7 text-white" /></div>
+  1907→            <div>
+  1908→              <h3 className="text-base font-bold">Professional Account</h3>
+  1909→              <p className="text-xs text-muted-foreground">Monetize your content and grow your audience</p>
+  1910→            </div>
+  1911→          </div>
+  1912→          <Card className="bg-secondary border-border">
+  1913→            <CardContent className="p-4 space-y-3">
+  1914→              <h4 className="text-sm font-semibold">Requirements</h4>
+  1915→              <ul className="space-y-2 text-[12px] text-muted-foreground">
+  1916→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Verified account</li>
+  1917→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Active profile for 30+ days</li>
+  1918→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />10+ profile photos</li>
+  1919→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Clean community record</li>
+  1920→              </ul>
+  1921→              <Button className="w-full bg-primary text-primary-foreground text-xs" onClick={() => {}}>Apply for Professional</Button>
+  1922→            </CardContent>
+  1923→          </Card>
+  1924→        </div>
+  1925→      </ScrollArea>
+  1926→    );
+  1927→  }
+  1928→
+  1929→  // ─── FOOTPRINTS VIEW ───────────────────────────────────────
+  1930→  function FootprintsView() {
+  1931→    if (footprintsLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1932→    return (
+  1933→      <ScrollArea className="h-full">
+  1934→        <div className="p-4 space-y-1">
+  1935→          {footprints.length === 0 ? <EmptyState icon={FootprintsIcon} title="No footprints" desc="Profiles you visit will appear here" />
+  1936→            : footprints.map((fp: any) => fp.target && (
+  1937→              <UserRow key={fp.id} user={fp.target} sub={<span>Visited {timeAgo(fp.createdAt)}</span>} onClick={() => openProfile(fp.target.id)} />
+  1938→            ))}
+  1939→        </div>
+  1940→      </ScrollArea>
+  1941→    );
+  1942→  }
+  1943→
+  1944→
+  1945→  // ─── NOTES VIEW ────────────────────────────────────────────
+  1946→  function NotesView() {
+  1947→    return (
+  1948→      <ScrollArea className="h-full">
+  1949→        <div className="p-4 space-y-4">
+  1950→          <div className="flex items-center justify-between">
+  1951→            <h3 className="text-sm font-semibold">My Notes ({notes.length})</h3>
+  1952→            <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={() => { setNoteTargetId(''); setNoteContent(''); setShowNoteDialog(true); }}><Plus className="w-3.5 h-3.5 mr-1" /> Add</Button>
+  1953→          </div>
+  1954→          {notes.length === 0 ? <EmptyState icon={StickyNote} title="No notes" desc="Add notes to user profiles to remember details" />
+  1955→            : notes.map((note: any) => (
+  1956→              <Card key={note.id} className="bg-secondary border-border">
+  1957→                <CardContent className="p-3">
+  1958→                  <div className="flex items-center justify-between mb-1">
+  1959→                    <div className="flex items-center gap-2">
+  1960→                      {note.target && <button onClick={() => openProfile(note.target.id)} className="text-[12px] font-semibold hover:text-primary">{note.target.displayName}</button>}
+  1961→                      <Badge className="text-[9px] bg-muted">{note.type}</Badge>
+  1962→                    </div>
+  1963→                    <div className="flex gap-1">
+  1964→                      <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" onClick={() => handleDeleteNote(note.id)}><X className="w-3 h-3" /></Button>
+  1965→                    </div>
+  1966→                  </div>
+  1967→                  <p className="text-[12px] text-muted-foreground">{note.content}</p>
+  1968→                  <p className="text-[10px] text-muted-foreground mt-1">{timeAgo(note.createdAt)}</p>
+  1969→                </CardContent>
+  1970→              </Card>
+  1971→            ))}
+  1972→        </div>
+  1973→      </ScrollArea>
+  1974→    );
+  1975→  }
+  1976→
+  1977→  // ─── BOOSTS VIEW ────────────────────────────────────────────
+  1978→  function BoostsView() {
+  1979→    if (boostsLoading) return <LoadingGrid cols={1} rows={3} />;
+  1980→    const activeBoosts = allBoosts.filter((b: any) => b.isActive);
+  1981→    return (
+  1982→      <ScrollArea className="h-full">
+  1983→        <div className="p-4 space-y-6">
+  1984→          {/* Active boosts */}
+  1985→          <div className="space-y-3">
+  1986→            <SectionHeader icon={Zap} label="Active Boosts" count={activeBoosts.length} />
+  1987→            {activeBoosts.length === 0 ? <p className="text-xs text-muted-foreground">No active boosts</p>
+  1988→              : activeBoosts.map((boost: any) => (
+  1989→                <div key={boost.id} className="p-3 rounded-xl bg-secondary border border-border boost-glow">
+  1990→                  <div className="flex items-center justify-between mb-2">
+  1991→                    <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-primary" /><span className="text-[12px] font-semibold capitalize">{boost.type} Boost</span></div>
+  1992→                    <Badge className="bg-green-400/20 text-green-400 text-[9px]">Active</Badge>
+  1993→                  </div>
+  1994→                  <Progress value={boost.duration > 0 ? 50 : 100} className="h-1.5" />
+  1995→                  <p className="text-[10px] text-muted-foreground mt-1">Ends {timeAgo(boost.endsAt)}</p>
+  1996→                </div>
+  1997→              ))}
+  1998→          </div>
+  1999→          {/* Purchase */}
+
+[showing lines 1500-1999 of 2979; use offset=2000 with limit to continue reading]

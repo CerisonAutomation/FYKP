@@ -3,32 +3,37 @@ import { db } from '@/lib/db';
 
 interface VoiceBody {
   receiverId: string;
+  audioData: string;
   duration: number;
   chatType?: string;
   groupId?: string;
 }
 
-// POST /api/chat/voice - simulate voice message creation (stores a placeholder)
+// POST /api/chat/voice - create a voice message with real audio data
 export async function POST(request: NextRequest) {
   try {
     const body: VoiceBody = await request.json();
-    const { receiverId, duration, chatType, groupId } = body;
+    const { receiverId, audioData, duration, chatType, groupId } = body;
 
-    if (!receiverId || !duration) {
+    if (!receiverId || !audioData || !duration) {
       return NextResponse.json(
-        { error: 'receiverId and duration are required' },
+        { error: 'receiverId, audioData, and duration are required' },
         { status: 400 }
       );
     }
 
+    const mediaUrl = audioData.startsWith('data:')
+      ? audioData
+      : `data:audio/webm;base64,${audioData}`;
+
     const message = await db.message.create({
       data: {
-        content: '🎤 Voice message',
+        content: `Voice message (${duration}s)`,
         senderId: 'test-user-1',
         receiverId,
         type: 'audio',
         voiceDuration: duration,
-        mediaUrl: 'voice-placeholder://' + Date.now(),
+        mediaUrl,
         chatType: chatType || 'direct',
         groupId: groupId || null,
       },

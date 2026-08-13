@@ -1,13 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-// GET /api/discover - returns users for the discover grid (nearby, shuffled, with photos)
+// Haversine distance formula (returns km)
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// GET /api/discover - returns users for the discover grid with real haversine distances
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '30');
     const page = parseInt(searchParams.get('page') || '1');
     const skip = (page - 1) * limit;
+    const refLat = parseFloat(searchParams.get('lat') || '35.8969');
+    const refLng = parseFloat(searchParams.get('lng') || '14.4425');
 
     const users = await db.user.findMany({
       where: {
@@ -48,19 +63,21 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Shuffle for discover feed and add distance
-    const shuffled = users.sort(() => Math.random() - 0.5).map((user) => {
-      let distance: number | null = null;
-      if (user.lat && user.lng) {
-        distance = Math.floor(Math.random() * 50) + 1;
-      }
+    // Shuffle for discover feed and calculate real haversine distance
+    const shuffled = users
+      .sort(() => Math.random() - 0.5)
+      .map((user) => {
+        let distance: number | null = null;
+        if (user.lat && user.lng) {
+          distance = Math.round(haversine(refLat, refLng, user.lat, user.lng) * 10) / 10;
+        }
 
-      return {
-        ...user,
-        distance,
-        lastSeen: user.lastSeen.toISOString(),
-      };
-    });
+        return {
+          ...user,
+          distance,
+          lastSeen: user.lastSeen.toISOString(),
+        };
+      });
 
     return NextResponse.json({
       data: shuffled,

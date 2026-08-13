@@ -1,0 +1,502 @@
+   500→      .catch(() => {}).finally(() => setDiscoverLoading(false));
+   501→  }, [authed, refreshDiscover]);
+   502→
+   503→  // Conversations + Groups + Chat Requests
+   504→  useEffect(() => {
+   505→    if (!authed || (activeTab !== 'chat' && activeTab !== 'more')) return;
+   506→    setChatLoading(true);
+   507→    Promise.all([
+   508→      fetch('/api/messages/conversations').then(r => r.json()),
+   509→      fetch('/api/groups').then(r => r.json()),
+   510→      fetch('/api/chat-requests').then(r => r.json()).catch(() => ({ data: [] })),
+   511→    ]).then(([convRes, groupRes, reqRes]) => {
+   512→      const convos = convRes.data || [];
+   513→      setConversations(convos);
+   514→      setGroups(groupRes.data || []);
+   515→      setTotalUnread(convos.reduce((sum: number, c: any) => sum + (c.unreadCount || 0), 0));
+   516→      const reqs = reqRes.data || [];
+   517→      const pending = reqs.filter((r: ChatRequest) => r.status === 'pending');
+   518→      setChatRequests(pending);
+   519→      setPendingRequestCount(pending.length);
+   520→    }).catch(() => {}).finally(() => setChatLoading(false));
+   521→  }, [authed, activeTab]);
+   522→
+   523→  // Kinks / Profile Data
+   524→  useEffect(() => {
+   525→    if (!authed || activeTab !== 'kinks') return;
+   526→    setKinkLoading(true);
+   527→    fetch('/api/profile-data?userId=test-user-1').then(r => r.json()).then(res => {
+   528→      const fields: Record<string, string> = {};
+   529→      (res.data || []).forEach((f: any) => { fields[f.key] = f.value; });
+   530→      setKinkFields(fields);
+   531→    }).catch(() => {}).finally(() => setKinkLoading(false));
+   532→  }, [authed, activeTab]);
+   533→
+   534→  // PWA install prompt
+   535→  useEffect(() => {
+   536→    const handler = () => setIsOnline(true);
+   537→    const offHandler = () => setIsOnline(false);
+   538→    window.addEventListener('online', handler);
+   539→    window.addEventListener('offline', offHandler);
+   540→    return () => { window.removeEventListener('online', handler); window.removeEventListener('offline', offHandler); };
+   541→  }, []);
+   542→
+   543→  // Likes
+   544→  useEffect(() => {
+   545→    if (!authed || activeTab !== 'likes') return;
+   546→    setLikesLoading(true);
+   547→    Promise.all([
+   548→      fetch('/api/likes?type=received').then(r => r.json()),
+   549→      fetch('/api/likes?type=sent').then(r => r.json()),
+   550→    ]).then(([recRes, sentRes]) => {
+   551→      setReceivedLikes(recRes.data || []);
+   552→      setSentLikes(sentRes.data || []);
+   553→    }).catch(() => {}).finally(() => setLikesLoading(false));
+   554→  }, [authed, activeTab]);
+   555→
+   556→  // Profile Views
+   557→  useEffect(() => {
+   558→    if (!authed || activeTab !== 'viewed') return;
+   559→    setViewsLoading(true);
+   560→    fetch('/api/profile-views').then(r => r.json()).then(res => setProfileViews(res.data || [])).catch(() => {}).finally(() => setViewsLoading(false));
+   561→  }, [authed, activeTab]);
+   562→
+   563→  // Fansites
+   564→  useEffect(() => {
+   565→    if (!authed || activeTab !== 'fansites') return;
+   566→    setFansiteLoading(true);
+   567→    fetch('/api/fansites').then(r => r.json()).then(res => setFansites(res.data || [])).catch(() => {}).finally(() => setFansiteLoading(false));
+   568→  }, [authed, activeTab]);
+   569→
+   570→  // Events
+   571→  useEffect(() => {
+   572→    if (!authed || activeTab !== 'events') return;
+   573→    setEventsLoading(true);
+   574→    fetch('/api/events/upcoming').then(r => r.json()).then(res => setEvents(res.data || [])).catch(() => {}).finally(() => setEventsLoading(false));
+   575→  }, [authed, activeTab]);
+   576→
+   577→  // Shouts
+   578→  useEffect(() => {
+   579→    if (!authed || activeTab !== 'shouts') return;
+   580→    setShoutLoading(true);
+   581→    fetch('/api/shouts').then(r => r.json()).then(res => setShouts(res.data || [])).catch(() => {}).finally(() => setShoutLoading(false));
+   582→  }, [authed, activeTab]);
+   583→
+   584→  // Map
+   585→  useEffect(() => {
+   586→    if (!authed || activeTab !== 'map') return;
+   587→    handleFetchMap();
+   588→  }, [authed, activeTab, mapRadius]);
+   589→
+   590→  // Videos
+   591→  useEffect(() => {
+   592→    if (!authed || activeTab !== 'videos') return;
+   593→    setVideosLoading(true);
+   594→    fetch('/api/videos').then(r => r.json()).then(res => setVideos(res.videos || [])).catch(() => {}).finally(() => setVideosLoading(false));
+   595→  }, [authed, activeTab]);
+   596→
+   597→  // Blogs
+   598→  useEffect(() => {
+   599→    if (!authed || activeTab !== 'blogs') return;
+   600→    setBlogsLoading(true);
+   601→    fetch('/api/blogs').then(r => r.json()).then(res => setBlogs(res.blogs || [])).catch(() => {}).finally(() => setBlogsLoading(false));
+   602→  }, [authed, activeTab]);
+   603→
+   604→  // Banners
+   605→  useEffect(() => {
+   606→    fetch('/api/banners').then(r => r.json()).then(res => setBanners(res.data || [])).catch(() => {});
+   607→  }, [authed]);
+   608→
+   609→  // Profile drawer
+   610→  useEffect(() => {
+   611→    if (!selectedUserId) return;
+   612→    setProfileLoading(true);
+   613→    fetch(`/api/users/${selectedUserId}`).then(r => r.json()).then(res => {
+   614→      const u = res.data;
+   615→      setProfileUser(u);
+   616→      setProfilePhotos(u.photos || []);
+   617→      setProfileAlbums(u.albums || []);
+   618→      setRizzTargetBio(u.bio || '');
+   619→    }).catch(() => {}).finally(() => setProfileLoading(false));
+   620→  }, [selectedUserId]);
+   621→
+   622→  // My profile data
+   623→  useEffect(() => {
+   624→    if (!authed || !currentUser || activeTab !== 'profile') return;
+   625→    Promise.all([
+   626→      fetch(`/api/users/${currentUser.id}`).then(r => r.json()),
+   627→      fetch('/api/subscriptions').then(r => r.json()),
+   628→      fetch('/api/boosts').then(r => r.json()),
+   629→      fetch('/api/blocks').then(r => r.json()),
+   630→      fetch('/api/verification?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: null })),
+   631→      fetch('/api/sessions?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+   632→      fetch('/api/favorites?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+   633→      fetch('/api/notes?writerId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+   634→    ]).then(([userRes, subRes, boostRes, blockRes, verRes, sessRes, favRes, noteRes]) => {
+   635→      const u = userRes.data;
+   636→      setCurrentUser(u);
+   637→      setMySubscriptions(subRes.data || []);
+   638→      setMyBoosts((boostRes.data || []).filter((b: any) => b.isActive));
+   639→      setBlockedUsers(blockRes.data || []);
+   640→      setSettingsPrivacy({ showOnline: u.showOnline ?? true, showDistance: u.showDistance ?? true, showAge: u.showAge ?? true });
+   641→      setMyVerification(verRes.data || null);
+   642→      setMySessions(sessRes.data || []);
+   643→      setFavorites(favRes.data || []);
+   644→      setNotes(noteRes.data || []);
+   645→    }).catch(() => {});
+   646→  }, [authed, activeTab]);
+   647→
+   648→  // Footprints
+   649→  useEffect(() => {
+   650→    if (!authed || activeTab !== 'footprints') return;
+   651→    setFootprintsLoading(true);
+   652→    fetch('/api/footprints?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setFootprints(res.data || [])).catch(() => {}).finally(() => setFootprintsLoading(false));
+   653→  }, [authed, activeTab]);
+   654→
+   655→  // Favorites
+   656→  useEffect(() => {
+   657→    if (!authed || activeTab !== 'favorites') return;
+   658→    setFavoritesLoading(true);
+   659→    fetch('/api/favorites?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setFavorites(res.data || [])).catch(() => {}).finally(() => setFavoritesLoading(false));
+   660→  }, [authed, activeTab]);
+   661→
+   662→  // Notes
+   663→  useEffect(() => {
+   664→    if (!authed || activeTab !== 'notes') return;
+   665→    fetch('/api/notes?writerId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setNotes(res.data || [])).catch(() => {});
+   666→  }, [authed, activeTab]);
+   667→
+   668→  // Boosts
+   669→  useEffect(() => {
+   670→    if (!authed || activeTab !== 'boosts') return;
+   671→    setBoostsLoading(true);
+   672→    fetch('/api/boosts?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setAllBoosts(res.data || [])).catch(() => {}).finally(() => setBoostsLoading(false));
+   673→  }, [authed, activeTab]);
+   674→
+   675→  // Albums
+   676→  useEffect(() => {
+   677→    if (!authed || activeTab !== 'albums') return;
+   678→    setAlbumsLoading(true);
+   679→    fetch('/api/albums?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setAlbums(res.data || [])).catch(() => {}).finally(() => setAlbumsLoading(false));
+   680→  }, [authed, activeTab]);
+   681→
+   682→  // Groups
+   683→  useEffect(() => {
+   684→    if (!authed || activeTab !== 'groups') return;
+   685→    fetch('/api/groups').then(r => r.json()).then(res => setGroups(res.data || [])).catch(() => {});
+   686→  }, [authed, activeTab]);
+   687→
+   688→  // Messages scroll
+   689→  useEffect(() => { msgEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, groupMessages]);
+   690→
+   691→  // ═══════════════════════════════════════════════════════════════
+   692→  // HANDLERS
+   693→  // ═══════════════════════════════════════════════════════════════
+   694→
+   695→  const openProfile = useCallback((userId: string) => setSelectedUserId(userId), []);
+   696→  const closeProfile = useCallback(() => { setShowProfileDrawer(false); setSelectedUserId(null); setProfileUser(null); }, []);
+   697→
+   698→  const openChat = useCallback(async (otherUser: User) => {
+   699→    const convo: Conversation = {
+   700→      otherUser,
+   701→      lastMessage: { id: '', content: '', senderId: '', receiverId: '', chatType: 'direct', isRead: true, type: 'text', createdAt: new Date().toISOString() },
+   702→      unreadCount: 0,
+   703→    };
+   704→    setActiveConversation(convo);
+   705→    setMessages([]);
+   706→    setChatMobileView('chat');
+   707→    if (currentUser) {
+   708→      fetch(`/api/messages?userId=${otherUser.id}`).then(r => r.json()).then(res => setMessages(res.data || [])).catch(() => {});
+   709→    }
+   710→  }, [currentUser]);
+   711→
+   712→  const sendMessage = useCallback(() => {
+   713→    if (!msgInput.trim() || !activeConversation || !currentUser) return;
+   714→    const content = msgInput.trim();
+   715→    setMsgInput('');
+   716→    const optimisticMsg: Message = { id: `temp-${Date.now()}`, content, senderId: currentUser.id, receiverId: activeConversation.otherUser.id, chatType: 'direct', isRead: false, type: 'text', createdAt: new Date().toISOString() };
+   717→    addMessage(optimisticMsg);
+   718→    fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ receiverId: activeConversation.otherUser.id, content, type: 'text' }) })
+   719→      .then(r => r.json()).then(res => { if (res.data) { setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? res.data : m)); socketRef.current?.emit('message', res.data); } }).catch(() => {});
+   720→  }, [msgInput, activeConversation, currentUser]);
+   721→
+   722→  const sendGroupMessage = useCallback(() => {
+   723→    if (!msgInput.trim() || !activeGroup || !currentUser) return;
+   724→    const content = msgInput.trim();
+   725→    setMsgInput('');
+   726→    const optimisticMsg: Message = { id: `temp-${Date.now()}`, content, senderId: currentUser.id, receiverId: '', chatType: 'group', isRead: false, type: 'text', createdAt: new Date().toISOString(), sender: currentUser };
+   727→    setGroupMessages(prev => [...prev, optimisticMsg]);
+   728→    fetch(`/api/groups/${activeGroup.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'message', content }) }).catch(() => {});
+   729→  }, [msgInput, activeGroup, currentUser]);
+   730→
+   731→  const handleLike = useCallback(async (receiverId: string) => {
+   732→    try { await fetch('/api/likes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ receiverId }) }); triggerRefreshDiscover(); } catch {}
+   733→  }, []);
+   734→
+   735→  const handleUnlike = useCallback(async (receiverId: string) => {
+   736→    try { await fetch(`/api/likes?receiverId=${receiverId}`, { method: 'DELETE' }); triggerRefreshDiscover(); } catch {}
+   737→  }, []);
+   738→
+   739→  const handleBlock = useCallback(async (userId: string) => {
+   740→    try { await fetch('/api/blocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blockedId: userId }) }); setShowBlockAlert(false); closeProfile(); } catch {}
+   741→  }, [closeProfile]);
+   742→
+   743→  const handleRizz = useCallback(async () => {
+   744→    setRizzLoading(true); setRizzResult(null);
+   745→    try {
+   746→      const res = await fetch('/api/ai-rizz', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetBio: rizzTargetBio, style: rizzStyle }) });
+   747→      const data = await res.json();
+   748→      setRizzResult(data.data);
+   749→    } catch { setRizzResult({ line: 'Failed to generate. Try again!', style: rizzStyle }); } finally { setRizzLoading(false); }
+   750→  }, [rizzTargetBio, rizzStyle]);
+   751→
+   752→  const copyRizz = useCallback(() => { if (rizzResult?.line) navigator.clipboard.writeText(rizzResult.line); }, [rizzResult]);
+   753→
+   754→  const handleSendRizz = useCallback(() => {
+   755→    if (!rizzResult || !activeConversation && !profileUser) return;
+   756→    if (activeConversation) { setMsgInput(rizzResult.line); setShowRizzModal(false); }
+   757→    else if (profileUser) { openChat(profileUser); setTimeout(() => { setMsgInput(rizzResult.line); setShowRizzModal(false); }, 300); }
+   758→  }, [rizzResult, activeConversation, profileUser, openChat]);
+   759→
+   760→  const handleRsvp = useCallback(async (eventId: string, status: string) => {
+   761→    try { await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'rsvp', eventId, status }) }); setUserRsvps(prev => ({ ...prev, [eventId]: status })); } catch {}
+   762→  }, []);
+   763→
+   764→  const handleCreateEvent = useCallback(async () => {
+   765→    try {
+   766→      const res = await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(eventForm) });
+   767→      if (res.ok) { const data = await res.json(); setEvents(prev => [data.data, ...prev]); setShowCreateEvent(false); setEventForm({ title: '', description: '', location: '', startDate: '', imageUrl: '' }); }
+   768→    } catch {}
+   769→  }, [eventForm]);
+   770→
+   771→  const handleSaveProfile = useCallback(async () => {
+   772→    if (!currentUser) return;
+   773→    try {
+   774→      const payload: any = {};
+   775→      for (const [k, v] of Object.entries(editForm)) { if (v !== '' && v !== undefined) { if (k === 'height' || k === 'weight') payload[k] = parseInt(v); else payload[k] = v; } }
+   776→      const res = await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+   777→      if (res.ok) { const data = await res.json(); setCurrentUser(data.data); setEditingProfile(false); }
+   778→    } catch {}
+   779→  }, [currentUser, editForm]);
+   780→
+   781→  const handleSaveSettings = useCallback(async () => {
+   782→    if (!currentUser) return;
+   783→    try { await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settingsPrivacy) }); setCurrentUser({ ...currentUser, ...settingsPrivacy }); } catch {}
+   784→  }, [currentUser, settingsPrivacy]);
+   785→
+   786→  const handleChatRequest = useCallback(async (requestId: string, action: 'accept' | 'decline') => {
+   787→    try { await fetch('/api/chat-requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestId, action }) }); setChatRequests(prev => prev.filter(r => r.id !== requestId)); setPendingRequestCount(prev => Math.max(0, prev - 1)); } catch {}
+   788→  }, []);
+   789→
+   790→  const handleShout = useCallback(async () => {
+   791→    if (!shoutInput.trim() || !currentUser) return;
+   792→    try {
+   793→      const res = await fetch(`/api/shouts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: shoutInput.trim(), type: shoutType }) });
+   794→      if (res.ok) { const data = await res.json(); if (data.data) addShout(data.data); setShoutInput(''); }
+   795→    } catch {}
+   796→  }, [shoutInput, currentUser, shoutType]);
+   797→
+   798→  const handleFetchMap = useCallback(async () => {
+   799→    const lat = userLat || currentUser?.lat || 35.69;
+   800→    const lng = userLng || currentUser?.lng || 14.42;
+   801→    setMapLoading(true);
+   802→    try {
+   803→      const res = await fetch(`/api/user-map?lat=${lat}&lng=${lng}&radius=${mapRadius}&userId=${CURRENT_USER_ID}`);
+   804→      const data = await res.json();
+   805→      setMapUsers(data.users || []);
+   806→    } catch {} finally { setMapLoading(false); }
+   807→  }, [currentUser, userLat, userLng, mapRadius]);
+   808→
+   809→  const handleFavorite = useCallback(async (targetId: string, isSuper: boolean = false) => {
+   810→    if (!currentUser) return;
+   811→    try { await fetch(`/api/favorites?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId, isSuper }) }); } catch {}
+   812→  }, [currentUser]);
+   813→
+   814→  const handleSaveNote = useCallback(async () => {
+   815→    if (!currentUser || !noteTargetId || !noteContent.trim()) return;
+   816→    try { await fetch(`/api/notes?writerId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: noteTargetId, content: noteContent.trim() }) }); setShowNoteDialog(false); setNoteContent(''); setNoteTargetId(null); } catch {}
+   817→  }, [currentUser, noteTargetId, noteContent]);
+   818→
+   819→  const handleDeleteNote = useCallback(async (noteId: string) => {
+   820→    try { await fetch(`/api/notes/${noteId}`, { method: 'DELETE' }); setNotes(prev => prev.filter((n: any) => n.id !== noteId)); } catch {}
+   821→  }, []);
+   822→
+   823→  const handleInfer = useCallback(async (category?: InferCategory) => {
+   824→    if (!inferTargetUser) return;
+   825→    const cats = category ? [category] : INFER_CATEGORIES.map(c => c.id);
+   826→    setInferLoading(true);
+   827→    const newResults: Record<string, any> = {};
+   828→    for (const cat of cats) {
+   829→      try {
+   830→        const res = await fetch('/api/ai-rizz', {
+   831→          method: 'POST', headers: { 'Content-Type': 'application/json' },
+   832→          body: JSON.stringify({ targetBio: inferTargetUser.bio || '', style: cat, fullProfile: inferTargetUser, inferCategory: cat }),
+   833→        });
+   834→        const data = await res.json();
+   835→        newResults[cat] = { category: cat, confidence: Math.floor(Math.random() * 30 + 70), title: data.data?.line || 'Analysis complete', content: data.data?.context || `Detailed ${cat} analysis for ${inferTargetUser.displayName}`, bulletPoints: ['Based on profile analysis', 'AI-generated insights', 'Personalized recommendations'], color: cat === 'red-flags' ? 'red' : cat === 'green-flags' ? 'green' : 'blue' };
+   836→      } catch { newResults[cat] = { category: cat, confidence: 50, title: 'Analysis unavailable', content: 'Could not generate analysis', bulletPoints: [], color: 'gray' }; }
+   837→    }
+   838→    setInferResultsMap(newResults);
+   839→    setInferLoading(false);
+   840→  }, [inferTargetUser]);
+   841→
+   842→  const handleCreateGroup = useCallback(async () => {
+   843→    if (!currentUser || !groupForm.name.trim()) return;
+   844→    try {
+   845→      const res = await fetch('/api/groups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(groupForm) });
+   846→      if (res.ok) { const data = await res.json(); setGroups(prev => [data.data, ...prev]); setShowCreateGroup(false); setGroupForm({ name: '', description: '', isPublic: true }); }
+   847→    } catch {}
+   848→  }, [currentUser, groupForm]);
+   849→
+   850→  const handleCreateBanner = useCallback(async () => {
+   851→    if (!currentUser) return;
+   852→    try {
+   853→      const res = await fetch('/api/banners', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'My Banner', imageUrl: DEFAULT_COVER, position: 0 }) });
+   854→      if (res.ok) { const data = await res.json(); setBanners(prev => [...prev, data.data]); }
+   855→    } catch {}
+   856→  }, [currentUser]);
+   857→
+   858→  // Filtered discover users
+   859→  const filteredDiscover = discoverUsers.filter(u => {
+   860→    if (onlineOnly && !u.online) return false;
+   861→    if (u.age && (u.age < ageRange[0] || u.age > ageRange[1])) return false;
+   862→    if (lookingFor !== 'all' && u.lookingFor !== lookingFor) return false;
+   863→    if (ethnicityFilter !== 'all' && u.ethnicity !== ethnicityFilter) return false;
+   864→    if (bodyTypeFilter !== 'all' && u.bodyType !== bodyTypeFilter) return false;
+   865→    return true;
+   866→  });
+   867→
+   868→  const cascadeUser = filteredDiscover[cascadeIndex];
+   869→
+   870→  // ═══════════════════════════════════════════════════════════════
+   871→  // LOGIN SCREEN
+   872→  // ═══════════════════════════════════════════════════════════════
+   873→  if (authLoading) {
+   874→    return (
+   875→      <div className="h-screen flex flex-col items-center justify-center bg-background gap-4">
+   876→        <div className="text-2xl font-bold gradient-text">NEXUS</div>
+   877→        <Skeleton className="h-4 w-32" />
+   878→      </div>
+   879→    );
+   880→  }
+   881→
+   882→  if (!authed) {
+   883→    return (
+   884→      <div className="h-screen flex flex-col items-center justify-center bg-background px-6">
+   885→        <div className="text-4xl font-bold gradient-text mb-2">NEXUS</div>
+   886→        <p className="text-muted-foreground text-sm mb-8">Connect. Discover. Thrive.</p>
+   887→        <Card className="w-full max-w-sm bg-card border-border"><CardContent className="p-6">
+   888→          <button onClick={() => { setCurrentUser({ id: CURRENT_USER_ID, username: 'testuser', displayName: 'Test User', email: 'test@nexus.app', avatar: DEFAULT_AVATAR, bio: 'Love adventures and good coffee ☕', age: 28, gender: 'male', location: 'Valletta, Malta', lat: 35.8989, lng: 14.5146, geoCity: 'Valletta', geoRegion: 'Central Region', geoCountry: 'Malta', online: true, lastSeen: new Date().toISOString(), isPremium: true, isVerified: true, showOnline: true, showDistance: true, showAge: true, showActivity: true, hidePicsOffline: false, lookingFor: 'relationship', aboutMe: 'Adventurous soul looking for meaningful connections. I love hiking, photography, and trying new cuisines. Always up for a good conversation over coffee or wine.', height: 180, weight: 75, ethnicity: 'white', bodyType: 'athletic', relationshipStatus: 'single', position: 'versatile', pronouns: 'he/him', displayUnits: 'metric', lang: 'en', soundOff: false, notifPushOff: false, notifEmailOff: false, notifTelegramOff: false, mailingInternal: true, mailingPartner: true, profileOff: false, privateAuto: false, noPros: false, noPub: false, isProfessional: false, professionalStatus: 'none', verificationStatus: 'verified', voucher: null, _count: { photos: 12, receivedLikes: 47, receivedViews: 234, shouts: 5, favorites: 18, blogs: 2, videos: 1, sentMessages: 89, receivedMessages: 76, notesWritten: 8 } } as any); setAuthed(true); }} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium">
+   889→            Quick Login as Test User
+   890→          </button>
+   891→        </CardContent></Card>
+   892→      </div>
+   893→    );
+   894→  }
+   895→
+   896→
+   897→  // ═══════════════════════════════════════════════════════════════
+   898→  // MAIN NAV CONSTANTS
+   899→  // ═══════════════════════════════════════════════════════════════
+   900→  const MAIN_TABS = [
+   901→    { tab: 'discover' as const, icon: Compass, label: 'Discover', badge: 0 },
+   902→    { tab: 'map' as const, icon: MapPinned, label: 'Map', badge: 0 },
+   903→    { tab: 'chat' as const, icon: MessageCircle, label: 'Chat', badge: totalUnread + pendingRequestCount },
+   904→    { tab: 'likes' as const, icon: Heart, label: 'Likes', badge: receivedLikes.length },
+   905→    { tab: 'more' as const, icon: Grid2X2, label: 'More', badge: 0 },
+   906→  ];
+   907→
+   908→  const isMainTab = (t: string) => ['discover', 'map', 'chat', 'likes', 'more'].includes(t);
+   909→
+   910→  const getPageTitle = () => {
+   911→    const titles: Record<string, string> = {
+   912→      events: 'Events & Agenda', viewed: 'Viewed Me', shouts: 'Shouts',
+   913→      fansites: 'Fansites', videos: 'Videos', blogs: 'Blogs', groups: 'Groups',
+   914→      albums: 'Albums', membership: 'Membership', verified: 'Verified',
+   915→      professional: 'Professional', footprints: 'Footprints', notes: 'Notes',
+   916→      boosts: 'Boosts', favorites: 'Favorites', account: 'Account',
+   917→      preferences: 'Preferences', 'geo-settings': 'GEO Settings',
+   918→      banners: 'Banners', sites: 'Sites', legal: 'Legal', faqs: 'FAQs',
+   919→      abuse: 'Report & Block', advantages: 'Advantages', affiliation: 'Affiliation',
+   920→      profile: 'My Profile', infer: 'INFER AI Analysis', more: 'More',
+   921→    };
+   922→    return titles[activeTab] || 'NEXUS';
+   923→  };
+   924→
+   925→  // ═══════════════════════════════════════════════════════════════
+   926→  // RENDER
+   927→  // ═══════════════════════════════════════════════════════════════
+   928→  return (
+   929→    <TooltipProvider>
+   930→    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+   931→
+   932→      {/* ═══ HEADER ═══ */}
+   933→      <header className="h-14 flex items-center justify-between px-4 bg-card/80 backdrop-blur-lg border-b border-border shrink-0 z-50">
+   934→        <div className="flex items-center gap-3">
+   935→          {isMainTab(activeTab) ? (
+   936→            <span className="text-lg font-bold gradient-text tracking-wider">NEXUS</span>
+   937→          ) : (
+   938→            <button onClick={() => setActiveTab('more')} className="p-1 hover:bg-secondary rounded-lg transition-colors">
+   939→              <ArrowLeft className="w-4 h-4" />
+   940→            </button>
+   941→          )}
+   942→          {activeTab === 'chat' && activeConversation && (
+   943→            <button onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }} className="md:hidden p-1 hover:bg-secondary rounded-lg transition-colors">
+   944→              <ChevronLeft className="w-5 h-5" />
+   945→            </button>
+   946→          )}
+   947→          {!isMainTab(activeTab) && <span className="text-sm font-medium">{getPageTitle()}</span>}
+   948→        </div>
+   949→        <div className="flex items-center gap-1">
+   950→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground"><Search className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Search</TooltipContent></Tooltip>
+   951→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}><Settings className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Settings</TooltipContent></Tooltip>
+   952→          <button onClick={() => currentUser && openProfile(currentUser.id)} className="ml-1">
+   953→            <Avatar className="h-8 w-8 border-2 border-primary/50">
+   954→              <AvatarImage src={getAvatar(currentUser)} alt={currentUser?.displayName || ''} />
+   955→              <AvatarFallback className="text-xs">{currentUser?.displayName?.[0] || 'U'}</AvatarFallback>
+   956→            </Avatar>
+   957→          </button>
+   958→        </div>
+   959→      </header>
+   960→
+   961→      {/* ═══ MAIN CONTENT ═══ */}
+   962→      <main className="flex-1 overflow-hidden relative">
+   963→        {/* Offline Banner */}
+   964→        {!isOnline && <div className="absolute top-0 inset-x-0 z-50 bg-destructive/90 text-destructive-foreground text-center text-[11px] py-1.5 font-medium"><WifiOff className="w-3 h-3 inline mr-1" />You are offline. Some features may not work.</div>}
+   965→        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : activeTab === 'kinks' ? <KinksView /> : <MoreView />}
+   966→      </main>
+   967→
+   968→      {/* ═══ BOTTOM NAV ═══ */}
+   969→      <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-0.5">
+   970→        {MAIN_TABS.map(({ tab, icon: Icon, label, badge }) => (
+   971→          <button key={tab} onClick={() => { setActiveTab(tab); setShowSettings(false); if (tab === 'chat') { setChatMobileView('list'); setActiveConversation(null); setActiveGroup(null); } }}
+   972→            className={`h-12 flex flex-col items-center justify-center gap-0.5 relative transition-colors px-1 ${activeTab === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+   973→            <Icon className="w-4 h-4" />
+   974→            <span className="text-[9px] leading-none">{label}</span>
+   975→            {activeTab === tab && <span className="absolute bottom-0 w-4 h-0.5 bg-primary rounded-full" />}
+   976→            {badge > 0 && <span className="absolute -top-0.5 right-1/2 translate-x-4 min-w-[14px] h-3.5 flex items-center justify-center text-[8px] font-bold bg-primary text-primary-foreground rounded-full px-0.5">{badge > 99 ? '99+' : badge}</span>}
+   977→          </button>
+   978→        ))}
+   979→      </nav>
+   980→
+   981→      {/* ═══ PROFILE DRAWER ═══ */}
+   982→      <Sheet open={showProfileDrawer} onOpenChange={(open) => { if (!open) closeProfile(); }}>
+   983→        <SheetContent side="right" className="w-full sm:max-w-md bg-card border-border p-0 overflow-y-auto">
+   984→          {profileLoading ? <div className="p-6 space-y-4"><Skeleton className="h-64 w-full rounded-xl" /><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-32" /></div>
+   985→            : profileUser ? <ProfileDrawerContent /> : null}
+   986→        </SheetContent>
+   987→      </Sheet>
+   988→
+   989→      {/* ═══ FANSITE DETAIL SHEET ═══ */}
+   990→      <Sheet open={showFansiteSheet} onOpenChange={setShowFansiteSheet}>
+   991→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   992→          {selectedFansite && <FansiteDetail />}
+   993→        </SheetContent>
+   994→      </Sheet>
+   995→
+   996→      {/* ═══ ALBUM DETAIL SHEET ═══ */}
+   997→      <Sheet open={!!selectedAlbum} onOpenChange={(open) => { if (!open) setSelectedAlbum(null); }}>
+   998→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   999→          {selectedAlbum && <AlbumDetail />}
+
+[showing lines 500-999 of 2979; use offset=1000 with limit to continue reading]

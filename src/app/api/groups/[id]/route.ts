@@ -57,7 +57,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { content, type, mediaUrl } = body;
+    const { content, type, mediaUrl, expiresAt } = body;
 
     if (!content) {
       return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
@@ -83,6 +83,7 @@ export async function POST(
         groupId: id,
         type: type || 'text',
         mediaUrl: mediaUrl || null,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
       },
       include: {
         sender: {

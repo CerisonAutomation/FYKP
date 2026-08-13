@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { io as socketIO, Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import { formatDistanceToNow } from 'date-fns';
 import { useAppStore } from '@/store/app';
 import type { User, Message, Conversation, GroupChat } from '@/types';
@@ -58,8 +58,8 @@ interface NexusChatProps {
 // ═══════════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════
-const REACTION_EMOJIS = ['\u2764\uFE0F', '\uD83D\uDE02', '\uD83D\uDD25', '\uD83D\uDC4D', '\uD83D\uDE2E', '\uD83D\uDE2E'];
-const REACTION_DISPLAY = ['\u2764\uFE0F', '\uD83D\uDE02', '\uD83D\uDD25', '\uD83D\uDC4D', '\uD83D\uDE31', '\uD83D\uDE2E'];
+const REACTION_EMOJIS = ['\u2764\uFE0F', '\uD83D\uDE02', '\uD83D\uDD25', '\uD83D\uDC4D', '\uD83D\uDE2E', '\uD83D\uDE31'];
+const REACTION_DISPLAY = ['\u2764\uFE0F', '\uD83D\uDE02', '\uD83D\uDD25', '\uD83D\uDC4D', '\uD83D\uDE2E', '\uD83D\uDE31'];
 
 const DISAPPEAR_OPTIONS = [
   { label: '5s', value: '5s' },
@@ -102,7 +102,7 @@ function WaveformBars({ playing, duration }: { playing: boolean; duration: numbe
   return (
     <div className="flex items-center gap-[2px] h-8">
       {Array.from({ length: bars }).map((_, i) => {
-        const h = 20 + Math.sin(i * 0.8) * 30 + Math.random() * 20;
+        const h = 20 + Math.sin(i * 0.8) * 30 + Math.abs(Math.sin(i * 1.7 + duration * 0.1)) * 20;
         return (
           <motion.div
             key={i}
@@ -325,6 +325,43 @@ export default function NexusChat(props: NexusChatProps) {
     }
   };
 
+  // Parse disappearing timer value (e.g. '5s', '30s', '1m', '5m', '1h') to seconds
+  const parseDisappearingToSeconds = (val: string): number => {
+    const num = parseInt(val);
+    if (val.endsWith('h')) return num * 3600;
+    if (val.endsWith('m')) return num * 60;
+    return num; // seconds
+  };
+
+  // Send handler that supports disappearing messages
+  const handleSend = async () => {
+    if (!msgInput.trim()) return;
+    if (showDisappearingTimer) {
+      const seconds = parseDisappearingToSeconds(showDisappearingTimer);
+      const expiresAt = new Date(Date.now() + seconds * 1000).toISOString();
+      try {
+        const endpoint = isGroup ? `/api/groups/${otherUserId}` : '/api/messages';
+        await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            receiverId: otherUserId,
+            content: msgInput.trim(),
+            type: 'text',
+            expiresAt,
+          }),
+        });
+        setMsgInput('');
+        setShowDisappearingTimer(null);
+        setTimeout(() => fetchAutoReplies(), 500);
+      } catch (e) {
+        console.error('Disappearing send error:', e);
+      }
+    } else {
+      handleSendAndSuggest();
+    }
+  };
+
   // #2 Real-Time Translation
   const translateMessage = async (msg: Message) => {
     if (translations[msg.id]) return;
@@ -380,13 +417,12 @@ export default function NexusChat(props: NexusChatProps) {
     }
   };
 
-  // Run event detection when messages change
+  // Run event detection when messages change (direct conversations only, every 5th message)
   useEffect(() => {
-    // Disabled during development to prevent API errors on send
-    // if (chatMessages.length >= 2 && chatMessages.length % 3 === 0) {
-    //   detectEvent();
-    // }
-  }, [chatMessages.length]);
+    if (activeConversation && chatMessages.length >= 2 && chatMessages.length % 5 === 0) {
+      detectEvent();
+    }
+  }, [chatMessages.length, activeConversation]);
 
   // #5 Voice Message Recording
   const startRecording = () => {
@@ -521,7 +557,7 @@ export default function NexusChat(props: NexusChatProps) {
       await fetch('/api/chat/forward', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messageId: forwardMessage.id, targetConversationId: forwardTarget }),
+        body: JSON.stringify({ messageId: forwardMessage.id, toReceiverId: forwardTarget }),
       });
     } catch { /* silent */ } finally {
       setLoadingAction(null);
@@ -584,13 +620,19 @@ export default function NexusChat(props: NexusChatProps) {
     setMeetupLoading(true);
     setShowMeetupSuggestions(true);
     try {
+      const otherUser = isGroup ? null : chatUser;
       const res = await fetch('/api/chat/meetup-suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: otherUserId }),
+        body: JSON.stringify({
+          userLat: currentUser?.lat || 35.8969,
+          userLng: currentUser?.lng || 14.4425,
+          otherLat: otherUser?.lat || 35.9,
+          otherLng: otherUser?.lng || 14.45,
+        }),
       });
       const data = await res.json();
-      setMeetupSuggestions(data.venues || []);
+      setMeetupSuggestions(data.suggestions || data.venues || []);
     } catch {
       setMeetupSuggestions([]);
     } finally {
@@ -645,7 +687,24 @@ export default function NexusChat(props: NexusChatProps) {
     const mine = chatMessages.filter((m) => m.senderId === currentUser?.id);
     const theirs = chatMessages.filter((m) => m.senderId !== currentUser?.id);
     const totalChars = chatMessages.reduce((sum, m) => sum + m.content.length, 0);
-    const avgRespTime = theirs.length > 0 ? '2m 15s' : 'N/A';
+    let avgRespTime = 'N/A';
+    if (chatMessages.length >= 2) {
+      const gaps: number[] = [];
+      for (let i = 1; i < chatMessages.length; i++) {
+        if (chatMessages[i].senderId !== chatMessages[i - 1].senderId) {
+          const t1 = new Date(chatMessages[i - 1].createdAt).getTime();
+          const t2 = new Date(chatMessages[i].createdAt).getTime();
+          if (t2 > t1) gaps.push(t2 - t1);
+        }
+      }
+      if (gaps.length > 0) {
+        const avgMs = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+        const totalSec = Math.floor(avgMs / 1000);
+        const m = Math.floor(totalSec / 60);
+        const s = totalSec % 60;
+        avgRespTime = `${m}m ${s}s`;
+      }
+    }
     return { total: chatMessages.length, mine: mine.length, theirs: theirs.length, totalChars, avgRespTime };
   };
 
@@ -1536,7 +1595,7 @@ export default function NexusChat(props: NexusChatProps) {
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                handleSendAndSuggest();
+                handleSend();
               }
             }}
             placeholder={isRecording ? '' : 'Type a message...'}
@@ -1566,7 +1625,7 @@ export default function NexusChat(props: NexusChatProps) {
           <Button
             size="icon"
             className="h-9 w-9 shrink-0 bg-primary text-primary-foreground"
-            onClick={handleSendAndSuggest}
+            onClick={handleSend}
             disabled={!msgInput.trim() && !isRecording}
           >
             <Send className="w-4 h-4" />

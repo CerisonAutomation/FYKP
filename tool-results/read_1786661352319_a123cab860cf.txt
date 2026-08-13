@@ -1,0 +1,602 @@
+  1001→                  <CallCard msg={msg} />
+  1002→                ) : isAlbum ? (
+  1003→                  <div className="flex items-center gap-2 mt-1">
+  1004→                    <ImageIcon className="w-4 h-4 opacity-60" aria-hidden="true" />
+  1005→                    <span className="text-[12px]">Shared an album</span>
+  1006→                  </div>
+  1007→                ) : isScheduled ? (
+  1008→                  <div className="space-y-1">
+  1009→                    <p className="text-[12px]">{msg.content}</p>
+  1010→                    <div className="flex items-center gap-1 text-[10px] opacity-60">
+  1011→                      <Timer className="w-3 h-3" />
+  1012→                      Scheduled for {msg.scheduledAt ? new Date(msg.scheduledAt).toLocaleString() : 'N/A'}
+  1013→                    </div>
+  1014→                  </div>
+  1015→                ) : (
+  1016→                  <p className="text-[13px] break-words whitespace-pre-wrap">{msg.content}</p>
+  1017→                )}
+  1018→
+  1019→                {/* Translation */}
+  1020→                {translation && (
+  1021→                  <div className="mt-1.5 pt-1.5 border-t border-current/10">
+  1022→                    <div className="flex items-center gap-1 text-[9px] opacity-50 mb-0.5">
+  1023→                      <Languages className="w-3 h-3" /> Translated
+  1024→                    </div>
+  1025→                    <p className="text-[11px] opacity-80">{translation}</p>
+  1026→                  </div>
+  1027→                )}
+  1028→                {typing && (
+  1029→                  <div className="flex items-center gap-1 mt-1 text-[10px] opacity-50">
+  1030→                    <Loader2 className="w-3 h-3 animate-spin" /> Translating...
+  1031→                  </div>
+  1032→                )}
+  1033→
+  1034→                {/* Reactions */}
+  1035→                <ReactionChips msgId={msg.id} reactionsStr={msg.reactions} />
+  1036→
+  1037→                {/* Timestamp + Read Receipt */}
+  1038→                <div className={`flex items-center justify-end gap-1 mt-1 ${isMine ? 'text-primary-foreground/50' : 'text-muted-foreground'}`}>
+  1039→                  {msg.isFavorited && <Star className="w-3 h-3 text-amber-400" />}
+  1040→                  <span className="text-[9px]">{timeAgo(msg.createdAt)}</span>
+  1041→                  {isMine && (
+  1042→                    msg.isRead ? <CheckCheck className="w-3 h-3" /> : <Check className="w-3 h-3" />
+  1043→                  )}
+  1044→                </div>
+  1045→              </div>
+  1046→
+  1047→              {/* Disappearing countdown */}
+  1048→              {msg.expiresAt && (
+  1049→                <div className="px-3 pb-1.5">
+  1050→                  <div className="flex items-center gap-1 text-[9px] opacity-50">
+  1051→                    <Timer className="w-3 h-3" />
+  1052→                    <span>Expires {timeAgo(msg.expiresAt)}</span>
+  1053→                  </div>
+  1054→                </div>
+  1055→              )}
+  1056→
+  1057→              {/* Hover action buttons */}
+  1058→              {!isRecalled && (
+  1059→                <div className="absolute -top-2 right-2 hidden group-hover:flex items-center bg-card border border-border rounded-full shadow-lg p-0.5 gap-0.5 z-10">
+  1060→                  <button
+  1061→                    onClick={(e) => { e.stopPropagation(); setShowReactionPicker(msg.id); }}
+  1062→                    className="p-1 hover:bg-secondary rounded-full transition-colors"
+  1063→                  >
+  1064→                    <Heart className="w-3 h-3 text-muted-foreground" />
+  1065→                  </button>
+  1066→                  <button
+  1067→                    onClick={(e) => { e.stopPropagation(); handleReply(msg); }}
+  1068→                    className="p-1 hover:bg-secondary rounded-full transition-colors"
+  1069→                  >
+  1070→                    <Reply className="w-3 h-3 text-muted-foreground" />
+  1071→                  </button>
+  1072→                  <button
+  1073→                    onClick={(e) => { e.stopPropagation(); translateMessage(msg); }}
+  1074→                    className="p-1 hover:bg-secondary rounded-full transition-colors"
+  1075→                  >
+  1076→                    <Languages className="w-3 h-3 text-muted-foreground" />
+  1077→                  </button>
+  1078→                  <button
+  1079→                    onClick={(e) => { e.stopPropagation(); openForwardModal(msg); }}
+  1080→                    className="p-1 hover:bg-secondary rounded-full transition-colors"
+  1081→                  >
+  1082→                    <Forward className="w-3 h-3 text-muted-foreground" />
+  1083→                  </button>
+  1084→                </div>
+  1085→              )}
+  1086→
+  1087→              {/* Reaction picker popup */}
+  1088→              <AnimatePresence>
+  1089→                {showReactionPicker === msg.id && (
+  1090→                  <motion.div
+  1091→                    initial={{ opacity: 0, scale: 0.8, y: 5 }}
+  1092→                    animate={{ opacity: 1, scale: 1, y: 0 }}
+  1093→                    exit={{ opacity: 0, scale: 0.8, y: 5 }}
+  1094→                    className={`absolute ${isMine ? 'bottom-full right-0' : 'bottom-full left-0'} mb-2 bg-card border border-border rounded-full px-2 py-1 flex gap-1 shadow-xl z-20`}
+  1095→                  >
+  1096→                    {REACTION_DISPLAY.map((emoji, i) => (
+  1097→                      <button
+  1098→                        key={i}
+  1099→                        onClick={() => toggleReaction(msg.id, REACTION_EMOJIS[i])}
+  1100→                        className="w-8 h-8 flex items-center justify-center hover:bg-secondary rounded-full transition-transform hover:scale-125 text-lg"
+  1101→                      >
+  1102→                        {emoji}
+  1103→                      </button>
+  1104→                    ))}
+  1105→                  </motion.div>
+  1106→                )}
+  1107→              </AnimatePresence>
+  1108→            </motion.div>
+  1109→          </ContextMenuTrigger>
+  1110→          <ContextMenuContent className="bg-card border-border">
+  1111→            {!isMine && (
+  1112→              <ContextMenuItem onClick={() => handleReply(msg)} className="gap-2 text-foreground">
+  1113→                <Reply className="w-4 h-4" /> Reply
+  1114→              </ContextMenuItem>
+  1115→            )}
+  1116→            <ContextMenuItem onClick={() => translateMessage(msg)} className="gap-2 text-foreground">
+  1117→              <Languages className="w-4 h-4" /> Translate
+  1118→            </ContextMenuItem>
+  1119→            <ContextMenuItem onClick={() => togglePin(msg)} className="gap-2 text-foreground">
+  1120→              {msg.isPinned ? <><PinOff className="w-4 h-4" /> Unpin</> : <><Pin className="w-4 h-4" /> Pin</>}
+  1121→            </ContextMenuItem>
+  1122→            <ContextMenuItem onClick={() => toggleFavorite(msg)} className="gap-2 text-foreground">
+  1123→              {msg.isFavorited ? <><StarOff className="w-4 h-4" /> Unfavorite</> : <><Star className="w-4 h-4" /> Favorite</>}
+  1124→            </ContextMenuItem>
+  1125→            <ContextMenuItem onClick={() => openForwardModal(msg)} className="gap-2 text-foreground">
+  1126→              <Forward className="w-4 h-4" /> Forward
+  1127→            </ContextMenuItem>
+  1128→            {isMine && (
+  1129→              <ContextMenuItem onClick={() => recallMessage(msg)} className="gap-2 text-red-400">
+  1130→                <Trash2 className="w-4 h-4" /> Unsend
+  1131→              </ContextMenuItem>
+  1132→            )}
+  1133→          </ContextMenuContent>
+  1134→        </ContextMenu>
+  1135→      </div>
+  1136→    );
+  1137→  };
+  1138→
+  1139→  // ═══════════════════════════════════════════════════════════════
+  1140→  // CHAT HEADER
+  1141→  // ═══════════════════════════════════════════════════════════════
+  1142→  const ChatHeader = () => {
+  1143→    const hivStatus = (chatUserData as any)?.hivStatus;
+  1144→    return (
+  1145→      <div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0 bg-card">
+  1146→        <button
+  1147→          onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }}
+  1148→          className="md:hidden p-1.5 hover:bg-secondary rounded-lg transition-colors"
+  1149→        >
+  1150→          <ChevronLeft className="w-5 h-5" />
+  1151→        </button>
+  1152→
+  1153→        <button onClick={() => chatUser && openProfile(chatUser.id)} className="relative">
+  1154→          <Avatar className="h-9 w-9">
+  1155→            <AvatarImage src={getAvatar(isGroup ? undefined : chatUser)} />
+  1156→            <AvatarFallback className="text-xs">
+  1157→              {(isGroup ? activeGroup?.name : chatUser?.displayName)?.[0] || '?'}
+  1158→            </AvatarFallback>
+  1159→          </Avatar>
+  1160→          {chatUser?.online && (
+  1161→            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-card" />
+  1162→          )}
+  1163→        </button>
+  1164→
+  1165→        <div className="flex-1 min-w-0">
+  1166→          <div className="flex items-center gap-1.5 flex-wrap">
+  1167→            <p className="text-[13px] font-semibold truncate">
+  1168→              {isGroup ? activeGroup?.name : chatUser?.displayName}
+  1169→            </p>
+  1170→            {/* #24 HIV Badge */}
+  1171→            {hivStatus && hivStatus !== 'not-specified' && hivStatus !== 'prefer-not-to-say' && (
+  1172→              <Badge variant="outline" className={`text-[9px] px-1.5 py-0 h-4 ${HIV_BADGE_COLORS[hivStatus] || 'bg-gray-600'} text-white border-0 gap-0.5`}>
+  1173→                <Shield className="w-2.5 h-2.5" />
+  1174→                {hivStatus === 'on-prep' ? 'PrEP' : hivStatus === 'undetectable' ? 'U=U' : hivStatus}
+  1175→              </Badge>
+  1176→            )}
+  1177→            {/* #25 Meet Now Tags */}
+  1178→            {meetNowTags.map((tag: string) => {
+  1179→              const mt = MEET_NOW_ICONS[tag.trim()];
+  1180→              return mt ? (
+  1181→                <Badge key={tag} variant="outline" className={`text-[8px] px-1 py-0 h-4 ${mt.color} text-white border-0 gap-0.5`}>
+  1182→                  <mt.icon className="w-2.5 h-2.5" />
+  1183→                </Badge>
+  1184→              ) : null;
+  1185→            })}
+  1186→          </div>
+  1187→          <p className="text-[10px] text-muted-foreground">
+  1188→            {isGroup
+  1189→              ? `${activeGroup?._count?.members || 0} members`
+  1190→              : chatUser?.online
+  1191→                ? 'Online'
+  1192→                : `Last seen ${chatUser?.lastSeen ? timeAgo(chatUser.lastSeen) : 'unknown'}`}
+  1193→          </p>
+  1194→        </div>
+  1195→
+  1196→        {/* Header actions */}
+  1197→        <div className="flex items-center gap-0.5">
+  1198→          <TooltipProvider>
+  1199→            <Tooltip>
+  1200→              <TooltipTrigger asChild>
+  1201→                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => createCallLink('voice')}>
+  1202→                  <Phone className="w-4 h-4" />
+  1203→                </Button>
+  1204→              </TooltipTrigger>
+  1205→              <TooltipContent>Voice Call</TooltipContent>
+  1206→            </Tooltip>
+  1207→          </TooltipProvider>
+  1208→
+  1209→          <TooltipProvider>
+  1210→            <Tooltip>
+  1211→              <TooltipTrigger asChild>
+  1212→                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => createCallLink('video')}>
+  1213→                  <Video className="w-4 h-4" />
+  1214→                </Button>
+  1215→              </TooltipTrigger>
+  1216→              <TooltipContent>Video Call</TooltipContent>
+  1217→            </Tooltip>
+  1218→          </TooltipProvider>
+  1219→
+  1220→          <DropdownMenu>
+  1221→            <DropdownMenuTrigger asChild>
+  1222→              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+  1223→                <MoreVertical className="w-4 h-4" />
+  1224→              </Button>
+  1225→            </DropdownMenuTrigger>
+  1226→            <DropdownMenuContent align="end" className="bg-card border-border w-52">
+  1227→              <DropdownMenuItem onClick={() => setShowChatSearch(!showChatSearch)} className="gap-2 text-foreground cursor-pointer">
+  1228→                <Search className="w-4 h-4" /> Search Messages
+  1229→              </DropdownMenuItem>
+  1230→              <DropdownMenuItem onClick={openMediaGallery} className="gap-2 text-foreground cursor-pointer">
+  1231→                <ImageIcon className="w-4 h-4" aria-hidden="true" /> Media Gallery
+  1232→              </DropdownMenuItem>
+  1233→              <DropdownMenuItem onClick={fetchAiSummary} className="gap-2 text-foreground cursor-pointer">
+  1234→                <Sparkles className="w-4 h-4" /> AI Summary
+  1235→              </DropdownMenuItem>
+  1236→              <DropdownMenuItem onClick={fetchMeetupSuggestions} className="gap-2 text-foreground cursor-pointer">
+  1237→                <MapPin className="w-4 h-4" /> Suggest Meetup
+  1238→              </DropdownMenuItem>
+  1239→              <DropdownMenuItem onClick={() => setShowThemeModal(true)} className="gap-2 text-foreground cursor-pointer">
+  1240→                <Palette className="w-4 h-4" /> Theme
+  1241→              </DropdownMenuItem>
+  1242→              <DropdownMenuSeparator className="bg-border" />
+  1243→              <DropdownMenuItem onClick={toggleNsfwFilter} className="gap-2 text-foreground cursor-pointer">
+  1244→                <EyeOff className="w-4 h-4" /> {nsfwFilter ? 'Show Explicit' : 'Filter Explicit'}
+  1245→              </DropdownMenuItem>
+  1246→              <DropdownMenuItem onClick={() => setFavoritedFilter(!favoritedFilter)} className="gap-2 text-foreground cursor-pointer">
+  1247→                <BookmarkCheck className="w-4 h-4" /> {favoritedFilter ? 'Show All' : 'Favorites Only'}
+  1248→              </DropdownMenuItem>
+  1249→              <DropdownMenuSeparator className="bg-border" />
+  1250→              <DropdownMenuItem onClick={activateSafeWord} className="gap-2 text-red-500 cursor-pointer">
+  1251→                <ShieldAlert className="w-4 h-4" /> Safe Mode (SOS)
+  1252→              </DropdownMenuItem>
+  1253→            </DropdownMenuContent>
+  1254→          </DropdownMenu>
+  1255→        </div>
+  1256→      </div>
+  1257→    );
+  1258→  };
+  1259→
+  1260→  // ═══════════════════════════════════════════════════════════════
+  1261→  // PINNED MESSAGES BAR
+  1262→  // ═══════════════════════════════════════════════════════════════
+  1263→  const PinnedMessagesBar = () => {
+  1264→    if (pinnedMessages.length === 0) return null;
+  1265→    return (
+  1266→      <div className="border-b border-border bg-secondary/30">
+  1267→        <div className="flex items-center gap-2 px-3 py-1.5">
+  1268→          <Pin className="w-3 h-3 text-amber-400 shrink-0" />
+  1269→          <span className="text-[10px] text-muted-foreground font-medium">Pinned</span>
+  1270→        </div>
+  1271→        <ScrollArea className="max-w-full" type="scroll">
+  1272→          <div className="flex gap-2 px-3 pb-2 overflow-x-auto">
+  1273→            {pinnedMessages.map((pm) => (
+  1274→              <div key={pm.id} className="shrink-0 max-w-[200px] px-3 py-1.5 rounded-lg bg-card border border-border">
+  1275→                <p className="text-[11px] font-medium truncate">{pm.isRecalled ? 'Message recalled' : pm.content}</p>
+  1276→                <p className="text-[9px] text-muted-foreground">{pm.sender?.displayName}</p>
+  1277→              </div>
+  1278→            ))}
+  1279→          </div>
+  1280→        </ScrollArea>
+  1281→      </div>
+  1282→    );
+  1283→  };
+  1284→
+  1285→  // ═══════════════════════════════════════════════════════════════
+  1286→  // TYPING INDICATOR
+  1287→  // ═══════════════════════════════════════════════════════════════
+  1288→  const TypingIndicator = () => {
+  1289→    const isTyping = Object.keys(typingUsers).length > 0;
+  1290→    if (!isTyping) return null;
+  1291→    return (
+  1292→      <motion.div
+  1293→        initial={{ opacity: 0, y: 5 }}
+  1294→        animate={{ opacity: 1, y: 0 }}
+  1295→        exit={{ opacity: 0, y: 5 }}
+  1296→        className="flex justify-start mb-2"
+  1297→      >
+  1298→        <div className={`${theme.otherBg} border ${theme.otherBorder} rounded-2xl rounded-bl-md px-4 py-3`}
+  1299→        >
+  1300→          <div className="flex items-center gap-1">
+  1301→            {[0, 1, 2].map((i) => (
+  1302→              <motion.div
+  1303→                key={i}
+  1304→                className="w-2 h-2 bg-muted-foreground rounded-full"
+  1305→                animate={{ y: [0, -6, 0] }}
+  1306→                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+  1307→              />
+  1308→            ))}
+  1309→          </div>
+  1310→        </div>
+  1311→      </motion.div>
+  1312→    );
+  1313→  };
+  1314→
+  1315→  // ═══════════════════════════════════════════════════════════════
+  1316→  // EVENT DETECTION BANNER
+  1317→  // ═══════════════════════════════════════════════════════════════
+  1318→  const EventDetectionBanner = () => {
+  1319→    if (!eventDetection?.detected || eventDetection.eventId) return null;
+  1320→    return (
+  1321→      <motion.div
+  1322→        initial={{ opacity: 0, y: 10 }}
+  1323→        animate={{ opacity: 1, y: 0 }}
+  1324→        exit={{ opacity: 0, y: 10 }}
+  1325→        className="mx-3 mb-2 p-2.5 rounded-xl bg-violet-600/10 border border-violet-500/30"
+  1326→      >
+  1327→        <div className="flex items-center gap-2">
+  1328→          <Sparkles className="w-4 h-4 text-violet-400 shrink-0" />
+  1329→          <p className="text-[11px] text-violet-300 flex-1">Detected: {eventDetection.description} Create Event →</p>
+  1330→          <Button
+  1331→            size="sm"
+  1332→            variant="ghost"
+  1333→            className="h-6 px-2 text-[10px] text-violet-400 hover:text-violet-300 hover:bg-violet-600/20"
+  1334→            onClick={createEventFromDetection}
+  1335→            disabled={!!loadingAction === true}
+  1336→          >
+  1337→            {loadingAction === 'create-event' ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Create'}
+  1338→          </Button>
+  1339→          <button onClick={() => setEventDetection(null)}>
+  1340→            <X className="w-3 h-3 text-muted-foreground" />
+  1341→          </button>
+  1342→        </div>
+  1343→      </motion.div>
+  1344→    );
+  1345→  };
+  1346→
+  1347→  // ═══════════════════════════════════════════════════════════════
+  1348→  // AI AUTO-REPLY SUGGESTIONS
+  1349→  // ═══════════════════════════════════════════════════════════════
+  1350→  const AutoReplySuggestions = () => {
+  1351→    if (!showAutoReplies || autoReplies.length === 0) return null;
+  1352→    return (
+  1353→      <AnimatePresence>
+  1354→        <motion.div
+  1355→          initial={{ opacity: 0, y: 10 }}
+  1356→          animate={{ opacity: 1, y: 0 }}
+  1357→          exit={{ opacity: 0, y: 10 }}
+  1358→          className="mx-3 mb-2"
+  1359→        >
+  1360→          <div className="flex items-center gap-1 mb-1">
+  1361→            <Bot className="w-3 h-3 text-violet-400" />
+  1362→            <span className="text-[10px] text-muted-foreground">AI Suggested Replies</span>
+  1363→            <button onClick={() => setShowAutoReplies(false)} className="ml-auto">
+  1364→              <X className="w-3 h-3 text-muted-foreground" />
+  1365→            </button>
+  1366→          </div>
+  1367→          <div className="flex flex-col gap-1">
+  1368→            {autoReplies.map((reply, i) => (
+  1369→              <button
+  1370→                key={i}
+  1371→                onClick={() => {
+  1372→                  setMsgInput(reply);
+  1373→                  setShowAutoReplies(false);
+  1374→                }}
+  1375→                className="text-left px-3 py-2 rounded-lg bg-secondary/50 border border-border/50 hover:border-violet-500/50 hover:bg-violet-600/10 transition-all text-[12px] text-foreground"
+  1376→              >
+  1377→                <Sparkles className="w-3 h-3 text-violet-400 inline mr-1.5" />
+  1378→                {reply}
+  1379→              </button>
+  1380→            ))}
+  1381→          </div>
+  1382→        </motion.div>
+  1383→      </AnimatePresence>
+  1384→    );
+  1385→  };
+  1386→
+  1387→  // ═══════════════════════════════════════════════════════════════
+  1388→  // CHAT TOOLBAR (plus button actions)
+  1389→  // ═══════════════════════════════════════════════════════════════
+  1390→  const ChatToolbar = () => {
+  1391→    const toolbarActions = [
+  1392→      { icon: Image, label: 'Album', color: 'text-pink-400', onClick: async () => { try { const res = await fetch('/api/albums'); const data = await res.json(); setAlbums(Array.isArray(data) ? data : []); } catch { setAlbums([]); } setShowAlbumPicker(true); }},
+  1393→      { icon: MapPin, label: 'Location', color: 'text-amber-400', onClick: () => setShowLocationPicker(true) },
+  1394→      { icon: Mic, label: 'Voice', color: 'text-cyan-400', onClick: startRecording },
+  1395→      { icon: Vote, label: 'Poll', color: 'text-violet-400', onClick: () => setShowCreatePollModal(true) },
+  1396→      { icon: Timer, label: 'Schedule', color: 'text-orange-400', onClick: () => setShowScheduleModal(true) },
+  1397→      { icon: Phone, label: 'Call', color: 'text-emerald-400', onClick: () => setShowCallModal(true) },
+  1398→    ];
+  1399→    return (
+  1400→      <AnimatePresence>
+  1401→        {showToolbar && (
+  1402→          <motion.div
+  1403→            initial={{ opacity: 0, height: 0 }}
+  1404→            animate={{ opacity: 1, height: 'auto' }}
+  1405→            exit={{ opacity: 0, height: 0 }}
+  1406→            className="border-t border-border bg-card overflow-hidden"
+  1407→          >
+  1408→            <div className="grid grid-cols-3 gap-2 p-3">
+  1409→              {toolbarActions.map((action, i) => (
+  1410→                <button
+  1411→                  key={i}
+  1412→                  onClick={() => { action.onClick(); setShowToolbar(false); }}
+  1413→                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-secondary transition-colors"
+  1414→                >
+  1415→                  <div className={`p-2 rounded-full bg-secondary ${action.color}`}>
+  1416→                    <action.icon className="w-5 h-5" />
+  1417→                  </div>
+  1418→                  <span className="text-[10px] text-muted-foreground">{action.label}</span>
+  1419→                </button>
+  1420→              ))}
+  1421→            </div>
+  1422→            {/* Disappearing messages picker */}
+  1423→            <div className="px-3 pb-3">
+  1424→              <div className="flex items-center gap-2">
+  1425→                <Timer className="w-3.5 h-3.5 text-orange-400" />
+  1426→                <span className="text-[10px] text-muted-foreground">Disappearing:</span>
+  1427→                <div className="flex gap-1">
+  1428→                  {DISAPPEAR_OPTIONS.map((opt) => (
+  1429→                    <button
+  1430→                      key={opt.value}
+  1431→                      onClick={() => setShowDisappearingTimer(showDisappearingTimer === opt.value ? null : opt.value)}
+  1432→                      className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${showDisappearingTimer === opt.value ? 'bg-orange-600 text-white border-orange-600' : 'border-border text-muted-foreground hover:border-orange-500/50'}`}
+  1433→                    >
+  1434→                      {opt.label}
+  1435→                    </button>
+  1436→                  ))}
+  1437→                </div>
+  1438→              </div>
+  1439→            </div>
+  1440→          </motion.div>
+  1441→        )}
+  1442→      </AnimatePresence>
+  1443→    );
+  1444→  };
+  1445→
+  1446→  // ═══════════════════════════════════════════════════════════════
+  1447→  // CHAT INPUT
+  1448→  // ═══════════════════════════════════════════════════════════════
+  1449→  const ChatInput = () => {
+  1450→    return (
+  1451→      <div className="border-t border-border shrink-0 bg-card">
+  1452→        {/* Recording UI */}
+  1453→        <AnimatePresence>
+  1454→          {isRecording && (
+  1455→            <motion.div
+  1456→              initial={{ opacity: 0, height: 0 }}
+  1457→              animate={{ opacity: 1, height: 'auto' }}
+  1458→              exit={{ opacity: 0, height: 0 }}
+  1459→              className="px-4 py-2 border-b border-border bg-red-950/30 flex items-center gap-3"
+  1460→            >
+  1461→              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+  1462→              <span className="text-[12px] text-red-400">Recording</span>
+  1463→              <span className="text-[14px] font-mono text-foreground">{formatDuration(recordingDuration)}</span>
+  1464→              <div className="flex-1" />
+  1465→              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={stopRecording}>
+  1466→                <MicOff className="w-4 h-4 text-red-400" />
+  1467→              </Button>
+  1468→            </motion.div>
+  1469→          )}
+  1470→        </AnimatePresence>
+  1471→
+  1472→        {/* Reply bar */}
+  1473→        <AnimatePresence>
+  1474→          {replyingTo && <ReplyQuote msg={replyingTo} />}
+  1475→        </AnimatePresence>
+  1476→
+  1477→        {/* Disappearing timer badge */}
+  1478→        {showDisappearingTimer && (
+  1479→          <div className="px-4 py-1 bg-orange-950/30 flex items-center gap-2">
+  1480→            <Timer className="w-3 h-3 text-orange-400" />
+  1481→            <span className="text-[10px] text-orange-400">Disappearing: {showDisappearingTimer}</span>
+  1482→            <button onClick={() => setShowDisappearingTimer(null)} className="ml-auto">
+  1483→              <X className="w-3 h-3 text-muted-foreground" />
+  1484→            </button>
+  1485→          </div>
+  1486→        )}
+  1487→
+  1488→        {/* Search bar */}
+  1489→        <AnimatePresence>
+  1490→          {showChatSearch && (
+  1491→            <motion.div
+  1492→              initial={{ opacity: 0, height: 0 }}
+  1493→              animate={{ opacity: 1, height: 'auto' }}
+  1494→              exit={{ opacity: 0, height: 0 }}
+  1495→              className="px-4 py-2 border-b border-border flex items-center gap-2"
+  1496→            >
+  1497→              <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+  1498→              <Input
+  1499→                value={chatSearchQuery}
+  1500→                onChange={(e) => setChatSearchQuery(e.target.value)}
+  1501→                placeholder="Search messages..."
+  1502→                className="h-8 text-[12px] bg-transparent border-0 focus-visible:ring-0 px-0"
+  1503→                autoFocus
+  1504→              />
+  1505→              {chatSearchQuery && (
+  1506→                <span className="text-[10px] text-muted-foreground shrink-0">{displayMessages.length} found</span>
+  1507→              )}
+  1508→              <button onClick={() => { setShowChatSearch(false); setChatSearchQuery(''); }}>
+  1509→                <X className="w-4 h-4 text-muted-foreground" />
+  1510→              </button>
+  1511→            </motion.div>
+  1512→          )}
+  1513→        </AnimatePresence>
+  1514→
+  1515→        {/* Main input row */}
+  1516→        <div className="px-3 py-2 flex items-center gap-2">
+  1517→          <TooltipProvider>
+  1518→            <Tooltip>
+  1519→              <TooltipTrigger asChild>
+  1520→                <Button
+  1521→                  variant="ghost"
+  1522→                  size="icon"
+  1523→                  className={`h-9 w-9 shrink-0 text-muted-foreground transition-colors ${showToolbar ? 'bg-secondary text-foreground' : ''}`}
+  1524→                  onClick={() => setShowToolbar(!showToolbar)}
+  1525→                >
+  1526→                  <Plus className={`w-5 h-5 transition-transform ${showToolbar ? 'rotate-45' : ''}`} />
+  1527→                </Button>
+  1528→              </TooltipTrigger>
+  1529→              <TooltipContent>More</TooltipContent>
+  1530→            </Tooltip>
+  1531→          </TooltipProvider>
+  1532→
+  1533→          <Input
+  1534→            value={msgInput}
+  1535→            onChange={(e) => setMsgInput(e.target.value)}
+  1536→            onKeyDown={(e) => {
+  1537→              if (e.key === 'Enter' && !e.shiftKey) {
+  1538→                e.preventDefault();
+  1539→                handleSendAndSuggest();
+  1540→              }
+  1541→            }}
+  1542→            placeholder={isRecording ? '' : 'Type a message...'}
+  1543→            className="flex-1 h-9 text-[13px] bg-secondary border-border"
+  1544→            disabled={isRecording}
+  1545→          />
+  1546→
+  1547→          <TooltipProvider>
+  1548→            <Tooltip>
+  1549→              <TooltipTrigger asChild>
+  1550→                <Button
+  1551→                  variant="ghost"
+  1552→                  size="icon"
+  1553→                  className={`h-9 w-9 shrink-0 ${isRecording ? 'bg-red-600 text-white hover:bg-red-700' : 'text-muted-foreground'}`}
+  1554→                  onMouseDown={startRecording}
+  1555→                  onMouseUp={stopRecording}
+  1556→                  onTouchStart={startRecording}
+  1557→                  onTouchEnd={stopRecording}
+  1558→                >
+  1559→                  {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+  1560→                </Button>
+  1561→              </TooltipTrigger>
+  1562→              <TooltipContent>{isRecording ? 'Release to send' : 'Hold to record'}</TooltipContent>
+  1563→            </Tooltip>
+  1564→          </TooltipProvider>
+  1565→
+  1566→          <Button
+  1567→            size="icon"
+  1568→            className="h-9 w-9 shrink-0 bg-primary text-primary-foreground"
+  1569→            onClick={handleSendAndSuggest}
+  1570→            disabled={!msgInput.trim() && !isRecording}
+  1571→          >
+  1572→            <Send className="w-4 h-4" />
+  1573→          </Button>
+  1574→        </div>
+  1575→      </div>
+  1576→    );
+  1577→  };
+  1578→
+  1579→  // ═══════════════════════════════════════════════════════════════
+  1580→  // MODALS
+  1581→  // ═══════════════════════════════════════════════════════════════
+  1582→
+  1583→  // Album Picker Modal
+  1584→  const AlbumPickerModal = () => (
+  1585→    <Dialog open={showAlbumPicker} onOpenChange={setShowAlbumPicker}>
+  1586→      <DialogContent className="bg-card border-border max-w-md">
+  1587→        <DialogHeader>
+  1588→          <DialogTitle className="text-foreground">Share Album</DialogTitle>
+  1589→        </DialogHeader>
+  1590→        <ScrollArea className="max-h-64 overflow-y-auto">
+  1591→          <div className="space-y-2">
+  1592→            {albums.map((album: any) => (
+  1593→              <button
+  1594→                key={album.id}
+  1595→                onClick={async () => {
+  1596→                  setSelectedAlbum(album);
+  1597→                  try {
+  1598→                    await fetch('/api/chat/album-share', {
+  1599→                      method: 'POST',
+  1600→                      headers: { 'Content-Type': 'application/json' },
+
+[showing lines 1001-1600 of 2104; use offset=1601 with limit to continue reading]

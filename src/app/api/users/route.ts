@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-// GET /api/users - list users with pagination and filters
+// Haversine distance formula (returns km)
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// GET /api/users - list users with pagination, filters, and real haversine distances
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -12,6 +25,8 @@ export async function GET(request: NextRequest) {
     const minAge = parseInt(searchParams.get('minAge') || '0');
     const maxAge = parseInt(searchParams.get('maxAge') || '150');
     const onlineStatus = searchParams.get('online') || '';
+    const refLat = parseFloat(searchParams.get('lat') || '35.8969');
+    const refLng = parseFloat(searchParams.get('lng') || '14.4425');
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
@@ -75,12 +90,11 @@ export async function GET(request: NextRequest) {
       db.user.count({ where }),
     ]);
 
-    // Calculate dummy distance for demo (in km)
+    // Calculate real haversine distance
     const usersWithDistance = users.map((user) => {
       let distance: number | null = null;
       if (user.lat && user.lng) {
-        // Simple demo distance calculation
-        distance = Math.floor(Math.random() * 50) + 1;
+        distance = Math.round(haversine(refLat, refLng, user.lat, user.lng) * 10) / 10;
       }
       return {
         ...user,

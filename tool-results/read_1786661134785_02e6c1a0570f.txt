@@ -1,0 +1,480 @@
+  2500→                  <p className="text-sm font-bold gradient-text">{s.val}</p>
+  2501→                  <p className="text-[9px] text-muted-foreground">{s.label}</p>
+  2502→                </div>
+  2503→              ))}
+  2504→            </div>
+  2505→            {/* Details */}
+  2506→            <Card className="bg-secondary border-border"><CardContent className="p-3">
+  2507→              <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Details</h4>
+  2508→              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+  2509→                {u.lookingFor && <DetailCell label="Looking for" value={u.lookingFor} />}
+  2510→                {u.height && <DetailCell label="Height" value={`${u.height} cm`} />}
+  2511→                {u.bodyType && <DetailCell label="Body type" value={u.bodyType} />}
+  2512→                {u.ethnicity && <DetailCell label="Ethnicity" value={u.ethnicity} />}
+  2513→                {u.relationshipStatus && <DetailCell label="Relationship" value={u.relationshipStatus} />}
+  2514→                {u.position && <DetailCell label="Position" value={u.position} />}
+  2515→              </div>
+  2516→            </CardContent></Card>
+  2517→            {/* Subscriptions */}
+  2518→            {mySubscriptions.length > 0 && (
+  2519→              <div className="space-y-2">
+  2520→                <SectionHeader icon={Crown} label="Subscriptions" count={mySubscriptions.length} />
+  2521→                {mySubscriptions.map((sub: any) => (
+  2522→                  <div key={sub.id} className="p-2.5 rounded-xl bg-secondary border border-border flex items-center justify-between">
+  2523→                    <span className="text-[12px] font-medium capitalize">{sub.tier} Plan</span>
+  2524→                    <Badge className={`text-[9px] ${sub.isActive ? 'bg-green-400/20 text-green-400' : 'bg-muted text-muted-foreground'}`}>{sub.isActive ? 'Active' : 'Expired'}</Badge>
+  2525→                  </div>
+  2526→                ))}
+  2527→              </div>
+  2528→            )}
+  2529→            {/* Active boosts */}
+  2530→            {myBoosts.length > 0 && (
+  2531→              <div className="space-y-2">
+  2532→                <SectionHeader icon={Zap} label="Active Boosts" count={myBoosts.length} />
+  2533→                {myBoosts.map((b: any) => (
+  2534→                  <div key={b.id} className="p-2.5 rounded-xl bg-secondary border border-border boost-glow flex items-center gap-2">
+  2535→                    <Zap className="w-4 h-4 text-primary" /><span className="text-[12px] font-medium capitalize">{b.type} Boost</span>
+  2536→                  </div>
+  2537→                ))}
+  2538→              </div>
+  2539→            )}
+  2540→            {/* Favorites */}
+  2541→            <div className="space-y-2">
+  2542→              <SectionHeader icon={Bookmark} label="Favorites" count={favorites.length} action={<Button variant="ghost" size="sm" className="text-[10px] text-primary h-6" onClick={() => setActiveTab('favorites')}>View all</Button>} />
+  2543→              {favorites.length > 0 ? favorites.slice(0, 5).map((fav: any) => (
+  2544→                <button key={fav.id} onClick={() => openProfile(fav.targetId)} className="flex items-center gap-2 p-2 rounded-lg hover:bg-secondary/50 transition-colors">
+  2545→                  <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-[10px]">{fav.target?.displayName?.[0]}</AvatarFallback></Avatar>
+  2546→                  <span className="text-[12px]">{fav.target?.displayName}</span>
+  2547→                  {fav.isSuper && <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />}
+  2548→                </button>
+  2549→              )) : <p className="text-xs text-muted-foreground">No favorites yet</p>}
+  2550→            </div>
+  2551→            {/* Notes */}
+  2552→            <div className="space-y-2">
+  2553→              <SectionHeader icon={StickyNote} label="Notes" count={notes.length} action={<Button variant="ghost" size="sm" className="text-[10px] text-primary h-6" onClick={() => setActiveTab('notes')}>View all</Button>} />
+  2554→              {notes.length > 0 ? notes.slice(0, 5).map((note: any) => (
+  2555→                <div key={note.id} className="p-2.5 rounded-xl bg-secondary border border-border">
+  2556→                  <div className="flex items-center gap-2 mb-1"><button onClick={() => openProfile(note.targetId)} className="text-[12px] font-semibold hover:underline">{note.target?.displayName}</button><Badge variant="secondary" className="text-[9px] bg-muted">{note.type}</Badge></div>
+  2557→                  <p className="text-[12px] text-muted-foreground line-clamp-2">{note.content}</p>
+  2558→                </div>
+  2559→              )) : <p className="text-xs text-muted-foreground">No notes yet</p>}
+  2560→            </div>
+  2561→            {/* Verification */}
+  2562→            <div className="space-y-2">
+  2563→              <SectionHeader icon={ShieldCheck} label="Verification" />
+  2564→              <div className="p-3 rounded-xl bg-secondary border border-border">
+  2565→                <div className="flex items-center gap-2">
+  2566→                  {myVerification?.status === 'verified' ? <ShieldCheck className="w-5 h-5 text-green-400" /> : myVerification?.status === 'pending' ? <Clock className="w-5 h-5 text-yellow-400" /> : <Shield className="w-5 h-5 text-muted-foreground" />}
+  2567→                  <span className={`text-sm font-medium ${myVerification?.status === 'verified' ? 'text-green-400' : 'text-muted-foreground'}`}>{myVerification?.status === 'verified' ? 'Verified' : myVerification?.status === 'pending' ? 'Pending Review' : 'Not Verified'}</span>
+  2568→                </div>
+  2569→              </div>
+  2570→            </div>
+  2571→            {/* Sessions */}
+  2572→            <div className="space-y-2">
+  2573→              <SectionHeader icon={MonitorSmartphone} label="Sessions" count={mySessions.length} />
+  2574→              {mySessions.length > 0 ? mySessions.slice(0, 5).map((sess: any) => (
+  2575→                <div key={sess.id} className="flex items-center justify-between p-2.5 rounded-xl bg-secondary border border-border">
+  2576→                  <div className="flex items-center gap-2">
+  2577→                    <MonitorSmartphone className="w-4 h-4 text-muted-foreground" />
+  2578→                    <div><p className="text-[12px] font-medium">{sess.platform || 'Unknown'}{sess.device ? ` · ${sess.device}` : ''}</p><p className="text-[10px] text-muted-foreground">{timeAgo(sess.lastSeen)}</p></div>
+  2579→                  </div>
+  2580→                  {sess.isActive && <Badge className="bg-green-400/20 text-green-400 text-[9px]">Active</Badge>}
+  2581→                </div>
+  2582→              )) : <p className="text-xs text-muted-foreground">No sessions</p>}
+  2583→            </div>
+  2584→            {/* Quick links */}
+  2585→            <div className="grid grid-cols-2 gap-2">
+  2586→              <Button variant="outline" className="border-border text-xs" onClick={() => setShowSettings(true)}><Settings className="w-3.5 h-3.5 mr-1.5" /> Settings</Button>
+  2587→              <Button variant="outline" className="border-border text-xs" onClick={() => setActiveTab('preferences')}><Sliders className="w-3.5 h-3.5 mr-1.5" /> Preferences</Button>
+  2588→            </div>
+  2589→            <div className="h-4" />
+  2590→          </div>
+  2591→        </div>
+  2592→      </ScrollArea>
+  2593→    );
+  2594→  }
+  2595→
+  2596→  function DetailCell({ label, value }: { label: string; value: string }) {
+  2597→    return (<div className="flex justify-between p-2 rounded-lg bg-card/50"><span className="text-muted-foreground text-[11px]">{label}</span><span className="text-[12px] font-medium capitalize">{value}</span></div>);
+  2598→  }
+  2599→
+  2600→  function Sliders(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 12H3"/><path d="M15 6H3"/><path d="M21 18H3"/><circle cx="15" cy="6" r="2"/><circle cx="21" cy="12" r="2"/><circle cx="15" cy="18" r="2"/></svg>; }
+  2601→
+  2602→  // ─── INFER VIEW (AI Analysis) ──────────────────────────────
+  2603→  function InferView() {
+  2604→    const allUsers = [...discoverUsers, ...receivedLikes.map(l => l.sender).filter(Boolean), ...favorites.map(f => f.target).filter(Boolean)];
+  2605→    const uniqueUsers = [...new Map(allUsers.filter(Boolean).map(u => [u.id, u])).values()] as User[];
+  2606→
+  2607→    return (
+  2608→      <div className="h-full flex flex-col">
+  2609→        {/* User Selector */}
+  2610→        <div className="px-4 py-3 border-b border-border shrink-0">
+  2611→          <div className="flex items-center gap-2 mb-2">
+  2612→            <Brain className="w-4 h-4 text-primary" />
+  2613→            <span className="text-xs font-semibold">Select a user to analyze</span>
+  2614→          </div>
+  2615→          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+  2616→            {uniqueUsers.slice(0, 15).map(u => (
+  2617→              <button key={u.id} onClick={() => { setInferTargetUser(u); setInferResultsMap({}); }}
+  2618→                className={`shrink-0 flex flex-col items-center gap-1 p-1.5 rounded-xl border transition-all ${inferTargetUser?.id === u.id ? 'bg-primary/10 border-primary/30' : 'bg-secondary border-border hover:border-primary/20'}`}>
+  2619→                <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(u)} /><AvatarFallback className="text-[9px]">{u.displayName?.[0]}</AvatarFallback></Avatar>
+  2620→                <span className="text-[9px] max-w-[48px] truncate">{u.displayName?.split(' ')[0]}</span>
+  2621→              </button>
+  2622→            ))}
+  2623→            {uniqueUsers.length === 0 && <p className="text-[11px] text-muted-foreground py-2">Discover or like some users first to analyze them</p>}
+  2624→          </div>
+  2625→        </div>
+  2626→        {inferTargetUser && (
+  2627→          <ScrollArea className="flex-1">
+  2628→            <div className="p-4 space-y-4">
+  2629→              {/* Target user info */}
+  2630→              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary border border-border">
+  2631→                <Avatar className="h-10 w-10"><AvatarImage src={getAvatar(inferTargetUser)} /><AvatarFallback className="text-xs">{inferTargetUser.displayName?.[0]}</AvatarFallback></Avatar>
+  2632→                <div className="flex-1 min-w-0">
+  2633→                  <p className="text-[13px] font-semibold">{inferTargetUser.displayName}{inferTargetUser.age ? `, ${inferTargetUser.age}` : ''}</p>
+  2634→                  <p className="text-[10px] text-muted-foreground truncate">{inferTargetUser.bio || 'No bio'}</p>
+  2635→                </div>
+  2636→              </div>
+  2637→              {/* Category tabs */}
+  2638→              <Tabs value={inferCategory} onValueChange={(v) => setInferCategory(v as InferCategory)}>
+  2639→                <TabsList className="bg-secondary border border-border w-full h-auto p-1 flex-wrap">
+  2640→                  {INFER_CATEGORIES.map(cat => {
+  2641→                    const Icon = cat.icon;
+  2642→                    return <TabsTrigger key={cat.id} value={cat.id} className={`text-[10px] flex-1 min-w-[80px] h-8 flex items-center gap-1 ${inferCategory === cat.id ? cat.color : ''}`}><Icon className="w-3 h-3" />{cat.label}</TabsTrigger>;
+  2643→                  })}
+  2644→                </TabsList>
+  2645→              </Tabs>
+  2646→              {/* Analyze buttons */}
+  2647→              <div className="flex gap-2">
+  2648→                <Button className="flex-1 bg-primary text-primary-foreground text-xs h-9" disabled={inferLoading} onClick={() => handleInfer(inferCategory)}>
+  2649→                  {inferLoading ? 'Analyzing...' : `Analyze ${INFER_CATEGORIES.find(c => c.id === inferCategory)?.label}`}
+  2650→                </Button>
+  2651→                <Button variant="outline" className="h-9 text-xs border-border" disabled={inferLoading} onClick={() => handleInfer()}>
+  2652→                  <Sparkles className="w-3.5 h-3.5 mr-1" /> Full Analysis
+  2653→                </Button>
+  2654→              </div>
+  2655→              {/* Results */}
+  2656→              {Object.keys(inferResultsMap).length > 0 && (
+  2657→                <div className="space-y-3">
+  2658→                  {Object.entries(inferResultsMap).map(([catId, result]: [string, any]) => {
+  2659→                    const cat = INFER_CATEGORIES.find(c => c.id === catId);
+  2660→                    if (!cat) return null;
+  2661→                    return (
+  2662→                      <Card key={catId} className={`bg-secondary border ${result.color === 'red' ? 'border-red-500/30' : result.color === 'green' ? 'border-green-500/30' : 'border-border'}`}>
+  2663→                        <CardContent className="p-4 space-y-3">
+  2664→                          <div className="flex items-center justify-between">
+  2665→                            <div className="flex items-center gap-2">
+  2666→                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${result.color === 'red' ? 'bg-red-500/20' : result.color === 'green' ? 'bg-green-500/20' : 'bg-primary/20'}`}>
+  2667→                                <cat.icon className={`w-4 h-4 ${result.color === 'red' ? 'text-red-400' : result.color === 'green' ? 'text-green-400' : 'text-primary'}`} />
+  2668→                              </div>
+  2669→                              <div><p className="text-[12px] font-semibold">{cat.label}</p><p className="text-[10px] text-muted-foreground">{cat.desc}</p></div>
+  2670→                            </div>
+  2671→                            <div className="text-right">
+  2672→                              <p className={`text-sm font-bold ${result.color === 'red' ? 'text-red-400' : result.color === 'green' ? 'text-green-400' : 'text-primary'}`}>{result.confidence}%</p>
+  2673→                              <p className="text-[9px] text-muted-foreground">confidence</p>
+  2674→                            </div>
+  2675→                          </div>
+  2676→                          <Progress value={result.confidence} className={`h-1.5 ${result.color === 'red' ? '[&>div]:bg-red-400' : result.color === 'green' ? '[&>div]:bg-green-400' : ''}`} />
+  2677→                          <div>
+  2678→                            <p className="text-[13px] font-medium">{result.title}</p>
+  2679→                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{result.content}</p>
+  2680→                          </div>
+  2681→                          {result.bulletPoints?.length > 0 && (
+  2682→                            <ul className="space-y-1.5">
+  2683→                              {result.bulletPoints.map((bp: string, i: number) => (
+  2684→                                <li key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground">
+  2685→                                  <span className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${result.color === 'red' ? 'bg-red-400' : result.color === 'green' ? 'bg-green-400' : 'bg-primary'}`} />
+  2686→                                  {bp}
+  2687→                                </li>
+  2688→                              ))}
+  2689→                            </ul>
+  2690→                          )}
+  2691→                        </CardContent>
+  2692→                      </Card>
+  2693→                    );
+  2694→                  })}
+  2695→                </div>
+  2696→              )}
+  2697→              {Object.keys(inferResultsMap).length === 0 && !inferLoading && (
+  2698→                <EmptyState icon={Brain} title="Select a category to analyze" desc="Choose an analysis category above or run a full analysis" />
+  2699→              )}
+  2700→            </div>
+  2701→          </ScrollArea>
+  2702→        )}
+  2703→        {!inferTargetUser && (
+  2704→          <div className="flex-1 flex items-center justify-center">
+  2705→            <EmptyState icon={Target} title="Select a user to analyze" desc="Pick someone from the selector above to run AI analysis" />
+  2706→          </div>
+  2707→        )}
+  2708→      </div>
+  2709→    );
+  2710→  }
+  2711→
+  2712→  // ─── PROFILE DRAWER CONTENT ────────────────────────────────
+  2713→  function ProfileDrawerContent() {
+  2714→    if (!profileUser) return null;
+  2715→    const u = profileUser;
+  2716→    const currentPhoto = profilePhotos[profileGalleryIndex];
+  2717→    return (
+  2718→      <div className="space-y-0">
+  2719→        <div className="relative bg-secondary">
+  2720→          <div className="aspect-square max-h-[55vh] relative">
+  2721→            {currentPhoto ? <img src={currentPhoto.url} alt={u.displayName} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>}
+  2722→            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/50 to-transparent" />
+  2723→          </div>
+  2724→          {profilePhotos.length > 1 && (
+  2725→            <>
+  2726→              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+  2727→                {profilePhotos.map((_, i) => (<button key={i} onClick={() => setProfileGalleryIndex(i)} className={`w-2 h-2 rounded-full transition-all ${i === profileGalleryIndex ? 'bg-primary w-4' : 'bg-white/40'}`} />))}
+  2728→              </div>
+  2729→              <button onClick={() => setProfileGalleryIndex(i => (i - 1 + profilePhotos.length) % profilePhotos.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white"><ChevronLeft className="w-5 h-5" /></button>
+  2730→              <button onClick={() => setProfileGalleryIndex(i => (i + 1) % profilePhotos.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white"><ChevronRight className="w-5 h-5" /></button>
+  2731→            </>
+  2732→          )}
+  2733→          <button onClick={closeProfile} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white"><X className="w-4 h-4" /></button>
+  2734→        </div>
+  2735→        <div className="px-4 -mt-8 relative z-10 space-y-4">
+  2736→          <div className="flex items-start gap-3">
+  2737→            <div className="flex-1">
+  2738→              <div className="flex items-center gap-2 flex-wrap">
+  2739→                <h2 className="text-xl font-bold">{u.displayName}{u.showAge !== false && u.age ? `, ${u.age}` : ''}</h2>
+  2740→                {u.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+  2741→                {u.isPremium && <Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge>}
+  2742→              </div>
+  2743→              <div className="flex items-center gap-3 text-[12px] text-muted-foreground mt-1">
+  2744→                <span>@{u.username}</span>{u.pronouns && <span>{u.pronouns}</span>}
+  2745→              </div>
+  2746→            </div>
+  2747→            <div className={`flex items-center gap-1.5 text-[11px] ${u.online ? 'text-green-400' : 'text-muted-foreground'}`}>
+  2748→              {u.online && u.showOnline && <span className="w-2 h-2 bg-green-400 rounded-full online-pulse" />}
+  2749→              {getLastSeenText(u)}
+  2750→            </div>
+  2751→          </div>
+  2752→          <div className="flex gap-2 overflow-x-auto pb-1">
+  2753→            {[
+  2754→              { val: u._count?.photos || 0, label: 'Photos' },
+  2755→              { val: u._count?.receivedViews || 0, label: 'Views' },
+  2756→              { val: u._count?.receivedLikes || 0, label: 'Likes' },
+  2757→            ].map(s => (
+  2758→              <div key={s.label} className="shrink-0 text-center p-2.5 rounded-xl bg-secondary border border-border min-w-[68px]">
+  2759→                <p className="text-sm font-bold gradient-text">{s.val}</p>
+  2760→                <p className="text-[9px] text-muted-foreground">{s.label}</p>
+  2761→              </div>
+  2762→            ))}
+  2763→          </div>
+  2764→          {u.lookingFor && (
+  2765→            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+  2766→              <Heart className="w-4 h-4 text-primary" /><span className="text-sm">Looking for: <span className="capitalize text-primary font-medium">{u.lookingFor}</span></span>
+  2767→            </div>
+  2768→          )}
+  2769→          <div className="space-y-1.5">
+  2770→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Details</h4>
+  2771→            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+  2772→              {u.height && <DetailCell label="Height" value={`${u.height} cm`} />}
+  2773→              {u.bodyType && <DetailCell label="Body type" value={u.bodyType} />}
+  2774→              {u.ethnicity && <DetailCell label="Ethnicity" value={u.ethnicity} />}
+  2775→              {u.position && <DetailCell label="Position" value={u.position} />}
+  2776→              {u.relationshipStatus && <DetailCell label="Relationship" value={u.relationshipStatus} />}
+  2777→              {u.location && <DetailCell label="Location" value={u.location} />}
+  2778→              <DetailCell label="Gender" value={u.gender} />
+  2779→            </div>
+  2780→          </div>
+  2781→          {u.aboutMe && (<div className="space-y-1"><h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">About Me</h4><p className="text-sm leading-relaxed">{u.aboutMe}</p></div>)}
+  2782→          {profilePhotos.length > 1 && (
+  2783→            <div className="space-y-2"><h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Photos</h4>
+  2784→              <div className="grid grid-cols-4 gap-1.5">{profilePhotos.map((p, i) => (<button key={p.id} onClick={() => setProfileGalleryIndex(i)} className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${i === profileGalleryIndex ? 'border-primary' : 'border-transparent'}`}><img src={p.url} alt="" className="w-full h-full object-cover" /></button>))}</div>
+  2785→            </div>
+  2786→          )}
+  2787→          <div className="flex gap-2 pt-2 pb-6">
+  2788→            <Button className="flex-1 bg-primary text-primary-foreground" onClick={() => { openChat(u); closeProfile(); }}><MessageCircle className="w-4 h-4 mr-2" /> Message</Button>
+  2789→            <Tooltip><TooltipTrigger asChild><Button variant="outline" className="border-border" onClick={() => handleFavorite(u.id)}><Bookmark className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Favorite</TooltipContent></Tooltip>
+  2790→            <Tooltip><TooltipTrigger asChild><Button variant="outline" className="border-border" onClick={() => { setNoteTargetId(u.id); setShowNoteDialog(true); }}><StickyNote className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Note</TooltipContent></Tooltip>
+  2791→            <Button variant="outline" className="border-border" onClick={() => handleLike(u.id)}><Heart className="w-4 h-4 mr-1" /></Button>
+  2792→            <Button variant="outline" className="border-border" onClick={() => { setRizzTargetBio(u.bio || ''); setShowRizzModal(true); }}><Sparkles className="w-4 h-4" /></Button>
+  2793→            <DropdownMenu>
+  2794→              <DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="border-border h-9 w-9"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger>
+  2795→              <DropdownMenuContent className="bg-card border-border" align="end">
+  2796→                <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setShowBlockAlert(true)}><Block className="w-4 h-4 mr-2" /> Block</DropdownMenuItem>
+  2797→                <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setActiveTab('abuse')}><Flag className="w-4 h-4 mr-2" /> Report</DropdownMenuItem>
+  2798→              </DropdownMenuContent>
+  2799→            </DropdownMenu>
+  2800→          </div>
+  2801→        </div>
+  2802→      </div>
+  2803→    );
+  2804→  }
+  2805→
+  2806→  // ─── KINKS & BEDROOM VIEW ─────────────────────────────
+  2807→  function KinksView() {
+  2808→    const toggleField = (key: string, value: string) => {
+  2809→      const current = kinkFields[key] || '';
+  2810→      const arr = current ? current.split(',') : [];
+  2811→      const idx = arr.indexOf(value);
+  2812→      if (idx >= 0) arr.splice(idx, 1); else arr.push(value);
+  2813→      const updated = { ...kinkFields, [key]: arr.join(',') };
+  2814→      setKinkFields(updated);
+  2815→      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1', fields: updated }) }).catch(() => {});
+  2816→    };
+  2817→    const setSingleField = (key: string, value: string) => {
+  2818→      const updated = { ...kinkFields, [key]: value };
+  2819→      setKinkFields(updated);
+  2820→      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1', fields: updated }) }).catch(() => {});
+  2821→    };
+  2822→    const ChipField = ({ label, key, options }: { label: string; key: string; options: readonly string[] }) => {
+  2823→      const current = (kinkFields[key] || '').split(',').filter(Boolean);
+  2824→      return (
+  2825→        <div className="space-y-2">
+  2826→          <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</h4>
+  2827→          <div className="flex flex-wrap gap-1.5">
+  2828→            {options.map(opt => (
+  2829→              <button key={opt} onClick={() => toggleField(key, opt)}
+  2830→                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${current.includes(opt) ? 'bg-primary/20 text-primary border-primary/40' : 'bg-secondary text-muted-foreground border-border hover:border-primary/20'}`}>
+  2831→                {opt.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+  2832→              </button>
+  2833→            ))}
+  2834→          </div>
+  2835→        </div>
+  2836→      );
+  2837→    };
+  2838→    const SingleField = ({ label, key, options }: { label: string; key: string; options: readonly string[] }) => {
+  2839→      return (
+  2840→        <div className="space-y-2">
+  2841→          <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</h4>
+  2842→          <div className="flex flex-wrap gap-1.5">
+  2843→            {options.map(opt => (
+  2844→              <button key={opt} onClick={() => setSingleField(key, opt)}
+  2845→                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${kinkFields[key] === opt ? 'bg-primary/20 text-primary border-primary/40' : 'bg-secondary text-muted-foreground border-border hover:border-primary/20'}`}>
+  2846→                {opt.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+  2847→              </button>
+  2848→            ))}
+  2849→          </div>
+  2850→        </div>
+  2851→      );
+  2852→    };
+  2853→    if (kinkLoading) return <LoadingGrid cols={1} rows={6} />;
+  2854→    const kinkTabs = [
+  2855→      { id: 'bedroom', label: 'Bedroom', icon: Cherry },
+  2856→      { id: 'appearance', label: 'Appearance', icon: Palette },
+  2857→      { id: 'interests', label: 'Interests', icon: Target },
+  2858→      { id: 'lifestyle', label: 'Lifestyle', icon: Briefcase },
+  2859→    ];
+  2860→    return (
+  2861→      <div className="h-full flex flex-col">
+  2862→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  2863→          {kinkTabs.map(t => {
+  2864→            const Icon = t.icon;
+  2865→            return <button key={t.id} onClick={() => setKinkTab(t.id)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${kinkTab === t.id ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}><Icon className="w-3 h-3 mr-1 inline" />{t.label}</button>;
+  2866→          })}
+  2867→        </div>
+  2868→        <ScrollArea className="flex-1">
+  2869→          <div className="p-4 space-y-6 max-w-2xl mx-auto">
+  2870→            {kinkTab === 'bedroom' && (<>
+  2871→              <SingleField label="Position" key="position" options={['top','bottom','versatile','versatile-top','versatile-bottom','side','no']} />
+  2872→              <SingleField label="FF / Fisting" key="ff_role" options={FF_ROLE_OPTIONS} />
+  2873→              <SingleField label="S&M Level" key="sm_level" options={SM_LEVEL_OPTIONS} />
+  2874→              <ChipField label="Fetish & Clothing" key="fetishes" options={FETISH_CLOTHING_OPTIONS} />
+  2875→              <SingleField label="Safer Sex" key="safer_sex" options={SAFER_SEX_OPTIONS} />
+  2876→              <SingleField label="Dick Size" key="dick_size" options={DICK_SIZE_OPTIONS} />
+  2877→              <SingleField label="Circumcision" key="circumcision" options={CIRCUMCISION_OPTIONS} />
+  2878→              <SingleField label="Dirty Sex" key="dirty_sex" options={DIRTY_SEX_OPTIONS} />
+  2879→              <SingleField label="Meet At" key="meet_at" options={MEET_AT_OPTIONS} />
+  2880→            </>)}
+  2881→            {kinkTab === 'appearance' && (<>
+  2882→              <ChipField label="Tribes" key="tribes" options={TRIBE_OPTIONS} />
+  2883→              <SingleField label="Hair Color" key="hair_color" options={HAIR_COLOR_OPTIONS} />
+  2884→              <SingleField label="Hair Length" key="hair_length" options={HAIR_LENGTH_OPTIONS} />
+  2885→              <SingleField label="Eye Color" key="eye_color" options={EYE_COLOR_OPTIONS} />
+  2886→              <SingleField label="Beard" key="beard" options={BEARD_OPTIONS} />
+  2887→              <SingleField label="Piercings" key="piercings" options={PIERCING_OPTIONS} />
+  2888→              <SingleField label="Tattoos" key="tattoos" options={TATTOO_OPTIONS} />
+  2889→            </>)}
+  2890→            {kinkTab === 'interests' && (<>
+  2891→              <ChipField label="Going Out" key="going_out" options={GOING_OUT_OPTIONS} />
+  2892→              <ChipField label="Music Genres" key="music_genres" options={MUSIC_GENRE_OPTIONS} />
+  2893→              <ChipField label="Sports" key="sports" options={SPORT_OPTIONS} />
+  2894→              <ChipField label="Food" key="food" options={FOOD_OPTIONS} />
+  2895→            </>)}
+  2896→            {kinkTab === 'lifestyle' && (<>
+  2897→              <ChipField label="Travel Style" key="travel_style" options={TRAVEL_STYLE_OPTIONS} />
+  2898→              <ChipField label="Profession" key="profession" options={PROFESSION_OPTIONS} />
+  2899→              <SingleField label="Smoker" key="smoker" options={['no','socially','yes']} />
+  2900→            </>)}
+  2901→          </div>
+  2902→        </ScrollArea>
+  2903→      </div>
+  2904→    );
+  2905→  }
+  2906→
+  2907→  // ─── SETTINGS PANEL ────────────────────────────────────────
+  2908→  function SettingsPanel() {
+  2909→    return (
+  2910→      <ScrollArea className="h-full">
+  2911→        <div className="max-w-lg mx-auto p-4 space-y-6">
+  2912→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2913→            <SectionHeader icon={User} label="Account" />
+  2914→            <div className="flex items-center justify-between"><div><p className="text-sm">Email</p><p className="text-[11px] text-muted-foreground">{currentUser?.email}</p></div><Badge variant="outline" className="text-[10px] border-border">Verified</Badge></div>
+  2915→            <Separator className="bg-border" />
+  2916→            <div className="flex items-center justify-between"><p className="text-sm">Username</p><p className="text-[11px] text-muted-foreground">@{currentUser?.username}</p></div>
+  2917→          </CardContent></Card>
+  2918→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2919→            <SectionHeader icon={Shield} label="Privacy" />
+  2920→            {[
+  2921→              { key: 'showOnline', label: 'Show Online', desc: 'Let others see when you are online' },
+  2922→              { key: 'showDistance', label: 'Show Distance', desc: 'Display your distance' },
+  2923→              { key: 'showAge', label: 'Show Age', desc: 'Display your age' },
+  2924→            ].map(item => (
+  2925→              <React.Fragment key={item.key}>
+  2926→                <div className="flex items-center justify-between"><div><p className="text-sm">{item.label}</p><p className="text-[11px] text-muted-foreground">{item.desc}</p></div>
+  2927→                  <Switch checked={(settingsPrivacy as any)[item.key]} onCheckedChange={v => setSettingsPrivacy(p => ({ ...p, [item.key]: v }))} /></div>
+  2928→                <Separator className="bg-border" />
+  2929→              </React.Fragment>
+  2930→            ))}
+  2931→            <Button size="sm" className="bg-primary text-primary-foreground" onClick={handleSaveSettings}>Save Privacy</Button>
+  2932→          </CardContent></Card>
+  2933→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2934→            <SectionHeader icon={Bell} label="Notifications" />
+  2935→            {[
+  2936→              { key: 'push', label: 'Push Notifications', desc: 'Receive push notifications' },
+  2937→              { key: 'chat', label: 'Chat Messages', desc: 'New message alerts' },
+  2938→              { key: 'likes', label: 'Likes', desc: 'Like notifications' },
+  2939→              { key: 'views', label: 'Profile Views', desc: 'View notifications' },
+  2940→            ].map((item, idx) => (
+  2941→              <React.Fragment key={item.key}>
+  2942→                <div className="flex items-center justify-between"><div><p className="text-sm">{item.label}</p><p className="text-[11px] text-muted-foreground">{item.desc}</p></div>
+  2943→                  <Switch checked={(settingsNotifs as any)[item.key]} onCheckedChange={v => setSettingsNotifs(p => ({ ...p, [item.key]: v }))} /></div>
+  2944→                {idx < 3 && <Separator className="bg-border" />}
+  2945→              </React.Fragment>
+  2946→            ))}
+  2947→          </CardContent></Card>
+  2948→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2949→            <SectionHeader icon={Crown} label="Premium" />
+  2950→            {currentUser?.isPremium ? (
+  2951→              <div className="flex items-center justify-between"><div><p className="text-sm gradient-text font-semibold">Premium Active</p><p className="text-[11px] text-muted-foreground">Enjoy all premium features</p></div><Crown className="w-6 h-6 text-yellow-400" /></div>
+  2952→            ) : (
+  2953→              <div><p className="text-sm font-medium">Upgrade to Premium</p><p className="text-[11px] text-muted-foreground mt-1">Get unlimited likes, see who viewed you, and more</p>
+  2954→                <Button className="mt-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-black text-xs"><Crown className="w-4 h-4 mr-2" /> Go Premium</Button></div>
+  2955→            )}
+  2956→          </CardContent></Card>
+  2957→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2958→            <SectionHeader icon={Block} label="Blocked Users" count={blockedUsers.length} />
+  2959→            {blockedUsers.length > 0 ? blockedUsers.map((b: any) => (
+  2960→              <div key={b.id} className="flex items-center gap-3 p-2 rounded-lg"><Avatar className="h-8 w-8"><AvatarImage src={getAvatar(b.blocked)} /><AvatarFallback className="text-[10px]">{(b.blocked as any)?.displayName?.[0]}</AvatarFallback></Avatar>
+  2961→                <span className="text-sm flex-1">{(b.blocked as any)?.displayName || 'User'}</span>
+  2962→                <Button size="sm" variant="ghost" className="text-xs text-destructive" onClick={async () => { try { await fetch(`/api/blocks?blockedId=${(b.blocked as any)?.id}`, { method: 'DELETE' }); setBlockedUsers(prev => prev.filter((x: any) => x.id !== b.id)); } catch {} }}>Unblock</Button></div>
+  2963→            )) : <p className="text-xs text-muted-foreground">No blocked users</p>}
+  2964→          </CardContent></Card>
+  2965→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-2">
+  2966→            <SectionHeader icon={Globe} label="About NEXUS" />
+  2967→            <p className="text-sm">NEXUS v2.0.0</p><p className="text-[11px] text-muted-foreground">A unified dating & social platform</p>
+  2968→            <Separator className="bg-border" />
+  2969→            <div className="space-y-1 text-xs text-muted-foreground"><button className="hover:text-foreground" onClick={() => setActiveTab('legal')}>Terms of Service</button><br /><button className="hover:text-foreground" onClick={() => setActiveTab('legal')}>Privacy Policy</button></div>
+  2970→          </CardContent></Card>
+  2971→          <Button variant="outline" className="w-full border-destructive/30 text-destructive hover:bg-destructive/10" onClick={() => { setCurrentUser(null); setAuthed(false); setShowSettings(false); }}><LogOut className="w-4 h-4 mr-2" /> Log Out</Button>
+  2972→          <div className="h-4" />
+  2973→        </div>
+  2974→      </ScrollArea>
+  2975→    );
+  2976→  }
+  2977→}
+  2978→
+  2979→

@@ -1,0 +1,602 @@
+  1501→                placeholder="Search messages..."
+  1502→                className="h-8 text-[12px] bg-transparent border-0 focus-visible:ring-0 px-0"
+  1503→                autoFocus
+  1504→              />
+  1505→              {chatSearchQuery && (
+  1506→                <span className="text-[10px] text-muted-foreground shrink-0">{displayMessages.length} found</span>
+  1507→              )}
+  1508→              <button onClick={() => { setShowChatSearch(false); setChatSearchQuery(''); }}>
+  1509→                <X className="w-4 h-4 text-muted-foreground" />
+  1510→              </button>
+  1511→            </motion.div>
+  1512→          )}
+  1513→        </AnimatePresence>
+  1514→
+  1515→        {/* Main input row */}
+  1516→        <div className="px-3 py-2 flex items-center gap-2">
+  1517→          <TooltipProvider>
+  1518→            <Tooltip>
+  1519→              <TooltipTrigger asChild>
+  1520→                <Button
+  1521→                  variant="ghost"
+  1522→                  size="icon"
+  1523→                  className={`h-9 w-9 shrink-0 text-muted-foreground transition-colors ${showToolbar ? 'bg-secondary text-foreground' : ''}`}
+  1524→                  onClick={() => setShowToolbar(!showToolbar)}
+  1525→                >
+  1526→                  <Plus className={`w-5 h-5 transition-transform ${showToolbar ? 'rotate-45' : ''}`} />
+  1527→                </Button>
+  1528→              </TooltipTrigger>
+  1529→              <TooltipContent>More</TooltipContent>
+  1530→            </Tooltip>
+  1531→          </TooltipProvider>
+  1532→
+  1533→          <Input
+  1534→            value={msgInput}
+  1535→            onChange={(e) => setMsgInput(e.target.value)}
+  1536→            onKeyDown={(e) => {
+  1537→              if (e.key === 'Enter' && !e.shiftKey) {
+  1538→                e.preventDefault();
+  1539→                handleSendAndSuggest();
+  1540→              }
+  1541→            }}
+  1542→            placeholder={isRecording ? '' : 'Type a message...'}
+  1543→            className="flex-1 h-9 text-[13px] bg-secondary border-border"
+  1544→            disabled={isRecording}
+  1545→          />
+  1546→
+  1547→          <TooltipProvider>
+  1548→            <Tooltip>
+  1549→              <TooltipTrigger asChild>
+  1550→                <Button
+  1551→                  variant="ghost"
+  1552→                  size="icon"
+  1553→                  className={`h-9 w-9 shrink-0 ${isRecording ? 'bg-red-600 text-white hover:bg-red-700' : 'text-muted-foreground'}`}
+  1554→                  onMouseDown={startRecording}
+  1555→                  onMouseUp={stopRecording}
+  1556→                  onTouchStart={startRecording}
+  1557→                  onTouchEnd={stopRecording}
+  1558→                >
+  1559→                  {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+  1560→                </Button>
+  1561→              </TooltipTrigger>
+  1562→              <TooltipContent>{isRecording ? 'Release to send' : 'Hold to record'}</TooltipContent>
+  1563→            </Tooltip>
+  1564→          </TooltipProvider>
+  1565→
+  1566→          <Button
+  1567→            size="icon"
+  1568→            className="h-9 w-9 shrink-0 bg-primary text-primary-foreground"
+  1569→            onClick={handleSendAndSuggest}
+  1570→            disabled={!msgInput.trim() && !isRecording}
+  1571→          >
+  1572→            <Send className="w-4 h-4" />
+  1573→          </Button>
+  1574→        </div>
+  1575→      </div>
+  1576→    );
+  1577→  };
+  1578→
+  1579→  // ═══════════════════════════════════════════════════════════════
+  1580→  // MODALS
+  1581→  // ═══════════════════════════════════════════════════════════════
+  1582→
+  1583→  // Album Picker Modal
+  1584→  const AlbumPickerModal = () => (
+  1585→    <Dialog open={showAlbumPicker} onOpenChange={setShowAlbumPicker}>
+  1586→      <DialogContent className="bg-card border-border max-w-md">
+  1587→        <DialogHeader>
+  1588→          <DialogTitle className="text-foreground">Share Album</DialogTitle>
+  1589→        </DialogHeader>
+  1590→        <ScrollArea className="max-h-64 overflow-y-auto">
+  1591→          <div className="space-y-2">
+  1592→            {albums.map((album: any) => (
+  1593→              <button
+  1594→                key={album.id}
+  1595→                onClick={async () => {
+  1596→                  setSelectedAlbum(album);
+  1597→                  try {
+  1598→                    await fetch('/api/chat/album-share', {
+  1599→                      method: 'POST',
+  1600→                      headers: { 'Content-Type': 'application/json' },
+  1601→                      body: JSON.stringify({ receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct', albumId: album.id }),
+  1602→                    });
+  1603→                  } catch { /* silent */ }
+  1604→                  setShowAlbumPicker(false);
+  1605→                }}
+  1606→                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors ${selectedAlbum?.id === album.id ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}
+  1607→              >
+  1608→                <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center">
+  1609→                  <ImageIcon className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+  1610→                </div>
+  1611→                <div className="flex-1 text-left">
+  1612→                  <p className="text-[12px] font-medium text-foreground">{album.name}</p>
+  1613→                  <p className="text-[10px] text-muted-foreground">{album._count?.photos || 0} photos</p>
+  1614→                </div>
+  1615→              </button>
+  1616→            ))}
+  1617→            {albums.length === 0 && <p className="text-center text-[12px] text-muted-foreground py-4">No albums found</p>}
+  1618→          </div>
+  1619→        </ScrollArea>
+  1620→      </DialogContent>
+  1621→    </Dialog>
+  1622→  );
+  1623→
+  1624→  // Location Picker Modal
+  1625→  const LocationPickerModal = () => (
+  1626→    <Dialog open={showLocationPicker} onOpenChange={setShowLocationPicker}>
+  1627→      <DialogContent className="bg-card border-border max-w-md">
+  1628→        <DialogHeader>
+  1629→          <DialogTitle className="text-foreground">Share Location</DialogTitle>
+  1630→        </DialogHeader>
+  1631→        <div className="space-y-3">
+  1632→          <div className="h-40 rounded-lg bg-secondary border border-border flex items-center justify-center relative overflow-hidden">
+  1633→            <Navigation className="w-8 h-8 text-muted-foreground" />
+  1634→            <div className="absolute bottom-2 left-2 right-2">
+  1635→              <Input
+  1636→                value={locationName}
+  1637→                onChange={(e) => setLocationName(e.target.value)}
+  1638→                placeholder="Location name (e.g. Central Park)"
+  1639→                className="h-8 text-[12px] bg-card/90 border-border"
+  1640→              />
+  1641→            </div>
+  1642→          </div>
+  1643→          <Button
+  1644→            onClick={async () => {
+  1645→              try {
+  1646→                await fetch('/api/chat/location', {
+  1647→                  method: 'POST',
+  1648→                  headers: { 'Content-Type': 'application/json' },
+  1649→                  body: JSON.stringify({ receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct', lat: 40.758, lng: -73.985, name: locationName || 'My Location' }),
+  1650→                });
+  1651→              } catch { /* silent */ }
+  1652→              setShowLocationPicker(false);
+  1653→              setLocationName('');
+  1654→            }}
+  1655→            className="w-full"
+  1656→            disabled={loadingAction === 'location'}
+  1657→          >
+  1658→            {loadingAction === 'location' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <MapPin className="w-4 h-4 mr-2" />}
+  1659→            Share Location
+  1660→          </Button>
+  1661→        </div>
+  1662→      </DialogContent>
+  1663→    </Dialog>
+  1664→  );
+  1665→
+  1666→  // Poll Create Modal
+  1667→  const PollCreateModal = () => (
+  1668→    <Dialog open={showCreatePollModal} onOpenChange={setShowCreatePollModal}>
+  1669→      <DialogContent className="bg-card border-border max-w-md">
+  1670→        <DialogHeader>
+  1671→          <DialogTitle className="text-foreground">Create Poll</DialogTitle>
+  1672→        </DialogHeader>
+  1673→        <div className="space-y-3">
+  1674→          <Input
+  1675→            value={pollQuestion}
+  1676→            onChange={(e) => setPollQuestion(e.target.value)}
+  1677→            placeholder="Ask a question..."
+  1678→            className="text-[13px] bg-secondary border-border"
+  1679→          />
+  1680→          <div className="space-y-2">
+  1681→            {pollOptions.map((opt, i) => (
+  1682→              <div key={i} className="flex items-center gap-2">
+  1683→                <Input
+  1684→                  value={opt}
+  1685→                  onChange={(e) => {
+  1686→                    const next = [...pollOptions];
+  1687→                    next[i] = e.target.value;
+  1688→                    setPollOptions(next);
+  1689→                  }}
+  1690→                  placeholder={`Option ${i + 1}`}
+  1691→                  className="text-[12px] bg-secondary border-border"
+  1692→                />
+  1693→                {pollOptions.length > 2 && (
+  1694→                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setPollOptions(pollOptions.filter((_, j) => j !== i))}>
+  1695→                    <X className="w-3 h-3" />
+  1696→                  </Button>
+  1697→                )}
+  1698→              </div>
+  1699→            ))}
+  1700→            {pollOptions.length < 5 && (
+  1701→              <Button variant="ghost" size="sm" className="text-[11px] text-muted-foreground" onClick={() => setPollOptions([...pollOptions, ''])}>
+  1702→                + Add Option
+  1703→              </Button>
+  1704→            )}
+  1705→          </div>
+  1706→          <Button onClick={createPoll} className="w-full" disabled={!pollQuestion || pollOptions.filter(Boolean).length < 2 || !!loadingAction}>
+  1707→            {loadingAction === 'poll' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Vote className="w-4 h-4 mr-2" />}
+  1708→            Create Poll
+  1709→          </Button>
+  1710→        </div>
+  1711→      </DialogContent>
+  1712→    </Dialog>
+  1713→  );
+  1714→
+  1715→  // Schedule Message Modal
+  1716→  const ScheduleMessageModal = () => (
+  1717→    <Dialog open={showScheduleModal} onOpenChange={setShowScheduleModal}>
+  1718→      <DialogContent className="bg-card border-border max-w-md">
+  1719→        <DialogHeader>
+  1720→          <DialogTitle className="text-foreground">Schedule Message</DialogTitle>
+  1721→        </DialogHeader>
+  1722→        <div className="space-y-3">
+  1723→          <Textarea
+  1724→            value={msgInput}
+  1725→            onChange={(e) => setMsgInput(e.target.value)}
+  1726→            placeholder="Message content..."
+  1727→            className="text-[13px] bg-secondary border-border min-h-[80px]"
+  1728→          />
+  1729→          <div className="grid grid-cols-2 gap-2">
+  1730→            <div>
+  1731→              <Label className="text-[11px] text-muted-foreground mb-1 block">Date</Label>
+  1732→              <Input
+  1733→                type="date"
+  1734→                value={scheduleDate}
+  1735→                onChange={(e) => setScheduleDate(e.target.value)}
+  1736→                className="text-[12px] bg-secondary border-border"
+  1737→              />
+  1738→            </div>
+  1739→            <div>
+  1740→              <Label className="text-[11px] text-muted-foreground mb-1 block">Time</Label>
+  1741→              <Input
+  1742→                type="time"
+  1743→                value={scheduleTime}
+  1744→                onChange={(e) => setScheduleTime(e.target.value)}
+  1745→                className="text-[12px] bg-secondary border-border"
+  1746→              />
+  1747→            </div>
+  1748→          </div>
+  1749→          <Button onClick={sendScheduledMessage} className="w-full" disabled={!msgInput || !scheduleDate || !scheduleTime || !!loadingAction}>
+  1750→            {loadingAction === 'schedule' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Timer className="w-4 h-4 mr-2" />}
+  1751→            Schedule
+  1752→          </Button>
+  1753→        </div>
+  1754→      </DialogContent>
+  1755→    </Dialog>
+  1756→  );
+  1757→
+  1758→  // Forward Message Modal
+  1759→  const ForwardMessageModal = () => (
+  1760→    <Dialog open={showForwardModal} onOpenChange={(open) => { if (!open) { setShowForwardModal(false); setForwardMessage(null); setForwardTarget(''); } }}>
+  1761→      <DialogContent className="bg-card border-border max-w-md">
+  1762→        <DialogHeader>
+  1763→          <DialogTitle className="text-foreground">Forward Message</DialogTitle>
+  1764→        </DialogHeader>
+  1765→        <div className="space-y-3">
+  1766→          {forwardMessage && (
+  1767→            <div className="p-2 rounded-lg bg-secondary border border-border">
+  1768→              <p className="text-[11px] text-muted-foreground mb-0.5">From: {forwardMessage.sender?.displayName}</p>
+  1769→              <p className="text-[12px] text-foreground line-clamp-2">{forwardMessage.content}</p>
+  1770→            </div>
+  1771→          )}
+  1772→          <ScrollArea className="max-h-48 overflow-y-auto">
+  1773→            <div className="space-y-1">
+  1774→              {conversationsForForward.map((convo: Conversation) => (
+  1775→                <button
+  1776→                  key={convo.otherUser.id}
+  1777→                  onClick={() => setForwardTarget(convo.otherUser.id)}
+  1778→                  className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors ${forwardTarget === convo.otherUser.id ? 'bg-primary/10 border border-primary/50' : 'hover:bg-secondary'}`}
+  1779→                >
+  1780→                  <Avatar className="h-8 w-8">
+  1781→                    <AvatarImage src={getAvatar(convo.otherUser)} />
+  1782→                    <AvatarFallback className="text-[10px]">{convo.otherUser.displayName?.[0]}</AvatarFallback>
+  1783→                  </Avatar>
+  1784→                  <span className="text-[12px] text-foreground">{convo.otherUser.displayName}</span>
+  1785→                </button>
+  1786→              ))}
+  1787→              {conversationsForForward.length === 0 && <p className="text-center text-[12px] text-muted-foreground py-4">No conversations</p>}
+  1788→            </div>
+  1789→          </ScrollArea>
+  1790→          <Button onClick={forwardMessageAction} className="w-full" disabled={!forwardTarget || !!loadingAction}>
+  1791→            {loadingAction === 'forward' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Forward className="w-4 h-4 mr-2" />}
+  1792→            Forward
+  1793→          </Button>
+  1794→        </div>
+  1795→      </DialogContent>
+  1796→    </Dialog>
+  1797→  );
+  1798→
+  1799→  // Call Modal
+  1800→  const CallModal = () => (
+  1801→    <Dialog open={showCallModal} onOpenChange={setShowCallModal}>
+  1802→      <DialogContent className="bg-card border-border max-w-sm">
+  1803→        <DialogHeader>
+  1804→          <DialogTitle className="text-foreground">Start Call</DialogTitle>
+  1805→        </DialogHeader>
+  1806→        <div className="grid grid-cols-2 gap-3">
+  1807→          <button
+  1808→            onClick={() => createCallLink('voice')}
+  1809→            className="flex flex-col items-center gap-2 p-6 rounded-xl border border-border hover:border-emerald-500/50 hover:bg-emerald-600/5 transition-all"
+  1810→          >
+  1811→            <div className="p-3 rounded-full bg-emerald-600/20">
+  1812→              <Phone className="w-6 h-6 text-emerald-400" />
+  1813→            </div>
+  1814→            <span className="text-[12px] font-medium text-foreground">Voice Call</span>
+  1815→          </button>
+  1816→          <button
+  1817→            onClick={() => createCallLink('video')}
+  1818→            className="flex flex-col items-center gap-2 p-6 rounded-xl border border-border hover:border-violet-500/50 hover:bg-violet-600/5 transition-all"
+  1819→          >
+  1820→            <div className="p-3 rounded-full bg-violet-600/20">
+  1821→              <Video className="w-6 h-6 text-violet-400" />
+  1822→            </div>
+  1823→            <span className="text-[12px] font-medium text-foreground">Video Call</span>
+  1824→          </button>
+  1825→        </div>
+  1826→      </DialogContent>
+  1827→    </Dialog>
+  1828→  );
+  1829→
+  1830→  // AI Summary Modal
+  1831→  const AiSummaryModal = () => (
+  1832→    <Dialog open={showAiSummary} onOpenChange={setShowAiSummary}>
+  1833→      <DialogContent className="bg-card border-border max-w-md">
+  1834→        <DialogHeader>
+  1835→          <DialogTitle className="text-foreground flex items-center gap-2">
+  1836→            <Sparkles className="w-4 h-4 text-violet-400" /> AI Conversation Summary
+  1837→          </DialogTitle>
+  1838→        </DialogHeader>
+  1839→        <div className="min-h-[80px]">
+  1840→          {summaryLoading ? (
+  1841→            <div className="flex items-center justify-center py-8">
+  1842→              <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
+  1843→            </div>
+  1844→          ) : (
+  1845→            <p className="text-[13px] text-foreground leading-relaxed">{aiSummary}</p>
+  1846→          )}
+  1847→        </div>
+  1848→      </DialogContent>
+  1849→    </Dialog>
+  1850→  );
+  1851→
+  1852→  // Meetup Suggestions Modal
+  1853→  const MeetupSuggestionsModal = () => (
+  1854→    <Dialog open={showMeetupSuggestions} onOpenChange={setShowMeetupSuggestions}>
+  1855→      <DialogContent className="bg-card border-border max-w-md">
+  1856→        <DialogHeader>
+  1857→          <DialogTitle className="text-foreground flex items-center gap-2">
+  1858→            <MapPin className="w-4 h-4 text-amber-400" /> Suggested Meetup Spots
+  1859→          </DialogTitle>
+  1860→        </DialogHeader>
+  1861→        <ScrollArea className="max-h-72 overflow-y-auto">
+  1862→          {meetupLoading ? (
+  1863→            <div className="flex items-center justify-center py-8">
+  1864→              <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
+  1865→            </div>
+  1866→          ) : meetupSuggestions.length > 0 ? (
+  1867→            <div className="space-y-2">
+  1868→              {meetupSuggestions.map((venue: any, i: number) => (
+  1869→                <div key={i} className="p-3 rounded-xl border border-border hover:border-amber-500/30 transition-colors">
+  1870→                  <div className="flex items-start gap-3">
+  1871→                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+  1872→                      <MapPin className="w-5 h-5 text-amber-400" />
+  1873→                    </div>
+  1874→                    <div className="flex-1 min-w-0">
+  1875→                      <p className="text-[13px] font-semibold text-foreground">{venue.name}</p>
+  1876→                      <p className="text-[11px] text-muted-foreground mt-0.5">{venue.description}</p>
+  1877→                      {venue.rating && (
+  1878→                        <div className="flex items-center gap-1 mt-1">
+  1879→                          <Star className="w-3 h-3 text-amber-400" />
+  1880→                          <span className="text-[10px] text-muted-foreground">{venue.rating}</span>
+  1881→                        </div>
+  1882→                      )}
+  1883→                    </div>
+  1884→                    <Button variant="outline" size="sm" className="h-7 text-[10px] shrink-0 border-amber-500/50 text-amber-400 hover:bg-amber-600/10">
+  1885→                      <ArrowUpRight className="w-3 h-3" />
+  1886→                    </Button>
+  1887→                  </div>
+  1888→                </div>
+  1889→              ))}
+  1890→            </div>
+  1891→          ) : (
+  1892→            <p className="text-center text-[12px] text-muted-foreground py-8">No suggestions available</p>
+  1893→          )}
+  1894→        </ScrollArea>
+  1895→      </DialogContent>
+  1896→    </Dialog>
+  1897→  );
+  1898→
+  1899→  // Media Gallery Modal
+  1900→  const MediaGalleryModal = () => (
+  1901→    <Dialog open={showChatMediaGallery} onOpenChange={setShowChatMediaGallery}>
+  1902→      <DialogContent className="bg-card border-border max-w-lg">
+  1903→        <DialogHeader>
+  1904→          <DialogTitle className="text-foreground">Shared Media</DialogTitle>
+  1905→        </DialogHeader>
+  1906→        <ScrollArea className="max-h-96 overflow-y-auto">
+  1907→          {mediaGalleryItems.length > 0 ? (
+  1908→            <div className="grid grid-cols-3 gap-1">
+  1909→              {mediaGalleryItems.map((msg) => (
+  1910→                <div key={msg.id} className={`aspect-square rounded-lg bg-secondary ${nsfwFilter ? 'blur-sm hover:blur-none transition-all cursor-pointer' : ''} flex items-center justify-center`}
+  1911→                  onClick={() => nsfwFilter && revealImage(msg.id)}
+  1912→                >
+  1913→                  <div className="text-center">
+  1914→                    {msg.type === 'video' ? <Video className="w-6 h-6 text-muted-foreground mx-auto" aria-hidden="true" /> : <ImageIcon className="w-6 h-6 text-muted-foreground mx-auto" aria-hidden="true" />}
+  1915→                    <p className="text-[8px] text-muted-foreground mt-1 px-1 truncate">{msg.content}</p>
+  1916→                  </div>
+  1917→                </div>
+  1918→              ))}
+  1919→            </div>
+  1920→          ) : (
+  1921→            <p className="text-center text-[12px] text-muted-foreground py-8">No shared media</p>
+  1922→          )}
+  1923→        </ScrollArea>
+  1924→      </DialogContent>
+  1925→    </Dialog>
+  1926→  );
+  1927→
+  1928→  // Chat Theme Modal
+  1929→  const ChatThemeModal = () => (
+  1930→    <Dialog open={showThemeModal} onOpenChange={setShowThemeModal}>
+  1931→      <DialogContent className="bg-card border-border max-w-sm">
+  1932→        <DialogHeader>
+  1933→          <DialogTitle className="text-foreground flex items-center gap-2">
+  1934→            <Palette className="w-4 h-4 text-violet-400" /> Chat Theme
+  1935→          </DialogTitle>
+  1936→        </DialogHeader>
+  1937→        <div className="grid grid-cols-2 gap-2">
+  1938→          {CHAT_THEMES.map((t) => (
+  1939→            <button
+  1940→              key={t.id}
+  1941→              onClick={() => { setChatTheme(t.id); setShowThemeModal(false); }}
+  1942→              className={`p-3 rounded-xl border-2 transition-all ${chatTheme === t.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}
+  1943→            >
+  1944→              <div className="flex gap-2 mb-2">
+  1945→                <div className={`w-6 h-4 rounded ${t.ownBg}`} />
+  1946→                <div className={`w-6 h-4 rounded ${t.otherBg} border ${t.otherBorder}`} />
+  1947→              </div>
+  1948→              <p className="text-[11px] text-foreground font-medium">{t.label}</p>
+  1949→            </button>
+  1950→          ))}
+  1951→        </div>
+  1952→      </DialogContent>
+  1953→    </Dialog>
+  1954→  );
+  1955→
+  1956→  // Message Stats Modal
+  1957→  const MessageStatsModal = () => {
+  1958→    const stats = getStats();
+  1959→    return (
+  1960→      <Dialog open={showStatsModal} onOpenChange={setShowStatsModal}>
+  1961→        <DialogContent className="bg-card border-border max-w-sm">
+  1962→          <DialogHeader>
+  1963→            <DialogTitle className="text-foreground flex items-center gap-2">
+  1964→              <BarChart3 className="w-4 h-4 text-cyan-400" /> Message Stats
+  1965→            </DialogTitle>
+  1966→          </DialogHeader>
+  1967→          <div className="space-y-3">
+  1968→            <div className="grid grid-cols-2 gap-3">
+  1969→              <div className="p-3 rounded-xl bg-secondary border border-border text-center">
+  1970→                <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+  1971→                <p className="text-[10px] text-muted-foreground">Total Messages</p>
+  1972→              </div>
+  1973→              <div className="p-3 rounded-xl bg-secondary border border-border text-center">
+  1974→                <p className="text-2xl font-bold text-foreground">{stats.totalChars}</p>
+  1975→                <p className="text-[10px] text-muted-foreground">Characters</p>
+  1976→              </div>
+  1977→              <div className="p-3 rounded-xl bg-secondary border border-border text-center">
+  1978→                <p className="text-2xl font-bold text-primary">{stats.mine}</p>
+  1979→                <p className="text-[10px] text-muted-foreground">Your Messages</p>
+  1980→              </div>
+  1981→              <div className="p-3 rounded-xl bg-secondary border border-border text-center">
+  1982→                <p className="text-2xl font-bold text-amber-400">{stats.theirs}</p>
+  1983→                <p className="text-[10px] text-muted-foreground">Their Messages</p>
+  1984→              </div>
+  1985→            </div>
+  1986→            <Separator className="bg-border" />
+  1987→            <div className="flex items-center justify-between">
+  1988→              <span className="text-[11px] text-muted-foreground">Avg Response Time</span>
+  1989→              <span className="text-[12px] font-medium text-foreground">{stats.avgRespTime}</span>
+  1990→            </div>
+  1991→          </div>
+  1992→        </DialogContent>
+  1993→      </Dialog>
+  1994→    );
+  1995→  };
+  1996→
+  1997→  // Safe Mode Overlay (#29)
+  1998→  const SafeModeOverlay = () => (
+  1999→    <AnimatePresence>
+  2000→      {showSafeWord && (
+  2001→        <motion.div
+  2002→          initial={{ opacity: 0 }}
+  2003→          animate={{ opacity: 1 }}
+  2004→          exit={{ opacity: 0 }}
+  2005→          className="fixed inset-0 z-[200] bg-red-900 flex flex-col items-center justify-center"
+  2006→        >
+  2007→          <motion.div
+  2008→            initial={{ scale: 0.5, opacity: 0 }}
+  2009→            animate={{ scale: 1, opacity: 1 }}
+  2010→            transition={{ delay: 0.2, type: 'spring' }}
+  2011→            className="text-center"
+  2012→          >
+  2013→            <ShieldAlert className="w-20 h-20 text-red-300 mx-auto mb-4" />
+  2014→            <h1 className="text-3xl font-bold text-white mb-2">SAFE MODE</h1>
+  2015→            <h2 className="text-xl text-red-200 mb-6">ACTIVATED</h2>
+  2016→            <p className="text-sm text-red-300">Clearing chat and returning to list...</p>
+  2017→          </motion.div>
+  2018→        </motion.div>
+  2019→      )}
+  2020→    </AnimatePresence>
+  2021→  );
+  2022→
+  2023→  // ═══════════════════════════════════════════════════════════════
+  2024→  // MAIN RENDER
+  2025→  // ═══════════════════════════════════════════════════════════════
+  2026→  return (
+  2027→    <TooltipProvider>
+  2028→      <div className="h-full flex flex-col relative" onContextMenu={(e) => {
+  2029→        // Only show stats on long press in empty area (not on a message)
+  2030→        if ((e.target as HTMLElement).closest('[data-message]')) return;
+  2031→      }}>
+  2032→        {/* Chat Header */}
+  2033→        <ChatHeader />
+  2034→
+  2035→        {/* Pinned Messages Bar */}
+  2036→        <PinnedMessagesBar />
+  2037→
+  2038→        {/* Message List */}
+  2039→        <ScrollArea className="flex-1" ref={scrollContainerRef}>
+  2040→          <div className="px-3 py-4 space-y-2">
+  2041→            {displayMessages.length === 0 && !showChatSearch && (
+  2042→              <div className="flex flex-col items-center justify-center py-12">
+  2043→                <MessageSquare className="w-12 h-12 text-muted-foreground/30 mb-3" />
+  2044→                <p className="text-[13px] text-muted-foreground">
+  2045→                  {showChatSearch ? 'No messages found' : 'No messages yet. Say hello!'}
+  2046→                </p>
+  2047→              </div>
+  2048→            )}
+  2049→
+  2050→            {displayMessages.map((msg) => (
+  2051→              <div key={msg.id} data-message="true">
+  2052→                <MessageBubble msg={msg} />
+  2053→              </div>
+  2054→            ))}
+  2055→
+  2056→            {/* Typing indicator */}
+  2057→            <TypingIndicator />
+  2058→
+  2059→            <div ref={msgEndRef} />
+  2060→          </div>
+  2061→        </ScrollArea>
+  2062→
+  2063→        {/* Event Detection Banner */}
+  2064→        <EventDetectionBanner />
+  2065→
+  2066→        {/* AI Auto-Reply Suggestions */}
+  2067→        <AutoReplySuggestions />
+  2068→
+  2069→        {/* Chat Toolbar */}
+  2070→        <ChatToolbar />
+  2071→
+  2072→        {/* Chat Input */}
+  2073→        <ChatInput />
+  2074→
+  2075→        {/* Quick Context Card (group chat) */}
+  2076→        <QuickContextCardComp />
+  2077→
+  2078→        {/* Safe Mode Overlay */}
+  2079→        <SafeModeOverlay />
+  2080→
+  2081→        {/* ═══ ALL MODALS ═══ */}
+  2082→        <AlbumPickerModal />
+  2083→        <LocationPickerModal />
+  2084→        <PollCreateModal />
+  2085→        <ScheduleMessageModal />
+  2086→        <ForwardMessageModal />
+  2087→        <CallModal />
+  2088→        <AiSummaryModal />
+  2089→        <MeetupSuggestionsModal />
+  2090→        <MediaGalleryModal />
+  2091→        <ChatThemeModal />
+  2092→        <MessageStatsModal />
+  2093→
+  2094→        {/* Long-press empty area → stats (mobile) */}
+  2095→        <div
+  2096→          className="hidden"
+  2097→          onContextMenu={(e) => { e.preventDefault(); setShowStatsModal(true); }}
+  2098→          onTouchStart={() => { /* handled by empty area long press */ }}
+  2099→        />
+  2100→      </div>
+
+[showing lines 1501-2100 of 2104; use offset=2101 with limit to continue reading]

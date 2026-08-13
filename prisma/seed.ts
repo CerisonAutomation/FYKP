@@ -257,20 +257,54 @@ async function main() {
   const group3 = await db.groupChat.create({ data: { name: 'Nightlife Crew', description: 'Weekend plans and party connections', ownerId: otherUsers[7], isPublic: false, tags: 'party,nightlife,social' } });
   await db.groupMember.createMany({ data: [otherUsers[7], otherUsers[2], otherUsers[5], otherUsers[11], otherUsers[15]].map((uid, idx) => ({ userId: uid, groupId: group3.id, role: idx === 0 ? 'owner' : 'member' })) });
 
-  // Events
+  // Events (15 diverse events with types and attendee counts)
   const eventsData = [
-    { title: 'Beach Party @ Golden Bay', description: 'Sun, sand, and good vibes. Bring your own drinks!', location: 'Golden Bay, Malta', lat: 35.9167, lng: 14.3333, startDate: new Date(Date.now() + 86400000 * 3), ownerId: testUser.id, imageUrl: AVATARS[0] },
-    { title: 'Pride Walk Valletta', description: 'Annual Pride march through the streets of Valletta. Everyone welcome!', location: 'Valletta, Malta', lat: 35.8989, lng: 14.5146, startDate: new Date(Date.now() + 86400000 * 7), ownerId: otherUsers[2], imageUrl: AVATARS[5] },
-    { title: 'Speed Dating Night', description: 'Meet 10+ singles in one night. Drinks included!', location: 'St. Julian\'s, Malta', lat: 35.9133, lng: 14.4967, startDate: new Date(Date.now() + 86400000 * 2), ownerId: otherUsers[5], imageUrl: AVATARS[3] },
-    { title: 'Drag Show @ The Alley', description: 'Weekly drag extravaganza. Doors at 10pm.', location: 'Sliema, Malta', lat: 35.9117, lng: 14.4983, startDate: new Date(Date.now() + 86400000 * 1), ownerId: otherUsers[8], imageUrl: AVATARS[8] },
-    { title: 'Yoga in the Park', description: 'Morning yoga session for all levels. Mats provided.', location: 'Floriana, Malta', lat: 35.8925, lng: 14.5083, startDate: new Date(Date.now() + 86400000 * 5), ownerId: otherUsers[12], imageUrl: AVATARS[12] },
-    { title: 'Tech Meetup: Web Dev', description: 'Networking for developers and designers. Pizza provided!', location: 'Gzira, Malta', lat: 35.9067, lng: 14.4933, startDate: new Date(Date.now() + 86400000 * 10), ownerId: testUser.id, imageUrl: AVATARS[16] },
+    { title: 'Beach Party @ Golden Bay', description: 'Sun, sand, and good vibes. Bring your own drinks and sunscreen!', location: 'Golden Bay, Malta', lat: 35.9167, lng: 14.3333, startDate: new Date(Date.now() + 86400000 * 3), endDate: new Date(Date.now() + 86400000 * 3 + 36000000), ownerId: testUser.id, imageUrl: AVATARS[0], type: 'party', attendeeCount: 85, isPublic: true },
+    { title: 'Pride Walk Valletta', description: 'Annual Pride march through the streets of Valletta. Everyone welcome! Meet at Freedom Square.', location: 'Valletta, Malta', lat: 35.8989, lng: 14.5146, startDate: new Date(Date.now() + 86400000 * 7), endDate: new Date(Date.now() + 86400000 * 7 + 14400000), ownerId: otherUsers[2], imageUrl: AVATARS[5], type: 'social', attendeeCount: 320, isPublic: true },
+    { title: 'Speed Dating: 25-35', description: 'Meet 10-12 guys in one evening. 5-minute dates with a complimentary drink included.', location: "St. Julian's, Malta", lat: 35.9133, lng: 14.4967, startDate: new Date(Date.now() + 86400000 * 2), endDate: new Date(Date.now() + 86400000 * 2 + 10800000), ownerId: otherUsers[5], imageUrl: AVATARS[3], type: 'meetup', attendeeCount: 24, isPublic: true },
+    { title: 'Drag Show @ The Alley', description: 'Weekly drag extravaganza featuring local and international queens. Doors at 10pm, show at 11pm.', location: 'Sliema, Malta', lat: 35.9117, lng: 14.4983, startDate: new Date(Date.now() + 86400000 * 1), endDate: new Date(Date.now() + 86400000 * 1 + 14400000), ownerId: otherUsers[8], imageUrl: AVATARS[8], type: 'cultural', attendeeCount: 65, isPublic: true },
+    { title: 'Morning Yoga in the Park', description: 'Sunrise yoga session for all levels. Mats and water provided. Donation-based.', location: 'Floriana, Malta', lat: 35.8925, lng: 14.5083, startDate: new Date(Date.now() + 86400000 * 5), endDate: new Date(Date.now() + 86400000 * 5 + 3600000), ownerId: otherUsers[12], imageUrl: AVATARS[12], type: 'sports', attendeeCount: 18, isPublic: true },
+    { title: 'Queer Tech Meetup', description: 'Networking for LGBTQ+ developers, designers, and tech professionals. Pizza provided!', location: 'Gzira, Malta', lat: 35.9067, lng: 14.4933, startDate: new Date(Date.now() + 86400000 * 10), endDate: new Date(Date.now() + 86400000 * 10 + 7200000), ownerId: testUser.id, imageUrl: AVATARS[16], type: 'meetup', attendeeCount: 35, isPublic: true },
+    { title: 'Bear Night @ The Eagle', description: 'Monthly bear community party. Dress code: leather, gear, or nothing. Go-go dancers all night.', location: 'Paceville, Malta', lat: 35.9217, lng: 14.4833, startDate: new Date(Date.now() + 86400000 * 4), endDate: new Date(Date.now() + 86400000 * 5 + 21600000), ownerId: otherUsers[1], imageUrl: AVATARS[1], type: 'party', attendeeCount: 140, isPublic: true },
+    { title: 'Queer Volleyball Tournament', description: 'Beach volleyball tournament. Teams of 4-6, all skill levels. Prizes for best team name!', location: 'St. George\'s Bay, Malta', lat: 35.9150, lng: 14.4850, startDate: new Date(Date.now() + 86400000 * 12), endDate: new Date(Date.now() + 86400000 * 12 + 28800000), ownerId: otherUsers[4], imageUrl: AVATARS[4], type: 'sports', attendeeCount: 48, isPublic: true },
+    { title: 'Drag Bingo Night', description: 'Campy drag-hosted bingo with hilarious prizes. Hosted by local legend. $5 cards at the door.', location: 'Valletta, Malta', lat: 35.8975, lng: 14.5120, startDate: new Date(Date.now() + 86400000 * 6), endDate: new Date(Date.now() + 86400000 * 6 + 10800000), ownerId: otherUsers[9], imageUrl: AVATARS[9], type: 'cultural', attendeeCount: 55, isPublic: true },
+    { title: 'Queer Book Club: Giovanni\'s Room', description: 'Discussing James Baldwin\'s classic. New members welcome. Coffee and pastries provided.', location: 'Mdina, Malta', lat: 35.8867, lng: 14.4050, startDate: new Date(Date.now() + 86400000 * 8), endDate: new Date(Date.now() + 86400000 * 8 + 7200000), ownerId: otherUsers[11], imageUrl: AVATARS[11], type: 'cultural', attendeeCount: 12, isPublic: true },
+    { title: 'Sunset Beach Social', description: 'Casual beach hangout with a bonfire, snacks, and acoustic music. Bring a blanket and drinks.', location: 'Blue Lagoon, Comino', lat: 35.9700, lng: 14.3600, startDate: new Date(Date.now() + 86400000 * 9), endDate: new Date(Date.now() + 86400000 * 9 + 21600000), ownerId: otherUsers[14], imageUrl: AVATARS[14], type: 'social', attendeeCount: 30, isPublic: true },
+    { title: 'LGBTQ+ Swim Night', description: 'Exclusive swim session at the community pool. Water volleyball, lap swimming, and poolside socializing.', location: 'Marsascala, Malta', lat: 35.8550, lng: 14.5400, startDate: new Date(Date.now() + 86400000 * 11), endDate: new Date(Date.now() + 86400000 * 11 + 9000000), ownerId: otherUsers[6], imageUrl: AVATARS[6], type: 'sports', attendeeCount: 40, isPublic: true },
+    { title: 'Queer Supper Club', description: 'Monthly community dinner. This month: authentic Maltese cuisine at a hidden gem restaurant. Prix fixe €35.', location: 'Birgu, Malta', lat: 35.8930, lng: 14.5190, startDate: new Date(Date.now() + 86400000 * 14), endDate: new Date(Date.now() + 86400000 * 14 + 10800000), ownerId: otherUsers[15], imageUrl: AVATARS[15], type: 'social', attendeeCount: 16, isPublic: true },
+    { title: 'Circuit Party: NEON', description: 'High-energy circuit party with international DJs, laser shows, and massive sound system. Dress to impress.', location: 'Paceville, Malta', lat: 35.9220, lng: 14.4810, startDate: new Date(Date.now() + 86400000 * 15), endDate: new Date(Date.now() + 86400000 * 16 + 28800000), ownerId: otherUsers[7], imageUrl: AVATARS[7], type: 'party', attendeeCount: 250, isPublic: true },
+    { title: 'Queer Running Club: 5K', description: 'Monthly fun run through Valletta. All paces welcome. Post-run coffee at the finish line.', location: 'Valletta, Malta', lat: 35.8990, lng: 14.5150, startDate: new Date(Date.now() + 86400000 * 13), endDate: new Date(Date.now() + 86400000 * 13 + 5400000), ownerId: otherUsers[18], imageUrl: AVATARS[18], type: 'sports', attendeeCount: 22, isPublic: true },
   ];
-  const createdEvents = await db.event.createMany({ data: eventsData });
 
-  // RSVPs for test user
-  for (let i = 0; i < 4; i++) {
-    try { await db.eventRSVP.create({ data: { userId: testUser.id, eventId: eventsData[i].ownerId === testUser.id ? eventsData[(i + 1) % eventsData.length].ownerId : eventsData[i].ownerId, status: i === 0 ? 'going' : i === 1 ? 'maybe' : 'interested' } }); } catch {}
+  // Create events one by one to capture IDs
+  const createdEventIds: string[] = [];
+  for (const ev of eventsData) {
+    const event = await db.event.create({ data: ev });
+    createdEventIds.push(event.id);
+  }
+  console.log(`Created ${createdEventIds.length} events`);
+
+  // RSVPs for test user (using actual event IDs)
+  for (let i = 0; i < Math.min(6, createdEventIds.length); i++) {
+    try {
+      await db.eventRSVP.create({
+        data: {
+          userId: testUser.id,
+          eventId: createdEventIds[i],
+          status: i < 2 ? 'going' : i < 4 ? 'maybe' : 'interested',
+        },
+      });
+    } catch {}
+  }
+  // RSVPs from other users
+  for (let i = 0; i < Math.min(4, createdEventIds.length); i++) {
+    for (let j = 0; j < 5; j++) {
+      try {
+        await db.eventRSVP.create({
+          data: { userId: otherUsers[j], eventId: createdEventIds[i], status: j < 3 ? 'going' : 'interested' },
+        });
+      } catch {}
+    }
   }
 
   // Fansites

@@ -6,7 +6,7 @@ interface CallBody {
   callType: 'voice' | 'video';
 }
 
-// POST /api/chat/call - generate a call link
+// POST /api/chat/call - initiate a call and store real call metadata
 export async function POST(request: NextRequest) {
   try {
     const body: CallBody = await request.json();
@@ -26,21 +26,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const randomId = crypto.randomUUID().slice(0, 8);
-    const callLink = `nexus-call://${randomId}`;
+    const callId = crypto.randomUUID();
+    const label = callType === 'video' ? 'Video call' : 'Voice call';
+    const icon = callType === 'video' ? '📹' : '📞';
 
     const callData = JSON.stringify({
+      callId,
       type: callType,
-      link: callLink,
+      callLink: callId,
+      status: 'initiated',
+      initiatedAt: new Date().toISOString(),
       duration: null,
     });
 
-    const icon = callType === 'video' ? '📹' : '📞';
-    const label = callType === 'video' ? 'Video call' : 'Voice call';
-
     const message = await db.message.create({
       data: {
-        content: `${icon} ${label}`,
+        content: `${icon} ${label} (Call ID: ${callId})`,
         senderId: 'test-user-1',
         receiverId,
         type: 'call',
