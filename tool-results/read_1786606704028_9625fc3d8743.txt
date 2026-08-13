@@ -1,0 +1,302 @@
+     1→     1→# ReverseAPK Analysis Report
+     2→     2→## com.clovers.rizz.apk
+     3→     3→Generated: Thu Aug 13 01:30:46 CEST 2026
+     4→     4→
+     5→     5→## AndroidManifest.xml
+     6→     6→```xml
+     7→     7→<?xml version="1.0" encoding="utf-8"?>
+     8→     8→<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="36" android:compileSdkVersionCodename="16" android:requiredSplitTypes="base__abi,base__density" android:splitTypes="" package="com.clovers.rizz" platformBuildVersionCode="36" platformBuildVersionName="16">
+     9→     9→    <uses-permission android:name="android.permission.INTERNET"/>
+    10→    10→    <uses-permission android:maxSdkVersion="32" android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    11→    11→    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    12→    12→    <uses-permission android:name="android.permission.VIBRATE"/>
+    13→    13→    <uses-permission android:maxSdkVersion="32" android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    14→    14→    <uses-permission android:name="com.android.vending.BILLING"/>
+    15→    15→    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    16→    16→    <queries>
+    17→    17→        <intent>
+    18→    18→            <action android:name="android.intent.action.VIEW"/>
+    19→    19→            <category android:name="android.intent.category.BROWSABLE"/>
+    20→    20→            <data android:scheme="https"/>
+    21→    21→        </intent>
+    22→    22→        <intent>
+    23→    23→            <action android:name="android.intent.action.OPEN_DOCUMENT_TREE"/>
+    24→    24→        </intent>
+    25→    25→        <intent>
+    26→    26→            <action android:name="android.media.action.IMAGE_CAPTURE"/>
+    27→    27→        </intent>
+    28→    28→        <intent>
+    29→    29→            <action android:name="android.media.action.ACTION_VIDEO_CAPTURE"/>
+    30→    30→        </intent>
+    31→    31→        <intent>
+    32→    32→            <action android:name="android.support.customtabs.action.CustomTabsService"/>
+    33→    33→        </intent>
+    34→    34→        <intent>
+    35→    35→            <action android:name="android.intent.action.GET_CONTENT"/>
+    36→    36→            <category android:name="android.intent.category.OPENABLE"/>
+    37→    37→            <data android:mimeType="*/*"/>
+    38→    38→        </intent>
+    39→    39→        <intent>
+    40→    40→            <action android:name="com.android.vending.billing.InAppBillingService.BIND"/>
+    41→    41→        </intent>
+    42→    42→        <intent>
+    43→    43→            <action android:name="com.google.android.apps.play.billingtestcompanion.BillingOverrideService.BIND"/>
+    44→    44→        </intent>
+    45→    45→    </queries>
+    46→    46→    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    47→    47→    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    48→    48→    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    49→    49→    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    50→    50→    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    51→    51→    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+    52→    52→    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"/>
+    53→    53→    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION"/>
+    54→    54→    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID"/>
+    55→    55→    <permission android:name="com.clovers.rizz.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="signature"/>
+    56→    56→    <uses-permission android:name="com.clovers.rizz.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+    57→    57→    <application android:allowBackup="false" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:dataExtractionRules="@xml/rizz_data_extraction_rules" android:enableOnBackInvokedCallback="false" android:extractNativeLibs="false" android:fullBackupContent="@xml/rizz_backup_rules" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:name="com.pairip.application.Application" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true" android:theme="@style/AppTheme">
+    58→    58→        <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
+    59→    59→        <meta-data android:name="expo.modules.updates.ENABLE_BSDIFF_PATCH_SUPPORT" android:value="true"/>
+    60→    60→        <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
+    61→    61→        <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
+    62→    62→        <activity android:configChanges="assetsPaths|locale|keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|layoutDirection" android:exported="true" android:launchMode="singleTask" android:name="com.clovers.rizz.MainActivity" android:screenOrientation="portrait" android:theme="@style/Theme.App.SplashScreen" android:windowSoftInputMode="adjustResize">
+    63→    63→            <intent-filter>
+    64→    64→                <action android:name="android.intent.action.MAIN"/>
+    65→    65→                <category android:name="android.intent.category.LAUNCHER"/>
+    66→    66→            </intent-filter>
+    67→    67→            <intent-filter>
+    68→    68→                <action android:name="android.intent.action.VIEW"/>
+    69→    69→                <category android:name="android.intent.category.DEFAULT"/>
+    70→    70→                <category android:name="android.intent.category.BROWSABLE"/>
+    71→    71→                <data android:scheme="app"/>
+    72→    72→                <data android:scheme="exp+app"/>
+    73→    73→            </intent-filter>
+    74→    74→        </activity>
+    75→    75→        <meta-data android:name="org.unimodules.core.AppLoader#react-native-headless" android:value="expo.modules.adapters.react.apploader.RNHeadlessAppLoader"/>
+    76→    76→        <meta-data android:name="com.facebook.soloader.enabled" android:value="true"/>
+    77→    77→        <meta-data android:name="firebase_analytics_collection_enabled" android:value="true"/>
+    78→    78→        <meta-data android:name="firebase_analytics_collection_deactivated" android:value="false"/>
+    79→    79→        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="true"/>
+    80→    80→        <meta-data android:name="google_analytics_ssaid_collection_enabled" android:value="true"/>
+    81→    81→        <meta-data android:name="google_analytics_automatic_screen_reporting_enabled" android:value="true"/>
+    82→    82→        <meta-data android:name="google_analytics_default_allow_analytics_storage" android:value="true"/>
+    83→    83→        <meta-data android:name="google_analytics_default_allow_ad_storage" android:value="true"/>
+    84→    84→        <meta-data android:name="google_analytics_default_allow_ad_user_data" android:value="true"/>
+    85→    85→        <meta-data android:name="google_analytics_default_allow_ad_personalization_signals" android:value="true"/>
+    86→    86→        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false"/>
+    87→    87→        <provider android:authorities="com.clovers.rizz.reactnativefirebasecrashlyticsinitprovider" android:exported="false" android:initOrder="98" android:name="io.invertase.firebase.crashlytics.ReactNativeFirebaseCrashlyticsInitProvider"/>
+    88→    88→        <meta-data android:name="app_data_collection_default_enabled" android:value="true"/>
+    89→    89→        <service android:directBootAware="true" android:exported="false" android:name="com.google.firebase.components.ComponentDiscoveryService">
+    90→    90→            <meta-data android:name="com.google.firebase.components:io.invertase.firebase.app.ReactNativeFirebaseAppRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+    91→    91→            <meta-data android:name="com.google.firebase.components:com.google.firebase.crashlytics.ndk.CrashlyticsNdkRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+    92→    92→            <meta-data android:name="com.google.firebase.components:com.google.firebase.crashlytics.FirebaseCrashlyticsKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+    93→    93→            <meta-data android:name="com.google.firebase.components:com.google.firebase.crashlytics.CrashlyticsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+    94→    94→            <meta-data android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+    95→    95→            <meta-data android:name="com.google.firebase.components:com.google.firebase.sessions.FirebaseSessionsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+    96→    96→            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+    97→    97→            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+    98→    98→            <meta-data android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+    99→    99→            <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   100→   100→        </service>
+   101→   101→        <provider android:authorities="com.clovers.rizz.reactnativefirebaseappinitprovider" android:exported="false" android:initOrder="99" android:name="io.invertase.firebase.app.ReactNativeFirebaseAppInitProvider"/>
+   102→   102→        <provider android:authorities="com.clovers.rizz.FileSystemFileProvider" android:exported="false" android:grantUriPermissions="true" android:name="expo.modules.filesystem.FileSystemFileProvider">
+   103→   103→            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_system_provider_paths"/>
+   104→   104→        </provider>
+   105→   105→        <provider android:authorities="com.clovers.rizz.ClipboardFileProvider" android:exported="false" android:grantUriPermissions="true" android:name="expo.modules.clipboard.ClipboardFileProvider">
+   106→   106→            <meta-data android:name="expo.modules.clipboard.CLIPBOARD_FILE_PROVIDER_PATHS" android:resource="@xml/clipboard_provider_paths"/>
+   107→   107→        </provider>
+   108→   108→        <service android:enabled="false" android:exported="false" android:name="com.google.android.gms.metadata.ModuleDependencies">
+   109→   109→            <intent-filter>
+   110→   110→                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES"/>
+   111→   111→            </intent-filter>
+   112→   112→            <meta-data android:name="photopicker_activity:0:required" android:value=""/>
+   113→   113→        </service>
+   114→   114→        <activity android:exported="false" android:name="com.canhub.cropper.CropImageActivity"/>
+   115→   115→        <activity android:exported="false" android:name="expo.modules.imagepicker.ExpoCropImageActivity" android:theme="@style/Theme.AppCompat.DayNight"/>
+   116→   116→        <provider android:authorities="com.clovers.rizz.ImagePickerFileProvider" android:exported="false" android:grantUriPermissions="true" android:name="expo.modules.imagepicker.fileprovider.ImagePickerFileProvider">
+   117→   117→            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/image_picker_provider_paths"/>
+   118→   118→        </provider>
+   119→   119→        <activity android:exported="false" android:launchMode="singleTop" android:name="expo.modules.webbrowser.BrowserProxyActivity" android:taskAffinity=".webContainer" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   120→   120→        <service android:enabled="true" android:exported="false" android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder">
+   121→   121→            <meta-data android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY" android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl"/>
+   122→   122→        </service>
+   123→   123→        <activity android:configChanges="keyboardHidden|orientation|screenLayout|screenSize" android:enabled="true" android:exported="false" android:fitsSystemWindows="true" android:name="androidx.credentials.playservices.controllers.identityauth.HiddenActivity" android:theme="@style/Theme.Hidden"/>
+   124→   124→        <activity android:configChanges="keyboardHidden|orientation|screenLayout|screenSize" android:enabled="true" android:exported="false" android:fitsSystemWindows="true" android:name="androidx.credentials.playservices.controllers.identitycredentials.IdentityCredentialApiHiddenActivity" android:theme="@style/Theme.Hidden"/>
+   125→   125→        <activity android:excludeFromRecents="true" android:exported="false" android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   126→   126→        <service android:exported="true" android:name="com.google.android.gms.auth.api.signin.RevocationBoundService" android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION" android:visibleToInstantApps="true"/>
+   127→   127→        <provider android:authorities="com.clovers.rizz.cropper.fileprovider" android:exported="false" android:grantUriPermissions="true" android:name="com.canhub.cropper.CropFileProvider">
+   128→   128→            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/cropper_library_file_paths"/>
+   129→   129→        </provider>
+   130→   130→        <meta-data android:name="com.bumptech.glide.integration.okhttp3.OkHttpGlideModule" android:value="GlideModule"/>
+   131→   131→        <receiver android:exported="true" android:name="com.amazon.device.iap.ResponseReceiver" android:permission="com.amazon.inapp.purchasing.Permission.NOTIFY">
+   132→   132→            <intent-filter>
+   133→   133→                <action android:name="com.amazon.inapp.purchasing.NOTIFY"/>
+   134→   134→            </intent-filter>
+   135→   135→        </receiver>
+   136→   136→        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:name="com.revenuecat.purchases.amazon.purchasing.ProxyAmazonBillingActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   137→   137→        <activity android:configChanges="orientation|screenSize" android:excludeFromRecents="true" android:name="com.revenuecat.purchases.SimulatedStoreErrorDialogActivity" android:theme="@android:style/Theme.Material.Dialog.Alert"/>
+   138→   138→        <meta-data android:name="com.google.android.play.billingclient.version" android:value="8.3.0"/>
+   139→   139→        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:exported="false" android:name="com.android.billingclient.api.ProxyBillingActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   140→   140→        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:exported="false" android:name="com.android.billingclient.api.ProxyBillingActivityV2" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   141→   141→        <receiver android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementReceiver"/>
+   142→   142→        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService"/>
+   143→   143→        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   144→   144→        <activity android:exported="false" android:name="com.google.android.gms.common.api.GoogleApiActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+   145→   145→        <service android:enabled="false" android:exported="false" android:name="com.google.firebase.sessions.SessionLifecycleService"/>
+   146→   146→        <provider android:authorities="com.clovers.rizz.firebaseinitprovider" android:directBootAware="true" android:exported="false" android:initOrder="100" android:name="com.google.firebase.provider.FirebaseInitProvider"/>
+   147→   147→        <uses-library android:name="android.ext.adservices" android:required="false"/>
+   148→   148→        <provider android:authorities="com.clovers.rizz.androidx-startup" android:exported="false" android:name="androidx.startup.InitializationProvider">
+   149→   149→            <meta-data android:name="androidx.emoji2.text.EmojiCompatInitializer" android:value="androidx.startup"/>
+   150→   150→            <meta-data android:name="androidx.lifecycle.ProcessLifecycleInitializer" android:value="androidx.startup"/>
+   151→   151→            <meta-data android:name="androidx.profileinstaller.ProfileInstallerInitializer" android:value="androidx.startup"/>
+   152→   152→        </provider>
+   153→   153→        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+   154→   154→        <uses-library android:name="androidx.window.extensions" android:required="false"/>
+   155→   155→        <uses-library android:name="androidx.window.sidecar" android:required="false"/>
+   156→   156→        <service android:exported="false" android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery">
+   157→   157→            <meta-data android:name="backend:com.google.android.datatransport.cct.CctBackendFactory" android:value="cct"/>
+   158→   158→        </service>
+   159→   159→        <receiver android:directBootAware="false" android:enabled="true" android:exported="true" android:name="androidx.profileinstaller.ProfileInstallReceiver" android:permission="android.permission.DUMP">
+   160→   160→            <intent-filter>
+   161→   161→                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE"/>
+   162→   162→            </intent-filter>
+   163→   163→            <intent-filter>
+   164→   164→                <action android:name="androidx.profileinstaller.action.SKIP_FILE"/>
+   165→   165→            </intent-filter>
+   166→   166→            <intent-filter>
+   167→   167→                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE"/>
+   168→   168→            </intent-filter>
+   169→   169→            <intent-filter>
+   170→   170→                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION"/>
+   171→   171→            </intent-filter>
+   172→   172→        </receiver>
+   173→   173→        <service android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   174→   174→        <receiver android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"/>
+   175→   175→        <activity android:exported="false" android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity" android:stateNotNeeded="true" android:theme="@style/Theme.PlayCore.Transparent"/>
+   176→   176→        <activity android:exported="false" android:name="com.pairip.licensecheck.LicenseActivity"/>
+   177→   177→        <meta-data android:name="com.android.vending.splits.required" android:value="true"/>
+   178→   178→        <meta-data android:name="com.android.stamp.source" android:value="https://play.google.com/store"/>
+   179→   179→        <meta-data android:name="com.android.stamp.type" android:value="STAMP_TYPE_DISTRIBUTION_APK"/>
+   180→   180→        <meta-data android:name="com.android.vending.splits" android:resource="@xml/splits0"/>
+   181→   181→        <meta-data android:name="com.android.vending.derived.apk.id" android:value="3"/>
+   182→   182→    </application>
+   183→   183→    <uses-permission android:name="com.android.vending.CHECK_LICENSE"/>
+   184→   184→</manifest>
+   185→   185→```
+   186→   186→
+   187→   187→## Package Info
+   188→   188→<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="36" android:compileSdkVersionCodename="16" android:requiredSplitTypes="base__abi,base__density" android:splitTypes="" package="com.clovers.rizz" platformBuildVersionCode="36" platformBuildVersionName="16">
+   189→   189→
+   190→   190→## Activities
+   191→   191→- com.clovers.rizz.MainActivity
+   192→   192→- com.canhub.cropper.CropImageActivity
+   193→   193→- expo.modules.imagepicker.ExpoCropImageActivity
+   194→   194→- expo.modules.webbrowser.BrowserProxyActivity
+   195→   195→- androidx.credentials.playservices.controllers.identityauth.HiddenActivity
+   196→   196→- androidx.credentials.playservices.controllers.identitycredentials.IdentityCredentialApiHiddenActivity
+   197→   197→- com.google.android.gms.auth.api.signin.internal.SignInHubActivity
+   198→   198→- com.revenuecat.purchases.amazon.purchasing.ProxyAmazonBillingActivity
+   199→   199→- com.revenuecat.purchases.SimulatedStoreErrorDialogActivity
+   200→   200→- com.android.billingclient.api.ProxyBillingActivity
+   201→   201→- com.android.billingclient.api.ProxyBillingActivityV2
+   202→   202→- com.google.android.gms.common.api.GoogleApiActivity
+   203→   203→- com.google.android.play.core.common.PlayCoreDialogWrapperActivity
+   204→   204→- com.pairip.licensecheck.LicenseActivity
+   205→   205→
+   206→   206→## Services
+   207→   207→- com.google.firebase.components.ComponentDiscoveryService
+   208→   208→- com.google.android.gms.metadata.ModuleDependencies
+   209→   209→- androidx.credentials.playservices.CredentialProviderMetadataHolder
+   210→   210→- com.google.android.gms.auth.api.signin.RevocationBoundService
+   211→   211→- com.google.android.gms.measurement.AppMeasurementService
+   212→   212→- com.google.android.gms.measurement.AppMeasurementJobService
+   213→   213→- com.google.firebase.sessions.SessionLifecycleService
+   214→   214→- com.google.android.datatransport.runtime.backends.TransportBackendDiscovery
+   215→   215→- com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService
+   216→   216→
+   217→   217→## Permissions
+   218→   218→- android.permission.INTERNET
+   219→   219→- android.permission.READ_EXTERNAL_STORAGE
+   220→   220→- android.permission.SYSTEM_ALERT_WINDOW
+   221→   221→- android.permission.VIBRATE
+   222→   222→- android.permission.WRITE_EXTERNAL_STORAGE
+   223→   223→- android.permission.ACCESS_NETWORK_STATE
+   224→   224→- android.permission.ACCESS_COARSE_LOCATION
+   225→   225→- android.permission.WAKE_LOCK
+   226→   226→- android.permission.ACCESS_WIFI_STATE
+   227→   227→- android.permission.USE_BIOMETRIC
+   228→   228→- android.permission.USE_FINGERPRINT
+   229→   229→- android.permission.ACCESS_ADSERVICES_ATTRIBUTION
+   230→   230→- android.permission.ACCESS_ADSERVICES_AD_ID
+   231→   231→        <service android:exported="true" android:name="com.google.android.gms.auth.api.signin.RevocationBoundService" android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION" android:visibleToInstantApps="true"/>
+   232→   232→        <receiver android:exported="true" android:name="com.amazon.device.iap.ResponseReceiver" android:permission="com.amazon.inapp.purchasing.Permission.NOTIFY">
+   233→   233→        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   234→   234→        <receiver android:directBootAware="false" android:enabled="true" android:exported="true" android:name="androidx.profileinstaller.ProfileInstallReceiver" android:permission="android.permission.DUMP">
+   235→   235→        <service android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+   236→   236→
+   237→   237→## API URLs Found
+   238→   238→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/AndroidManifest.xml:2:<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+   239→   239→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/AndroidManifest.xml:422:            android:value="https://play.google.com/store"/>
+   240→   240→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/client_analytics.proto:7://     http://www.apache.org/licenses/LICENSE-2.0
+   241→   241→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/META-INF/androidx/annotation/annotation/LICENSE.txt:4:                        http://www.apache.org/licenses/
+   242→   242→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/META-INF/androidx/collection/collection-ktx/LICENSE.txt:4:                        http://www.apache.org/licenses/
+   243→   243→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/META-INF/androidx/collection/collection/LICENSE.txt:4:                        http://www.apache.org/licenses/
+   244→   244→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/META-INF/androidx/lifecycle/lifecycle-common-java8/LICENSE.txt:4:                        http://www.apache.org/licenses/
+   245→   245→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/META-INF/androidx/lifecycle/lifecycle-common/LICENSE.txt:4:                        http://www.apache.org/licenses/
+   246→   246→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/okhttp3/internal/publicsuffix/NOTICE:2:https://publicsuffix.org/list/public_suffix_list.dat
+   247→   247→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/okhttp3/internal/publicsuffix/NOTICE:5:https://mozilla.org/MPL/2.0/
+   248→   248→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_any.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   249→   249→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_common.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   250→   250→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_cyrillic.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   251→   251→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_english.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   252→   252→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_french.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   253→   253→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_german.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   254→   254→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_hebrew.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   255→   255→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_hungarian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   256→   256→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_polish.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   257→   257→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_romanian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   258→   258→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_russian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   259→   259→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_approx_spanish.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   260→   260→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_any.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   261→   261→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_approx_common.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   262→   262→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_common.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   263→   263→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_cyrillic.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   264→   264→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_english.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   265→   265→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_french.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   266→   266→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_german.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   267→   267→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_hebrew.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   268→   268→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_hungarian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   269→   269→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_polish.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   270→   270→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_romanian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   271→   271→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_russian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   272→   272→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_exact_spanish.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   273→   273→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_hebrew_common.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   274→   274→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_lang.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   275→   275→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_languages.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   276→   276→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_any.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   277→   277→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_cyrillic.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   278→   278→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_english.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   279→   279→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_french.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   280→   280→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_german.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   281→   281→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_hebrew.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   282→   282→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_hungarian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   283→   283→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_polish.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   284→   284→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_romanian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   285→   285→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_russian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   286→   286→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/ash_rules_spanish.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   287→   287→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_any.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   288→   288→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_arabic.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   289→   289→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_common.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   290→   290→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_cyrillic.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   291→   291→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_czech.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   292→   292→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_dutch.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   293→   293→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_english.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   294→   294→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_french.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   295→   295→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_german.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   296→   296→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_greek.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   297→   297→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_greeklatin.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   298→   298→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_hebrew.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   299→   299→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_hungarian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+   300→   300→/Users/cb/ghidra-projects/dating-apps/com.clovers.rizz.apk-reverseapk/jadx/resources/org/apache/commons/codec/language/bm/gen_approx_italian.txt:9: *      http://www.apache.org/licenses/LICENSE-2.0
+
+[showing lines 1-300 of 914; use offset=301 with limit to continue reading]

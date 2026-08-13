@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  displayName   String
+  email         String    @unique
+  passwordHash  String
+  avatar        String?
+  bio           String?
+  age           Int?
+  gender        String    @default("male")
+  location      String?
+  lat           Float?
+  lng           Float?
+  online        Boolean   @default(true)
+  lastSeen      DateTime  @default(now())
+  isPremium     Boolean   @default(false)
+  premiumExpiry DateTime?
+  isVerified    Boolean   @default(false)
+  isBanned      Boolean   @default(false)
+  showOnline    Boolean   @default(true)
+  showDistance   Boolean   @default(true)
+  showAge       Boolean   @default(true)
+  lookingFor    String    @default("relationship")
+  aboutMe       String?
+  height        Int?
+  weight        Int?
+  ethnicity     String?
+  bodyType      String?
+  relationshipStatus String?
+  position      String?
+  hivStatus     String?
+  pronouns      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sentMessages     Message[]     @relation("SentMessages")
+  receivedMessages Message[]     @relation("ReceivedMessages")
+  sentLikes        Like[]        @relation("SentLikes")
+  receivedLikes    Like[]        @relation("ReceivedLikes")
+  sentBlocks       Block[]       @relation("SentBlocks")
+  receivedBlocks   Block[]       @relation("ReceivedBlocks")
+  sentViews        ProfileView[] @relation("SentViews")
+  receivedViews    ProfileView[] @relation("ReceivedViews")
+  photos           Photo[]
+  albums           Album[]
+  fansite          Fansite?
+  subscriptions    Subscription[]
+  sentChatRequests ChatRequest[]  @relation("SentChatRequest")
+  receivedChatRequests ChatRequest[]  @relation("ReceivedChatRequest")
+  groupMemberships GroupMember[]
+  ownedGroups      GroupChat[]
+  events           Event[]
+  eventRSVPs       EventRSVP[]
+  footprints       Footprint[]   @relation("FootprintTarget")
+  createdFootprints Footprint[]  @relation("FootprintCreator")
+  boostHistory     Boost[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  senderId  String
+  receiverId String
+  chatType  String   @default("direct")
+  groupId   String?
+  isRead    Boolean  @default(false)
+  isDeleted Boolean  @default(false)
+  type      String   @default("text")
+  mediaUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sender   User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  group    GroupChat? @relation(fields: [groupId], references: [id])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  senderId  String
+  receiverId String
+  createdAt DateTime @default(now())
+
+  sender   User @relation("SentLikes", fields: [senderId], references: [id])
+  receiver User @relation("ReceivedLikes", fields: [receiverId], references: [id])
+
+  @@unique([senderId, receiverId])
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  reason    String?
+  createdAt DateTime @default(now())
+
+  blocker User @relation("SentBlocks", fields: [blockerId], references: [id])
+  blocked User @relation("ReceivedBlocks", fields: [blockedId], references: [id])
+
+  @@unique([blockerId, blockedId])
+}
+
+model ProfileView {
+  id       String   @id @default(cuid())
+  viewerId String
+  viewedId String
+  createdAt DateTime @default(now())
+
+  viewer User @relation("SentViews", fields: [viewerId], references: [id])
+  viewed User @relation("ReceivedViews", fields: [viewedId], references: [id])
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  thumbnailUrl String?
+  width     Int?
+  height    Int?
+  isPrivate Boolean  @default(false)
+  isExpiring Boolean  @default(false)
+  expiresAt DateTime?
+  sortOrder Int      @default(0)
+  albumId   String?
+  userId    String
+  createdAt DateTime @default(now())
+
+  user  User    @relation(fields: [userId], references: [id])
+  album Album?  @relation(fields: [albumId], references: [id])
+}
+
+model Album {
+  id        String   @id @default(cuid())
+  name      String
+  isPrivate Boolean  @default(false)
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id])
+  photos Photo[]
+}
+
+model Fansite {
+  id          String   @id @default(cuid())
+  name        String
+  nick        String   @unique
+  description  String?
+  geoName     String?
+  trailerUrl  String?
+  trailerImageUrl String?
+  status      String   @default("draft")
+  isAnonymous Boolean  @default(false)
+  statusComments String?
+  userId      String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user    User      @relation(fields: [userId], references: [id])
+  links   FansiteLink[]
+  products FansiteProduct[]
+}
+
+model FansiteLink {
+  id        String   @id @default(cuid())
+  type      String
+  url       String
+  label     String?
+  value     String?
+  icon      String?
+  fansiteId String
+
+  fansite Fansite @relation(fields: [fansiteId], references: [id])
+}
+
+model FansiteProduct {
+  id        String   @id @default(cuid())
+  period    String
+  price     Float
+  priceOld  Float?
+  until     String?
+  url       String
+  fansiteId String
+
+  fansite Fansite @relation(fields: [fansiteId], references: [id])
+}
+
+model Subscription {
+  id         String   @id @default(cuid())
+  userId     String
+  tier       String   @default("free")
+  startDate  DateTime @default(now())
+  endDate    DateTime?
+  isActive   Boolean  @default(true)
+  paymentMethod String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model ChatRequest {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  status     String   @default("pending")
+  message    String?
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("SentChatRequest", fields: [senderId], references: [id])
+  receiver User @relation("ReceivedChatRequest", fields: [receiverId], references: [id])
+}
+
+model GroupChat {
+  id        String   @id @default(cuid())
+  name      String
+  avatar    String?
+  description String?
+  ownerId   String
+  isPublic  Boolean  @default(false)
+  maxMembers Int     @default(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner   User           @relation(fields: [ownerId], references: [id])
+  members GroupMember[]
+  messages Message[]
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  userId    String
+  groupId   String
+  role      String   @default("member")
+  joinedAt  DateTime @default(now())
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group GroupChat @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description  String?
+  location    String?
+  lat         Float?
+  lng         Float?
+  startDate   DateTime
+  endDate     DateTime?
+  imageUrl    String?
+  ownerId     String
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner  User         @relation(fields: [ownerId], references: [id])
+  rsvps  EventRSVP[]
+}
+
+model EventRSVP {
+  id       String   @id @default(cuid())
+  userId   String
+  eventId  String
+  status   String   @default("going")
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Footprint {
+  id        String   @id @default(cuid())
+  userId    String
+  targetId  String
+  createdAt DateTime @default(now())
+
+  user   User @relation("FootprintCreator", fields: [userId], references: [id])
+  target User @relation("FootprintTarget", fields: [targetId], references: [id])
+
+  @@unique([userId, targetId])
+}
+
+model Boost {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   @default("standard")
+  duration  Int      @default(30)
+  startedAt DateTime @default(now())
+  endsAt    DateTime
+  isActive  Boolean  @default(true)
+
+  user User @relation(fields: [userId], references: [id])
+}
