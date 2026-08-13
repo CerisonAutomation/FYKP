@@ -7,6 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ═══════════════════════════════════════════════════════════════
+// ENUM CONSTANTS (stored as String in SQLite, documented here)
+// ═══════════════════════════════════════════════════════════════
+// Gender: "male" | "female" | "non-binary" | "transgender" | "other"
+// BodyType: "slim" | "average" | "athletic" | "muscular" | "curvy" | "bbw" | "stocky"
+// Ethnicity: "white" | "black" | "latino" | "asian" | "middle-eastern" | "indian" | "mixed" | "other"
+// LookingFor: "relationship" | "casual" | "friends" | "networking" | "not-specified"
+// RelationshipStatus: "single" | "in-a-relationship" | "married" | "divorced" | "widowed" | "open-relationship"
+// Position: "top" | "bottom" | "versatile" | "side" | "not-specified"
+// ChatType: "direct" | "group"
+// MessageType: "text" | "image" | "video" | "audio" | "gift" | "system" | "sticker"
+// SubscriptionTier: "free" | "premium" | "vip" | "creator"
+// BoostType: "standard" | "super" | "spotlight" | "mega"
+// GroupRole: "owner" | "admin" | "moderator" | "member"
+// RSVPStatus: "going" | "maybe" | "interested" | "declined"
+// VerificationStatus: "none" | "pending" | "verified" | "rejected"
+// ProfessionalStatus: "none" | "pending" | "approved" | "suspended"
+// ShoutType: "text" | "image" | "video"
+// NoteType: "private" | "public"
+
 model User {
   id            String    @id @default(cuid())
   username      String    @unique
@@ -20,6 +40,10 @@ model User {
   location      String?
   lat           Float?
   lng           Float?
+  geoCity       String?
+  geoRegion     String?
+  geoCountry    String?
+  geoAccuracy   Float?
   online        Boolean   @default(true)
   lastSeen      DateTime  @default(now())
   isPremium     Boolean   @default(false)
@@ -29,6 +53,8 @@ model User {
   showOnline    Boolean   @default(true)
   showDistance   Boolean   @default(true)
   showAge       Boolean   @default(true)
+  showActivity  Boolean   @default(true)
+  hidePicsOffline Boolean @default(false)
   lookingFor    String    @default("relationship")
   aboutMe       String?
   height        Int?
@@ -39,6 +65,22 @@ model User {
   position      String?
   hivStatus     String?
   pronouns      String?
+  displayUnits  String    @default("metric")
+  lang          String    @default("en")
+  soundOff      Boolean   @default(false)
+  notifPushOff  Boolean   @default(false)
+  notifEmailOff Boolean   @default(false)
+  notifTelegramOff Boolean @default(false)
+  mailingInternal Boolean @default(true)
+  mailingPartner  Boolean @default(true)
+  profileOff    Boolean   @default(false)
+  privateAuto   Boolean   @default(false)
+  noPros        Boolean   @default(false)
+  noPub         Boolean   @default(false)
+  isProfessional Boolean  @default(false)
+  professionalStatus String @default("none")
+  verificationStatus String @default("none")
+  voucher       String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -63,6 +105,16 @@ model User {
   footprints       Footprint[]   @relation("FootprintTarget")
   createdFootprints Footprint[]  @relation("FootprintCreator")
   boostHistory     Boost[]
+  shouts           Shout[]
+  notesWritten     UserNote[]    @relation("NoteWriter")
+  notesReceived    UserNote[]    @relation("NoteTarget")
+  favoritesAdded   UserFavorite[] @relation("FavBy")
+  superFavoritesAdded UserFavorite[] @relation("SuperFavBy")
+  blogs            Blog[]
+  videos           Video[]
+  banners          Banner[]
+  verifications    Verification[]
+  sessions         UserSession[]
 }
 
 model Message {
@@ -219,15 +271,24 @@ model ChatRequest {
 }
 
 model GroupChat {
-  id        String   @id @default(cuid())
-  name      String
-  avatar    String?
+  id          String   @id @default(cuid())
+  name        String
+  avatar      String?
   description String?
-  ownerId   String
-  isPublic  Boolean  @default(false)
-  maxMembers Int     @default(50)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  ownerId     String
+  isPublic    Boolean  @default(false)
+  maxMembers  Int      @default(50)
+  address     String?
+  lat         Float?
+  lng         Float?
+  geoName     String?
+  tags        String?
+  hidden      Boolean  @default(false)
+  eventStart  DateTime?
+  eventEnd    DateTime?
+  duration    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   owner   User           @relation(fields: [ownerId], references: [id])
   members GroupMember[]
@@ -299,6 +360,120 @@ model Boost {
   startedAt DateTime @default(now())
   endsAt    DateTime
   isActive  Boolean  @default(true)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NEW MODELS FROM OMOLINK REPORT
+// ═══════════════════════════════════════════════════════════════
+
+model Shout {
+  id        String   @id @default(cuid())
+  content   String
+  type      String   @default("text")
+  mediaUrl  String?
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model UserNote {
+  id        String   @id @default(cuid())
+  content   String
+  type      String   @default("private")
+  writerId  String
+  targetId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  writer User @relation("NoteWriter", fields: [writerId], references: [id])
+  target User @relation("NoteTarget", fields: [targetId], references: [id])
+
+  @@unique([writerId, targetId])
+}
+
+model UserFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  targetId  String
+  isSuper   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user   User @relation("FavBy", fields: [userId], references: [id])
+  target User @relation("SuperFavBy", fields: [targetId], references: [id])
+
+  @@unique([userId, targetId])
+}
+
+model Blog {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  imageUrl  String?
+  slug      String   @unique
+  userId    String
+  isPublished Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Video {
+  id        String   @id @default(cuid())
+  title     String
+  url       String
+  thumbnailUrl String?
+  duration  Int?
+  userId    String
+  isPrivate Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String
+  linkUrl   String?
+  position  Int      @default(0)
+  isActive  Boolean  @default(true)
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Verification {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  type      String   @default("age")
+  status    String   @default("none")
+  documentUrl String?
+  phone     String?
+  phonePrefix String?
+  submittedAt DateTime?
+  reviewedAt  DateTime?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  userId    String
+  device    String?
+  platform  String?
+  ip        String?
+  token     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  lastSeen  DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
 }

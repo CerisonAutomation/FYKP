@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { io as socketIO, Socket } from 'socket.io-client';
 import { formatDistanceToNow, format } from 'date-fns';
 import { useAppStore } from '@/store/app';
-import type { User, Message, Conversation, Like, Fansite, AppEvent, GroupChat, Photo, Album, ChatRequest, ProfileView as ProfileViewType } from '@/types';
+import type { User, Message, Conversation, Like, Fansite, AppEvent, GroupChat, Photo, Album, ChatRequest, ProfileView as ProfileViewType, Shout, UserFavorite, UserNote, Blog, Video as VideoType, Banner, Verification, UserSession } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -33,6 +33,8 @@ import {
   ThumbsUp, ThumbsDown, Eye, Image as ImageIcon, Users, Zap,
   Copy, Sparkles, LogOut, Link2, ExternalLink, Flag, Ban as Block,
   Pencil, Camera, MoreVertical, ArrowLeft, Plus, Clock, Globe,
+  Map, Megaphone, Video, FileText, Bookmark, StickyNote, MapPinned,
+  StarOff, ShieldCheck, MonitorSmartphone, Crosshair,
 } from 'lucide-react';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -99,6 +101,9 @@ export default function NexusApp() {
     messages, setMessages, addMessage, refreshDiscover, triggerRefreshDiscover,
     discoverView, setDiscoverView, sidebarOpen, setSidebarOpen,
     chatRequests, setChatRequests, pendingRequestCount, setPendingRequestCount,
+    shouts, setShouts, addShout, favorites, setFavorites, notes, setNotes,
+    blogs, setBlogs, videos, setVideos, banners, setBanners,
+    userLat, setUserLat, userLng, setUserLng,
   } = store;
 
   // ── Auth state ──
@@ -174,6 +179,32 @@ export default function NexusApp() {
   const [notifications] = useState(3);
   const [showBlockAlert, setShowBlockAlert] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
+
+  // ── Shouts state ──
+  const [shoutInput, setShoutInput] = useState('');
+  const [shoutLoading, setShoutLoading] = useState(true);
+
+  // ── Map state ──
+  const [mapUsers, setMapUsers] = useState<(User & { distance?: number })[]>([]);
+  const [mapLoading, setMapLoading] = useState(false);
+  const [mapRadius, setMapRadius] = useState(50);
+  const [mapCenter, setMapCenter] = useState({ lat: 35.69, lng: 14.42 });
+
+  // ── Videos state ──
+  const [videosLoading, setVideosLoading] = useState(true);
+
+  // ── Blogs state ──
+  const [blogsLoading, setBlogsLoading] = useState(true);
+
+  // ── Notes / Favorites state ──
+  const [noteContent, setNoteContent] = useState('');
+  const [noteTargetId, setNoteTargetId] = useState<string | null>(null);
+  const [showNoteDialog, setShowNoteDialog] = useState(false);
+  const [favoritesLoading, setFavoritesLoading] = useState(true);
+
+  // ── Verification state ──
+  const [myVerification, setMyVerification] = useState<Verification | null>(null);
+  const [mySessions, setMySessions] = useState<UserSession[]>([]);
 
   // ─── Auth ──────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -306,6 +337,47 @@ export default function NexusApp() {
     }).catch(() => {}).finally(() => setEventsLoading(false));
   }, [authed, activeTab]);
 
+  // ─── Fetch Shouts ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!authed || activeTab !== 'shouts') return;
+    setShoutLoading(true);
+    fetch('/api/shouts').then(r => r.json()).then(res => {
+      setShouts(res.data || []);
+    }).catch(() => {}).finally(() => setShoutLoading(false));
+  }, [authed, activeTab]);
+
+  // ─── Fetch Map / GEO ──────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!authed || activeTab !== 'map') return;
+    handleUpdateGeo();
+    handleFetchMap();
+  }, [authed, activeTab, mapRadius]);
+
+  // ─── Fetch Videos ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!authed || activeTab !== 'videos') return;
+    setVideosLoading(true);
+    fetch('/api/videos').then(r => r.json()).then(res => {
+      setVideos(res.videos || []);
+    }).catch(() => {}).finally(() => setVideosLoading(false));
+  }, [authed, activeTab]);
+
+  // ─── Fetch Blogs ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!authed || activeTab !== 'blogs') return;
+    setBlogsLoading(true);
+    fetch('/api/blogs').then(r => r.json()).then(res => {
+      setBlogs(res.blogs || []);
+    }).catch(() => {}).finally(() => setBlogsLoading(false));
+  }, [authed, activeTab]);
+
+  // ─── Fetch Banners ────────────────────────────────────────────────────────
+  useEffect(() => {
+    fetch('/api/banners').then(r => r.json()).then(res => {
+      setBanners(res.data || []);
+    }).catch(() => {});
+  }, [authed]);
+
   // ─── Fetch Profile ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!selectedUserId) return;
@@ -334,13 +406,21 @@ export default function NexusApp() {
       fetch('/api/subscriptions').then(r => r.json()),
       fetch('/api/boosts').then(r => r.json()),
       fetch('/api/blocks').then(r => r.json()),
-    ]).then(([userRes, subRes, boostRes, blockRes]) => {
+      fetch('/api/verification?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: null })),
+      fetch('/api/sessions?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/favorites?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/notes?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+    ]).then(([userRes, subRes, boostRes, blockRes, verRes, sessRes, favRes, noteRes]) => {
       const u = userRes.data;
       setCurrentUser(u);
       setMySubscriptions(subRes.data || []);
       setMyBoosts((boostRes.data || []).filter((b: any) => b.isActive));
       setBlockedUsers(blockRes.data || []);
       setSettingsPrivacy({ showOnline: u.showOnline ?? true, showDistance: u.showDistance ?? true, showAge: u.showAge ?? true });
+      setMyVerification(verRes.data || null);
+      setMySessions(sessRes.data || []);
+      setFavorites(favRes.data || []);
+      setNotes(noteRes.data || []);
     }).catch(() => {});
   }, [authed, activeTab]);
 
@@ -568,6 +648,77 @@ export default function NexusApp() {
     } catch {}
   }, [setChatRequests, setPendingRequestCount]);
 
+  // ─── New feature handlers ────────────────────────────────────────────────
+  const handleShout = useCallback(async () => {
+    if (!shoutInput.trim() || !currentUser) return;
+    try {
+      const res = await fetch(`/api/shouts?userId=${currentUser.id}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: shoutInput.trim(), type: 'text' }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.data) addShout(data.data);
+        setShoutInput('');
+      }
+    } catch {}
+  }, [shoutInput, currentUser, addShout]);
+
+  const handleFetchMap = useCallback(async () => {
+    if (!currentUser) return;
+    const lat = userLat || currentUser.lat || 35.69;
+    const lng = userLng || currentUser.lng || 14.42;
+    setMapLoading(true);
+    try {
+      const res = await fetch(`/api/user-map?lat=${lat}&lng=${lng}&radius=${mapRadius}&userId=${currentUser.id}`);
+      const data = await res.json();
+      setMapUsers(data.users || []);
+      setMapCenter({ lat, lng });
+    } catch {} finally { setMapLoading(false); }
+  }, [currentUser, userLat, userLng, mapRadius]);
+
+  const handleFavorite = useCallback(async (targetId: string, isSuper: boolean = false) => {
+    if (!currentUser) return;
+    try {
+      await fetch(`/api/favorites?userId=${currentUser.id}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetId, isSuper }),
+      });
+    } catch {}
+  }, [currentUser]);
+
+  const handleSaveNote = useCallback(async () => {
+    if (!currentUser || !noteTargetId || !noteContent.trim()) return;
+    try {
+      await fetch(`/api/notes?userId=${currentUser.id}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetId: noteTargetId, content: noteContent.trim() }),
+      });
+      setShowNoteDialog(false); setNoteContent(''); setNoteTargetId(null);
+    } catch {}
+  }, [currentUser, noteTargetId, noteContent]);
+
+  const handleUpdateGeo = useCallback(() => {
+    if (!currentUser) return;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLat(pos.coords.latitude);
+          setUserLng(pos.coords.longitude);
+          fetch('/api/user-map?userId=' + currentUser.id, {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          }).then(() => {
+            if (activeTab === 'map') handleFetchMap();
+          }).catch(() => {});
+        },
+        () => {},
+        { enableHighAccuracy: true },
+      );
+    }
+  }, [currentUser, activeTab, handleFetchMap, setUserLat, setUserLng]);
+
+
   // ─── Filtered discover users ───────────────────────────────────────────────
   const filteredDiscover = discoverUsers.filter(u => {
     if (onlineOnly && !u.online) return false;
@@ -688,6 +839,15 @@ export default function NexusApp() {
         {/* ─── Fansites Tab ─── */}
         {!showSettings && activeTab === 'fansites' && <FansitesView />}
 
+        {/* ─── Videos Tab ─── */}
+        {!showSettings && activeTab === 'videos' && <VideosView />}
+
+        {/* ─── Shouts Tab ─── */}
+        {!showSettings && activeTab === 'shouts' && <ShoutsView />}
+
+        {/* ─── Map Tab ─── */}
+        {!showSettings && activeTab === 'map' && <MapView />}
+
         {/* ─── Events Tab ─── */}
         {!showSettings && activeTab === 'events' && <EventsView />}
 
@@ -699,11 +859,12 @@ export default function NexusApp() {
       <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-0.5">
         {([
           { tab: 'discover' as const, icon: Compass, label: 'Discover', badge: 0 },
+          { tab: 'map' as const, icon: MapPinned, label: 'Map', badge: 0 },
           { tab: 'chat' as const, icon: MessageCircle, label: 'Chat', badge: totalUnread + pendingRequestCount },
           { tab: 'likes' as const, icon: Heart, label: 'Likes', badge: receivedLikes.length },
-          { tab: 'viewed' as const, icon: Eye, label: 'Viewed', badge: 0 },
+          { tab: 'shouts' as const, icon: Megaphone, label: 'Shouts', badge: 0 },
           { tab: 'fansites' as const, icon: Star, label: 'Fansites', badge: 0 },
-          { tab: 'events' as const, icon: Calendar, label: 'Events', badge: 0 },
+          { tab: 'videos' as const, icon: Video, label: 'Videos', badge: 0 },
           { tab: 'profile' as const, icon: User, label: 'Profile', badge: 0 },
         ]).map(({ tab, icon: Icon, label, badge }) => (
           <button
@@ -788,6 +949,22 @@ export default function NexusApp() {
                 )}
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ NOTE DIALOG ═══ */}
+      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
+        <DialogContent className="bg-card border-border sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><StickyNote className="w-5 h-5 text-primary" /> Add Note</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <Textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Write a private note about this user..." className="bg-secondary border-border text-sm" rows={3} />
+            <div className="flex gap-2">
+              <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveNote} disabled={!noteContent.trim()}>Save Note</Button>
+              <Button size="sm" variant="outline" className="border-border" onClick={() => { setShowNoteDialog(false); setNoteContent(''); }}>Cancel</Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -1550,6 +1727,140 @@ export default function NexusApp() {
     );
   }
 
+  // ─── Shouts View ───────────────────────────────────────────────────────────
+  function ShoutsView() {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-3 border-b border-border shrink-0">
+          <h2 className="text-sm font-semibold">Shouts</h2>
+          <p className="text-[11px] text-muted-foreground">What's on your mind?</p>
+        </div>
+        {/* Shout composer */}
+        <div className="px-3 py-2 border-b border-border flex gap-2 shrink-0">
+          <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(currentUser)} /><AvatarFallback className="text-xs">{currentUser?.displayName?.[0]}</AvatarFallback></Avatar>
+          <div className="flex-1 flex gap-2">
+            <Input value={shoutInput} onChange={e => setShoutInput(e.target.value)} placeholder="Shout something..." className="h-8 text-xs bg-secondary border-border" onKeyDown={e => e.key === 'Enter' && handleShout()} />
+            <Button size="sm" className="h-8 bg-primary text-primary-foreground text-xs shrink-0" onClick={handleShout} disabled={!shoutInput.trim()}><Send className="w-3.5 h-3.5" /></Button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3 space-y-3">
+          {shoutLoading ? (
+            Array.from({ length: 4 }).map((_, i) => <div key={i} className="p-3 rounded-xl bg-card border border-border"><div className="flex gap-2"><Skeleton className="h-8 w-8 rounded-full" /><div className="flex-1 space-y-2"><Skeleton className="h-3 w-24" /><Skeleton className="h-12 w-full" /></div></div></div>)
+          ) : shouts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 space-y-3"><Megaphone className="w-12 h-12 text-muted-foreground" /><p className="text-muted-foreground text-sm">No shouts yet. Be the first!</p></div>
+          ) : (
+            shouts.map((shout: any) => (
+              <div key={shout.id} className="p-3 rounded-xl bg-card border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <button onClick={() => openProfile(shout.userId)}><Avatar className="h-7 w-7"><AvatarImage src={getAvatar(shout.user)} /><AvatarFallback className="text-[10px]">{shout.user?.displayName?.[0]}</AvatarFallback></Avatar></button>
+                  <button onClick={() => openProfile(shout.userId)} className="text-[12px] font-semibold hover:underline">{shout.user?.displayName}</button>
+                  <span className="text-[10px] text-muted-foreground">@{shout.user?.username}</span>
+                  <span className="ml-auto text-[10px] text-muted-foreground">{timeAgo(shout.createdAt)}</span>
+                </div>
+                <p className="text-sm leading-relaxed">{shout.content}</p>
+                {shout.mediaUrl && <div className="mt-2 rounded-lg overflow-hidden"><img src={shout.mediaUrl} alt="" className="w-full max-h-64 object-cover" /></div>}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Map / GEO View ─────────────────────────────────────────────────────
+  function MapView() {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-3 border-b border-border shrink-0 flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-semibold">Nearby</h2>
+            <p className="text-[11px] text-muted-foreground">{mapUsers.length} users within {mapRadius}km</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select value={String(mapRadius)} onValueChange={v => setMapRadius(Number(v))}>
+              <SelectTrigger className="w-20 h-7 text-[11px] bg-secondary border-border"><SelectValue /></SelectTrigger>
+              <SelectContent className="bg-card border-border">
+                {[10, 25, 50, 100, 200].map(r => <SelectItem key={r} value={String(r)}>{r}km</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button size="sm" variant="outline" className="h-7 text-[11px] border-border" onClick={handleFetchMap}><Crosshair className="w-3 h-3" /></Button>
+          </div>
+        </div>
+        {/* Stylized map grid */}
+        <div className="flex-1 overflow-y-auto relative bg-secondary/30">
+          {/* CSS Grid Map */}
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 50%, rgba(59,130,246,0.08) 0%, transparent 70%)' }} />
+          <div className="relative p-3 space-y-2">
+            {/* Center marker */}
+            <div className="flex items-center justify-center py-4">
+              <div className="relative">
+                <div className="w-4 h-4 bg-primary rounded-full animate-pulse" />
+                <div className="absolute -inset-2 bg-primary/20 rounded-full" />
+                <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] text-primary font-medium">You</span>
+              </div>
+            </div>
+            {mapLoading ? (
+              Array.from({ length: 4 }).map((_, i) => <div key={i} className="flex gap-2 p-2 rounded-lg bg-card/50"><Skeleton className="h-10 w-10 rounded-full" /><Skeleton className="h-4 w-24" /></div>)
+            ) : mapUsers.length === 0 ? (
+              <div className="flex flex-col items-center py-8"><Map className="w-10 h-10 text-muted-foreground" /><p className="text-xs text-muted-foreground mt-2">No users found nearby</p></div>
+            ) : (
+              mapUsers.map((u: any) => (
+                <button key={u.id} onClick={() => openProfile(u.id)} className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-card border border-border hover:border-primary/30 transition-all text-left">
+                  <div className="relative">
+                    <Avatar className="h-10 w-10"><AvatarImage src={getAvatar(u)} /><AvatarFallback className="text-xs">{u.displayName?.[0]}</AvatarFallback></Avatar>
+                    {u.online && <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-card" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold truncate">{u.displayName}{u.showAge !== false && u.age ? `, ${u.age}` : ''}</p>
+                    <p className="text-[11px] text-muted-foreground">@{u.username}{u.location ? ` · ${u.location}` : ''}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    {u.distance != null && <p className="text-[12px] font-semibold text-primary">{Math.round(u.distance)}km</p>}
+                    <p className="text-[10px] text-muted-foreground">{u.online ? 'Online' : timeAgo(u.lastSeen)}</p>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Videos View ──────────────────────────────────────────────────────────
+  function VideosView() {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-3 border-b border-border shrink-0">
+          <h2 className="text-sm font-semibold">Videos</h2>
+          <p className="text-[11px] text-muted-foreground">Browse and share</p>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3">
+          {videosLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">{Array.from({ length: 6 }).map((_, i) => <div key={i}><Skeleton className="aspect-video w-full rounded-xl" /><Skeleton className="h-4 w-32 mt-2" /></div>)}</div>
+          ) : videos.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 space-y-3"><Video className="w-12 h-12 text-muted-foreground" /><p className="text-muted-foreground text-sm">No videos yet</p></div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {videos.map((video: any) => (
+                <div key={video.id} className="rounded-xl overflow-hidden bg-card border border-border group">
+                  <div className="aspect-video relative bg-secondary">
+                    {video.thumbnailUrl ? <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Video className="w-8 h-8 text-muted-foreground" /></div>}
+                    {video.duration && <span className="absolute bottom-1 right-1 text-[9px] bg-black/70 text-white px-1 rounded">{video.duration}s</span>}
+                  </div>
+                  <div className="p-2">
+                    <p className="text-[12px] font-medium truncate">{video.title}</p>
+                    <p className="text-[10px] text-muted-foreground">by {video.user?.displayName}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // ─── Profile View (My Profile) ─────────────────────────────────────────────
   function ProfileView() {
     if (!currentUser) return null;
@@ -1776,6 +2087,67 @@ export default function NexusApp() {
               </div>
             )}
 
+            {/* My Favorites */}
+            <div className="space-y-2">
+              <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><Bookmark className="w-4 h-4" /> My Favorites ({favorites.length})</h3>
+              {favorites.length > 0 ? favorites.slice(0, 10).map((fav: any) => (
+                <button key={fav.id} onClick={() => openProfile(fav.targetId)} className="w-full flex items-center gap-2 p-2 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all text-left">
+                  <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-[10px]">{(fav.target as any)?.displayName?.[0]}</AvatarFallback></Avatar>
+                  <div className="flex-1 min-w-0"><p className="text-[13px] font-medium truncate">{(fav.target as any)?.displayName}</p><p className="text-[10px] text-muted-foreground">{(fav.target as any)?.username}</p></div>
+                  {fav.isSuper && <Star className="w-3.5 h-3.5 text-yellow-400" />}
+                </button>
+              )) : <p className="text-xs text-muted-foreground">No favorites yet</p>}
+            </div>
+
+            {/* My Notes */}
+            <div className="space-y-2">
+              <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><StickyNote className="w-4 h-4" /> My Notes ({notes.length})</h3>
+              {notes.length > 0 ? notes.slice(0, 10).map((note: any) => (
+                <div key={note.id} className="p-2.5 rounded-xl bg-secondary border border-border">
+                  <div className="flex items-center gap-2 mb-1">
+                    <button onClick={() => openProfile(note.targetId)} className="text-[12px] font-semibold hover:underline">{(note.target as any)?.displayName}</button>
+                    <Badge variant="secondary" className="text-[9px] bg-muted">{note.type}</Badge>
+                  </div>
+                  <p className="text-[12px] text-muted-foreground line-clamp-2">{note.content}</p>
+                </div>
+              )) : <p className="text-xs text-muted-foreground">No notes yet. Add notes to user profiles!</p>}
+            </div>
+
+            {/* Verification Status */}
+            <div className="space-y-2">
+              <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><ShieldCheck className="w-4 h-4" /> Verification</h3>
+              <div className="p-3 rounded-xl bg-secondary border border-border">
+                <div className="flex items-center gap-2">
+                  {myVerification?.status === 'verified' ? <><ShieldCheck className="w-5 h-5 text-green-400" /><span className="text-sm font-medium text-green-400">Verified</span></> :
+                   myVerification?.status === 'pending' ? <><Clock className="w-5 h-5 text-yellow-400" /><span className="text-sm font-medium text-yellow-400">Pending Review</span></> :
+                   <><Shield className="w-5 h-5 text-muted-foreground" /><span className="text-sm font-medium text-muted-foreground">Not Verified</span></>}
+                </div>
+                {myVerification?.status !== 'verified' && (
+                  <Button size="sm" variant="outline" className="mt-2 h-8 text-xs border-border" onClick={async () => {
+                    if (!currentUser) return;
+                    await fetch(`/api/verification?userId=${currentUser.id}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type: 'age' }) });
+                    const res = await fetch(`/api/verification?userId=${currentUser.id}`);
+                    const data = await res.json();
+                    setMyVerification(data.data);
+                  }}><ShieldCheck className="w-3 h-3 mr-1" /> Request Verification</Button>
+                )}
+              </div>
+            </div>
+
+            {/* Active Sessions */}
+            <div className="space-y-2">
+              <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2"><MonitorSmartphone className="w-4 h-4" /> Sessions ({mySessions.length})</h3>
+              {mySessions.length > 0 ? mySessions.slice(0, 5).map((sess: any) => (
+                <div key={sess.id} className="flex items-center justify-between p-2.5 rounded-xl bg-secondary border border-border">
+                  <div className="flex items-center gap-2">
+                    <MonitorSmartphone className="w-4 h-4 text-muted-foreground" />
+                    <div><p className="text-[12px] font-medium">{sess.platform || 'Unknown'}{sess.device ? ` · ${sess.device}` : ''}</p><p className="text-[10px] text-muted-foreground">{timeAgo(sess.lastSeen)}</p></div>
+                  </div>
+                  {sess.isActive && <Badge className="bg-green-400/20 text-green-400 text-[9px]">Active</Badge>}
+                </div>
+              )) : <p className="text-xs text-muted-foreground">No sessions</p>}
+            </div>
+
             {/* Settings shortcut */}
             <Button variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}>
               <Settings className="w-4 h-4 mr-2" /> Settings & Privacy
@@ -1935,6 +2307,8 @@ export default function NexusApp() {
               <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { openChat(u); closeProfile(); }}>
                 <MessageCircle className="w-4 h-4 mr-2" /> Message
               </Button>
+              <Tooltip><TooltipTrigger asChild><Button variant="outline" className="border-border hover:bg-secondary" onClick={() => handleFavorite(u.id)}><Bookmark className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Favorite</TooltipContent></Tooltip>
+              <Tooltip><TooltipTrigger asChild><Button variant="outline" className="border-border hover:bg-secondary" onClick={() => { setNoteTargetId(u.id); setShowNoteDialog(true); }}><StickyNote className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Add Note</TooltipContent></Tooltip>
               <Button variant="outline" className="border-border hover:bg-secondary" onClick={() => handleLike(u.id)}>
                 <Heart className="w-4 h-4 mr-1" /> Like
               </Button>

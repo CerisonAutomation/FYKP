@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { User, TabId, Message, Conversation, ChatRequest } from '@/types';
+import type { User, TabId, Message, Conversation, ChatRequest, Shout, UserFavorite, UserNote, Blog, Video, Banner } from '@/types';
 
 interface AppState {
   currentUser: User | null;
@@ -35,6 +35,24 @@ interface AppState {
   setChatRequests: (reqs: ChatRequest[]) => void;
   pendingRequestCount: number;
   setPendingRequestCount: (n: number) => void;
+  // New from OMOLINK
+  shouts: Shout[];
+  setShouts: (s: Shout[]) => void;
+  addShout: (s: Shout) => void;
+  favorites: UserFavorite[];
+  setFavorites: (f: UserFavorite[]) => void;
+  notes: UserNote[];
+  setNotes: (n: UserNote[]) => void;
+  blogs: Blog[];
+  setBlogs: (b: Blog[]) => void;
+  videos: Video[];
+  setVideos: (v: Video[]) => void;
+  banners: Banner[];
+  setBanners: (b: Banner[]) => void;
+  userLat: number | null;
+  setUserLat: (l: number | null) => void;
+  userLng: number | null;
+  setUserLng: (l: number | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -71,4 +89,22 @@ export const useAppStore = create<AppState>((set) => ({
   setChatRequests: (reqs) => set({ chatRequests: reqs }),
   pendingRequestCount: 0,
   setPendingRequestCount: (n) => set({ pendingRequestCount: n }),
+  // New
+  shouts: [],
+  setShouts: (s) => set({ shouts: s }),
+  addShout: (s) => set((st) => ({ shouts: [s, ...st.shouts] })),
+  favorites: [],
+  setFavorites: (f) => set({ favorites: f }),
+  notes: [],
+  setNotes: (n) => set({ notes: n }),
+  blogs: [],
+  setBlogs: (b) => set({ blogs: b }),
+  videos: [],
+  setVideos: (v) => set({ videos: v }),
+  banners: [],
+  setBanners: (b) => set({ banners: b }),
+  userLat: null,
+  setUserLat: (l) => set({ userLat: l }),
+  userLng: null,
+  setUserLng: (l) => set({ userLng: l }),
 }));
