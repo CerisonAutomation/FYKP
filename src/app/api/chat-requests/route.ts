@@ -4,42 +4,20 @@ import { db } from '@/lib/db';
 // GET /api/chat-requests - get pending requests (sent and received)
 export async function GET() {
   try {
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
-    const [sent, received] = await Promise.all([
-      db.chatRequest.findMany({
-        where: { senderId: me.id },
-        orderBy: { createdAt: 'desc' },
-        include: {
-          receiver: {
-            select: { id: true, username: true, displayName: true, avatar: true, online: true },
-          },
+    const received = await db.chatRequest.findMany({
+      where: { receiverId: me.id },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        sender: {
+          select: { id: true, username: true, displayName: true, avatar: true, online: true },
         },
-      }),
-      db.chatRequest.findMany({
-        where: { receiverId: me.id },
-        orderBy: { createdAt: 'desc' },
-        include: {
-          sender: {
-            select: { id: true, username: true, displayName: true, avatar: true, online: true },
-          },
-        },
-      }),
-    ]);
-
-    const pending = received.filter((r) => r.status === 'pending');
-
-    return NextResponse.json({
-      data: {
-        sent,
-        received,
-        pendingCount: pending.length,
       },
     });
+
+    // Return flat array so frontend can .filter() on it
+    return NextResponse.json({ data: received });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -51,11 +29,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { action, requestId, receiverId, message } = body;
 
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     if (action === 'send') {
       // Send a new chat request

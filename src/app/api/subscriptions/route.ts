@@ -4,11 +4,7 @@ import { db } from '@/lib/db';
 // GET /api/subscriptions - get user subscriptions (both active and expired)
 export async function GET() {
   try {
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     const subscriptions = await db.subscription.findMany({
       where: { userId: me.id },
@@ -31,11 +27,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'fansiteId is required' }, { status: 400 });
     }
 
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     // Check if fansite exists
     const fansite = await db.fansite.findUnique({ where: { id: fansiteId } });

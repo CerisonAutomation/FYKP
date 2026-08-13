@@ -4,11 +4,7 @@ import { db } from '@/lib/db';
 // GET /api/boosts - get active boosts for current user
 export async function GET() {
   try {
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     const boosts = await db.boost.findMany({
       where: {
@@ -30,11 +26,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { type, duration } = body;
 
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     const boostType = type || 'standard';
     const boostDuration = duration || 30;

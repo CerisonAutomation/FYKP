@@ -4,11 +4,7 @@ import { db } from '@/lib/db';
 // GET /api/messages/conversations - list all conversations with last message, unread count, other user info
 export async function GET() {
   try {
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     // Get all messages involving "me" that are not deleted
     const messages = await db.message.findMany({

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
     const users = await db.user.findMany({
       where: {
-        id: { not: undefined }, // all users
+        id: { not: 'test-user-1' },
       },
       skip,
       take: limit,

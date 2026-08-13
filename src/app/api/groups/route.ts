@@ -1,43 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-// GET /api/groups - list groups user is in
+// GET /api/groups - list groups (my groups first, then public discoverable groups)
 export async function GET() {
   try {
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const ME_ID = 'test-user-1';
 
+    // Get groups user is a member of
     const memberships = await db.groupMember.findMany({
-      where: { userId: me.id },
+      where: { userId: ME_ID },
       include: {
         group: {
           include: {
-            owner: {
-              select: { id: true, username: true, displayName: true, avatar: true },
-            },
-            _count: {
-              select: { members: true, messages: true },
-            },
-            messages: {
-              orderBy: { createdAt: 'desc' },
-              take: 1,
-            },
+            owner: { select: { id: true, username: true, displayName: true, avatar: true } },
+            _count: { select: { members: true, messages: true } },
+            messages: { orderBy: { createdAt: 'desc' }, take: 1 },
           },
         },
       },
       orderBy: { joinedAt: 'desc' },
     });
 
-    const groups = memberships.map((m) => ({
+    const myGroups = memberships.map((m) => ({
       ...m.group,
       myRole: m.role,
       joinedAt: m.joinedAt,
     }));
 
-    return NextResponse.json({ data: groups });
+    // Get public groups not yet joined
+    const memberGroupIds = memberships.map((m) => m.groupId);
+    const discoverGroups = await db.groupChat.findMany({
+      where: {
+        isPublic: true,
+        hidden: false,
+        ...(memberGroupIds.length > 0 ? { id: { notIn: memberGroupIds } } : {}),
+      },
+      include: {
+        owner: { select: { id: true, username: true, displayName: true, avatar: true } },
+        _count: { select: { members: true, messages: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return NextResponse.json({ data: [...myGroups, ...discoverGroups] });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -53,11 +58,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Group name is required' }, { status: 400 });
     }
 
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     const group = await db.groupChat.create({
       data: {

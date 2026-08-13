@@ -7,11 +7,16 @@ const io = new Server({
 io.on('connection', (socket) => {
   console.log('Chat client connected:', socket.id);
 
-  socket.on('join', (userId: string) => {
-    socket.join(`user:${userId}`);
-    socket.data.userId = userId;
+  // Frontend sends: socket.emit('join', { userId: currentUser.id })
+  socket.on('join', (data: string | { userId: string }) => {
+    const userId = typeof data === 'string' ? data : data?.userId;
+    if (userId) {
+      socket.join(`user:${userId}`);
+      socket.data.userId = userId;
+    }
   });
 
+  // Relay message in real-time (persistence handled by frontend via /api/messages)
   socket.on('message', (data: { senderId: string; receiverId: string; content: string; type?: string }) => {
     const msg = {
       id: `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`,

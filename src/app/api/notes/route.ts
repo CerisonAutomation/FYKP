@@ -5,7 +5,7 @@ import { db } from '@/lib/db';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const userId = searchParams.get('userId') || searchParams.get('writerId');
     const targetId = searchParams.get('targetId');
 
     if (!userId) {
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const userId = searchParams.get('userId') || searchParams.get('writerId');
 
     if (!userId) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });

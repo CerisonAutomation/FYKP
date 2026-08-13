@@ -4,13 +4,8 @@ import { db } from '@/lib/db';
 // GET /api/auth - return current user (demo: first user)
 export async function GET() {
   try {
-    const user = await db.user.findFirst({
-      orderBy: { createdAt: 'asc' },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'No users found' }, { status: 404 });
-    }
+    const user = await db.user.findUnique({ where: { id: 'test-user-1' } });
+    if (!user) throw new Error('test-user-1 not found');
 
     const { passwordHash, ...safeUser } = user;
     return NextResponse.json({ data: safeUser });

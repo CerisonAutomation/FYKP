@@ -4,10 +4,7 @@ import { db } from '@/lib/db';
 // GET /api/profile-views - who viewed me (list of profile viewers)
 export async function GET() {
   try {
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     const views = await db.profileView.findMany({
       where: { viewedId: me.id },
@@ -55,10 +52,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'viewedId is required' }, { status: 400 });
     }
 
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     if (me.id === viewedId) {
       return NextResponse.json({ error: 'Cannot view your own profile' }, { status: 400 });

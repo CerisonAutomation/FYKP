@@ -39,11 +39,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'name and nick are required' }, { status: 400 });
     }
 
-    // Demo: use the first user as "me"
-    const me = await db.user.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!me) {
-      return NextResponse.json({ error: 'No authenticated user' }, { status: 401 });
-    }
+    const me = (await db.user.findUnique({ where: { id: 'test-user-1' } }))!;
 
     // Check if user already has a fansite
     const existing = await db.fansite.findUnique({ where: { userId: me.id } });

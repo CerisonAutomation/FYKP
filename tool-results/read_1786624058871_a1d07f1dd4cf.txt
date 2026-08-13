@@ -1,0 +1,502 @@
+   618→    if (!authed || activeTab !== 'boosts') return;
+   619→    setBoostsLoading(true);
+   620→    fetch('/api/boosts?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setAllBoosts(res.data || [])).catch(() => {}).finally(() => setBoostsLoading(false));
+   621→  }, [authed, activeTab]);
+   622→
+   623→  // Albums
+   624→  useEffect(() => {
+   625→    if (!authed || activeTab !== 'albums') return;
+   626→    setAlbumsLoading(true);
+   627→    fetch('/api/albums?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setAlbums(res.data || [])).catch(() => {}).finally(() => setAlbumsLoading(false));
+   628→  }, [authed, activeTab]);
+   629→
+   630→  // Groups
+   631→  useEffect(() => {
+   632→    if (!authed || activeTab !== 'groups') return;
+   633→    fetch('/api/groups').then(r => r.json()).then(res => setGroups(res.data || [])).catch(() => {});
+   634→  }, [authed, activeTab]);
+   635→
+   636→  // Messages scroll
+   637→  useEffect(() => { msgEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, groupMessages]);
+   638→
+   639→  // ═══════════════════════════════════════════════════════════════
+   640→  // HANDLERS
+   641→  // ═══════════════════════════════════════════════════════════════
+   642→
+   643→  const openProfile = useCallback((userId: string) => setSelectedUserId(userId), []);
+   644→  const closeProfile = useCallback(() => { setShowProfileDrawer(false); setSelectedUserId(null); setProfileUser(null); }, []);
+   645→
+   646→  const openChat = useCallback(async (otherUser: User) => {
+   647→    const convo: Conversation = {
+   648→      otherUser,
+   649→      lastMessage: { id: '', content: '', senderId: '', receiverId: '', chatType: 'direct', isRead: true, type: 'text', createdAt: new Date().toISOString() },
+   650→      unreadCount: 0,
+   651→    };
+   652→    setActiveConversation(convo);
+   653→    setMessages([]);
+   654→    setChatMobileView('chat');
+   655→    if (currentUser) {
+   656→      fetch(`/api/messages?userId=${otherUser.id}`).then(r => r.json()).then(res => setMessages(res.data || [])).catch(() => {});
+   657→    }
+   658→  }, [currentUser]);
+   659→
+   660→  const sendMessage = useCallback(() => {
+   661→    if (!msgInput.trim() || !activeConversation || !currentUser) return;
+   662→    const content = msgInput.trim();
+   663→    setMsgInput('');
+   664→    const optimisticMsg: Message = { id: `temp-${Date.now()}`, content, senderId: currentUser.id, receiverId: activeConversation.otherUser.id, chatType: 'direct', isRead: false, type: 'text', createdAt: new Date().toISOString() };
+   665→    addMessage(optimisticMsg);
+   666→    fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ receiverId: activeConversation.otherUser.id, content, type: 'text' }) })
+   667→      .then(r => r.json()).then(res => { if (res.data) { setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? res.data : m)); socketRef.current?.emit('message', res.data); } }).catch(() => {});
+   668→  }, [msgInput, activeConversation, currentUser]);
+   669→
+   670→  const sendGroupMessage = useCallback(() => {
+   671→    if (!msgInput.trim() || !activeGroup || !currentUser) return;
+   672→    const content = msgInput.trim();
+   673→    setMsgInput('');
+   674→    const optimisticMsg: Message = { id: `temp-${Date.now()}`, content, senderId: currentUser.id, receiverId: '', chatType: 'group', isRead: false, type: 'text', createdAt: new Date().toISOString(), sender: currentUser };
+   675→    setGroupMessages(prev => [...prev, optimisticMsg]);
+   676→    fetch(`/api/groups/${activeGroup.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'message', content }) }).catch(() => {});
+   677→  }, [msgInput, activeGroup, currentUser]);
+   678→
+   679→  const handleLike = useCallback(async (receiverId: string) => {
+   680→    try { await fetch('/api/likes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ receiverId }) }); triggerRefreshDiscover(); } catch {}
+   681→  }, []);
+   682→
+   683→  const handleUnlike = useCallback(async (receiverId: string) => {
+   684→    try { await fetch(`/api/likes?receiverId=${receiverId}`, { method: 'DELETE' }); triggerRefreshDiscover(); } catch {}
+   685→  }, []);
+   686→
+   687→  const handleBlock = useCallback(async (userId: string) => {
+   688→    try { await fetch('/api/blocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blockedId: userId }) }); setShowBlockAlert(false); closeProfile(); } catch {}
+   689→  }, [closeProfile]);
+   690→
+   691→  const handleRizz = useCallback(async () => {
+   692→    setRizzLoading(true); setRizzResult(null);
+   693→    try {
+   694→      const res = await fetch('/api/ai-rizz', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetBio: rizzTargetBio, style: rizzStyle }) });
+   695→      const data = await res.json();
+   696→      setRizzResult(data.data);
+   697→    } catch { setRizzResult({ line: 'Failed to generate. Try again!', style: rizzStyle }); } finally { setRizzLoading(false); }
+   698→  }, [rizzTargetBio, rizzStyle]);
+   699→
+   700→  const copyRizz = useCallback(() => { if (rizzResult?.line) navigator.clipboard.writeText(rizzResult.line); }, [rizzResult]);
+   701→
+   702→  const handleSendRizz = useCallback(() => {
+   703→    if (!rizzResult || !activeConversation && !profileUser) return;
+   704→    if (activeConversation) { setMsgInput(rizzResult.line); setShowRizzModal(false); }
+   705→    else if (profileUser) { openChat(profileUser); setTimeout(() => { setMsgInput(rizzResult.line); setShowRizzModal(false); }, 300); }
+   706→  }, [rizzResult, activeConversation, profileUser, openChat]);
+   707→
+   708→  const handleRsvp = useCallback(async (eventId: string, status: string) => {
+   709→    try { await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'rsvp', eventId, status }) }); setUserRsvps(prev => ({ ...prev, [eventId]: status })); } catch {}
+   710→  }, []);
+   711→
+   712→  const handleCreateEvent = useCallback(async () => {
+   713→    try {
+   714→      const res = await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(eventForm) });
+   715→      if (res.ok) { const data = await res.json(); setEvents(prev => [data.data, ...prev]); setShowCreateEvent(false); setEventForm({ title: '', description: '', location: '', startDate: '', imageUrl: '' }); }
+   716→    } catch {}
+   717→  }, [eventForm]);
+   718→
+   719→  const handleSaveProfile = useCallback(async () => {
+   720→    if (!currentUser) return;
+   721→    try {
+   722→      const payload: any = {};
+   723→      for (const [k, v] of Object.entries(editForm)) { if (v !== '' && v !== undefined) { if (k === 'height' || k === 'weight') payload[k] = parseInt(v); else payload[k] = v; } }
+   724→      const res = await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+   725→      if (res.ok) { const data = await res.json(); setCurrentUser(data.data); setEditingProfile(false); }
+   726→    } catch {}
+   727→  }, [currentUser, editForm]);
+   728→
+   729→  const handleSaveSettings = useCallback(async () => {
+   730→    if (!currentUser) return;
+   731→    try { await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settingsPrivacy) }); setCurrentUser({ ...currentUser, ...settingsPrivacy }); } catch {}
+   732→  }, [currentUser, settingsPrivacy]);
+   733→
+   734→  const handleChatRequest = useCallback(async (requestId: string, action: 'accept' | 'decline') => {
+   735→    try { await fetch('/api/chat-requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestId, action }) }); setChatRequests(prev => prev.filter(r => r.id !== requestId)); setPendingRequestCount(prev => Math.max(0, prev - 1)); } catch {}
+   736→  }, []);
+   737→
+   738→  const handleShout = useCallback(async () => {
+   739→    if (!shoutInput.trim() || !currentUser) return;
+   740→    try {
+   741→      const res = await fetch(`/api/shouts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: shoutInput.trim(), type: shoutType }) });
+   742→      if (res.ok) { const data = await res.json(); if (data.data) addShout(data.data); setShoutInput(''); }
+   743→    } catch {}
+   744→  }, [shoutInput, currentUser, shoutType]);
+   745→
+   746→  const handleFetchMap = useCallback(async () => {
+   747→    const lat = userLat || currentUser?.lat || 35.69;
+   748→    const lng = userLng || currentUser?.lng || 14.42;
+   749→    setMapLoading(true);
+   750→    try {
+   751→      const res = await fetch(`/api/user-map?lat=${lat}&lng=${lng}&radius=${mapRadius}&userId=${CURRENT_USER_ID}`);
+   752→      const data = await res.json();
+   753→      setMapUsers(data.users || []);
+   754→    } catch {} finally { setMapLoading(false); }
+   755→  }, [currentUser, userLat, userLng, mapRadius]);
+   756→
+   757→  const handleFavorite = useCallback(async (targetId: string, isSuper: boolean = false) => {
+   758→    if (!currentUser) return;
+   759→    try { await fetch(`/api/favorites?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId, isSuper }) }); } catch {}
+   760→  }, [currentUser]);
+   761→
+   762→  const handleSaveNote = useCallback(async () => {
+   763→    if (!currentUser || !noteTargetId || !noteContent.trim()) return;
+   764→    try { await fetch(`/api/notes?writerId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: noteTargetId, content: noteContent.trim() }) }); setShowNoteDialog(false); setNoteContent(''); setNoteTargetId(null); } catch {}
+   765→  }, [currentUser, noteTargetId, noteContent]);
+   766→
+   767→  const handleDeleteNote = useCallback(async (noteId: string) => {
+   768→    try { await fetch(`/api/notes/${noteId}`, { method: 'DELETE' }); setNotes(prev => prev.filter((n: any) => n.id !== noteId)); } catch {}
+   769→  }, []);
+   770→
+   771→  const handleInfer = useCallback(async (category?: InferCategory) => {
+   772→    if (!inferTargetUser) return;
+   773→    const cats = category ? [category] : INFER_CATEGORIES.map(c => c.id);
+   774→    setInferLoading(true);
+   775→    const newResults: Record<string, any> = {};
+   776→    for (const cat of cats) {
+   777→      try {
+   778→        const res = await fetch('/api/ai-rizz', {
+   779→          method: 'POST', headers: { 'Content-Type': 'application/json' },
+   780→          body: JSON.stringify({ targetBio: inferTargetUser.bio || '', style: cat, fullProfile: inferTargetUser, inferCategory: cat }),
+   781→        });
+   782→        const data = await res.json();
+   783→        newResults[cat] = { category: cat, confidence: Math.floor(Math.random() * 30 + 70), title: data.data?.line || 'Analysis complete', content: data.data?.context || `Detailed ${cat} analysis for ${inferTargetUser.displayName}`, bulletPoints: ['Based on profile analysis', 'AI-generated insights', 'Personalized recommendations'], color: cat === 'red-flags' ? 'red' : cat === 'green-flags' ? 'green' : 'blue' };
+   784→      } catch { newResults[cat] = { category: cat, confidence: 50, title: 'Analysis unavailable', content: 'Could not generate analysis', bulletPoints: [], color: 'gray' }; }
+   785→    }
+   786→    setInferResultsMap(newResults);
+   787→    setInferLoading(false);
+   788→  }, [inferTargetUser]);
+   789→
+   790→  const handleCreateGroup = useCallback(async () => {
+   791→    if (!currentUser || !groupForm.name.trim()) return;
+   792→    try {
+   793→      const res = await fetch('/api/groups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(groupForm) });
+   794→      if (res.ok) { const data = await res.json(); setGroups(prev => [data.data, ...prev]); setShowCreateGroup(false); setGroupForm({ name: '', description: '', isPublic: true }); }
+   795→    } catch {}
+   796→  }, [currentUser, groupForm]);
+   797→
+   798→  const handleCreateBanner = useCallback(async () => {
+   799→    if (!currentUser) return;
+   800→    try {
+   801→      const res = await fetch('/api/banners', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'My Banner', imageUrl: DEFAULT_COVER, position: 0 }) });
+   802→      if (res.ok) { const data = await res.json(); setBanners(prev => [...prev, data.data]); }
+   803→    } catch {}
+   804→  }, [currentUser]);
+   805→
+   806→  // Filtered discover users
+   807→  const filteredDiscover = discoverUsers.filter(u => {
+   808→    if (onlineOnly && !u.online) return false;
+   809→    if (u.age && (u.age < ageRange[0] || u.age > ageRange[1])) return false;
+   810→    if (lookingFor !== 'all' && u.lookingFor !== lookingFor) return false;
+   811→    if (ethnicityFilter !== 'all' && u.ethnicity !== ethnicityFilter) return false;
+   812→    if (bodyTypeFilter !== 'all' && u.bodyType !== bodyTypeFilter) return false;
+   813→    return true;
+   814→  });
+   815→
+   816→  const cascadeUser = filteredDiscover[cascadeIndex];
+   817→
+   818→  // ═══════════════════════════════════════════════════════════════
+   819→  // LOGIN SCREEN
+   820→  // ═══════════════════════════════════════════════════════════════
+   821→  if (authLoading) {
+   822→    return (
+   823→      <div className="h-screen flex flex-col items-center justify-center bg-background gap-4">
+   824→        <div className="text-2xl font-bold gradient-text">NEXUS</div>
+   825→        <Skeleton className="h-4 w-32" />
+   826→      </div>
+   827→    );
+   828→  }
+   829→
+   830→  if (!authed) {
+   831→    return (
+   832→      <div className="h-screen flex flex-col items-center justify-center bg-background px-6">
+   833→        <div className="text-4xl font-bold gradient-text mb-2">NEXUS</div>
+   834→        <p className="text-muted-foreground text-sm mb-8">Connect. Discover. Thrive.</p>
+   835→        <Card className="w-full max-w-sm bg-card border-border"><CardContent className="p-6">
+   836→          <button onClick={() => { setCurrentUser({ id: CURRENT_USER_ID, username: 'testuser', displayName: 'Test User', email: 'test@nexus.app', avatar: DEFAULT_AVATAR, bio: 'Love adventures and good coffee ☕', age: 28, gender: 'male', location: 'Valletta, Malta', lat: 35.8989, lng: 14.5146, geoCity: 'Valletta', geoRegion: 'Central Region', geoCountry: 'Malta', online: true, lastSeen: new Date().toISOString(), isPremium: true, isVerified: true, showOnline: true, showDistance: true, showAge: true, showActivity: true, hidePicsOffline: false, lookingFor: 'relationship', aboutMe: 'Adventurous soul looking for meaningful connections. I love hiking, photography, and trying new cuisines. Always up for a good conversation over coffee or wine.', height: 180, weight: 75, ethnicity: 'white', bodyType: 'athletic', relationshipStatus: 'single', position: 'versatile', pronouns: 'he/him', displayUnits: 'metric', lang: 'en', soundOff: false, notifPushOff: false, notifEmailOff: false, notifTelegramOff: false, mailingInternal: true, mailingPartner: true, profileOff: false, privateAuto: false, noPros: false, noPub: false, isProfessional: false, professionalStatus: 'none', verificationStatus: 'verified', voucher: null, _count: { photos: 12, receivedLikes: 47, receivedViews: 234, shouts: 5, favorites: 18, blogs: 2, videos: 1, sentMessages: 89, receivedMessages: 76, notesWritten: 8 } } as any); setAuthed(true); }} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium">
+   837→            Quick Login as Test User
+   838→          </button>
+   839→        </CardContent></Card>
+   840→      </div>
+   841→    );
+   842→  }
+   843→
+   844→
+   845→  // ═══════════════════════════════════════════════════════════════
+   846→  // MAIN NAV CONSTANTS
+   847→  // ═══════════════════════════════════════════════════════════════
+   848→  const MAIN_TABS = [
+   849→    { tab: 'discover' as const, icon: Compass, label: 'Discover', badge: 0 },
+   850→    { tab: 'map' as const, icon: MapPinned, label: 'Map', badge: 0 },
+   851→    { tab: 'chat' as const, icon: MessageCircle, label: 'Chat', badge: totalUnread + pendingRequestCount },
+   852→    { tab: 'likes' as const, icon: Heart, label: 'Likes', badge: receivedLikes.length },
+   853→    { tab: 'more' as const, icon: Grid2X2, label: 'More', badge: 0 },
+   854→  ];
+   855→
+   856→  const isMainTab = (t: string) => ['discover', 'map', 'chat', 'likes', 'more'].includes(t);
+   857→
+   858→  const getPageTitle = () => {
+   859→    const titles: Record<string, string> = {
+   860→      events: 'Events & Agenda', viewed: 'Viewed Me', shouts: 'Shouts',
+   861→      fansites: 'Fansites', videos: 'Videos', blogs: 'Blogs', groups: 'Groups',
+   862→      albums: 'Albums', membership: 'Membership', verified: 'Verified',
+   863→      professional: 'Professional', footprints: 'Footprints', notes: 'Notes',
+   864→      boosts: 'Boosts', favorites: 'Favorites', account: 'Account',
+   865→      preferences: 'Preferences', 'geo-settings': 'GEO Settings',
+   866→      banners: 'Banners', sites: 'Sites', legal: 'Legal', faqs: 'FAQs',
+   867→      abuse: 'Report & Block', advantages: 'Advantages', affiliation: 'Affiliation',
+   868→      profile: 'My Profile', infer: 'INFER AI Analysis', more: 'More',
+   869→    };
+   870→    return titles[activeTab] || 'NEXUS';
+   871→  };
+   872→
+   873→  // ═══════════════════════════════════════════════════════════════
+   874→  // RENDER
+   875→  // ═══════════════════════════════════════════════════════════════
+   876→  return (
+   877→    <TooltipProvider>
+   878→    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+   879→
+   880→      {/* ═══ HEADER ═══ */}
+   881→      <header className="h-14 flex items-center justify-between px-4 bg-card/80 backdrop-blur-lg border-b border-border shrink-0 z-50">
+   882→        <div className="flex items-center gap-3">
+   883→          {isMainTab(activeTab) ? (
+   884→            <span className="text-lg font-bold gradient-text tracking-wider">NEXUS</span>
+   885→          ) : (
+   886→            <button onClick={() => setActiveTab('more')} className="p-1 hover:bg-secondary rounded-lg transition-colors">
+   887→              <ArrowLeft className="w-4 h-4" />
+   888→            </button>
+   889→          )}
+   890→          {activeTab === 'chat' && activeConversation && (
+   891→            <button onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }} className="md:hidden p-1 hover:bg-secondary rounded-lg transition-colors">
+   892→              <ChevronLeft className="w-5 h-5" />
+   893→            </button>
+   894→          )}
+   895→          {!isMainTab(activeTab) && <span className="text-sm font-medium">{getPageTitle()}</span>}
+   896→        </div>
+   897→        <div className="flex items-center gap-1">
+   898→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground"><Search className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Search</TooltipContent></Tooltip>
+   899→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}><Settings className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Settings</TooltipContent></Tooltip>
+   900→          <button onClick={() => currentUser && openProfile(currentUser.id)} className="ml-1">
+   901→            <Avatar className="h-8 w-8 border-2 border-primary/50">
+   902→              <AvatarImage src={getAvatar(currentUser)} alt={currentUser?.displayName || ''} />
+   903→              <AvatarFallback className="text-xs">{currentUser?.displayName?.[0] || 'U'}</AvatarFallback>
+   904→            </Avatar>
+   905→          </button>
+   906→        </div>
+   907→      </header>
+   908→
+   909→      {/* ═══ MAIN CONTENT ═══ */}
+   910→      <main className="flex-1 overflow-hidden relative">
+   911→        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : <MoreView />}
+   912→      </main>
+   913→
+   914→      {/* ═══ BOTTOM NAV ═══ */}
+   915→      <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-0.5">
+   916→        {MAIN_TABS.map(({ tab, icon: Icon, label, badge }) => (
+   917→          <button key={tab} onClick={() => { setActiveTab(tab); setShowSettings(false); if (tab === 'chat') { setChatMobileView('list'); setActiveConversation(null); setActiveGroup(null); } }}
+   918→            className={`h-12 flex flex-col items-center justify-center gap-0.5 relative transition-colors px-1 ${activeTab === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+   919→            <Icon className="w-4 h-4" />
+   920→            <span className="text-[9px] leading-none">{label}</span>
+   921→            {activeTab === tab && <span className="absolute bottom-0 w-4 h-0.5 bg-primary rounded-full" />}
+   922→            {badge > 0 && <span className="absolute -top-0.5 right-1/2 translate-x-4 min-w-[14px] h-3.5 flex items-center justify-center text-[8px] font-bold bg-primary text-primary-foreground rounded-full px-0.5">{badge > 99 ? '99+' : badge}</span>}
+   923→          </button>
+   924→        ))}
+   925→      </nav>
+   926→
+   927→      {/* ═══ PROFILE DRAWER ═══ */}
+   928→      <Sheet open={showProfileDrawer} onOpenChange={(open) => { if (!open) closeProfile(); }}>
+   929→        <SheetContent side="right" className="w-full sm:max-w-md bg-card border-border p-0 overflow-y-auto">
+   930→          {profileLoading ? <div className="p-6 space-y-4"><Skeleton className="h-64 w-full rounded-xl" /><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-32" /></div>
+   931→            : profileUser ? <ProfileDrawerContent /> : null}
+   932→        </SheetContent>
+   933→      </Sheet>
+   934→
+   935→      {/* ═══ FANSITE DETAIL SHEET ═══ */}
+   936→      <Sheet open={showFansiteSheet} onOpenChange={setShowFansiteSheet}>
+   937→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   938→          {selectedFansite && <FansiteDetail />}
+   939→        </SheetContent>
+   940→      </Sheet>
+   941→
+   942→      {/* ═══ ALBUM DETAIL SHEET ═══ */}
+   943→      <Sheet open={!!selectedAlbum} onOpenChange={(open) => { if (!open) setSelectedAlbum(null); }}>
+   944→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   945→          {selectedAlbum && <AlbumDetail />}
+   946→        </SheetContent>
+   947→      </Sheet>
+   948→
+   949→      {/* ═══ BLOG DETAIL SHEET ═══ */}
+   950→      <Sheet open={!!selectedBlog} onOpenChange={(open) => { if (!open) setSelectedBlog(null); }}>
+   951→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   952→          {selectedBlog && <BlogDetail />}
+   953→        </SheetContent>
+   954→      </Sheet>
+   955→
+   956→      {/* ═══ RIZZ MODAL ═══ */}
+   957→      <Dialog open={showRizzModal} onOpenChange={setShowRizzModal}>
+   958→        <DialogContent className="bg-card border-border sm:max-w-md">
+   959→          <DialogHeader><DialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI Rizz Generator</DialogTitle></DialogHeader>
+   960→          <div className="space-y-4 py-2">
+   961→            <div className="flex flex-wrap gap-2">
+   962→              {RIZZ_STYLES.map(s => (
+   963→                <button key={s.value} onClick={() => setRizzStyle(s.value)}
+   964→                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${rizzStyle === s.value ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-secondary-foreground border-border hover:border-primary/50'}`}>
+   965→                  {s.icon} {s.label}
+   966→                </button>
+   967→              ))}
+   968→            </div>
+   969→            <Button onClick={handleRizz} disabled={rizzLoading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+   970→              {rizzLoading ? 'Generating...' : 'Generate Pickup Line'}
+   971→            </Button>
+   972→            {rizzResult && (
+   973→              <div className="p-4 rounded-xl bg-secondary border border-border space-y-3">
+   974→                <p className="text-sm leading-relaxed">{rizzResult.line}</p>
+   975→                {rizzResult.context && <p className="text-[11px] text-muted-foreground">{rizzResult.context}</p>}
+   976→                <div className="flex gap-2">
+   977→                  <Button variant="outline" size="sm" onClick={copyRizz} className="text-xs border-border"><Copy className="w-3 h-3 mr-1" /> Copy</Button>
+   978→                  <Button size="sm" onClick={handleSendRizz} className="text-xs bg-primary text-primary-foreground"><Send className="w-3 h-3 mr-1" /> Send</Button>
+   979→                </div>
+   980→                {rizzResult.alternatives?.length > 0 && (
+   981→                  <div className="space-y-1 pt-2 border-t border-border">
+   982→                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Alternatives</p>
+   983→                    {rizzResult.alternatives.map((alt: string, i: number) => (
+   984→                      <p key={i} className="text-xs text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => setRizzResult({ ...rizzResult, line: alt })}>{alt}</p>
+   985→                    ))}
+   986→                  </div>
+   987→                )}
+   988→              </div>
+   989→            )}
+   990→          </div>
+   991→        </DialogContent>
+   992→      </Dialog>
+   993→
+   994→      {/* ═══ NOTE DIALOG ═══ */}
+   995→      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
+   996→        <DialogContent className="bg-card border-border sm:max-w-sm">
+   997→          <DialogHeader><DialogTitle className="flex items-center gap-2"><StickyNote className="w-5 h-5 text-primary" /> Add Note</DialogTitle></DialogHeader>
+   998→          <div className="space-y-3 py-2">
+   999→            <Textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Write a private note..." className="bg-secondary border-border text-sm" rows={3} />
+  1000→            <div className="flex gap-2">
+  1001→              <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveNote} disabled={!noteContent.trim()}>Save</Button>
+  1002→              <Button size="sm" variant="outline" className="border-border" onClick={() => { setShowNoteDialog(false); setNoteContent(''); }}>Cancel</Button>
+  1003→            </div>
+  1004→          </div>
+  1005→        </DialogContent>
+  1006→      </Dialog>
+  1007→
+  1008→      {/* ═══ BLOCK ALERT ═══ */}
+  1009→      <AlertDialog open={showBlockAlert} onOpenChange={setShowBlockAlert}>
+  1010→        <AlertDialogContent className="bg-card border-border">
+  1011→          <AlertDialogHeader>
+  1012→            <AlertDialogTitle>Block this user?</AlertDialogTitle>
+  1013→            <AlertDialogDescription>This user won't be able to see your profile or message you.</AlertDialogDescription>
+  1014→          </AlertDialogHeader>
+  1015→          <AlertDialogFooter>
+  1016→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1017→            <AlertDialogAction onClick={() => profileUser && handleBlock(profileUser.id)} className="bg-destructive text-white">Block</AlertDialogAction>
+  1018→          </AlertDialogFooter>
+  1019→        </AlertDialogContent>
+  1020→      </AlertDialog>
+  1021→
+  1022→      {/* ═══ CREATE EVENT DIALOG ═══ */}
+  1023→      <Dialog open={showCreateEvent} onOpenChange={setShowCreateEvent}>
+  1024→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1025→          <DialogHeader><DialogTitle>Create Event</DialogTitle></DialogHeader>
+  1026→          <div className="space-y-3 py-2">
+  1027→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={eventForm.title} onChange={e => setEventForm(p => ({ ...p, title: e.target.value }))} placeholder="Event name" className="bg-secondary border-border" /></div>
+  1028→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={eventForm.description} onChange={e => setEventForm(p => ({ ...p, description: e.target.value }))} placeholder="What's this about?" className="bg-secondary border-border" rows={3} /></div>
+  1029→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Location</Label><Input value={eventForm.location} onChange={e => setEventForm(p => ({ ...p, location: e.target.value }))} placeholder="Venue" className="bg-secondary border-border" /></div>
+  1030→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date & Time</Label><Input type="datetime-local" value={eventForm.startDate} onChange={e => setEventForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+  1031→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Image URL</Label><Input value={eventForm.imageUrl} onChange={e => setEventForm(p => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." className="bg-secondary border-border" /></div>
+  1032→          </div>
+  1033→          <DialogFooter>
+  1034→            <Button variant="outline" onClick={() => setShowCreateEvent(false)} className="border-border">Cancel</Button>
+  1035→            <Button onClick={handleCreateEvent} className="bg-primary text-primary-foreground" disabled={!eventForm.title || !eventForm.startDate}>Create</Button>
+  1036→          </DialogFooter>
+  1037→        </DialogContent>
+  1038→      </Dialog>
+  1039→
+  1040→      {/* ═══ CREATE GROUP DIALOG ═══ */}
+  1041→      <Dialog open={showCreateGroup} onOpenChange={setShowCreateGroup}>
+  1042→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1043→          <DialogHeader><DialogTitle>Create Group</DialogTitle></DialogHeader>
+  1044→          <div className="space-y-3 py-2">
+  1045→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Group Name</Label><Input value={groupForm.name} onChange={e => setGroupForm(p => ({ ...p, name: e.target.value }))} placeholder="Group name" className="bg-secondary border-border" /></div>
+  1046→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={groupForm.description} onChange={e => setGroupForm(p => ({ ...p, description: e.target.value }))} placeholder="About this group" className="bg-secondary border-border" rows={2} /></div>
+  1047→          </div>
+  1048→          <DialogFooter>
+  1049→            <Button variant="outline" onClick={() => setShowCreateGroup(false)} className="border-border">Cancel</Button>
+  1050→            <Button onClick={handleCreateGroup} className="bg-primary text-primary-foreground" disabled={!groupForm.name.trim()}>Create</Button>
+  1051→          </DialogFooter>
+  1052→        </DialogContent>
+  1053→      </Dialog>
+  1054→
+  1055→      {/* ═══ DELETE ACCOUNT ALERT ═══ */}
+  1056→      <AlertDialog open={showDeleteAccount} onOpenChange={setShowDeleteAccount}>
+  1057→        <AlertDialogContent className="bg-card border-border">
+  1058→          <AlertDialogHeader><AlertDialogTitle>Delete Account?</AlertDialogTitle><AlertDialogDescription>This is permanent and cannot be undone. All your data will be removed.</AlertDialogDescription></AlertDialogHeader>
+  1059→          <AlertDialogFooter>
+  1060→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1061→            <AlertDialogAction className="bg-destructive text-white" onClick={() => { setCurrentUser(null); setAuthed(false); setShowDeleteAccount(false); }}>Delete</AlertDialogAction>
+  1062→          </AlertDialogFooter>
+  1063→        </AlertDialogContent>
+  1064→      </AlertDialog>
+  1065→
+  1066→    </div>
+  1067→    </TooltipProvider>
+  1068→  );
+  1069→
+  1070→  // ═══════════════════════════════════════════════════════════════
+  1071→  // VIEW FUNCTIONS (hoisted — available throughout component)
+  1072→  // ═══════════════════════════════════════════════════════════════
+  1073→
+  1074→  // ─── DISCOVER ────────────────────────────────────────────────
+  1075→  function DiscoverView() {
+  1076→    if (discoverLoading) return <LoadingGrid />;
+  1077→    if (discoverUsers.length === 0) return <EmptyState icon={Compass} title="No profiles found" desc="Check back later for new people nearby" />;
+  1078→    return (
+  1079→      <div className="h-full flex flex-col">
+  1080→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1081→          <button onClick={() => setOnlineOnly(!onlineOnly)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${onlineOnly ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>🟢 Online</button>
+  1082→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{ageRange[0]}–{ageRange[1]}</button></PopoverTrigger>
+  1083→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Age Range</Label><Slider value={ageRange} onValueChange={setAgeRange} min={18} max={80} step={1} className="mt-2" /><div className="flex justify-between text-[11px] text-muted-foreground mt-1"><span>{ageRange[0]}</span><span>{ageRange[1]}</span></div></PopoverContent>
+  1084→          </Popover>
+  1085→          <Select value={lookingFor} onValueChange={setLookingFor}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All</SelectItem><SelectItem value="relationship">Relationship</SelectItem><SelectItem value="casual">Casual</SelectItem><SelectItem value="friends">Friends</SelectItem><SelectItem value="networking">Networking</SelectItem></SelectContent></Select>
+  1086→          <Select value={ethnicityFilter} onValueChange={setEthnicityFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Ethnicity" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Ethnicity</SelectItem><SelectItem value="white">White</SelectItem><SelectItem value="black">Black</SelectItem><SelectItem value="latino">Latino</SelectItem><SelectItem value="asian">Asian</SelectItem><SelectItem value="middle-eastern">Middle Eastern</SelectItem><SelectItem value="indian">Indian</SelectItem><SelectItem value="mixed">Mixed</SelectItem></SelectContent></Select>
+  1087→          <Select value={bodyTypeFilter} onValueChange={setBodyTypeFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Body" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Body Type</SelectItem><SelectItem value="slim">Slim</SelectItem><SelectItem value="average">Average</SelectItem><SelectItem value="athletic">Athletic</SelectItem><SelectItem value="muscular">Muscular</SelectItem><SelectItem value="curvy">Curvy</SelectItem></SelectContent></Select>
+  1088→          <div className="ml-auto flex gap-1 shrink-0">
+  1089→            <button onClick={() => setDiscoverView('grid')} className={`p-1.5 rounded-lg ${discoverView === 'grid' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Grid3X3 className="w-4 h-4" /></button>
+  1090→            <button onClick={() => setDiscoverView('cascade')} className={`p-1.5 rounded-lg ${discoverView === 'cascade' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Layers className="w-4 h-4" /></button>
+  1091→          </div>
+  1092→        </div>
+  1093→        <ScrollArea className="flex-1">
+  1094→          {discoverView === 'cascade' ? (
+  1095→            <div className="flex items-center justify-center p-6 h-full">
+  1096→              {cascadeUser ? (
+  1097→                <div key={cascadeUser.id} className="w-full max-w-sm cascade-animate">
+  1098→                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-secondary">
+  1099→                    {(cascadeUser.photos && cascadeUser.photos[0]) ? <img src={cascadeUser.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>}
+  1100→                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/60 to-transparent" />
+  1101→                    {cascadeUser.isPremium && <div className="absolute top-3 right-3"><Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge></div>}
+  1102→                    {cascadeUser.isVerified && <div className="absolute top-3 left-3"><Badge className="bg-blue-500/20 text-blue-400 text-[10px] border-blue-500/30"><ShieldCheck className="w-3 h-3" /></Badge></div>}
+  1103→                    {cascadeUser.online && cascadeUser.showOnline && <div className="absolute top-3 left-1/2 -translate-x-1/2"><span className="flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] text-green-400"><span className="w-1.5 h-1.5 bg-green-400 rounded-full online-pulse" /> Online</span></div>}
+  1104→                    <div className="absolute bottom-0 left-0 right-0 p-4">
+  1105→                      <h3 className="text-xl font-bold">{cascadeUser.displayName}{cascadeUser.age ? `, ${cascadeUser.age}` : ''}</h3>
+  1106→                      {cascadeUser.location && <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3" />{cascadeUser.location}</p>}
+  1107→                      {cascadeUser.bio && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{truncate(cascadeUser.bio, 100)}</p>}
+  1108→                      {cascadeUser.lookingFor && <Badge className="mt-2 bg-primary/20 text-primary text-[10px] border-primary/30 capitalize">{cascadeUser.lookingFor}</Badge>}
+  1109→                    </div>
+  1110→                  </div>
+  1111→                  <div className="flex gap-3 mt-4 justify-center">
+  1112→                    <button onClick={() => setCascadeIndex(i => i + 1)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+  1113→                    <button onClick={() => handleLike(cascadeUser.id)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><Heart className="w-5 h-5" /></button>
+  1114→                    <button onClick={() => openChat(cascadeUser)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><MessageCircle className="w-5 h-5" /></button>
+  1115→                    <button onClick={() => openProfile(cascadeUser.id)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Star className="w-5 h-5" /></button>
+  1116→                    <button onClick={() => { setRizzTargetBio(cascadeUser.bio || ''); setShowRizzModal(true); }} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Sparkles className="w-5 h-5" /></button>
+  1117→                  </div>
+
+[showing lines 618-1117 of 2810; use offset=1118 with limit to continue reading]
