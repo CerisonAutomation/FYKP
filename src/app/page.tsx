@@ -178,6 +178,13 @@ const CURRENT_USER_ID = 'test-user-1';
 // Dynamically import Leaflet map (no SSR - requires window)
 const MapLeaflet = dynamic(() => import('@/components/MapViewComponent'), { ssr: false, loading: () => <div className="w-full h-full bg-secondary/30 animate-pulse" /> });
 
+// Error boundary for map and other dynamic components
+class ErrorBoundary extends React.Component<{ fallback: React.ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() { return this.state.hasError ? this.props.fallback : this.props.children; }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // HELPER COMPONENTS & FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
@@ -1217,7 +1224,9 @@ export default function NexusApp() {
               <p className="text-xs text-muted-foreground">Your location is not visible to others</p>
             </div>
           ) : (
-            <MapLeaflet users={mapUsers} centerLat={mapCenterLat} centerLng={mapCenterLng} radius={mapRadius} onUserClick={openProfile} />
+            <ErrorBoundary fallback={<div className="flex-1 flex items-center justify-center"><div className="text-center"><MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-2" /><p className="text-sm text-muted-foreground">Map unavailable in this environment</p></div></div>}>
+              <MapLeaflet users={mapUsers} centerLat={mapCenterLat} centerLng={mapCenterLng} radius={mapRadius} onUserClick={openProfile} />
+            </ErrorBoundary>
           )}
         </div>
       </div>

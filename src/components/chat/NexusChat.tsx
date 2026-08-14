@@ -541,7 +541,7 @@ export default function NexusChat(props: NexusChatProps) {
   const openForwardModal = async (msg: Message) => {
     setForwardMessage(msg);
     try {
-      const res = await fetch('/api/conversations');
+      const res = await fetch('/api/messages/conversations');
       const data = await res.json();
       setConversationsForForward(Array.isArray(data) ? data : []);
     } catch {
