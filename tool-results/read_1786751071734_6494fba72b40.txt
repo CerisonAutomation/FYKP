@@ -1,0 +1,502 @@
+  1000→
+  1001→      {/* ═══ ALBUM DETAIL SHEET ═══ */}
+  1002→      <Sheet open={!!selectedAlbum} onOpenChange={(open) => { if (!open) setSelectedAlbum(null); }}>
+  1003→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+  1004→          {selectedAlbum && <AlbumDetail />}
+  1005→        </SheetContent>
+  1006→      </Sheet>
+  1007→
+  1008→      {/* ═══ BLOG DETAIL SHEET ═══ */}
+  1009→      <Sheet open={!!selectedBlog} onOpenChange={(open) => { if (!open) setSelectedBlog(null); }}>
+  1010→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+  1011→          {selectedBlog && <BlogDetail />}
+  1012→        </SheetContent>
+  1013→      </Sheet>
+  1014→
+  1015→      {/* ═══ RIZZ MODAL ═══ */}
+  1016→      <Dialog open={showRizzModal} onOpenChange={setShowRizzModal}>
+  1017→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1018→          <DialogHeader><DialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI Rizz Generator</DialogTitle></DialogHeader>
+  1019→          <div className="space-y-4 py-2">
+  1020→            <div className="flex flex-wrap gap-2">
+  1021→              {RIZZ_STYLES.map(s => (
+  1022→                <button key={s.value} onClick={() => setRizzStyle(s.value)}
+  1023→                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${rizzStyle === s.value ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-secondary-foreground border-border hover:border-primary/50'}`}>
+  1024→                  {s.icon} {s.label}
+  1025→                </button>
+  1026→              ))}
+  1027→            </div>
+  1028→            <Button onClick={handleRizz} disabled={rizzLoading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+  1029→              {rizzLoading ? 'Generating...' : 'Generate Pickup Line'}
+  1030→            </Button>
+  1031→            {rizzResult && (
+  1032→              <div className="p-4 rounded-xl bg-secondary border border-border space-y-3">
+  1033→                <p className="text-sm leading-relaxed">{rizzResult.line}</p>
+  1034→                {rizzResult.context && <p className="text-[11px] text-muted-foreground">{rizzResult.context}</p>}
+  1035→                <div className="flex gap-2">
+  1036→                  <Button variant="outline" size="sm" onClick={copyRizz} className="text-xs border-border"><Copy className="w-3 h-3 mr-1" /> Copy</Button>
+  1037→                  <Button size="sm" onClick={handleSendRizz} className="text-xs bg-primary text-primary-foreground"><Send className="w-3 h-3 mr-1" /> Send</Button>
+  1038→                </div>
+  1039→                {rizzResult.alternatives?.length > 0 && (
+  1040→                  <div className="space-y-1 pt-2 border-t border-border">
+  1041→                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Alternatives</p>
+  1042→                    {rizzResult.alternatives.map((alt: string, i: number) => (
+  1043→                      <p key={i} className="text-xs text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => setRizzResult({ ...rizzResult, line: alt })}>{alt}</p>
+  1044→                    ))}
+  1045→                  </div>
+  1046→                )}
+  1047→              </div>
+  1048→            )}
+  1049→          </div>
+  1050→        </DialogContent>
+  1051→      </Dialog>
+  1052→
+  1053→      {/* ═══ NOTE DIALOG ═══ */}
+  1054→      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
+  1055→        <DialogContent className="bg-card border-border sm:max-w-sm">
+  1056→          <DialogHeader><DialogTitle className="flex items-center gap-2"><StickyNote className="w-5 h-5 text-primary" /> Add Note</DialogTitle></DialogHeader>
+  1057→          <div className="space-y-3 py-2">
+  1058→            <Textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Write a private note..." className="bg-secondary border-border text-sm" rows={3} />
+  1059→            <div className="flex gap-2">
+  1060→              <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveNote} disabled={!noteContent.trim()}>Save</Button>
+  1061→              <Button size="sm" variant="outline" className="border-border" onClick={() => { setShowNoteDialog(false); setNoteContent(''); }}>Cancel</Button>
+  1062→            </div>
+  1063→          </div>
+  1064→        </DialogContent>
+  1065→      </Dialog>
+  1066→
+  1067→      {/* ═══ BLOCK ALERT ═══ */}
+  1068→      <AlertDialog open={showBlockAlert} onOpenChange={setShowBlockAlert}>
+  1069→        <AlertDialogContent className="bg-card border-border">
+  1070→          <AlertDialogHeader>
+  1071→            <AlertDialogTitle>Block this user?</AlertDialogTitle>
+  1072→            <AlertDialogDescription>This user won't be able to see your profile or message you.</AlertDialogDescription>
+  1073→          </AlertDialogHeader>
+  1074→          <AlertDialogFooter>
+  1075→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1076→            <AlertDialogAction onClick={() => profileUser && handleBlock(profileUser.id)} className="bg-destructive text-white">Block</AlertDialogAction>
+  1077→          </AlertDialogFooter>
+  1078→        </AlertDialogContent>
+  1079→      </AlertDialog>
+  1080→
+  1081→      {/* ═══ CREATE EVENT DIALOG ═══ */}
+  1082→      <Dialog open={showCreateEvent} onOpenChange={setShowCreateEvent}>
+  1083→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1084→          <DialogHeader><DialogTitle>Create Event</DialogTitle></DialogHeader>
+  1085→          <div className="space-y-3 py-2">
+  1086→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={eventForm.title} onChange={e => setEventForm(p => ({ ...p, title: e.target.value }))} placeholder="Event name" className="bg-secondary border-border" /></div>
+  1087→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={eventForm.description} onChange={e => setEventForm(p => ({ ...p, description: e.target.value }))} placeholder="What's this about?" className="bg-secondary border-border" rows={3} /></div>
+  1088→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Location</Label><Input value={eventForm.location} onChange={e => setEventForm(p => ({ ...p, location: e.target.value }))} placeholder="Venue" className="bg-secondary border-border" /></div>
+  1089→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date & Time</Label><Input type="datetime-local" value={eventForm.startDate} onChange={e => setEventForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+  1090→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Image URL</Label><Input value={eventForm.imageUrl} onChange={e => setEventForm(p => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." className="bg-secondary border-border" /></div>
+  1091→          </div>
+  1092→          <DialogFooter>
+  1093→            <Button variant="outline" onClick={() => setShowCreateEvent(false)} className="border-border">Cancel</Button>
+  1094→            <Button onClick={handleCreateEvent} className="bg-primary text-primary-foreground" disabled={!eventForm.title || !eventForm.startDate}>Create</Button>
+  1095→          </DialogFooter>
+  1096→        </DialogContent>
+  1097→      </Dialog>
+  1098→
+  1099→      {/* ═══ CREATE GROUP DIALOG ═══ */}
+  1100→      <Dialog open={showCreateGroup} onOpenChange={setShowCreateGroup}>
+  1101→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1102→          <DialogHeader><DialogTitle>Create Group</DialogTitle></DialogHeader>
+  1103→          <div className="space-y-3 py-2">
+  1104→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Group Name</Label><Input value={groupForm.name} onChange={e => setGroupForm(p => ({ ...p, name: e.target.value }))} placeholder="Group name" className="bg-secondary border-border" /></div>
+  1105→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={groupForm.description} onChange={e => setGroupForm(p => ({ ...p, description: e.target.value }))} placeholder="About this group" className="bg-secondary border-border" rows={2} /></div>
+  1106→          </div>
+  1107→          <DialogFooter>
+  1108→            <Button variant="outline" onClick={() => setShowCreateGroup(false)} className="border-border">Cancel</Button>
+  1109→            <Button onClick={handleCreateGroup} className="bg-primary text-primary-foreground" disabled={!groupForm.name.trim()}>Create</Button>
+  1110→          </DialogFooter>
+  1111→        </DialogContent>
+  1112→      </Dialog>
+  1113→
+  1114→      {/* ═══ DELETE ACCOUNT ALERT ═══ */}
+  1115→      <AlertDialog open={showDeleteAccount} onOpenChange={setShowDeleteAccount}>
+  1116→        <AlertDialogContent className="bg-card border-border">
+  1117→          <AlertDialogHeader><AlertDialogTitle>Delete Account?</AlertDialogTitle><AlertDialogDescription>This is permanent and cannot be undone. All your data will be removed.</AlertDialogDescription></AlertDialogHeader>
+  1118→          <AlertDialogFooter>
+  1119→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1120→            <AlertDialogAction className="bg-destructive text-white" onClick={() => { setCurrentUser(null); setAuthed(false); setShowDeleteAccount(false); }}>Delete</AlertDialogAction>
+  1121→          </AlertDialogFooter>
+  1122→        </AlertDialogContent>
+  1123→      </AlertDialog>
+  1124→
+  1125→    </div>
+  1126→    </TooltipProvider>
+  1127→  );
+  1128→
+  1129→  // ═══════════════════════════════════════════════════════════════
+  1130→  // VIEW FUNCTIONS (hoisted — available throughout component)
+  1131→  // ═══════════════════════════════════════════════════════════════
+  1132→
+  1133→  // ─── DISCOVER ────────────────────────────────────────────────
+  1134→  function DiscoverView() {
+  1135→    if (discoverLoading) return <LoadingGrid />;
+  1136→    if (discoverUsers.length === 0) return <EmptyState icon={Compass} title="No profiles found" desc="Check back later for new people nearby" />;
+  1137→    return (
+  1138→      <div className="h-full flex flex-col">
+  1139→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1140→          <button onClick={() => setOnlineOnly(!onlineOnly)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${onlineOnly ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>🟢 Online</button>
+  1141→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{ageRange[0]}–{ageRange[1]}</button></PopoverTrigger>
+  1142→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Age Range</Label><Slider value={ageRange} onValueChange={setAgeRange} min={18} max={80} step={1} className="mt-2" /><div className="flex justify-between text-[11px] text-muted-foreground mt-1"><span>{ageRange[0]}</span><span>{ageRange[1]}</span></div></PopoverContent>
+  1143→          </Popover>
+  1144→          <Select value={lookingFor} onValueChange={setLookingFor}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All</SelectItem><SelectItem value="relationship">Relationship</SelectItem><SelectItem value="casual">Casual</SelectItem><SelectItem value="friends">Friends</SelectItem><SelectItem value="networking">Networking</SelectItem></SelectContent></Select>
+  1145→          <Select value={ethnicityFilter} onValueChange={setEthnicityFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Ethnicity" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Ethnicity</SelectItem><SelectItem value="white">White</SelectItem><SelectItem value="black">Black</SelectItem><SelectItem value="latino">Latino</SelectItem><SelectItem value="asian">Asian</SelectItem><SelectItem value="middle-eastern">Middle Eastern</SelectItem><SelectItem value="indian">Indian</SelectItem><SelectItem value="mixed">Mixed</SelectItem></SelectContent></Select>
+  1146→          <Select value={bodyTypeFilter} onValueChange={setBodyTypeFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Body" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Body Type</SelectItem><SelectItem value="slim">Slim</SelectItem><SelectItem value="average">Average</SelectItem><SelectItem value="athletic">Athletic</SelectItem><SelectItem value="muscular">Muscular</SelectItem><SelectItem value="curvy">Curvy</SelectItem></SelectContent></Select>
+  1147→          <div className="ml-auto flex gap-1 shrink-0">
+  1148→            <button onClick={() => setDiscoverView('grid')} className={`p-1.5 rounded-lg ${discoverView === 'grid' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Grid3X3 className="w-4 h-4" /></button>
+  1149→            <button onClick={() => setDiscoverView('cascade')} className={`p-1.5 rounded-lg ${discoverView === 'cascade' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Layers className="w-4 h-4" /></button>
+  1150→          </div>
+  1151→        </div>
+  1152→        <ScrollArea className="flex-1">
+  1153→          {discoverView === 'cascade' ? (
+  1154→            <div className="flex items-center justify-center p-6 h-full">
+  1155→              {cascadeUser ? (
+  1156→                <div key={cascadeUser.id} className="w-full max-w-sm cascade-animate">
+  1157→                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-secondary">
+  1158→                    {(cascadeUser.photos && cascadeUser.photos[0]) ? <img src={cascadeUser.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>}
+  1159→                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/60 to-transparent" />
+  1160→                    {cascadeUser.isPremium && <div className="absolute top-3 right-3"><Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge></div>}
+  1161→                    {cascadeUser.isVerified && <div className="absolute top-3 left-3"><Badge className="bg-blue-500/20 text-blue-400 text-[10px] border-blue-500/30"><ShieldCheck className="w-3 h-3" /></Badge></div>}
+  1162→                    {cascadeUser.online && cascadeUser.showOnline && <div className="absolute top-3 left-1/2 -translate-x-1/2"><span className="flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] text-green-400"><span className="w-1.5 h-1.5 bg-green-400 rounded-full online-pulse" /> Online</span></div>}
+  1163→                    <div className="absolute bottom-0 left-0 right-0 p-4">
+  1164→                      <h3 className="text-xl font-bold">{cascadeUser.displayName}{cascadeUser.age ? `, ${cascadeUser.age}` : ''}</h3>
+  1165→                      {cascadeUser.location && <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3" />{cascadeUser.location}</p>}
+  1166→                      {cascadeUser.bio && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{truncate(cascadeUser.bio, 100)}</p>}
+  1167→                      {cascadeUser.lookingFor && <Badge className="mt-2 bg-primary/20 text-primary text-[10px] border-primary/30 capitalize">{cascadeUser.lookingFor}</Badge>}
+  1168→                    </div>
+  1169→                  </div>
+  1170→                  <div className="flex gap-3 mt-4 justify-center">
+  1171→                    <button onClick={() => setCascadeIndex(i => i + 1)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+  1172→                    <button onClick={() => handleLike(cascadeUser.id)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><Heart className="w-5 h-5" /></button>
+  1173→                    <button onClick={() => openChat(cascadeUser)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><MessageCircle className="w-5 h-5" /></button>
+  1174→                    <button onClick={() => openProfile(cascadeUser.id)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Star className="w-5 h-5" /></button>
+  1175→                    <button onClick={() => { setRizzTargetBio(cascadeUser.bio || ''); setShowRizzModal(true); }} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Sparkles className="w-5 h-5" /></button>
+  1176→                  </div>
+  1177→                </div>
+  1178→              ) : <EmptyState icon={Compass} title="No more profiles" desc="Adjust your filters or check back later" />}
+  1179→            </div>
+  1180→          ) : (
+  1181→            <div className="grid grid-cols-2 gap-3 p-4">
+  1182→              {filteredDiscover.map(user => (
+  1183→                <button key={user.id} onClick={() => openProfile(user.id)} className="profile-card rounded-xl overflow-hidden bg-secondary border border-border text-left">
+  1184→                  <div className="aspect-[3/4] relative">
+  1185→                    {(user.photos && user.photos[0]) ? <img src={user.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-secondary"><User className="w-12 h-12 text-muted-foreground" /></div>}
+  1186→                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-secondary via-secondary/50 to-transparent" />
+  1187→                    {user.online && user.showOnline && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-secondary online-pulse" />}
+  1188→                    {user.isPremium && <Crown className="absolute top-2 left-2 w-3.5 h-3.5 text-yellow-400" />}
+  1189→                  </div>
+  1190→                  <div className="p-2.5 -mt-6 relative">
+  1191→                    <p className="text-[13px] font-semibold truncate">{user.displayName}{user.age ? `, ${user.age}` : ''}</p>
+  1192→                    <p className="text-[10px] text-muted-foreground truncate">{user.location || ''}</p>
+  1193→                    {user.distance != null && <p className="text-[10px] text-primary">{user.distance} km away</p>}
+  1194→                  </div>
+  1195→                </button>
+  1196→              ))}
+  1197→            </div>
+  1198→          )}
+  1199→        </ScrollArea>
+  1200→      </div>
+  1201→    );
+  1202→  }
+  1203→
+  1204→
+  1205→  // ─── MAP VIEW ───────────────────────────────────────────────
+  1206→  function MapView() {
+  1207→    const mapCenterLat = userLat || currentUser?.lat || 35.8989;
+  1208→    const mapCenterLng = userLng || currentUser?.lng || 14.5146;
+  1209→    return (
+  1210→      <div className="h-full flex flex-col">
+  1211→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1212→          <Select value={mapFilter} onValueChange={setMapFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All Users</SelectItem><SelectItem value="online">Online</SelectItem><SelectItem value="recent">Recent</SelectItem><SelectItem value="nearby">Nearby</SelectItem><SelectItem value="new">New</SelectItem><SelectItem value="verified">Verified</SelectItem><SelectItem value="premium">Premium</SelectItem></SelectContent></Select>
+  1213→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{mapRadius} km</button></PopoverTrigger>
+  1214→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Radius</Label><Slider value={[mapRadius]} onValueChange={([v]) => setMapRadius(v)} min={1} max={200} step={1} className="mt-2" /><p className="text-[11px] text-muted-foreground mt-1">{mapRadius} km</p></PopoverContent>
+  1215→          </Popover>
+  1216→          <button onClick={() => setMapHidden(!mapHidden)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 ${mapHidden ? 'bg-destructive/20 text-destructive border-destructive/30' : 'bg-secondary text-muted-foreground border-border'}`}>{mapHidden ? '👁 Hidden' : '👁 Visible'}</button>
+  1217→          <span className="ml-auto text-[11px] text-muted-foreground">{mapUsers.length} users</span>
+  1218→        </div>
+  1219→        <div className="flex-1 relative">
+  1220→          {mapLoading ? <div className="absolute inset-0 flex items-center justify-center"><Skeleton className="w-full h-full" /></div> : mapHidden ? (
+  1221→            <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/20 gap-3">
+  1222→              <MapPinOff className="w-12 h-12 text-muted-foreground" />
+  1223→              <p className="text-sm text-muted-foreground">Map hidden</p>
+  1224→              <p className="text-xs text-muted-foreground">Your location is not visible to others</p>
+  1225→            </div>
+  1226→          ) : (
+  1227→            <ErrorBoundary fallback={<div className="flex-1 flex items-center justify-center"><div className="text-center"><MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-2" /><p className="text-sm text-muted-foreground">Map unavailable in this environment</p></div></div>}>
+  1228→              <MapLeaflet users={mapUsers} centerLat={mapCenterLat} centerLng={mapCenterLng} radius={mapRadius} onUserClick={openProfile} />
+  1229→            </ErrorBoundary>
+  1230→          )}
+  1231→        </div>
+  1232→      </div>
+  1233→    );
+  1234→  }
+  1235→
+  1236→  // ─── CHAT VIEW ─────────────────────────────────────────────
+  1237→  function ChatView() {
+  1238→    if (chatLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1239→    return (
+  1240→      <div className="h-full flex flex-col">
+  1241→        {chatMobileView === 'chat' && (activeConversation || activeGroup) ? (
+  1242→          <NexusChat
+  1243→            msgInput={msgInput}
+  1244→            setMsgInput={setMsgInput}
+  1245→            sendMessage={sendMessage}
+  1246→            sendGroupMessage={sendGroupMessage}
+  1247→            activeConversation={activeConversation}
+  1248→            activeGroup={activeGroup}
+  1249→            messages={messages}
+  1250→            groupMessages={groupMessages}
+  1251→            setGroupMessages={setGroupMessages}
+  1252→            getAvatar={getAvatar}
+  1253→            openProfile={openProfile}
+  1254→            setActiveConversation={setActiveConversation}
+  1255→            setActiveGroup={setActiveGroup}
+  1256→            setChatMobileView={setChatMobileView}
+  1257→            msgEndRef={msgEndRef}
+  1258→            socket={socketRef.current}
+  1259→          />
+  1260→        ) : (
+  1261→          <ScrollArea className="flex-1">
+  1262→            <div className="p-4 space-y-4">
+  1263→            {/* Sort & AI Controls */}
+  1264→            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+  1265→              {CHAT_SORT_OPTIONS.map(mode => (
+  1266→                <button key={mode} onClick={() => setChatSortMode(mode)}
+  1267→                  className={`px-2.5 py-1 rounded-full text-[10px] font-medium border shrink-0 transition-all ${chatSortMode === mode ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1268→                  {mode === 'recent' && <Clock3 className="w-3 h-3 mr-1 inline" />}
+  1269→                  {mode === 'intent' && <Target className="w-3 h-3 mr-1 inline" />}
+  1270→                  {mode === 'quality' && <HeartPulse className="w-3 h-3 mr-1 inline" />}
+  1271→                  {mode === 'unread' && <MessageSquare className="w-3 h-3 mr-1 inline" />}
+  1272→                  {mode === 'online' && <Wifi className="w-3 h-3 mr-1 inline" />}
+  1273→                  {mode.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+  1274→                </button>
+  1275→              ))}
+  1276→              <button onClick={async () => { setAiLoading(true); try { const res = await fetch('/api/chat/ai-analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1' }) }); const data = await res.json(); setAiAnalysis(data); } catch {} setAiLoading(false); }}
+  1277→                className="ml-auto px-2.5 py-1 rounded-full text-[10px] font-medium border bg-primary/10 text-primary border-primary/30 shrink-0" disabled={aiLoading}>
+  1278→                <Bot className="w-3 h-3 mr-1 inline" />{aiLoading ? 'Analyzing...' : 'AI Analyze All'}
+  1279→              </button>
+  1280→            </div>
+  1281→            {/* Chat Requests */}
+  1282→            {chatRequests.length > 0 && (
+  1283→                <div className="space-y-2">
+  1284→                  <SectionHeader icon={Bell} label="Chat Requests" count={chatRequests.length} />
+  1285→                  {chatRequests.map(req => (
+  1286→                    <div key={req.id} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+  1287→                      <button onClick={() => openProfile(req.sender?.id || '')}><Avatar className="h-10 w-10"><AvatarImage src={getAvatar(req.sender)} /><AvatarFallback className="text-xs">{req.sender?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1288→                      <div className="flex-1 min-w-0">
+  1289→                        <p className="text-[12px] font-semibold">{req.sender?.displayName}</p>
+  1290→                        <p className="text-[11px] text-muted-foreground truncate">{req.message || 'Wants to chat with you'}</p>
+  1291→                      </div>
+  1292→                      <div className="flex gap-1.5 shrink-0">
+  1293→                        <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => handleChatRequest(req.id, 'accept')}>Accept</Button>
+  1294→                        <Button size="sm" variant="outline" className="h-7 text-[10px] border-border px-2" onClick={() => handleChatRequest(req.id, 'decline')}>Decline</Button>
+  1295→                      </div>
+  1296→                    </div>
+  1297→                  ))}
+  1298→                </div>
+  1299→              )}
+  1300→              {/* Conversations */}
+  1301→              <Tabs defaultValue="direct">
+  1302→                <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  1303→                  <TabsTrigger value="direct" className="text-[11px] flex-1 h-7">Messages</TabsTrigger>
+  1304→                  <TabsTrigger value="groups" className="text-[11px] flex-1 h-7">Groups</TabsTrigger>
+  1305→                </TabsList>
+  1306→                <TabsContent value="direct" className="mt-3 space-y-1">
+  1307→                  {conversations.length === 0 ? <EmptyState icon={MessageCircle} title="No messages yet" desc="Start a conversation from someone's profile" />
+  1308→                    : conversations.map(convo => (
+  1309→                      <button key={convo.otherUser.id} onClick={() => { setActiveConversation(convo); setChatMobileView('chat'); fetch(`/api/messages?userId=${convo.otherUser.id}`).then(r => r.json()).then(res => setMessages(res.data || [])).catch(() => {}); }}
+  1310→                        className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1311→                        <div className="relative shrink-0">
+  1312→                          <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(convo.otherUser)} /><AvatarFallback className="text-xs">{convo.otherUser.displayName?.[0]}</AvatarFallback></Avatar>
+  1313→                          {convo.otherUser.online && convo.otherUser.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+  1314→                        </div>
+  1315→                        <div className="flex-1 min-w-0">
+  1316→                          <div className="flex items-center justify-between">
+  1317→                            <p className="text-[13px] font-semibold truncate">{convo.otherUser.displayName}</p>
+  1318→                            <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(convo.lastMessage.createdAt)}</span>
+  1319→                          </div>
+  1320→                          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{convo.lastMessage.content || '...'}</p>
+  1321→                        </div>
+  1322→                        {convo.unreadCount > 0 && <span className="min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground rounded-full">{convo.unreadCount}</span>}
+  1323→                      </button>
+  1324→                    ))}
+  1325→                </TabsContent>
+  1326→                <TabsContent value="groups" className="mt-3 space-y-1">
+  1327→                  {groups.length === 0 ? <EmptyState icon={Users} title="No groups yet" desc="Create or join a group to get started" />
+  1328→                    : groups.filter((g: any) => !g.hidden).map(group => (
+  1329→                      <button key={group.id} onClick={() => { setActiveGroup(group); setGroupMessages([]); setChatMobileView('chat'); }}
+  1330→                        className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1331→                        <Avatar className="h-11 w-11"><AvatarImage src={group.avatar} /><AvatarFallback className="text-xs">{group.name?.[0]}</AvatarFallback></Avatar>
+  1332→                        <div className="flex-1 min-w-0">
+  1333→                          <p className="text-[13px] font-semibold truncate">{group.name}</p>
+  1334→                          <p className="text-[11px] text-muted-foreground">{group._count?.members || 0} members {group.geoName ? `· ${group.geoName}` : ''}</p>
+  1335→                        </div>
+  1336→                      </button>
+  1337→                    ))}
+  1338→                </TabsContent>
+  1339→              </Tabs>
+  1340→            </div>
+  1341→          </ScrollArea>
+  1342→        )}
+  1343→      </div>
+  1344→    );
+  1345→  }
+  1346→
+  1347→  // ─── LIKES VIEW ─────────────────────────────────────────────
+  1348→  function LikesView() {
+  1349→    if (likesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1350→    return (
+  1351→      <div className="h-full flex flex-col">
+  1352→        <Tabs value={likesTab} onValueChange={(v) => setLikesTab(v as 'received' | 'sent')} className="flex flex-col h-full">
+  1353→          <div className="px-4 pt-3 shrink-0">
+  1354→            <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  1355→              <TabsTrigger value="received" className="text-[11px] flex-1 h-7">Received ({receivedLikes.length})</TabsTrigger>
+  1356→              <TabsTrigger value="sent" className="text-[11px] flex-1 h-7">Sent ({sentLikes.length})</TabsTrigger>
+  1357→            </TabsList>
+  1358→          </div>
+  1359→          <ScrollArea className="flex-1">
+  1360→            <TabsContent value="received" className="mt-3 px-4">
+  1361→              {receivedLikes.length === 0 ? <EmptyState icon={Heart} title="No likes received" desc="When someone likes you, they'll appear here" />
+  1362→                : receivedLikes.map(like => like.sender && (
+  1363→                  <div key={like.id} className="mb-2">
+  1364→                    <UserRow user={like.sender} sub={<span>{timeAgo(like.createdAt)}</span>}
+  1365→                      onClick={() => openProfile(like.sender.id)}
+  1366→                      actions={
+  1367→                        <>
+  1368→                          <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => openChat(like.sender)}>Accept</Button>
+  1369→                          <Button size="sm" variant="ghost" className="h-7 text-[10px] text-muted-foreground px-2" onClick={() => handleUnlike(like.sender.id)}><X className="w-3 h-3" /></Button>
+  1370→                        </>
+  1371→                      } />
+  1372→                  </div>
+  1373→                ))}
+  1374→            </TabsContent>
+  1375→            <TabsContent value="sent" className="mt-3 px-4">
+  1376→              {sentLikes.length === 0 ? <EmptyState icon={Heart} title="No likes sent" desc="Like someone and they'll appear here" />
+  1377→                : sentLikes.map(like => like.receiver && (
+  1378→                  <div key={like.id} className="mb-2">
+  1379→                    <UserRow user={like.receiver} sub={<span>{timeAgo(like.createdAt)}</span>} onClick={() => openProfile(like.receiver.id)}
+  1380→                      actions={<Button size="sm" variant="ghost" className="h-7 text-[10px] text-destructive px-2" onClick={() => handleUnlike(like.receiver.id)}><X className="w-3 h-3" /></Button>} />
+  1381→                  </div>
+  1382→                ))}
+  1383→            </TabsContent>
+  1384→          </ScrollArea>
+  1385→        </Tabs>
+  1386→      </div>
+  1387→    );
+  1388→  }
+  1389→
+  1390→  // ─── MORE VIEW (Page Directory) ───────────────────────────
+  1391→  function MoreView() {
+  1392→    return (
+  1393→      <ScrollArea className="h-full">
+  1394→        <div className="p-4 space-y-6">
+  1395→          <p className="text-xs text-muted-foreground">Explore all features of NEXUS</p>
+  1396→          {Object.entries(PAGE_DIRECTORY).map(([category, pages]) => (
+  1397→            <div key={category}>
+  1398→              <h3 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-3">{category}</h3>
+  1399→              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  1400→                {pages.map(page => {
+  1401→                  const Icon = page.icon;
+  1402→                  return (
+  1403→                    <button key={page.id} onClick={() => setActiveTab(page.id)}
+  1404→                      className="flex flex-col items-start gap-2 p-3 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all text-left group">
+  1405→                      <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+  1406→                        <Icon className="w-4 h-4 text-primary" />
+  1407→                      </div>
+  1408→                      <div className="flex-1 min-w-0">
+  1409→                        <p className="text-[12px] font-semibold truncate">{page.label}</p>
+  1410→                        <p className="text-[10px] text-muted-foreground truncate">{page.description}</p>
+  1411→                      </div>
+  1412→                      {page.badge && <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />}
+  1413→                    </button>
+  1414→                  );
+  1415→                })}
+  1416→              </div>
+  1417→            </div>
+  1418→          ))}
+  1419→          <div className="h-4" />
+  1420→        </div>
+  1421→      </ScrollArea>
+  1422→    );
+  1423→  }
+  1424→
+  1425→  // ─── EVENTS VIEW ───────────────────────────────────────────
+  1426→  function EventsView() {
+  1427→    if (eventsLoading) return <LoadingGrid cols={1} rows={4} />;
+  1428→    const filteredEvents = events.filter((e: any) => {
+  1429→      if (agendaFilter === 'today') return isToday(new Date(e.startDate));
+  1430→      if (agendaFilter === 'this-week') return isThisWeek(new Date(e.startDate));
+  1431→      if (agendaFilter === 'this-month') return isThisMonth(new Date(e.startDate));
+  1432→      return true;
+  1433→    });
+  1434→    return (
+  1435→      <div className="h-full flex flex-col">
+  1436→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1437→          {(['all', 'today', 'this-week', 'this-month', 'nearby', 'my-events'] as const).map(f => (
+  1438→            <button key={f} onClick={() => setAgendaFilter(f)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${agendaFilter === f ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1439→              {f.replace('-', ' ')}
+  1440→            </button>
+  1441→          ))}
+  1442→          <div className="ml-auto flex gap-1 shrink-0">
+  1443→            <button onClick={() => setAgendaView('list')} className={`p-1.5 rounded-lg ${agendaView === 'list' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><FileText className="w-4 h-4" /></button>
+  1444→            <button onClick={() => setAgendaView('calendar')} className={`p-1.5 rounded-lg ${agendaView === 'calendar' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Calendar className="w-4 h-4" /></button>
+  1445→            <button onClick={() => setAgendaView('map')} className={`p-1.5 rounded-lg ${agendaView === 'map' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><MapPinned className="w-4 h-4" /></button>
+  1446→          </div>
+  1447→        </div>
+  1448→        <ScrollArea className="flex-1">
+  1449→          <div className="p-4 space-y-3">
+  1450→            <Button className="w-full bg-primary text-primary-foreground h-9 text-xs" onClick={() => setShowCreateEvent(true)}><Plus className="w-3.5 h-3.5 mr-1.5" /> Create Event</Button>
+  1451→            {filteredEvents.length === 0 ? <EmptyState icon={Calendar} title="No events found" desc="Create one or adjust filters" />
+  1452→              : filteredEvents.map((event: any) => (
+  1453→                <Card key={event.id} className="bg-secondary border-border overflow-hidden">
+  1454→                  {event.imageUrl && <img src={event.imageUrl} alt="" className="w-full h-32 object-cover" />}
+  1455→                  <CardContent className="p-3">
+  1456→                    <div className="flex items-start justify-between gap-2">
+  1457→                      <div className="flex-1 min-w-0">
+  1458→                        <h3 className="text-sm font-semibold">{event.title}</h3>
+  1459→                        {event.description && <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{event.description}</p>}
+  1460→                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-2">
+  1461→                          <span className="flex items-center gap-0.5"><Clock className="w-3 h-3" />{fmtDate(event.startDate)}</span>
+  1462→                          {event.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{truncate(event.location, 20)}</span>}
+  1463→                        </div>
+  1464→                      </div>
+  1465→                    </div>
+  1466→                    <div className="flex gap-1.5 mt-3">
+  1467→                      {(['going', 'maybe', 'interested', 'declined'] as const).map(status => (
+  1468→                        <button key={status} onClick={() => handleRsvp(event.id, status)}
+  1469→                          className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all ${userRsvps[event.id] === status ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1470→                          {status}
+  1471→                        </button>
+  1472→                      ))}
+  1473→                    </div>
+  1474→                  </CardContent>
+  1475→                </Card>
+  1476→              ))}
+  1477→          </div>
+  1478→        </ScrollArea>
+  1479→      </div>
+  1480→    );
+  1481→  }
+  1482→
+  1483→  // ─── VIEWED ME VIEW ────────────────────────────────────────
+  1484→  function ViewedMeView() {
+  1485→    if (viewsLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1486→    return (
+  1487→      <ScrollArea className="h-full">
+  1488→        <div className="p-4 space-y-1">
+  1489→          {profileViews.length === 0 ? <EmptyState icon={Eye} title="No profile views" desc="When someone views your profile, they'll appear here" />
+  1490→            : profileViews.map(view => view.viewer && (
+  1491→              <UserRow key={view.id} user={view.viewer} sub={<span>Viewed {timeAgo(view.createdAt)}</span>} onClick={() => openProfile(view.viewer.id)}
+  1492→                actions={<Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => openChat(view.viewer)}>Chat</Button>} />
+  1493→            ))}
+  1494→        </div>
+  1495→      </ScrollArea>
+  1496→    );
+  1497→  }
+  1498→
+  1499→  // ─── SHOUTS VIEW ───────────────────────────────────────────
+
+[showing lines 1000-1499 of 2959; use offset=1500 with limit to continue reading]

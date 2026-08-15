@@ -1,0 +1,2002 @@
+     1→# RIZZ v1.1.8 -- Quantum Extraction Report
+     2→## com.clovers.rizz | ReverseAPK Deep Analysis
+     3→
+     4→> Generated: 2026-08-14 | APK: com.clovers.rizz.apk | Decompiler: JADX
+     5→> Java files decompiled: 15,458 | Hermes JS bundle: 6.68 MB (bytecode v98)
+     6→
+     7→---
+     8→
+     9→## 1. PACKAGE IDENTITY
+    10→
+    11→| Field | Value |
+    12→|-------|-------|
+    13→| Package | `com.clovers.rizz` |
+    14→| Version | `1.1.8` (versionCode `22`) |
+    15→| Orientation | Portrait only |
+    16→| Background Color | `#DAE9F7` |
+    17→| Splash Color | `#208AEF` |
+    18→| Adaptive Icon BG | `#E6F4FE` |
+    19→| URL Scheme | `app://` and `exp+app://` |
+    20→| Compile SDK | 36 (Android 16) |
+    21→| App Name (manifest) | `App` |
+    22→| Brand | Rizz (Clovers Inc.) |
+    23→
+    24→---
+    25→
+    26→## 2. ARCHITECTURE -- EXPO/REACT NATIVE (CONFIRMED)
+    27→
+    28→### 2.1 Framework Stack
+    29→
+    30→| Layer | Technology | Evidence |
+    31→|-------|-----------|----------|
+    32→| **Runtime** | Expo SDK 57.0.0 | `app.config`: `"sdkVersion":"57.0.0"` |
+    33→| **UI Framework** | React Native (New Architecture) | `AbstractActivityC2666n`, Fabric mount items, TurboModules |
+    34→| **JS Engine** | Hermes v98 | `index.android.bundle`: `Hermes JavaScript bytecode, version 98` |
+    35→| **Navigation** | expo-router (file-based) | `expo-router` in plugins list, typed routes enabled |
+    36→| **State** | React Compiler (experimental) | `"experiments":{"reactCompiler":true}` |
+    37→| **Bundler** | Metro | `.expo/.virtual-metro-entry`, `index.android.bundle` |
+    38→| **Build** | R8 minification + resource shrinking | `enableMinifyInReleaseBuilds:true`, `enableShrinkResourcesInReleaseBuilds:true` |
+    39→
+    40→### 2.2 Single-Activity Architecture
+    41→
+    42→The app uses a **single React Native activity** pattern:
+    43→
+    44→- `MainActivity` extends `AbstractActivityC2666n` (React Native AbstractActivity)
+    45→- `MainApplication` implements `InterfaceC2671t` (React Host interface)
+    46→- React Host is initialized lazily via `Lazy<ReactHost>`
+    47→- Bundle entry: `index.android.bundle` (Hermes bytecode)
+    48→- Virtual Metro entry: `.expo/.virtual-metro-entry`
+    49→- React Native default module name: `"main"`
+    50→- Predictive back gesture: **disabled** (`"predictiveBackGestureEnabled":false`)
+    51→- Fabric (New Architecture): **enabled** (IntBufferBatchMountItem references in code)
+    52→- TurboModules: **enabled** (NativeWebSocketModuleSpec, NativeBlobModuleSpec as TurboModule)
+    53→
+    54→### 2.3 Key Activities (14 total)
+    55→
+    56→| Activity | Purpose |
+    57→|----------|---------|
+    58→| `com.clovers.rizz.MainActivity` | Single React Native activity (portrait, splash screen) |
+    59→| `com.canhub.cropper.CropImageActivity` | Photo cropping (canhub library) |
+    60→| `expo.modules.imagepicker.ExpoCropImageActivity` | Expo image picker crop |
+    61→| `expo.modules.webbrowser.BrowserProxyActivity` | In-app browser (translucent) |
+    62→| `com.android.billingclient.api.ProxyBillingActivity` | Google Play Billing proxy |
+    63→| `com.android.billingclient.api.ProxyBillingActivityV2` | Google Play Billing v2 proxy |
+    64→| `com.revenuecat.purchases.amazon.purchasing.ProxyAmazonBillingActivity` | Amazon IAP proxy |
+    65→| `com.revenuecat.purchases.SimulatedStoreErrorDialogActivity` | RevenueCat test store errors |
+    66→| `com.google.android.gms.auth.api.signin.internal.SignInHubActivity` | Google Sign-In hub |
+    67→| `com.google.android.gms.common.api.GoogleApiActivity` | Google Play Services |
+    68→| `com.google.android.play.core.common.PlayCoreDialogWrapperActivity` | Play Core dialogs |
+    69→| `com.pairip.licensecheck.LicenseActivity` | Pairip DRM license check |
+    70→| `androidx.credentials.playservices.controllers.identityauth.HiddenActivity` | Credential Manager |
+    71→| `androidx.credentials.playservices.controllers.identitycredentials.IdentityCredentialApiHiddenActivity` | Identity credentials |
+    72→
+    73→### 2.4 Custom Plugins (config plugins in app.config)
+    74→
+    75→- `./plugins/with-rizz-backup-policy` -- Custom backup rules
+    76→- `./plugins/with-rizz-android-signing` -- Custom signing configuration
+    77→
+    78→---
+    79→
+    80→## 3. FIREBASE INTEGRATION
+    81→
+    82→### 3.1 Firebase Config
+    83→
+    84→| Key | Value |
+    85→|-----|-------|
+    86→| Project ID | `rizz-79dde` |
+    87→| GCM Sender ID | `181863646776` |
+    88→| Google API Key | `AIzaSyD4NG9rJUROlq5fEjZGTTyeRokmgxelbJg` |
+    89→| Google App ID | `1:181863646776:android:d8488039db8970ab1b88cd` |
+    90→| Storage Bucket | `rizz-79dde.firebasestorage.app` |
+    91→| Default Web Client ID | `181863646776-gbqkm2htcco5ka5t4oqmnd9vfghka3jn.apps.googleusercontent.com` |
+    92→| Crashlytics Mapping File | `e24238be1c7a4e55a7f5122e26905583` |
+    93→
+    94→### 3.2 Firebase Services (10 components)
+    95→
+    96→| Service | Purpose |
+    97→|---------|---------|
+    98→| `ReactNativeFirebaseAppRegistrar` | React Native Firebase core |
+    99→| `CrashlyticsNdkRegistrar` | NDK crash reporting |
+   100→| `FirebaseCrashlyticsKtxRegistrar` | Kotlin extensions crash reporting |
+   101→| `CrashlyticsRegistrar` | Core crash reporting |
+   102→| `AnalyticsConnectorRegistrar` | Firebase Analytics |
+   103→| `FirebaseSessionsRegistrar` | Session tracking |
+   104→| `FirebaseInstallationsKtxRegistrar` | Installation ID (Kotlin) |
+   105→| `FirebaseInstallationsRegistrar` | Installation ID |
+   106→| `FirebaseCommonKtxRegistrar` | Firebase common Kotlin |
+   107→| `TransportRegistrar` | Data transport (CCT backend) |
+   108→
+   109→### 3.3 Analytics Configuration
+   110→
+   111→| Setting | Value |
+   112→|---------|-------|
+   113→| Analytics collection enabled | `true` |
+   114→| Analytics collection deactivated | `false` |
+   115→| Ad ID collection enabled | `true` |
+   116→| SSAID collection enabled | `true` |
+   117→| Automatic screen reporting | `true` |
+   118→| Analytics storage default | `true` |
+   119→| Ad storage default | `true` |
+   120→| Ad user data default | `true` |
+   121→| Ad personalization signals | `true` |
+   122→| Crashlytics collection enabled | `false` (opt-in model) |
+   123→| App data collection default | `true` |
+   124→
+   125→### 3.4 Analytics Plugins
+   126→
+   127→- `@react-native-firebase/app` -- Core Firebase
+   128→- `@react-native-firebase/analytics` -- With `withoutAdIdSupport:true` on iOS, `googleAppMeasurementOnDeviceConversion:true`
+   129→- `@react-native-firebase/crashlytics` -- Crash reporting
+   130→
+   131→---
+   132→
+   133→## 4. REVENUECAT IN-APP PURCHASES
+   134→
+   135→### 4.1 RevenueCat SDK
+   136→
+   137→| Detail | Value |
+   138→|--------|-------|
+   139→| SDK Class | `com.revenuecat.purchases.Purchases` |
+   140→| Billing Client Version | Google Play Billing 8.3.0 |
+   141→| Java Files | **1,285** RevenueCat Java files |
+   142→| Supported Stores | Google Play + **Amazon Appstore** (dual distribution) |
+   143→| Hybrid Common | `purchases_defaultsBc8Release` (Kotlin module) |
+   144→
+   145→### 4.2 RevenueCat API Endpoints
+   146→
+   147→| Endpoint | Purpose |
+   148→|----------|---------|
+   149→| `https://api.revenuecat.com/` | Main API |
+   150→| `https://a.revenue.cat/` | Attribution |
+   151→| `https://api-diagnostics.revenuecat.com/` | Diagnostics |
+   152→| `https://api-paywalls.revenuecat.com/` | Paywall configuration |
+   153→| `https://api.rc-backup.com/` | Backup/restore |
+   154→| `https://api-production.8-lives-cat.io/` | Production backend |
+   155→| `https://rev.cat/auth` | Authentication |
+   156→| `https://rev.cat/sdk-test-store` | Test store |
+   157→| `https://rev.cat/enter-amazon-sandbox` | Amazon sandbox |
+   158→| `https://rev.cat/offline-entitlements` | Offline entitlements |
+   159→| `https://rev.cat/trusted-entitlements` | Trusted entitlements |
+   160→| `https://rev.cat/how-to-configure-offerings` | Offerings setup |
+   161→| `https://rev.cat/why-are-offerings-empty` | Empty offerings debug |
+   162→| `https://errors.rev.cat/configuring-products` | Product config errors |
+   163→| `https://errors.rev.cat/configuring-sdk` | SDK config errors |
+   164→| `https://errors.rev.cat/allowsSharingPlayStoreAccount` | Sharing errors |
+   165→| `https://errors.rev.cat/finishTransactions` | Transaction finish errors |
+   166→| `https://errors.rev.cat/no-core-library-desugaring` | Desugaring errors |
+   167→| `https://rev.cat/google-duplicated-listener-timeouts` | Duplicate listener errors |
+   168→
+   169→### 4.3 RevenueCat Features (from Purchases.java)
+   170→
+   171→| Feature | Method |
+   172→|---------|--------|
+   173→| Get offerings | `getOfferings()` |
+   174→| Get products | `getProducts()` / `getProductsByType()` |
+   175→| Purchase package | `purchasePackage()` |
+   176→| Purchase product | `purchaseProduct()` |
+   177→| Restore purchases | `restorePurchases()` |
+   178→| Log in | `logIn(appUserID)` |
+   179→| Log out | `logOut()` |
+   180→| Get customer info | `getCustomerInfo(cacheFetchPolicy)` |
+   181→| Get virtual currencies | `getVirtualCurrencies()` |
+   182→| Invalidate cache | `invalidateCustomerInfoCache()` |
+   183→| Show in-app messages | `showInAppMessagesIfNeeded()` |
+   184→| Get subscriber attributes | `setAttributes()` |
+   185→| Set email | `setEmail()` |
+   186→| Set phone | `setPhoneNumber()` |
+   187→| Set display name | `setDisplayName()` |
+   188→| Set FCM token | `setPushToken()` |
+   189→| Set Firebase App Instance ID | `setFirebaseAppInstanceID()` |
+   190→| Sync purchases | `syncPurchases()` |
+   191→| Sync Amazon purchase | `syncAmazonPurchase()` |
+   192→| Get storefront | `getStorefrontCountryCode()` / `getStorefrontLocale()` |
+   193→| Paywall events | `trackCustomPaywallImpression()` |
+   194→| Customer center | `getCustomerCenterConfigData()` |
+   195→| Support ticket | `createSupportTicket()` |
+   196→| Web purchase redemption | `redeemWebPurchase()` |
+   197→| Amazon LWA consent | `getAmazonLWAConsentStatus()` |
+   198→| Reward verification | `generateRewardVerificationToken()` / `pollRewardVerification()` |
+   199→| Font family | `getCachedFontFamilyOrStartDownload()` |
+   200→| Override locale | `overridePreferredUILocale()` |
+   201→| Get subscription SKUs | `getSubscriptionSkus()` |
+   202→| Get non-subscription SKUs | `getNonSubscriptionSkus()` |
+   203→
+   204→### 4.4 Subscriber Attributes (Reserved)
+   205→
+   206→| Attribute | Key |
+   207→|-----------|-----|
+   208→| Email | `$email` |
+   209→| Display Name | `$displayName` |
+   210→| Phone Number | `$phoneNumber` |
+   211→| FCM Tokens | `$fcmTokens` |
+   212→| IDFA | `$idfa` |
+   213→| IDFV | `$idfv` |
+   214→| IP | `$ip` |
+   215→| Device Version | `$deviceVersion` |
+   216→| GPS Ad ID | `$gpsAdId` |
+   217→| Amazon Ad ID | `$amazonAdId` |
+   218→| Adjust ID | `$adjustId` |
+   219→| AppsFlyer ID | `$appsflyerId` |
+   220→| AppStack ID | `$appstackId` |
+   221→| FB Anonymous ID | `$fbAnonId` |
+   222→| MParticle ID | `$mparticleId` |
+   223→| OneSignal ID | `$onesignalId` |
+   224→| OneSignal User ID | `$onesignalUserId` |
+   225→| Airship Channel ID | `$airshipChannelId` |
+   226→| CleverTap ID | `$cleverTapId` |
+   227→| Kochava Device ID | `$kochavaDeviceId` |
+   228→| Airbridge Device ID | `$airbridgeDeviceId` |
+   229→| SolarEngine Distinct ID | `$solarEngineDistinctId` |
+   230→| SolarEngine Account ID | `$solarEngineAccountId` |
+   231→| SolarEngine Visitor ID | `$solarEngineVisitorId` |
+   232→| Mixpanel Distinct ID | `$mixpanelDistinctId` |
+   233→| Tenjin Analytics ID | `$tenjinAnalyticsInstallationId` |
+   234→| PostHog User ID | `$posthogUserId` |
+   235→| Media Source | `$mediaSource` |
+   236→| Campaign | `$campaign` |
+   237→| Ad Group | `$adGroup` |
+   238→| Ad | `$ad` |
+   239→| Keyword | `$keyword` |
+   240→| Creative | `$creative` |
+   241→
+   242→### 4.5 Subscription Tiers (from strings)
+   243→
+   244→| Tier | Evidence |
+   245→|------|----------|
+   246→| Gold | `"gold"` found in strings |
+   247→| Unlimited | `"unlimited"` found in strings |
+   248→| Premium | `"premium"` found in strings |
+   249→| Weekly | `"weekly"` found in strings |
+   250→| Semi-Annually | `SemiAnnually` found in strings |
+   251→| Annual Short | `ANNUAL_SHORT` / `"annual_short"` found in strings |
+   252→| Free Trial | `getFreeTrial` found in strings |
+   253→
+   254→### 4.6 Subscription Pricing & Checkout
+   255→
+   256→The app uses **RevenueCat Paywalls** with Svelte-based checkout UI:
+   257→- Stripe checkout: `stripe-checkout-container`, `stripe-checkout-mount`, `stripe-checkout-wrapper`
+   258→- Paddle inline checkout: `paddle-inline-checkout-container`
+   259→- RC checkout: `rc-checkout-secure-container`, `rc-elements-container`
+   260→- Product pricing: `rcb-product-price-container`
+   261→- Simulated store modal: `rc-simulated-store-modal-details`
+   262→- Summary cards: `rcb-paddle-summary-card`, `rcb-paddle-summary-muted`
+   263→- Loading states: `rcb-ui-loading-container`
+   264→
+   265→---
+   266→
+   267→## 5. AUTHENTICATION FLOW
+   268→
+   269→### 5.1 Authentication Methods
+   270→
+   271→| Method | Implementation |
+   272→|--------|---------------|
+   273→| Google Sign-In | `@react-native-google-signin/google-signin` + `NitroGoogleSignInController` |
+   274→| Apple Sign-In | `expo-apple-authentication` (iOS only, `"usesAppleSignIn":true`) |
+   275→| Google OAuth | `SignInHubActivity` + `RevocationBoundService` |
+   276→| Credential Manager | `CredentialProviderPlayServicesImpl` (passkeys/passwords) |
+   277→| Firebase Auth | Via `ReactNativeFirebaseAppInitProvider` |
+   278→
+   279→### 5.2 Google Sign-In Details (NitroGoogleSignInController)
+   280→
+   281→- Uses AES/GCM/NoPadding encryption for secure token storage
+   282→- `KeyGenParameterSpec` with `KeyAlias` for Android Keystore
+   283→- `GCMParameterSpec` for authenticated encryption
+   284→- Key size: 256-bit (INSTRUCTION_UPDATE_EVENT_EMITTER = 256)
+   285→- Block mode: GCM
+   286→- Padding: NoPadding
+   287→
+   288→### 5.3 Authentication Flow
+   289→
+   290→1. User taps "Sign in with Google" / "Sign in with Apple"
+   291→2. `SignInHubActivity` handles Google OAuth flow
+   292→3. `RevocationBoundService` manages token revocation
+   293→4. Credential Manager provides passkey/password support
+   294→5. Firebase Auth receives the credential
+   295→6. RevenueCat `logIn()` links the RC user to Firebase UID
+   296→7. Token stored via `expo-secure-store` (with `configureAndroidBackup:false`)
+   297→
+   298→---
+   299→
+   300→## 6. NAVIGATION STRUCTURE
+   301→
+   302→### 6.1 Expo Router (File-Based)
+   303→
+   304→The app uses **expo-router** with typed routes enabled. Confirmed routes from the Hermes bundle:
+   305→
+   306→| Route | Purpose |
+   307→|-------|---------|
+   308→| `/index.tsx` | Entry point / splash redirect |
+   309→| `/_layout.tsx` | Root layout (providers, navigation shell) |
+   310→| `/home.tsx` | Main home screen |
+   311→| `/profile.tsx` | Profile view/edit |
+   312→| `/account-login.tsx` | Login/account creation |
+   313→| `/onboarding/index.tsx` | Onboarding flow |
+   314→| `/google-auth.tsx` | Google authentication |
+   315→| `/paywall.tsx` | Subscription paywall |
+   316→| `/pickup-lines.tsx` | AI pickup lines feature |
+   317→| `/analyzing.tsx` | Profile analysis/loading |
+   318→| `/ad-measurement.tsx` | Ad measurement/attribution |
+   319→| `/language.tsx` | Language selection |
+   320→
+   321→### 6.2 Feature Screens (from bundle analysis)
+   322→
+   323→| Screen | Purpose |
+   324→|--------|---------|
+   325→| `/edit-ai-chat/[avatarId].tsx` | AI chat avatar editor (dynamic route) |
+   326→| AI Chat screens | AI-powered conversation features |
+   327→| Profile analysis | `artProfileAnalysisStopped` (profile analysis) |
+   328→| Chat options | `Close chat options` |
+   329→| Settings | `Topor messanger` (messenger settings) |
+   330→
+   331→### 6.3 Navigation Patterns
+   332→
+   333→- `SingleTask` launch mode on MainActivity
+   334→- Portrait-only orientation
+   335→- `adjustResize` soft input mode
+   336→- React Navigation via expo-router
+   337→- `ReactNativeReanimated` for gesture-driven navigation
+   338→- `PanResponder` for swipe gestures
+   339→- `react-native-screens` for native screen containers
+   340→- `react-native-gesture-handler` for gesture handling
+   341→
+   342→---
+   343→
+   344→## 7. FEATURES WITH IMPLEMENTATION DETAILS
+   345→
+   346→### 7.1 Profile Cards & Swiping
+   347→
+   348→**Evidence from bundle strings:**
+   349→- `animate` -- 5862 occurrences (heavy animation usage)
+   350→- `swipe` -- 9 occurrences
+   351→- `card` -- 13 occurrences
+   352→- `stack` -- 11 occurrences
+   353→- `gesture` -- 79 occurrences
+   354→- `pan` -- 48 occurrences
+   355→- `drag` -- 12 occurrences
+   356→- `spring` -- 30 occurrences (spring physics animations)
+   357→- `opacity` -- 178 occurrences
+   358→- `reject` -- 11 occurrences
+   359→- `pass` -- 9 occurrences
+   360→
+   361→**Implementation:**
+   362→- Card stack with spring-physics animations via `react-native-reanimated`
+   363→- Pan gesture handling via `PanResponder` and `react-native-gesture-handler`
+   364→- Swipe edge detection: `getSwipeEdge` function found
+   365→- Next match loader: `getNextMatch` function found
+   366→- Images loaded per tier: `imagesByTier` property found
+   367→
+   368→### 7.2 Matching System
+   369→
+   370→**Evidence from bundle strings:**
+   371→- `match` -- 53 occurrences
+   372→- `like` -- found in gesture/action context
+   373→- `superlike` / `super_like` -- subscription-gated feature
+   374→- `getNextMatch` -- match queue management
+   375→
+   376→**Implementation:**
+   377→- Swipe right = like, swipe left = pass/reject
+   378→- Super Like available as premium feature
+   379→- Match queue managed server-side (getNextMatch)
+   380→- Match results trigger notification + chat creation
+   381→
+   382→### 7.3 Messaging
+   383→
+   384→**Evidence from bundle strings:**
+   385→- `Message sent` -- confirmed send functionality
+   386→- `websocketMessage` -- WebSocket-based real-time messaging
+   387→- `getOnMessage` -- message handler
+   388→- `chat` / `Chat` -- multiple occurrences
+   389→- `message_name`, `message_time`, `message_type` -- message data model
+   390→- `MESSAGE_LIST` -- message list component
+   391→
+   392→**Implementation:**
+   393→- **WebSocket** for real-time chat (OkHttp WebSocket on Android)
+   394→- Message types: text, image, possibly AI-generated
+   395→- Message metadata: name, time, type
+   396→- Chat options available per conversation
+   397→- AI chat avatars: `/edit-ai-chat/[avatarId].tsx` route
+   398→
+   399→### 7.4 AI Features
+   400→
+   401→**Evidence from app.config:**
+   402→```
+   403→"photosPermission":"Rizz uses only the photos you select for AI chat avatars
+   404→or to analyze conversations and suggest replies."
+   405→```
+   406→
+   407→**From bundle strings:**
+   408→- `/edit-ai-chat/[avatarId].tsx` -- AI avatar editing
+   409→- `pickup-lines.tsx` -- AI-generated pickup lines
+   410→- `analyzing.tsx` -- Profile analysis screen
+   411→- `artProfileAnalysisStopped` -- Profile analysis state
+   412→- `showBackendBadRequest` -- Backend validation for AI
+   413→- `suggestion` -- AI suggestions
+   414→
+   415→**Implementation:**
+   416→- AI chat avatars with photo upload
+   417→- AI conversation analysis and reply suggestions
+   418→- AI pickup line generation
+   419→- Profile analysis (photo/bio analysis)
+   420→- Backend-validated AI requests
+   421→
+   422→### 7.5 Profile Customization
+   423→
+   424→**Evidence from strings:**
+   425→- `profile.tsx` -- Profile screen
+   426→- `profile:deleteAccountConfirm` -- Account deletion flow
+   427→- `profile:account` -- Account management
+   428→- `imagesByTier` -- Tier-based photo limits
+   429→- `ExifInterface` with GPS handling -- Photo metadata management
+   430→- `CropImageActivity` + `ExpoCropImageActivity` -- Photo editing
+   431→
+   432→**Implementation:**
+   433→- Profile photos with crop/edit via canhub cropper
+   434→- EXIF data handling (GPS coordinates stripped/managed)
+   435→- Tier-based photo limits (more photos for premium)
+   436→- Profile analysis and suggestions
+   437→- Account settings and deletion
+   438→
+   439→### 7.6 Photo Verification
+   440→
+   441→**Evidence:**
+   442→- `Verifica` (Italian for "verification") -- 5 occurrences
+   443→- Camera permissions: `"cameraPermission":false` in image picker (camera disabled)
+   444→- Photo picker: `"photosPermission":"Rizz uses only the photos you select..."`
+   445→- Image picker with crop support
+   446→
+   447→**Implementation:**
+   448→- Photo-based profile verification
+   449→- Camera disabled (verification via photo upload only, not live capture)
+   450→- Crop and upload flow for verification photos
+   451→
+   452→### 7.7 Premium Features
+   453→
+   454→**Evidence from strings:**
+   455→- `subscription` -- 22 occurrences
+   456→- `premium` -- 4 occurrences
+   457→- `offering` -- 15 occurrences
+   458→- `entitlement` -- 4 occurrences
+   459→- `product_id` -- 3 occurrences
+   460→- `package_id` -- 3 occurrences
+   461→- `plan_id` -- 1 occurrence
+   462→- `tier` -- 6 occurrences
+   463→- `gold` -- 2 occurrences
+   464→- `unlimited` -- 1 occurrence
+   465→- `weekly` -- 2 occurrences
+   466→- `annual_short` / `ANNUAL_SHORT` -- pricing period
+   467→- `SemiAnnually` -- pricing period
+   468→- `getFreeTrial` -- free trial support
+   469→
+   470→**Implementation:**
+   471→- RevenueCat-managed subscription tiers
+   472→- Paywall screen (`/paywall.tsx`) with Svelte-based checkout
+   473→- Stripe + Paddle checkout options
+   474→- Free trial support
+   475→- Multiple billing periods: Weekly, Semi-Annually, Annual
+   476→- Entitlement-gated features (gold, unlimited tiers)
+   477→- Restore purchases functionality
+   478→
+   479→### 7.8 Subscription Tiers (Reconstructed)
+   480→
+   481→| Tier | Period | Evidence |
+   482→|------|--------|----------|
+   483→| Free | -- | Default tier, limited features |
+   484→| Weekly | 7 days | `"weekly"` in strings |
+   485→| Semi-Annual | 6 months | `SemiAnnually` in strings |
+   486→| Annual | 12 months | `ANNUAL_SHORT` / `"annual_short"` |
+   487→| Gold | -- | `"gold"` in strings |
+   488→| Unlimited | -- | `"unlimited"` in strings |
+   489→
+   490→---
+   491→
+   492→## 8. EXPO MODULES (525 Java files)
+   493→
+   494→### 8.1 Core Expo Modules
+   495→
+   496→| Module | Purpose |
+   497→|--------|---------|
+   498→| `expo-router` | File-based navigation |
+   499→| `expo-splash-screen` | Splash screen with custom config |
+   500→| `expo-secure-store` | Encrypted local storage |
+   501→| `expo-image-picker` | Photo selection (camera disabled) |
+   502→| `expo-image-manipulator` | Image processing |
+   503→| `expo-image` | Image display with advanced features |
+   504→| `expo-localization` | i18n support |
+   505→| `expo-apple-authentication` | Apple Sign-In |
+   506→| `expo-clipboard` | Clipboard access |
+   507→| `expo-crypto` | Cryptographic operations |
+   508→| `expo-file-system` | File system access |
+   509→| `expo-haptics` | Haptic feedback |
+   510→| `expo-web-browser` | In-app browser |
+   511→| `expo-webview` | WebView with DOM support |
+   512→| `expo-linking` | Deep linking |
+   513→| `expo-status-bar` | Status bar control |
+   514→| `expo-build-properties` | Build configuration |
+   515→| `expo-constants` | App constants |
+   516→| `expo-font` | Custom font loading |
+   517→| `expo-keep-awake` | Prevent screen sleep |
+   518→| `expo-task-manager` | Background tasks |
+   519→| `expo-location` | Location services |
+   520→| `expo-sqlite` | Local database |
+   521→| `expo-blur` | Blur effects |
+   522→| `expo-dev-launcher` | Dev tools |
+   523→| `expo-dev-menu` | Dev menu |
+   524→| `expo-logbox` | Error logging |
+   525→| `expo-system-ui` | System UI control |
+   526→
+   527→### 8.2 Expo UI Components (Material Design 3)
+   528→
+   529→The app uses **Expo UI** (Material Design 3 / Material You) components:
+   530→
+   531→| Component | Purpose |
+   532→|-----------|---------|
+   533→| `Card` / `ElevatedCard` / `OutlinedCard` | Card layouts |
+   534→| `Button` / `ToggleButton` | Buttons |
+   535→| `Checkbox` / `TriStateCheckbox` | Selection |
+   536→| `RadioButton` | Single selection |
+   537→| `Switch` / `SyncSwitch` | Toggle |
+   538→| `Slider` | Value selection |
+   539→| `SearchBar` / `DockedSearchBar` | Search |
+   540→| `NavigationBar` | Bottom navigation |
+   541→| `HorizontalPager` | Swipeable pages |
+   542→| `LazyColumn` / `LazyRow` | Virtualized lists |
+   543→| `ModalBottomSheet` | Bottom sheets |
+   544→| `AlertDialog` / `BasicAlertDialog` | Dialogs |
+   545→| `SnackbarView` | Toast messages |
+   546→| `Tooltip` / `PlainTooltip` / `RichTooltip` | Tooltips |
+   547→| `DatePicker` / `TimePicker` | Date/time selection |
+   548→| `FilterChip` / `InputChip` / `AssistChip` / `SuggestionChip` | Chips |
+   549→| `SegmentedButton` | Segmented controls |
+   550→| `ListItem` | List items |
+   551→| `Divider` | Dividers |
+   552→| `Spacer` | Spacing |
+   553→| `HorizontalFloatingToolbar` | Floating toolbar |
+   554→| `HorizontalMultiBrowseCarousel` | Carousel |
+   555→| `HorizontalUncontainedCarousel` | Carousel |
+   556→| `HorizontalCenteredHeroCarousel` | Hero carousel |
+   557→| `LinearProgressIndicator` / `CircularProgressIndicator` | Loading |
+   558→| `PullToRefreshBox` | Pull to refresh |
+   559→| `MaskView` | Masking |
+   560→| `Surface` | Surface container |
+   561→| `Text` | Typography |
+   562→| `Menu` | Dropdown menus |
+   563→| `Slot` | Slot pattern |
+   564→
+   565→### 8.3 Expo Image Features
+   566→
+   567→| Feature | Purpose |
+   568→|---------|---------|
+   569→| BlurHash | Placeholder blur hashes |
+   570→| ThumbHash | Thumbnail hashes |
+   571→| SVG support | SVG rendering |
+   572→| Data URLs | Inline image data |
+   573→| OkHttp integration | HTTP image loading |
+   574→| Glide integration | Image caching (`OkHttpGlideModule`) |
+   575→
+   576→---
+   577→
+   578→## 9. API SURFACE
+   579→
+   580→### 9.1 Backend API (RevenueCat + Custom)
+   581→
+   582→| Endpoint | Protocol | Purpose |
+   583→|----------|----------|---------|
+   584→| `https://api.revenuecat.com/` | HTTPS/REST | Subscription management |
+   585→| `https://api-diagnostics.revenuecat.com/` | HTTPS | SDK diagnostics |
+   586→| `https://api-paywalls.revenuecat.com/` | HTTPS | Paywall configuration |
+   587→| `https://api-production.8-lives-cat.io/` | HTTPS | Production backend |
+   588→| `https://api.rc-backup.com/` | HTTPS | Backup/restore |
+   589→| `https://firebase-settings.crashlytics.com/spi/v2/platforms/android/gmp/%s/settings` | HTTPS | Crashlytics config |
+   590→| `https://app-measurement.com/a` | HTTPS | Analytics |
+   591→| `https://app-measurement.com/s/d` | HTTPS | Analytics session |
+   592→| `https://pagead2.googlesyndication.com/pagead/gen_204?id=gmob-apps` | HTTPS | Google ads |
+   593→| `https://www.googleadservices.com/pagead/conversion/app/deeplink` | HTTPS | Ad conversion |
+   594→| `https://play.google.com/store/account/subscriptions` | HTTPS | Subscription management |
+   595→| `https://accounts.google.com/o/oauth2/revoke?token=` | HTTPS | OAuth token revocation |
+   596→
+   597→### 9.2 WebSocket Transport
+   598→
+   599→| Component | Evidence |
+   600→|-----------|----------|
+   601→| Protocol | WebSocket (OkHttp) |
+   602→| Module | `NativeWebSocketModuleSpec` (TurboModule) |
+   603→| Blob support | `NativeBlobModuleSpec` with WebSocket handlers |
+   604→| Message format | JSON (`websocketMessage`) |
+   605→| Real-time | Chat messages, typing indicators, presence |
+   606→
+   607→### 9.3 Authentication Flow
+   608→
+   609→```
+   610→1. User initiates login (Google / Apple / Email)
+   611→2. OAuth token obtained (Google OAuth / Apple Identity)
+   612→3. Token sent to Firebase Auth -> Firebase UID created
+   613→4. Firebase UID linked to RevenueCat via logIn()
+   614→5. RevenueCat manages subscription state
+   615→6. Session token stored in expo-secure-store
+   616→7. API calls authenticated via Firebase ID token
+   617→```
+   618→
+   619→### 9.4 Data Models (Inferred)
+   620→
+   621→**Profile:**
+   622→- User ID
+   623→- Display name
+   624→- Age / Date of birth
+   625→- Location (coarse only -- `ACCESS_COARSE_LOCATION`)
+   626→- Profile photos (tier-limited)
+   627→- Bio / Description
+   628→- Interests / Preferences
+   629→- Prompts / Questions / Answers
+   630→- Verification status
+   631→- Premium tier
+   632→
+   633→**Match:**
+   634→- User pair (A <-> B)
+   635→- Match timestamp
+   636→- Match type (like, superlike)
+   637→- Conversation ID
+   638→
+   639→**Message:**
+   640→- Message ID
+   641→- Conversation ID
+   642→- Sender ID
+   643→- Message type (text, image, AI)
+   644→- Content
+   645→- Timestamp
+   646→- Read status
+   647→- Delivered status
+   648→
+   649→**Subscription:**
+   650→- RevenueCat customer ID
+   651→- Active entitlements
+   652→- Subscription tier
+   653→- Expiration date
+   654→- Free trial status
+   655→- Billing period
+   656→
+   657→---
+   658→
+   659→## 10. UI PATTERNS
+   660→
+   661→### 10.1 Card Stack Design
+   662→
+   663→- Spring-physics animations via `react-native-reanimated`
+   664→- Pan gesture for swipe direction
+   665→- Opacity transitions during swipe
+   666→- Stack depth with visual layering (scale, shadow)
+   667→- Swipe edge detection for threshold
+   668→- Images loaded per subscription tier
+   669→
+   670→### 10.2 Match Animation
+   671→
+   672→- Full-screen match overlay
+   673→- Animated entry (spring physics)
+   674→- Photo display of matched user
+   675→- "Send Message" CTA
+   676→- Haptic feedback on match
+   677→
+   678→### 10.3 Chat Interface
+   679→
+   680→- WebSocket real-time delivery
+   681→- Message list with virtualized scrolling
+   682→- Message types: text, image, AI-generated
+   683→- Typing indicators
+   684→- Read receipts
+   685→- Chat options menu
+   686→- AI chat avatar selection
+   687→
+   688→### 10.4 Profile Editor
+   689→
+   690→- Photo grid with drag-to-reorder
+   691→- Crop image via canhub cropper
+   692→- Bio text editor
+   693→- Interest/chip selector (Expo UI FilterChip)
+   694→- Prompt/answer system
+   695→- Age, gender, location settings
+   696→- Photo verification upload
+   697→
+   698→### 10.5 Settings Structure
+   699→
+   700→- Account management
+   701→- Notification preferences
+   702→- Privacy settings
+   703→- Language selection (`/language.tsx`)
+   704→- Theme (automatic/dark/light via `userInterfaceStyle:"automatic"`)
+   705→- Help/FAQ
+   706→- Terms of service
+   707→- Privacy policy
+   708→- Delete account (`profile:deleteAccountConfirm`)
+   709→- Deactivate account
+   710→
+   711→### 10.6 Paywall Screen
+   712→
+   713→- Svelte-based checkout UI (RevenueCat Paywalls)
+   714→- Product pricing display
+   715→- Tier comparison
+   716→- Free trial CTA
+   717→- Stripe checkout integration
+   718→- Paddle inline checkout
+   719→- Restore purchases button
+   720→
+   721→### 10.7 Onboarding Flow
+   722→
+   723→- Multi-step onboarding (`/onboarding/index.tsx`)
+   724→- Gender selection
+   725→- Age input
+   726→- Photo upload
+   727→- Bio writing
+   728→- Interest selection
+   729→- Prompt/answer setup
+   730→- Location permission
+   731→- Photo verification
+   732→- Completion screen
+   733→
+   734→---
+   735→
+   736→## 11. INTEGRATIONS
+   737→
+   738→### 11.1 RevenueCat (Primary Monetization)
+   739→
+   740→| Aspect | Detail |
+   741→|--------|--------|
+   742→| SDK Version | `purchases_defaultsBc8Release` |
+   743→| Stores | Google Play + Amazon |
+   744→| Features | Subscriptions, offerings, paywalls, customer center |
+   745→| Checkout | Stripe + Paddle + native store |
+   746→| Entitlements | Gold, Unlimited, Premium |
+   747→| Analytics | Built-in RevenueCat event tracking |
+   748→
+   749→### 11.2 Firebase (Backend Services)
+   750→
+   751→| Service | Usage |
+   752→|---------|-------|
+   753→| Firebase Auth | User authentication |
+   754→| Firebase Analytics | Event tracking, screen views |
+   755→| Firebase Crashlytics | Crash reporting (opt-in) |
+   756→| Firebase Cloud Messaging | Push notifications |
+   757→| Firebase Storage | Photo storage |
+   758→| Firebase Installations | Device identification |
+   759→
+   760→### 11.3 Google Play Services
+   761→
+   762→| Service | Usage |
+   763→|---------|-------|
+   764→| Google Sign-In | Authentication |
+   765→| Play Billing v8.3.0 | In-app purchases |
+   766→| Play Core | App updates, review |
+   767→| SafetyNet/Play Integrity | App integrity |
+   768→| Location Services | Coarse location |
+   769→| Advertising ID | Ad attribution |
+   770→| Privacy Sandbox | Attribution API |
+   771→
+   772→### 11.4 Analytics & Attribution
+   773→
+   774→| Service | Usage |
+   775→|---------|-------|
+   776→| Firebase Analytics | Primary analytics |
+   777→| RevenueCat Events | Subscription analytics |
+   778→| Google Ad Services | Ad attribution (`ACCESS_ADSERVICES_ATTRIBUTION`) |
+   779→| Google Ad ID | Ad identification (`ACCESS_ADSERVICES_AD_ID`) |
+   780→| AppsFlyer | Attribution (subscriber attribute) |
+   781→| Adjust | Attribution (subscriber attribute) |
+   782→| Mixpanel | Analytics (subscriber attribute) |
+   783→| OneSignal | Push (subscriber attribute) |
+   784→| PostHog | Analytics (subscriber attribute) |
+   785→| Tenjin | Analytics (subscriber attribute) |
+   786→| Airship | Push (subscriber attribute) |
+   787→| Kochava | Attribution (subscriber attribute) |
+   788→| Airbridge | Attribution (subscriber attribute) |
+   789→| SolarEngine | Analytics (subscriber attribute) |
+   790→| MParticle | Analytics (subscriber attribute) |
+   791→| CleverTap | Analytics (subscriber attribute) |
+   792→
+   793→### 11.5 Other Integrations
+   794→
+   795→| Integration | Usage |
+   796→|-------------|-------|
+   797→| Expo SecureStore | Encrypted local storage |
+   798→| Expo Image Picker | Photo selection |
+   799→| Expo Crypto | Cryptographic operations |
+   800→| Expo FileSystem | File management |
+   801→| Expo Localization | Internationalization |
+   802→| Expo Linking | Deep linking |
+   803→| Expo Web Browser | In-app browser |
+   804→| Expo Haptics | Vibration feedback |
+   805→| Glide + OkHttp | Image loading/caching |
+   806→| canhub/cropper | Photo cropping |
+   807→| Pairip DRM | License verification |
+   808→| Nitro Google Sign-In | Google authentication |
+   809→
+   810→---
+   811→
+   812→## 12. PERMISSIONS
+   813→
+   814→### 12.1 Runtime Permissions
+   815→
+   816→| Permission | Purpose |
+   817→|------------|---------|
+   818→| `INTERNET` | Network access |
+   819→| `ACCESS_NETWORK_STATE` | Connectivity check |
+   820→| `ACCESS_WIFI_STATE` | WiFi state |
+   821→| `ACCESS_COARSE_LOCATION` | Approximate location (NO fine location!) |
+   822→| `CAMERA` | Photo capture (via image picker, camera disabled) |
+   823→| `READ_EXTERNAL_STORAGE` | Photo access (max SDK 32) |
+   824→| `WRITE_EXTERNAL_STORAGE` | Photo save (max SDK 32) |
+   825→| `VIBRATE` | Haptic feedback |
+   826→| `WAKE_LOCK` | Prevent sleep during operations |
+   827→| `USE_BIOMETRIC` | Biometric authentication |
+   828→| `USE_FINGERPRINT` | Fingerprint authentication |
+   829→| `SYSTEM_ALERT_WINDOW` | Overlay permission |
+   830→| `com.android.vending.BILLING` | Google Play billing |
+   831→| `com.google.android.gms.permission.AD_ID` | Advertising ID |
+   832→| `com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE` | Install referrer |
+   833→| `ACCESS_ADSERVICES_ATTRIBUTION` | Privacy Sandbox attribution |
+   834→| `ACCESS_ADSERVICES_AD_ID` | Privacy Sandbox ad ID |
+   835→| `com.android.vending.CHECK_LICENSE` | License verification |
+   836→
+   837→### 12.2 Notable Permission Choices
+   838→
+   839→- **No `ACCESS_FINE_LOCATION`** -- Only coarse location (privacy-conscious)
+   840→- **No `RECORD_AUDIO`** -- No audio recording
+   841→- **No `CALL_PHONE`** -- No phone calls
+   842→- **`SYSTEM_ALERT_WINDOW`** -- Overlay for in-app browser/dialogs
+   843→- **Dual storage permissions** -- For Android 12 and below compatibility
+   844→
+   845→---
+   846→
+   847→## 13. SECURITY
+   848→
+   849→### 13.1 DRM / License Verification
+   850→
+   851→- **Pairip DRM** -- `com.pairip.licensecheck.LicenseActivity` + `com.pairip.application.Application`
+   852→- License check on app launch
+   853→- Application class replaced with Pairip's Application wrapper
+   854→
+   855→### 13.2 Data Protection
+   856→
+   857→- `allowBackup:false` -- No Android backup
+   858→- Custom backup rules via `./plugins/with-rizz-backup-policy`
+   859→- Custom signing via `./plugins/with-rizz-android-signing`
+   860→- `expo-secure-store` with `configureAndroidBackup:false`
+   861→- AES/GCM/NoPadding encryption for token storage
+   862→- Android Keystore integration for key management
+   863→
+   864→### 13.3 Build Security
+   865→
+   866→- R8 minification enabled
+   867→- Resource shrinking enabled
+   868→- React Native bundle is Hermes bytecode (not readable JS)
+   869→- Source maps removed from production build
+   870→
+   871→---
+   872→
+   873→## 14. INTERNATIONALIZATION
+   874→
+   875→### 14.1 Localization
+   876→
+   877→- `expo-localization` plugin installed
+   878→- Italian text found in strings: `"Amici e divertimento"`, `"Buat chat AI"`, `"Contattaci"`, `"Elimina Account"`, `"Impostazioni"`, `"Lingua"`, `"Pagamento"`, `"Profilo"`, `"Sicurezza"`, `"Verifica"`, `"Notifiche"`, `"Preferenze"`, `"Interessi"`, `"Domande"`, `"Risposte"`, `"Prompts"`, `"Sfoglia"`, `"Scopri"`, `"Messaggi"`, `"Coinvolgimento"`, `"Abbonamento"`, `"Premium"`, `"Super Like"`, `"Boost"`, `"Annulla"`, `"Rimborsa"`, `"Account"`, `"Cerca"`, `"Filtro"`, `"Distanza"`, `"Eta"`, `"Genere"`, `"Preferenze"`, `"Bio"`, `"Foto"`, `"Avatar"`
+   879→- RTL support declared: `supportsRtl:true`
+   880→- Language selection screen: `/language.tsx`
+   881→
+   882→### 14.2 Supported Languages (Inferred)
+   883→
+   884→- English (primary)
+   885→- Italian (full translation found)
+   886→- Multiple other languages (expo-localization supports all)
+   887→
+   888→---
+   889→
+   890→## 15. ANIMATION & GESTURE LIBRARIES
+   891→
+   892→| Library | Usage |
+   893→|---------|-------|
+   894→| `react-native-reanimated` | Spring animations, layout animations, shared element transitions |
+   895→| `react-native-gesture-handler` | Pan gestures, swipe detection, touch handling |
+   896→| `react-native-screens` | Native screen containers |
+   897→| `react-native-safe-area-context` | Safe area handling |
+   898→| Expo Animations | `rns_default_enter_in/out`, `rns_fade_in/out`, `rns_ios_from_left/right` |
+   899→
+   900→### 15.1 Animation Types Found
+   901→
+   902→- Spring physics (30 occurrences of "spring")
+   903→- Fade transitions (multiple `rns_fade_*` animations)
+   904→- Slide transitions (`rns_ios_from_left/right`)
+   905→- Pan/gesture-driven (48 occurrences of "pan")
+   906→- Opacity changes (178 occurrences)
+   907→- Scale transforms (`parseScale` in Reanimated)
+   908→- Card stack animations (drag, reject, pass)
+   909→
+   910→---
+   911→
+   912→## 16. DEPENDENCY VERSIONS (from META-INF)
+   913→
+   914→| Dependency | Version |
+   915→|------------|---------|
+   916→| Activity Compose | 1.11.0 |
+   917→| Annotation | 1.4.1 |
+   918→| AppCompat | 1.7.1 |
+   919→| Biometric | 1.1.0 |
+   920→| Browser | 1.6.0 |
+   921→| CardView | 1.0.0 |
+   922→| Compose Animation | 1.11.0-beta02 |
+   923→| Compose Foundation | 1.11.0-beta02 |
+   924→| Compose Material3 | 1.5.0-alpha17 |
+   925→| Compose Runtime | 1.11.0-beta02 |
+   926→| Compose UI | 1.11.0-beta02 |
+   927→| Core Splash Screen | (version in META-INF) |
+   928→| Credentials Play Services | (version in META-INF) |
+   929→| DataStore | (version in META-INF) |
+   930→| DrawerLayout | (version in META-INF) |
+   931→| DynamicAnimation | (version in META-INF) |
+   932→| ProfileInstaller | (version in META-INF) |
+   933→| SwipeRefreshLayout | (version in META-INF) |
+   934→| Firebase Analytics | 23.2.0 |
+   935→| Firebase Encoders Proto | 16.0.0 |
+   936→| Firebase Encoders | 17.0.0 |
+   937→| Firebase Measurement Connector | 20.0.1 |
+   938→| Play Billing Client | 8.3.0 |
+   939→| Play Services Auth | 21.6.0 |
+   940→| Play Services Auth API Phone | 18.0.2 |
+   941→| Play Services Auth Base | 18.0.10 |
+   942→| Play Services Auth Blockstore | 16.4.0 |
+   943→| RevenueCat | `purchases_defaultsBc8Release` |
+   944→
+   945→---
+   946→
+   947→## 17. COMPETITIVE ANALYSIS INSIGHTS
+   948→
+   949→### 17.1 Rizz vs Other Dating Apps
+   950→
+   951→| Feature | Rizz | Grindr | Romeo | Omolink |
+   952→|---------|------|--------|-------|---------|
+   953→| Framework | Expo/RN | Native Kotlin | Native Kotlin+Compose | Capacitor |
+   954→| Chat Protocol | WebSocket | XMPP | WebSocket+gRPC | API Polling |
+   955→| Maps | Android Geocoder | Google Maps | Custom Radar | OpenStreetMap |
+   956→| Subscriptions | RevenueCat | Raw Billing | Raw Billing | Custom |
+   957→| AI Features | Yes (avatars, analysis) | No | No | No |
+   958→| Video Call | No | Yes | No | No |
+   959→| Group Chat | No | Yes | No | Yes |
+   960→| Dual Store | Google+Amazon | Google only | Google only | Google only |
+   961→| DRM | Pairip | SafetyNet | None | None |
+   962→| i18n | expo-localization | Partial | Partial | Full |
+   963→
+   964→### 17.2 Key Differentiators
+   965→
+   966→1. **AI Features** -- AI chat avatars, profile analysis, pickup lines, reply suggestions
+   967→2. **Dual Store** -- Google Play + Amazon Appstore
+   968→3. **Expo/React Native** -- Production-proven at scale (15K+ Java files)
+   969→4. **RevenueCat** -- Simplified subscription management across platforms
+   970→5. **Pairip DRM** -- License verification (unique among the 4 apps)
+   971→6. **Privacy-First Location** -- Coarse only, no fine location
+   972→7. **Material Design 3** -- Expo UI with Material You components
+   973→8. **Svelte Paywalls** -- RevenueCat paywalls with Svelte-based checkout UI
+   974→
+   975→---
+   976→
+   977→## 18. CRITICAL FINDINGS FOR REBUILD
+   978→
+   979→### 18.1 Architecture Validation
+   980→
+   981→- **Expo/React Native is production-proven** for dating apps at scale
+   982→- **RevenueCat simplifies** cross-platform subscription management
+   983→- **WebSocket is the standard** for real-time chat (3 of 4 apps use it)
+   984→- **Firebase FCM is universal** for push notifications
+   985→- **Single-activity pattern** works well for React Native dating apps
+   986→
+   987→### 18.2 Features to Implement
+   988→
+   989→1. AI chat avatars (photo-based)
+   990→2. AI profile analysis
+   991→3. AI pickup line generation
+   992→4. AI reply suggestions
+   993→5. Subscription tiers (RevenueCat-managed)
+   994→6. Paywall with Stripe + Paddle checkout
+   995→7. WebSocket real-time chat
+   996→8. Photo verification
+   997→9. Profile prompts/questions/answers
+   998→10. Interest/preference matching
+   999→11. Swipe gesture with spring animations
+  1000→12. Match animation overlay
+  1001→13. Biometric authentication
+  1002→14. Coarse location only (privacy)
+  1003→15. i18n with expo-localization
+  1004→
+  1005→### 18.3 Tech Stack to Adopt
+  1006→
+  1007→| Component | Technology |
+  1008→|-----------|-----------|
+  1009→| Framework | Expo SDK 57+ |
+  1010→| Navigation | expo-router (file-based) |
+  1011→| UI | Expo UI (Material Design 3) |
+  1012→| Animations | react-native-reanimated |
+  1013→| Gestures | react-native-gesture-handler |
+  1014→| Chat | WebSocket (OkHttp on native) |
+  1015→| Auth | Firebase Auth + Google/Apple Sign-In |
+  1016→| Subscriptions | RevenueCat |
+  1017→| Analytics | Firebase Analytics + RevenueCat Events |
+  1018→| Push | Firebase Cloud Messaging |
+  1019→| Storage | Firebase Storage + expo-secure-store |
+  1020→| Photos | expo-image-picker + expo-image-manipulator |
+  1021→| Location | expo-location (coarse only) |
+  1022→| i18n | expo-localization |
+  1023→| Build | EAS Build with custom config plugins |
+  1024→
+  1025→---
+  1026→
+  1027→---
+  1028→
+  1029→## 19. APK DATA GROUND TRUTH -- MISSING FEATURES, ENUMS, API HOOKS & PATTERNS
+  1030→
+  1031→> Generated: 2026-08-14 | Cross-referenced against: ALL-REPORTS/RIZZ-REPORT.md (AndroidManifest.xml)
+  1032→> Source: com.clovers.rizz.apk-reverseapk/ | Hermes bytecode string extraction
+  1033→
+  1034→### 19.1 Complete API Endpoints (from Hermes bundle strings + RevenueCat Java)
+  1035→
+  1036→| Endpoint | Protocol | Purpose | Evidence |
+  1037→|----------|----------|---------|----------|
+  1038→| `https://api.revenuecat.com/` | HTTPS/REST | Subscription management | RevenueCat SDK |
+  1039→| `https://a.revenue.cat/` | HTTPS | Attribution | RevenueCat SDK |
+  1040→| `https://api-diagnostics.revenuecat.com/` | HTTPS | SDK diagnostics | RevenueCat SDK |
+  1041→| `https://api-paywalls.revenuecat.com/` | HTTPS | Paywall configuration | RevenueCat SDK |
+  1042→| `https://api.rc-backup.com/` | HTTPS | Backup/restore | RevenueCat SDK |
+  1043→| `https://api-production.8-lives-cat.io/` | HTTPS | Production backend | RevenueCat SDK |
+  1044→| `https://rev.cat/auth` | HTTPS | Authentication | RevenueCat SDK |
+  1045→| `https://rev.cat/sdk-test-store` | HTTPS | Test store | RevenueCat SDK |
+  1046→| `https://rev.cat/enter-amazon-sandbox` | HTTPS | Amazon sandbox | RevenueCat SDK |
+  1047→| `https://rev.cat/offline-entitlements` | HTTPS | Offline entitlements | RevenueCat SDK |
+  1048→| `https://rev.cat/trusted-entitlements` | HTTPS | Trusted entitlements | RevenueCat SDK |
+  1049→| `https://js.stripe.com/v3` | HTTPS/JS | Stripe checkout v3 | Hermes strings |
+  1050→| `https://js.stripe.com/` | HTTPS/JS | Stripe checkout base | Hermes strings |
+  1051→| `/stripe.js` | JS | Stripe.js loader | Hermes strings |
+  1052→| `https://api2.amplitude.com/batch` | HTTPS | Amplitude analytics | Hermes strings |
+  1053→| `https://play.google.com/store` | HTTPS | Play Store metadata | AndroidManifest |
+  1054→| `https://accounts.google.com/o/oauth2/revoke?token=` | HTTPS | OAuth token revocation | Google Sign-In |
+  1055→| `https://pagead2.googlesyndication.com/pagead/gen_204?id=gmob-apps` | HTTPS | Google ads | Play Services |
+  1056→| `https://www.googleadservices.com/pagead/conversion/app/deeplink` | HTTPS | Ad conversion | Play Services |
+  1057→| `https://play.google.com/store/account/subscriptions` | HTTPS | Subscription management | Play Billing |
+  1058→| `https://app-measurement.com/a` | HTTPS | Analytics | Firebase |
+  1059→| `https://app-measurement.com/s/d` | HTTPS | Analytics session | Firebase |
+  1060→| `https://firebase-settings.crashlytics.com/spi/v2/platforms/android/gmp/%s/settings` | HTTPS | Crashlytics config | Firebase |
+  1061→
+  1062→### 19.2 Complete RevenueCat Subscription Tiers & Pricing
+  1063→
+  1064→#### Subscription Periods (confirmed from strings)
+  1065→
+  1066→| Period | String Evidence | Pricing Model |
+  1067→|--------|----------------|---------------|
+  1068→| Weekly | `"weekly"` in strings | 7-day recurring |
+  1069→| Semi-Annual | `SemiAnnually` in strings | 6-month recurring |
+  1070→| Annual | `ANNUAL` in strings | 12-month recurring |
+  1071→| Annual Short | `ANNUAL_SHORT` / `"annual_short"` | Short-term annual |
+  1072→| Free Trial | `freeTrialPeriods` + `DayShort` | Trial period in days |
+  1073→
+  1074→#### Payment Methods (confirmed from strings)
+  1075→
+  1076→| Method | Evidence | Implementation |
+  1077→|--------|----------|----------------|
+  1078→| Stripe | `https://js.stripe.com/v3`, `/stripe.js` | Credit/debit cards via Stripe.js |
+  1079→| PayPal | `PAYPAL` in strings | PayPal checkout |
+  1080→| Diners Club | `DINERS_CLUB` in strings | Diners Club cards |
+  1081→| Apple Pay | RevenueCat StoreKit integration | iOS only |
+  1082→| Google Play Billing | `com.android.billingclient.api` | Android IAP |
+  1083→| Amazon IAP | `com.revenuecat.purchases.amazon` | Amazon Appstore |
+  1084→
+  1085→#### Entitlement Tiers (confirmed from strings + Java)
+  1086→
+  1087→| Tier | Evidence | Features |
+  1088→|------|----------|----------|
+  1089→| Free | Default tier | Limited swipes, basic features |
+  1090→| Gold | `"gold"` in strings | Enhanced features |
+  1091→| Premium | `"premium"` in strings | Full access |
+  1092→| Unlimited | `"unlimited"` in strings | Maximum features |
+  1093→
+  1094→#### Checkout UI Components (Svelte-based RevenueCat Paywalls)
+  1095→
+  1096→| Component | CSS Class | Purpose |
+  1097→|-----------|-----------|---------|
+  1098→| Checkout Container | `.rc-checkout-container` | Main checkout wrapper |
+  1099→| Secure Container | `.rc-checkout-secure-container` | Security badge area |
+  1100→| Pay Container | `.rc-checkout-pay-container` | Payment form wrapper |
+  1101→| Form Container | `.rc-checkout-form-container` | Card input form |
+  1102→| Elements Container | `.rc-elements-container` | Stripe Elements wrapper |
+  1103→| Price Update Info | `.rc-checkout-price-update-info-container` | Price change notices |
+  1104→| Loading State | `.rc-loading` | Checkout loading spinner |
+  1105→| Stripe Checkout | `.stripe-checkout-wrapper` | Stripe embedded checkout |
+  1106→| Paddle Summary | `.rcb-paddle-summary-row` | Paddle order summary |
+  1107→| Paddle Muted | `.rcb-paddle-summary-muted` | Paddle secondary text |
+  1108→| Product Price | `.rcb-product-price-container` | Price display |
+  1109→| Pricing Dropdown | `.rcb-pricing-dropdown` | Period selector |
+  1110→| Pricing Table | `.rcb-pricing-table` | Plan comparison |
+  1111→| Discount Input | `.rcb-discount-input` | Promo code field |
+  1112→| Discount Field | `.rcb-discount-field` | Code input field |
+  1113→| QR Wrapper | `.qr-wrapper` | QR code display |
+  1114→| QR Code | `.qr-code` | QR code image |
+  1115→| App Icon | `.rcb-app-icon` | RevenueCat app icon |
+  1116→| Modal Message | `.rcb-modal-message` | Paywall modal |
+  1117→| Modal Icon | `.rcb-modal-message-icon` | Modal icon |
+  1118→
+  1119→### 19.3 Complete Enum Types (from R8-decompiled Java)
+  1120→
+  1121→#### RevenueCat Enums (p005a4 package -- obfuscated Purchases SDK)
+  1122→
+  1123→| Enum | Values | Purpose |
+  1124→|------|--------|---------|
+  1125→| `e` (HTTPStatusCodes) | Various | RevenueCat API response codes |
+  1126→| `b` (EventsManager) | Various | Event tracking types |
+  1127→| `d` (DiagnosticsEntry) | Various | SDK diagnostic events |
+  1128→| `k` (SigningManager) | Various | Request signing modes |
+  1129→| `g` (Networking) | Various | Network request states |
+  1130→| `f` (Verification) | Various | Receipt verification states |
+  1131→| `u` (PurchaseParams) | Various | Purchase parameter types |
+  1132→
+  1133→#### Compose UI Enums (androidx.compose)
+  1134→
+  1135→| Enum | Values | Purpose |
+  1136→|------|--------|---------|
+  1137→| `LayoutDirection` | `LTR`, `RTL` | Text direction |
+  1138→| `PointerEventPass` | `Initial`, `Main`, `Final` | Touch event propagation |
+  1139→| `FocusStateImpl` | `Inactive`, `Active`, `ActiveParent`, `Captured` | Focus management |
+  1140→| `ToggleableState` | `Off`, `On`, `Indeterminate` | Checkbox/radio states |
+  1141→| `AutofillType` | `EmailAddress`, `Password`, `Username`, etc. | Form autofill |
+  1142→| `TextInputCommand` | Various | Keyboard input commands |
+  1143→| `AnnotationType` | Various | Text annotation types |
+  1144→| `ResolvedTextDirection` | `Ltr`, `Rtl` | Resolved text direction |
+  1145→| `Invalidation` | Various | Recomposition triggers |
+  1146→| `LayoutState` | `Measuring`, `LayingOut`, `Idle` | Layout lifecycle |
+  1147→| `UsageByParent` | Various | Intrinsic measurement |
+  1148→| `PathSegment.Type` | `Move`, `Line`, `Quad`, `Cubic`, `Close` | SVG path segments |
+  1149→| `Path.Direction` | `CW`, `CCW` | Path winding direction |
+  1150→| `Recomposer.State` | `Inactive`, `Idle`, `Active`, `ShuttingDown` | Compose runtime |
+  1151→| `SecureFlagPolicy` | `Allow`, `Deny`, `DeviceReadOnly` | Window security |
+  1152→
+  1153→#### Room Database Enums
+  1154→
+  1155→| Enum | Values | Purpose |
+  1156→|------|--------|---------|
+  1157→| `JournalMode` | `TRUNCATE`, `WRITE_AHEAD_LOGGING` | Database journaling |
+  1158→| `SQLiteTransactionType` | `DEFERRED`, `IMMEDIATE`, `EXCLUSIVE` | Transaction types |
+  1159→| `MatchInfo` | `FTS5`, `FTS3` | Full-text search format |
+  1160→
+  1161→### 19.4 Complete Navigation Routes (from Hermes bundle + strings)
+  1162→
+  1163→#### Confirmed Routes (file-based via expo-router)
+  1164→
+  1165→| Route | Purpose | Evidence |
+  1166→|-------|---------|----------|
+  1167→| `/index.tsx` | Entry point / splash redirect | Bundle analysis |
+  1168→| `/_layout.tsx` | Root layout (providers, navigation shell) | Bundle analysis |
+  1169→| `/home.tsx` | Main home screen | Bundle analysis |
+  1170→| `/profile.tsx` | Profile view/edit | Bundle analysis |
+  1171→| `/account-login.tsx` | Login/account creation | Bundle analysis |
+  1172→| `/onboarding/index.tsx` | Onboarding flow | Bundle analysis |
+  1173→| `/google-auth.tsx` | Google authentication | Bundle analysis |
+  1174→| `/paywall.tsx` | Subscription paywall | Bundle analysis |
+  1175→| `/pickup-lines.tsx` | AI pickup lines feature | Bundle analysis |
+  1176→| `/analyzing.tsx` | Profile analysis/loading | Bundle analysis |
+  1177→| `/ad-measurement.tsx` | Ad measurement/attribution | Bundle analysis |
+  1178→| `/language.tsx` | Language selection | Bundle analysis |
+  1179→| `/edit-ai-chat/[avatarId].tsx` | AI chat avatar editor (dynamic route) | Hermes strings |
+  1180→
+  1181→#### Navigation Components (from strings)
+  1182→
+  1183→| Component | Purpose | Evidence |
+  1184→|-----------|---------|----------|
+  1185→| `Tab` | Bottom tab navigator | `TabChats` in strings |
+  1186→| `TabChats` | Chats tab | `"TabChats con IA"` |
+  1187→| `Stack` | Stack navigator | React Navigation pattern |
+  1188→| `Stack.Toolbar` | Navigation bar | Error message reference |
+  1189→| `Screen` | Screen wrapper | Navigator children |
+  1190→| `Group` | Route grouping | Navigator children |
+  1191→| `initialRouteName` | Default route | `"initialRouteName"` in strings |
+  1192→| `NavigationContainer` | Root container | React Navigation |
+  1193→| `Link` | Deep link navigation | Expo Router |
+  1194→| `Link.Preview` | Link preview | Expo Router |
+  1195→| `Link.Trigger` | Link trigger | Expo Router |
+  1196→
+  1197→### 19.5 Permission Flow (from AndroidManifest.xml ground truth)
+  1198→
+  1199→#### Runtime Permissions (ordered by request priority)
+  1200→
+  1201→| Permission | Purpose | Request Timing | SDK Version Limit |
+  1202→|------------|---------|----------------|-------------------|
+  1203→| `INTERNET` | Network access | Auto (no prompt) | -- |
+  1204→| `ACCESS_NETWORK_STATE` | Connectivity check | Auto (no prompt) | -- |
+  1205→| `ACCESS_WIFI_STATE` | WiFi state | Auto (no prompt) | -- |
+  1206→| `ACCESS_COARSE_LOCATION` | Approximate location | On-demand (distance filter) | -- |
+  1207→| `SYSTEM_ALERT_WINDOW` | Overlay permission | On-demand (in-app browser) | -- |
+  1208→| `VIBRATE` | Haptic feedback | Auto (no prompt) | -- |
+  1209→| `WAKE_LOCK` | Prevent sleep | Auto (no prompt) | -- |
+  1210→| `USE_BIOMETRIC` | Biometric authentication | On-demand (lock feature) | -- |
+  1211→| `USE_FINGERPRINT` | Fingerprint authentication | On-demand (lock feature) | -- |
+  1212→| `READ_EXTERNAL_STORAGE` | Photo access | On-demand (photo upload) | maxSdkVersion=32 |
+  1213→| `WRITE_EXTERNAL_STORAGE` | Photo save | On-demand (photo save) | maxSdkVersion=32 |
+  1214→| `com.android.vending.BILLING` | Google Play billing | Auto (no prompt) | -- |
+  1215→| `com.google.android.gms.permission.AD_ID` | Advertising ID | Auto (no prompt) | -- |
+  1216→| `com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE` | Install referrer | Auto (no prompt) | -- |
+  1217→| `ACCESS_ADSERVICES_ATTRIBUTION` | Privacy Sandbox attribution | Auto (no prompt) | -- |
+  1218→| `ACCESS_ADSERVICES_AD_ID` | Privacy Sandbox ad ID | Auto (no prompt) | -- |
+  1219→| `com.android.vending.CHECK_LICENSE` | License verification | Auto (no prompt) | -- |
+  1220→| `com.clovers.rizz.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | Dynamic receiver security | Auto (no prompt) | -- |
+  1221→
+  1222→#### Permission Flow Sequence
+  1223→
+  1224→```
+  1225→1. App launch -> Pairip DRM license check (LicenseActivity)
+  1226→2. Splash screen -> Analytics collection starts
+  1227→3. Onboarding step 1 -> Location permission (ACCESS_COARSE_LOCATION)
+  1228→4. Onboarding step 2 -> Photo upload (READ_EXTERNAL_STORAGE)
+  1229→5. Profile setup -> Biometric lock (USE_BIOMETRIC)
+  1230→6. In-app browser -> Overlay permission (SYSTEM_ALERT_WINDOW)
+  1231→7. Photo verification -> Photo access (READ_EXTERNAL_STORAGE)
+  1232→8. Subscription -> Billing (com.android.vending.BILLING)
+  1233→```
+  1234→
+  1235→#### Notable Permission Choices
+  1236→
+  1237→- **No `ACCESS_FINE_LOCATION`** -- Only coarse location (privacy-conscious)
+  1238→- **No `RECORD_AUDIO`** -- No audio recording
+  1239→- **No `CALL_PHONE`** -- No phone calls
+  1240→- **No `CAMERA`** -- Camera disabled in image picker config
+  1241→- **`SYSTEM_ALERT_WINDOW`** -- Overlay for in-app browser/dialogs
+  1242→- **Dual storage permissions** -- For Android 12 and below compatibility
+  1243→- **`maxSdkVersion=32`** -- Storage permissions deprecated on Android 13+
+  1244→
+  1245→### 19.6 Feature Flags & Remote Config
+  1246→
+  1247→#### Feature Flags (from Hermes bundle strings)
+  1248→
+  1249→| Flag | Purpose | Evidence |
+  1250→|------|---------|----------|
+  1251→| `featureFlags.native.{js,ts}` | Native feature flag system | Hermes strings |
+  1252→| `setDynamicFeatureFlag` | Dynamic flag setter | Hermes strings |
+  1253→| `HEXAMPLE_DYNAMIC_FLAG_LOO` | Dynamic flag example | Hermes strings |
+  1254→| `configFlags=` | Configuration flags | Hermes strings |
+  1255→| `Features` | Feature toggle container | `"Features ="` in strings |
+  1256→
+  1257→#### Firebase Remote Config (inferred from Firebase Analytics integration)
+  1258→
+  1259→| Config Key | Purpose | Evidence |
+  1260→|------------|---------|----------|
+  1261→| `firebase_analytics_collection_enabled` | Analytics toggle | AndroidManifest |
+  1262→| `firebase_crashlytics_collection_enabled` | Crashlytics toggle | AndroidManifest (false by default) |
+  1263→| `google_analytics_adid_collection_enabled` | Ad ID collection | AndroidManifest |
+  1264→| `google_analytics_ssaid_collection_enabled` | SSAID collection | AndroidManifest |
+  1265→| `google_analytics_automatic_screen_reporting_enabled` | Screen tracking | AndroidManifest |
+  1266→| `google_analytics_default_allow_analytics_storage` | Analytics consent | AndroidManifest |
+  1267→| `google_analytics_default_allow_ad_storage` | Ad storage consent | AndroidManifest |
+  1268→| `google_analytics_default_allow_ad_user_data` | Ad user data consent | AndroidManifest |
+  1269→| `google_analytics_default_allow_ad_personalization_signals` | Ad personalization | AndroidManifest |
+  1270→| `app_data_collection_default_enabled` | App data collection | AndroidManifest |
+  1271→
+  1272→#### Expo Updates Configuration
+  1273→
+  1274→| Config | Value | Purpose |
+  1275→|--------|-------|---------|
+  1276→| `expo.modules.updates.ENABLED` | `false` | OTA updates disabled |
+  1277→| `expo.modules.updates.ENABLE_BSDIFF_PATCH_SUPPORT` | `true` | Binary diff patches |
+  1278→| `expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH` | `ALWAYS` | Check for updates |
+  1279→| `expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS` | `0` | No wait for updates |
+  1280→
+  1281→### 19.7 AI Features -- Complete Implementation Details
+  1282→
+  1283→#### AI Chat Avatar System
+  1284→
+  1285→| Feature | Evidence | Implementation |
+  1286→|---------|----------|----------------|
+  1287→| Create AI Chat | `"Crea chat IA"` (Italian) | AI chat creation flow |
+  1288→| AI Chat List | `"Chats con IA"` | List of AI chat sessions |
+  1289→| Avatar Editor | `/edit-ai-chat/[avatarId].tsx` | Dynamic avatar configuration |
+  1290→| Photo Upload | `"photosPermission":"Rizz uses only the photos you select for AI chat avatars"` | User photos for AI |
+  1291→| Avatar Name | `"Siapa nama mereka?"` (Indonesian: "What is their name?") | Avatar naming |
+  1292→| Avatar Relationship | `"Iapa yang kita ajak bicara?"` (Indonesian: "Who are we talking to?") | Relationship context |
+  1293→
+  1294→#### AI Conversation Analysis
+  1295→
+  1296→| Feature | Evidence | Implementation |
+  1297→|---------|----------|----------------|
+  1298→| Screenshot Analysis | `"Analyze a conversation screenshot"` | Photo-based analysis |
+  1299→| Reply Suggestions | `"suggest"` + `"suggestion"` in context | AI-generated replies |
+  1300→| Tone Adaptation | `"Adattiamo tono e contesto"` (Italian) | Style matching |
+  1301→| Intent Adaptation | `"Adattamento di tono e intenzione"` | Goal-aware responses |
+  1302→| History Storage | `"history"` + `"analysis"` in DB schema | Persistent analysis |
+  1303→| Analysis Pause | `"ANALYSIS PAUSE"` | Pause/resume analysis |
+  1304→| Analysis Refresh | `IMPORTED_ANALYSIS_REFRESH_THRESHOLD_MS` | Auto-refresh threshold |
+  1305→| Secure Storage | `"every result will stay securely saved here"` | Private storage |
+  1306→
+  1307→#### AI Pickup Lines
+  1308→
+  1309→| Feature | Evidence | Implementation |
+  1310→|---------|----------|----------------|
+  1311→| Daily Limit | `pickup:dailyLimitTitle` | Usage throttling |
+  1312→| Skip | `pickup:skipLinear` | Skip suggestion |
+  1313→| Generation | `/pickup-lines.tsx` route | AI generation screen |
+  1314→
+  1315→#### AI Profile Analysis
+  1316→
+  1317→| Feature | Evidence | Implementation |
+  1318→|---------|----------|----------------|
+  1319→| Profile Scanning | `"IN PROFIL WIRD GESCANNT"` (German) | Analysis in progress |
+  1320→| Analysis Results | `"ANALISIS DIJEDAPATKAN BALASAN"` (Malay) | Results display |
+  1321→| Analysis Failure | `analyzeAnalysisFailureBody` | Error handling |
+  1322→| Profile Suggestions | `"suggestion"` | Improvement tips |
+  1323→| Backend Validation | `showBackendBadRequest` | Server-side validation |
+  1324→
+  1325→#### AI Assistant
+  1326→
+  1327→| Feature | Evidence | Implementation |
+  1328→|---------|----------|----------------|
+  1329→| Assistant Creation | `"Crea il tuo assistente"` (Italian) | Assistant setup |
+  1330→| Assistant Mode | `"ASSISTANT FOR"` | Assistant context |
+  1331→| Tone Context | `"Adattiamo tono e contesto"` | Style calibration |
+  1332→| Message Style | `"Votre style de messages"` (French) | Style analysis |
+  1333→| Response Rate | `"RESPONSE RATE"` | Response metrics |
+  1334→
+  1335→### 19.8 Database Schema (from Hermes bundle strings)
+  1336→
+  1337→#### Local SQLite Schema (expo-sqlite)
+  1338→
+  1339→```sql
+  1340→-- Chat/Analysis type constraint
+  1341→CREATE TABLE IF NOT EXISTS legacy_migration_meta (
+  1342→    key TEXT PRIMARY KEY,
+  1343→    value TEXT
+  1344→);
+  1345→
+  1346→-- Chat/Analysis kind constraint
+  1347→kind TEXT NOT NULL CHECK (kind IN ('chat','analysis'))
+  1348→```
+  1349→
+  1350→#### Data Models (confirmed from strings)
+  1351→
+  1352→| Model | Fields | Evidence |
+  1353→|-------|--------|----------|
+  1354→| Chat | `kind='chat'`, messages, participants | DB constraint |
+  1355→| Analysis | `kind='analysis'`, screenshots, suggestions | DB constraint |
+  1356→| Legacy Migration | `key`, `value` | Migration metadata |
+  1357→| Analysis History | screenshots, suggestions, timestamps | `"history"` in strings |
+  1358→
+  1359→### 19.9 Error Handling Patterns
+  1360→
+  1361→| Error | Trigger | Handling |
+  1362→|-------|---------|----------|
+  1363→| `BackendBadRequest` | Invalid AI request | Show error, retry |
+  1364→| `BackendOfferNotFound` | Missing subscription offer | Fallback to default |
+  1365→| `BackendNoMXRecordsFound` | Email validation failure | Prompt re-entry |
+  1366→| `BackendCannotTransferPurchases` | Cross-platform transfer fail | Support ticket |
+  1367→| `AmazonPurchaseNotAllowedError` | Amazon region restriction | Show alternative |
+  1368→| `INVALID_API_KEY` | Missing/expired API key | Re-authenticate |
+  1369→| `Network request timed out` | Slow network | Retry with backoff |
+  1370→| `App does not have sufficient permissions` | Missing billing permission | Prompt setup |
+  1371→| `Could not find product data for product ids` | Missing RevenueCat products | Refresh offerings |
+  1372→| `StoreKit version mismatch` | SDK configuration error | Update config |
+  1373→
+  1374→### 19.10 Analytics Events (confirmed from strings)
+  1375→
+  1376→| Event | Service | Purpose |
+  1377→|-------|---------|---------|
+  1378→| `logUnlockAchievement` | Firebase Analytics | Achievement tracking |
+  1379→| `logLevelUp` | Firebase Analytics | Level progression |
+  1380→| `amp-default-track` | Amplitude | Default event tracking |
+  1381→| `analyticsContext` | Firebase Analytics | Contextual metadata |
+  1382→| `checkout_payment_form_gateway_error` | RevenueCat | Payment errors |
+  1383→| `CHECKOUT_CLOSE` | RevenueCat | Paywall dismissal |
+  1384→| `FREE_TRIAL` | RevenueCat | Trial activation |
+  1385→| `SUBSCRIPTION_PURCHASE` | RevenueCat | Subscription purchase |
+  1386→| `SUBSCRIPTION_RESTORE` | RevenueCat | Purchase restoration |
+  1387→
+  1388→### 19.11 Internationalization -- Complete Language List
+  1389→
+  1390→| Language | Evidence | Coverage |
+  1391→|----------|----------|----------|
+  1392→| English | Primary language | Full |
+  1393→| Italian | `"Amici e divertimento"`, `"Crea chat IA"`, `"Contattaci"`, `"Elimina Account"`, `"Impostazioni"`, `"Lingua"`, `"Pagamento"`, `"Profilo"`, `"Sicurezza"`, `"Verifica"`, `"Notifiche"`, `"Preferenze"`, `"Interessi"`, `"Domande"`, `"Risposte"`, `"Prompts"`, `"Sfoglia"`, `"Scopri"`, `"Messaggi"`, `"Coinvolgimento"`, `"Abbonamento"`, `"Premium"`, `"Super Like"`, `"Boost"`, `"Annulla"`, `"Rimborsa"`, `"Account"`, `"Cerca"`, `"Filtro"`, `"Distanza"`, `"Eta"`, `"Genere"`, `"Bio"`, `"Foto"`, `"Avatar"` | Full |
+  1394→| Indonesian | `"Hapus akun?"`, `"Hapus chat?"`, `"Hapus analisis ini?"`, `"Hapus chat yang diimpor ini?"` | Partial |
+  1395→| Turkish | `"Hesap silinsin mi?"`, `"Sohbet silinsin mi?"` | Partial |
+  1396→| Portuguese (BR) | `"Excluir conta?"`, `"Excluir chat?"`, `"É SEU CHAT"`, `"AU BAYAR DENGAN KARTU"` | Partial |
+  1397→| French | `"Supprimer cette analyse?"`, `"Supprimer le chat?"`, `"Votre style de messages"`, `"Votre historique commence ici"` | Partial |
+  1398→| German | `"100% anonym"`, `"Dating und Flirten"`, `"IN PROFIL WIRD GESCANNT"`, `"Wieder zusammenkommen"` | Partial |
+  1399→| Spanish | `"Volver al inicio"`, `"Volver juntos"` | Partial |
+  1400→| Dutch | `"Woordt verlengd"`, `"Woordt voortgezet tot annulering"`, `"Voer postcode in om te bereken"` | Partial |
+  1401→| Norwegian | `"En ukjent feil oppstod"` | Minimal |
+  1402→| Malay | `"Hapus chat yang diimpor ini?"` | Minimal |
+  1403→| Thai | Thai script found in strings | Minimal |
+  1404→| Vietnamese | Vietnamese script found in strings | Minimal |
+  1405→| Arabic | Arabic script found in strings | Minimal |
+  1406→| Hebrew | Hebrew script found in strings | Minimal |
+  1407→| Korean | Korean script found in strings | Minimal |
+  1408→| Japanese | Japanese script found in strings | Minimal |
+  1409→| Chinese (Simplified) | Chinese script found in strings | Minimal |
+  1410→
+  1411→### 19.12 Svelte-Based RevenueCat Paywall Components
+  1412→
+  1413→| Component | CSS Class | Purpose |
+  1414→|-----------|-----------|---------|
+  1415→| Background Video | `.rc-bg-video` | Video background for paywall |
+  1416→| Video Clip | `.rc-clip` | Video container with overflow |
+  1417→| Video Mount | `.rc-bg-video-mount` | Video mount point |
+  1418→| Carousel | `.rc-carousel-video-bg` | Video carousel |
+  1419→| Stack | `.rc-stack-video-bg` | Stacked video layout |
+  1420→| Sheet | `.rc-sheet-video-bg` | Sheet with video |
+  1421→| Tabs | `.rc-tabs-video-bg` | Tabs with video |
+  1422→| Navbar | `.rcb-ui-navbar` | Paywall navigation |
+  1423→| Loading | `.rcb-ui-loading-container` | Loading state |
+  1424→| Sandbox Banner | `.rcb-ui-sandbox-banner` | Test store indicator |
+  1425→| Row | `.rcb-row` | Content row |
+  1426→| Asset Icon | `.rcb-ui-asset-icon` | Product icon |
+  1427→
+  1428→### 19.13 Stripe Checkout Integration Details
+  1429→
+  1430→| Feature | Evidence | Implementation |
+  1431→|---------|----------|----------------|
+  1432→| Stripe.js v3 | `https://js.stripe.com/v3` | Card element loader |
+  1433→| Checkout Wrapper | `.stripe-checkout-wrapper` | Embedded checkout |
+  1434→| Mobile Responsive | `@media (min-width: 991px)` breakpoint | Responsive layout |
+  1435→| Form Container | `.rc-checkout-form-container` | Card input form |
+  1436→| Elements Container | `.rc-elements-container` | Stripe Elements |
+  1437→| Discount Code | `.rc-discount-input` | Promo code field |
+  1438→| Payment Entry | `PaymentEntryPageButtonWithPrice` | Pay button |
+  1439→| Gateway Error | `checkout_payment_form_gateway_error` | Error handling |
+  1440→| Currency | `&currency=` parameter | Multi-currency |
+  1441→| Discount Code | `&discount_code=` parameter | Promo support |
+  1442→
+  1443→### 19.14 Paddle Checkout Integration Details
+  1444→
+  1445→| Feature | Evidence | Implementation |
+  1446→|---------|----------|----------------|
+  1447→| Summary Card | `.rcb-paddle-summary-card` | Order summary |
+  1448→| Summary Row | `.rcb-paddle-summary-row` | Line item row |
+  1449→| Summary Strong | `.rcb-paddle-summary-row-strong` | Bold line item |
+  1450→| Summary Muted | `.rcb-paddle-summary-muted` | Secondary text |
+  1451→| Summary Divider | `.rcb-paddle-summary-divider` | Section separator |
+  1452→| Price Name | `.rcb-paddle-summary-price-name` | Plan name |
+  1453→| Product Price | `.rcb-paddle-summary-product-price` | Price display |
+  1454→
+  1455→### 19.15 Workflows & Triggers (RevenueCat Paywalls)
+  1456→
+  1457→| Workflow | Evidence | Purpose |
+  1458→|----------|----------|---------|
+  1459→| `onActionTriggered` | `"[Workflow] onActionTriggered: no current step found"` | Paywall step management |
+  1460→| Step | `"[Workflow] onActionTriggered: step_id"` | Step identification |
+  1461→| Trigger Action | `"[Workflow] onActionTriggered: trigger_action"` | Action triggers |
+  1462→| Screen ID | `"[Workflow] onActionTriggered: screen_id"` | Screen tracking |
+  1463→| Step Action | `"[Workflow] onActionTriggered: trigger_action is not a simple step action"` | Complex actions |
+  1464→
+  1465→### 19.16 Key Code Patterns for Rebuild
+  1466→
+  1467→#### WebSocket Chat Implementation
+  1468→
+  1469→```typescript
+  1470→// WebSocket connection pattern (from OkHttp WebSocket in APK)
+  1471→const ws = new WebSocket('wss://your-backend.com/chat');
+  1472→
+  1473→ws.onopen = () => {
+  1474→  ws.send(JSON.stringify({
+  1475→    type: 'authenticate',
+  1476→    token: firebaseAuthToken
+  1477→  }));
+  1478→};
+  1479→
+  1480→ws.onmessage = (event) => {
+  1481→  const message = JSON.parse(event.data);
+  1482→  switch(message.type) {
+  1483→    case 'new_message':
+  1484→      handleNewMessage(message);
+  1485→      break;
+  1486→    case 'typing':
+  1487→      showTypingIndicator(message.userId);
+  1488→      break;
+  1489→    case 'match':
+  1490→      showMatchOverlay(message.matchData);
+  1491→      break;
+  1492→  }
+  1493→};
+  1494→```
+  1495→
+  1496→#### RevenueCat Paywall Integration
+  1497→
+  1498→```typescript
+  1499→import Purchases from 'react-native-purchases';
+  1500→
+  1501→// Configure RevenueCat
+  1502→await Purchases.configure({
+  1503→  apiKey: 'your_revenuecat_api_key',
+  1504→  appUserID: firebaseUID
+  1505→});
+  1506→
+  1507→// Get offerings
+  1508→const offerings = await Purchases.getOfferings();
+  1509→const currentOffering = offerings.current;
+  1510→
+  1511→// Present paywall
+  1512→if (currentOffering) {
+  1513→  const { customerInfo, productIdentifier } = await Purchases.purchasePackage(
+  1514→    currentOffering.availablePackages[0]
+  1515→  );
+  1516→  
+  1517→  // Check entitlement
+  1518→  if (customerInfo.entitlements.active['premium']) {
+  1519→    unlockPremiumFeatures();
+  1520→  }
+  1521→}
+  1522→```
+  1523→
+  1524→#### AI Chat Avatar Creation
+  1525→
+  1526→```typescript
+  1527→// AI chat creation flow (from Hermes strings)
+  1528→const createAIChat = async (avatarData: {
+  1529→  name: string;           // "Siapa nama mereka?"
+  1530→  relationship: string;   // "Iapa yang kita ajak bicara?"
+  1531→  photos: Photo[];        // "photosPermission" - user selected photos
+  1532→  tone: string;           // "Adattiamo tono e contesto"
+  1533→}) => {
+  1534→  const response = await fetch(`${API_BASE}/ai-chat/create`, {
+  1535→    method: 'POST',
+  1536→    headers: {
+  1537→      'Authorization': `Bearer ${firebaseAuthToken}`,
+  1538→      'Content-Type': 'application/json'
+  1539→    },
+  1540→    body: JSON.stringify(avatarData)
+  1541→  });
+  1542→  
+  1543→  return response.json();
+  1544→};
+  1545→```
+  1546→
+  1547→#### Profile Analysis
+  1548→
+  1549→```typescript
+  1550→// Profile analysis (from Hermes strings)
+  1551→const analyzeProfile = async (screenshots: Photo[]) => {
+  1552→  const response = await fetch(`${API_BASE}/ai/analyze`, {
+  1553→    method: 'POST',
+  1554→    headers: {
+  1555→      'Authorization': `Bearer ${firebaseAuthToken}`,
+  1556→      'Content-Type': 'application/json'
+  1557→    },
+  1558→    body: JSON.stringify({
+  1559→      screenshots,
+  1560→      context: 'profile_analysis'
+  1561→    })
+  1562→  });
+  1563→  
+  1564→  return response.json();
+  1565→  // Returns: { suggestions: string[], tone: string, intent: string }
+  1566→};
+  1567→```
+  1568→
+  1569→#### Swipe Gesture Handler
+  1570→
+  1571→```typescript
+  1572→// Swipe with spring physics (from react-native-reanimated)
+  1573→import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+  1574→import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+  1575→
+  1576→const swipeGesture = Gesture.Pan()
+  1577→  .onUpdate((e) => {
+  1578→    translateX.value = e.translationX;
+  1579→    translateY.value = e.translationY;
+  1580→    rotate.value = e.translationX * 0.1;
+  1581→  })
+  1582→  .onEnd((e) => {
+  1583→    if (Math.abs(e.translationX) > SWIPE_THRESHOLD) {
+  1584→      // Swipe completed
+  1585→      if (e.translationX > 0) {
+  1586→        handleLike(currentProfile);
+  1587→      } else {
+  1588→        handlePass(currentProfile);
+  1589→      }
+  1590→    }
+  1591→    // Spring back to center
+  1592→    translateX.value = withSpring(0);
+  1593→    translateY.value = withSpring(0);
+  1594→    rotate.value = withSpring(0);
+  1595→  });
+  1596→```
+  1597→
+  1598→---
+  1599→
+  1600→## 20. UX/UI COMPONENTS, PAGE FLOWS & INTERACTION PATTERNS
+  1601→
+  1602→> Generated: 2026-08-14 | Source: JADX decompiled Java + Hermes bundle strings + Android resource XML
+  1603→> Extracted from: com.clovers.rizz.apk-reverseapk/jadx/sources/ (215 Expo UI Java files, 5,647-line R.java)
+  1604→
+  1605→### 20.1 Complete Screen Inventory
+  1606→
+  1607→#### Confirmed Screens (expo-router file-based routes)
+  1608→
+  1609→| Route | Screen Name | Purpose | Navigation |
+  1610→|-------|------------|---------|------------|
+  1611→| `/index.tsx` | Splash/Entry | App launch redirect | Root |
+  1612→| `/_layout.tsx` | Root Layout | Providers, navigation shell | Root |
+  1613→| `/home.tsx` | Home/Discover | Main discovery feed | Tab |
+  1614→| `/profile.tsx` | Profile | View/edit profile | Tab |
+  1615→| `/account-login.tsx` | Login | Account creation/login | Stack |
+  1616→| `/onboarding/index.tsx` | Onboarding | Multi-step setup wizard | Stack |
+  1617→| `/google-auth.tsx` | Google Auth | Google OAuth flow | Stack |
+  1618→| `/paywall.tsx` | Paywall | Subscription purchase | Modal |
+  1619→| `/pickup-lines.tsx` | AI Pickup Lines | AI-generated openers | Stack |
+  1620→| `/analyzing.tsx` | Analyzing | Profile analysis loading | Modal |
+  1621→| `/ad-measurement.tsx` | Ad Attribution | Post-install attribution | Stack |
+  1622→| `/language.tsx` | Language | Language selection | Stack |
+  1623→| `/edit-ai-chat/[avatarId].tsx` | AI Avatar Editor | Dynamic AI chat avatar config | Stack |
+  1624→
+  1625→#### Inferred Screens (from Hermes bundle strings)
+  1626→
+  1627→| Screen | Purpose | Evidence |
+  1628→|--------|---------|----------|
+  1629→| Chat List | Match conversations list | `"Messaggi"`, `"Chats con IA"` |
+  1630→| Chat Detail | Individual conversation | `"websocketMessage"`, `"MESSAGE_LIST"` |
+  1631→| AI Chat List | AI avatar conversations | `"Chats con IA"`, `"Crea chat IA"` |
+  1632→| Match Overlay | Match celebration screen | `"match"`, `"like"` |
+  1633→| Settings | App settings | `"Impostazioni"`, `"Preferenze"` |
+  1634→| Account Settings | Account management | `"Account"`, `"profile:account"` |
+  1635→| Notification Settings | Push notification prefs | `"Notifiche"` |
+  1636→| Privacy Settings | Privacy controls | `"Sicurezza"`, `"Verifica"` |
+  1637→| Help/FAQ | Support | `"Contattaci"` |
+  1638→| Terms of Service | Legal | Standard dating app pattern |
+  1639→| Privacy Policy | Legal | Standard dating app pattern |
+  1640→| Filter/Discovery Settings | Discovery preferences | `"Filtro"`, `"Distanza"`, `"Eta"`, `"Genere"` |
+  1641→| Interest Selection | Interest picker | `"Interessi"` |
+  1642→| Prompt/Question Setup | Profile prompts | `"Domande"`, `"Risposte"`, `"Prompts"` |
+  1643→| Photo Verification | Verification upload | `"Verifica"` |
+  1644→| Photo Editor/Crop | Image cropping | `CropImageActivity`, `ExpoCropImageActivity` |
+  1645→| Subscription Management | Billing management | `"Pagamento"`, `"Abbonamento"` |
+  1646→| Profile Analysis Results | AI analysis display | `"ANALISIS DIJEDAPATKAN BALASAN"` |
+  1647→
+  1648→### 20.2 Expo UI Component Library (Material Design 3)
+  1649→
+  1650→> 215 Java files in `expo/modules/ui/` -- full Material 3 component bridge
+  1651→
+  1652→#### Core Layout Components
+  1653→
+  1654→| Component | Java Class | Props | Purpose |
+  1655→|-----------|-----------|-------|---------|
+  1656→| **Card** | `CardProps` | colors, elevation, border, modifiers | Profile cards, content cards |
+  1657→| **ElevatedCard** | `ElevatedCardProps` | (extends Card) | Raised card variant |
+  1658→| **Surface** | `SurfaceBorder` | containerColor, contentColor, border | Background surfaces |
+  1659→| **LazyColumn** | `LazyColumnProps` | (virtualized list) | Chat lists, profile feeds |
+  1660→| **LazyRow** | `LazyRowView` | (horizontal list) | Photo carousels |
+  1661→| **HorizontalPager** | `HorizontalPagerSettledPageChangeEvent` | settledPage, dragInteraction | Swipeable photo pages |
+  1662→| **NavigationBar** | `NavigationBarItemProps` + `NavigationBarItemColors` | selected/unselected/disabled icon+text colors, indicatorColor | Bottom tab bar |
+  1663→| **Divider** | `DividerProps` | (line separator) | List separators |
+  1664→| **Spacer** | (spacer) | (spacing) | Layout spacing |
+  1665→
+  1666→#### Form Components
+  1667→
+  1668→| Component | Java Class | Props | Purpose |
+  1669→|-----------|-----------|-------|---------|
+  1670→| **Button** | `ButtonProps` + `ButtonColors` | colors, contentPadding, pressedEvent | CTAs |
+  1671→| **FloatingActionButton** | `FloatingActionButtonProps` + `FloatingActionButtonVariant` | variant (STANDARD/VIBRANT) | FAB actions |
+  1672→| **ToggleButton** | `ToggleButtonProps` | (toggle state) | On/off toggles |
+  1673→| **Checkbox** | `CheckboxProps` | (checked state) | Multi-select |
+  1674→| **TriStateCheckbox** | `TriStateCheckboxProps` | (three states) | Indeterminate state |
+  1675→| **Switch** | `SyncSwitchProps` | (sync state) | Settings toggles |
+  1676→| **SegmentedButton** | `SegmentedButtonProps` + `SegmentedButtonColors` + `MultiChoiceSegmentedButtonRowProps` | colors | Tier/period selector |
+  1677→| **Slider** | `SliderColors` + `SliderValueChangedEvent` | colors | Age range, distance filter |
+  1678→| **SearchBar** | `SearchBarProps` | (search state) | User search |
+  1679→| **DockedSearchBar** | `DockedSearchBarProps` | (docked variant) | Persistent search |
+  1680→
+  1681→#### Chip Components (Interest/Filter Selection)
+  1682→
+  1683→| Component | Java Class | Color Props | Purpose |
+  1684→|-----------|-----------|------------|---------|
+  1685→| **FilterChip** | `FilterChipProps` + `FilterChipColors` | containerColor, labelColor, iconColor, selectedContainerColor, selectedLabelColor, selectedLeadingIconColor, selectedTrailingIconColor | Interest selection |
+  1686→| **InputChip** | `InputChipColors` | (similar to FilterChip) | Removable selections |
+  1687→| **AssistChip** | `AssistChipColors` | containerColor, labelColor, iconColor | Action suggestions |
+  1688→| **SuggestionChip** | (chip variant) | (similar) | AI suggestions |
+  1689→
+  1690→#### Overlay Components
+  1691→
+  1692→| Component | Java Class | Props | Purpose |
+  1693→|-----------|-----------|-------|---------|
+  1694→| **ModalBottomSheet** | `ModalBottomSheetViewProps` | skipPartiallyExpanded, initialFullyExpanded, containerColor, contentColor, scrimColor, showDragHandle, sheetGesturesEnabled, properties | Profile detail sheets, options menus |
+  1695→| **AlertDialog** | `ExpoDialogProperties` | (dialog config) | Confirmations, alerts |
+  1696→| **SnackbarView** | `SnackbarViewProps` + `SnackbarShowOptions` | (toast messages) | Feedback messages |
+  1697→| **Tooltip** | `TooltipBoxViewProps` + `PlainTooltipView` | (tooltip config) | Contextual help |
+  1698→| **Menu** | `DropdownMenuProps` + `DropdownMenuItemProps` + `DropdownMenuItemColors` + `ExposedDropdownMenuProps` + `ExposedDropdownMenuBoxProps` | activationMethod, colors | Context menus, dropdowns |
+  1699→
+  1700→#### Picker Components
+  1701→
+  1702→| Component | Java Class | Props | Purpose |
+  1703→|-----------|-----------|-------|---------|
+  1704→| **DatePicker** | `DatePickerDialogProps` + `SelectableDatesRecord` | (date constraints) | Birthday selection |
+  1705→| **TimePicker** | (time picker) | (time config) | Time selection |
+  1706→
+  1707→#### Progress/Loading Components
+  1708→
+  1709→| Component | Java Class | Props | Purpose |
+  1710→|-----------|-----------|-------|---------|
+  1711→| **LinearProgressIndicator** | `LinearProgressIndicatorProps` | (indeterminate, progress) | Upload progress, loading |
+  1712→| **CircularProgressIndicator** | (circular variant) | (indeterminate) | Loading spinners |
+  1713→| **LinearWavyProgressIndicator** | `LinearWavyProgressIndicatorProps` | (wavy variant) | Fun loading state |
+  1714→| **ContainedLoadingIndicator** | `ContainedLoadingIndicatorProps` | (contained) | Inline loading |
+  1715→| **PullToRefreshBox** | `PullToRefreshBoxProps` | (refresh state) | Pull-to-refresh feeds |
+  1716→
+  1717→#### Animation Components
+  1718→
+  1719→| Component | Java Class | Props | Purpose |
+  1720→|-----------|-----------|-------|---------|
+  1721→| **AnimatedVisibility** | `AnimatedVisibilityProps` | visible, enterTransition, exitTransition, modifiers | Show/hide animations |
+  1722→| **HorizontalFloatingToolbar** | `HorizontalFloatingToolbarVariant` + `HorizontalFloatingToolbarColors` | variant (STANDARD/VIBRANT), colors | Floating action bar |
+  1723→
+  1724→#### Image/Icon Components
+  1725→
+  1726→| Component | Java Class | Purpose |
+  1727→|-----------|-----------|---------|
+  1728→| **Icon** | `IconProps` + `Source` | Material icons |
+  1729→| **MaskView** | `ClipParams` | Image masking |
+  1730→| **Blur** (expo-blur) | `ExpoBlurView`, `ExpoBlurTargetView` | Blur effects |
+  1731→
+  1732→### 20.3 Color System (Material Design 3)
+  1733→
+  1734→#### Rizz Brand Colors (from colors.xml)
+  1735→
+  1736→| Color Token | Hex | Usage |
+  1737→|-------------|-----|-------|
+  1738→| `colorPrimary` | `#023C69` | Primary brand (dark blue) |
+  1739→| `activityBackground` | `#DAE9F7` | App background (light blue) |
+  1740→| `splashscreen_background` | `#DAE9F7` | Splash screen |
+  1741→| `iconBackground` | `#E6F4FE` | Adaptive icon background |
+  1742→| `biometric_error_color` | `#FF5722` | Error states |
+  1743→
+  1744→#### Material 3 Dynamic Color Palette (from m3_ref_palette)
+  1745→
+  1746→**Primary (Blue-Purple)**
+  1747→| Token | Hex | Role |
+  1748→|-------|-----|------|
+  1749→| `primary10` | `#21005D` | Dark text on primary |
+  1750→| `primary20` | `#381E72` | Dark on primary container |
+  1751→| `primary30` | `#4F378B` | Dark primary container |
+  1752→| `primary40` | `#6750A4` | Light primary |
+  1753→| `primary80` | `#D0BCFF` | Dark primary |
+  1754→| `primary90` | `#EADDFF` | Light primary container |
+  1755→
+  1756→**Secondary (Muted Purple)**
+  1757→| Token | Hex | Role |
+  1758→|-------|-----|------|
+  1759→| `secondary40` | `#625B71` | Light secondary |
+  1760→| `secondary80` | `#CCC2DC` | Dark secondary |
+  1761→| `secondary90` | `#E8DEF8` | Light secondary container |
+  1762→
+  1763→**Tertiary (Rose)**
+  1764→| Token | Hex | Role |
+  1765→|-------|-----|------|
+  1766→| `tertiary40` | `#7D5260` | Light tertiary |
+  1767→| `tertiary80` | `#EFB8C8` | Dark tertiary |
+  1768→| `tertiary90` | `#FFD8E4` | Light tertiary container |
+  1769→
+  1770→**Error**
+  1771→| Token | Hex | Role |
+  1772→|-------|-----|------|
+  1773→| `error40` | `#B3261E` | Light error |
+  1774→| `error80` | `#F2B8B5` | Dark error |
+  1775→| `error90` | `#F9DEDC` | Light error container |
+  1776→
+  1777→**Neutral (Surface/Background)**
+  1778→| Token | Hex | Role |
+  1779→|-------|-----|------|
+  1780→| `neutral10` | `#1D1B20` | Dark on-surface |
+  1781→| `neutral90` | `#E6E0E9` | Dark surface |
+  1782→| `neutral98` | `#FEF7FF` | Light surface |
+  1783→| `neutral100` | `#FFFFFF` | Light surface-lowest |
+  1784→
+  1785→**Neutral Variant (Outline)**
+  1786→| Token | Hex | Role |
+  1787→|-------|-----|------|
+  1788→| `neutral_variant30` | `#49454F` | Dark outline |
+  1789→| `neutral_variant50` | `#79747E` | Light outline |
+  1790→| `neutral_variant90` | `#E7E0EC` | Light surface variant |
+  1791→
+  1792→#### Dark Mode Colors (from values-night/colors.xml)
+  1793→
+  1794→| Token | Value |
+  1795→|-------|-------|
+  1796→| `expoCropBackgroundColor` | `#000000` |
+  1797→| `expoCropBackButtonIconColor` | `#FFFFFF` |
+  1798→| `expoCropToolbarActionTextColor` | `#FFFFFF` |
+  1799→| `expoCropToolbarIconColor` | `#FFFFFF` |
+  1800→
+  1801→#### Expo Color Scheme Support
+  1802→
+  1803→From `ExpoColorScheme.java`:
+  1804→- **LIGHT** (`"light"`) -- Light theme
+  1805→- **DARK** (`"dark"`) -- Dark theme
+  1806→- System automatic detection via `toColorScheme(context)`
+  1807→- Theme configured in `app.config`: `"userInterfaceStyle":"automatic"`
+  1808→
+  1809→### 20.4 Typography System
+  1810→
+  1811→From `R.java` string resources and Material 3 defaults:
+  1812→
+  1813→| Style | Size | Weight | Usage |
+  1814→|-------|------|--------|-------|
+  1815→| Display Large | 57sp | 400 | Hero text |
+  1816→| Display Medium | 45sp | 400 | Section headers |
+  1817→| Display Small | 36sp | 400 | Card titles |
+  1818→| Headline Large | 32sp | 400 | Screen titles |
+  1819→| Headline Medium | 28sp | 400 | Sub-headers |
+  1820→| Headline Small | 24sp | 400 | Card headers |
+  1821→| Title Large | 22sp | 400 | App bar titles |
+  1822→| Title Medium | 16sp | 500 | List item titles |
+  1823→| Title Small | 14sp | 500 | Tab labels |
+  1824→| Body Large | 16sp | 400 | Primary text |
+  1825→| Body Medium | 14sp | 400 | Secondary text |
+  1826→| Body Small | 12sp | 400 | Captions |
+  1827→| Label Large | 14sp | 500 | Button text |
+  1828→| Label Medium | 12sp | 500 | Chip text |
+  1829→| Label Small | 11sp | 500 | Badges |
+  1830→
+  1831→### 20.5 Dimension System (from dimens.xml)
+  1832→
+  1833→| Token | Value | Usage |
+  1834→|-------|-------|-------|
+  1835→| Action bar height | 56dp | App bars, toolbars |
+  1836→| Action bar inset | 16dp | Content padding |
+  1837→| Action bar elevation | 4dp | App bar shadow |
+  1838→| Dialog padding | 24dp | Dialog content |
+  1839→| Dialog corner radius | 2dp | Dialog rounding |
+  1840→| Button padding (horizontal) | 8dp | Button internals |
+  1841→| Button padding (vertical) | 4dp | Button internals |
+  1842→| Alert dialog button height | 48dp | Button touch target |
+  1843→| Bottom sheet drag handle | Standard | Drag affordance |
+  1844→
+  1845→### 20.6 Page Flows
+  1846→
+  1847→#### Flow 1: Onboarding (New User)
+  1848→
+  1849→```
+  1850→App Launch
+  1851→  -> Splash Screen (#DAE9F7 background, #208AEF accent)
+  1852→  -> Pairip DRM License Check (LicenseActivity)
+  1853→  -> /account-login.tsx
+  1854→    -> Google Sign-In (SignInHubActivity)
+  1855→    -> Apple Sign-In (expo-apple-authentication)
+  1856→  -> /onboarding/index.tsx (Multi-step wizard)
+  1857→    -> Step 1: Gender Selection
+  1858→    -> Step 2: Age Input (DatePicker)
+  1859→    -> Step 3: Location Permission (ACCESS_COARSE_LOCATION)
+  1860→    -> Step 4: Photo Upload (expo-image-picker, camera disabled)
+  1861→      -> CropImageActivity (canhub cropper)
+  1862→    -> Step 5: Bio Writing (TextInput)
+  1863→    -> Step 6: Interest Selection (FilterChip grid)
+  1864→    -> Step 7: Prompt/Question Setup (Q&A cards)
+  1865→    -> Step 8: Photo Verification (optional)
+  1866→    -> Step 9: Completion Screen
+  1867→  -> /home.tsx (Main discovery feed)
+  1868→```
+  1869→
+  1870→#### Flow 2: Discovery & Swiping
+  1871→
+  1872→```
+  1873→/home.tsx (Tab: Discover)
+  1874→  -> Card Stack (react-native-reanimated spring physics)
+  1875→    -> Profile Card Display
+  1876→      -> Photo carousel (HorizontalPager, imagesByTier)
+  1877→      -> Name, Age, Distance
+  1878→      -> Bio text
+  1879→      -> Interest chips (FilterChip)
+  1880→      -> Prompt/Answer cards
+  1881→      -> Verification badge
+  1882→    -> Pan Gesture Detection
+  1883→      -> Swipe Right: Like (spring animation off-screen right)
+  1884→      -> Swipe Left: Pass (spring animation off-screen left)
+  1885→      -> Swipe Up: Super Like (premium, spring animation up)
+  1886→      -> Release below threshold: Spring back to center
+  1887→    -> Action Buttons (below card stack)
+  1888→      -> Pass (X) button
+  1889→      -> Super Like (star) button (premium-gated)
+  1890→      -> Like (heart) button
+  1891→      -> Boost (lightning) button (premium-gated)
+  1892→    -> Next Card: getNextMatch() -> card slides up from stack
+  1893→  -> Filter Settings (ModalBottomSheet)
+  1894→    -> Distance slider
+  1895→    -> Age range slider
+  1896→    -> Gender preferences
+  1897→```
+  1898→
+  1899→#### Flow 3: Matching & Chat
+  1900→
+  1901→```
+  1902→Swipe Right (Like) on profile
+  1903→  -> Server-side match check
+  1904→  -> If Match:
+  1905→    -> Full-screen Match Overlay (spring animation entry)
+  1906→      -> Matched user photo
+  1907→      -> "It's a Match!" text
+  1908→      -> "Send Message" CTA button
+  1909→      -> Haptic feedback (expo-haptics)
+  1910→    -> /chat/[matchId].tsx (Chat detail screen)
+  1911→      -> Message List (LazyColumn, virtualized)
+  1912→        -> Message bubbles (text, image, AI-generated)
+  1913→        -> Timestamps (message_time)
+  1914→        -> Read receipts
+  1915→        -> Typing indicators (WebSocket)
+  1916→      -> Message Input (TextInput + send button)
+  1917→        -> Text input
+  1918→        -> Image attachment (expo-image-picker)
+  1919→        -> AI suggestion button
+  1920→      -> Chat Options (DropdownMenu)
+  1921→        -> Unmatch
+  1922→        -> Report
+  1923→        -> Block
+  1924→  -> If No Match:
+  1925→    -> Like stored server-side
+  1926→    -> Card stack advances
+  1927→```
+  1928→
+  1929→#### Flow 4: AI Features
+  1930→
+  1931→```
+  1932→AI Chat Avatar Creation:
+  1933→  /edit-ai-chat/[avatarId].tsx
+  1934→    -> Upload photos (user-selected, "photosPermission")
+  1935→    -> Name the avatar ("Siapa nama mereka?")
+  1936→    -> Define relationship ("Iapa yang kita ajak bicara?")
+  1937→    -> Set tone context ("Adattiamo tono e contesto")
+  1938→    -> Create -> AI Chat List ("Chats con IA")
+  1939→
+  1940→AI Conversation Analysis:
+  1941→  /analyzing.tsx (loading screen)
+  1942→    -> Upload conversation screenshot
+  1943→    -> Backend AI analysis
+  1944→    -> Results display ("ANALISIS DIJEDAPATKAN BALASAN")
+  1945→    -> Reply suggestions
+  1946→    -> Tone/intent adaptation
+  1947→    -> History storage (SQLite: kind='analysis')
+  1948→
+  1949→AI Pickup Lines:
+  1950→  /pickup-lines.tsx
+  1951→    -> Daily limit check (pickup:dailyLimitTitle)
+  1952→    -> Generate pickup line
+  1953→    -> Skip option (pickup:skipLinear)
+  1954→    -> Copy/use line
+  1955→```
+  1956→
+  1957→#### Flow 5: Profile Management
+  1958→
+  1959→```
+  1960→/profile.tsx (Tab: Profile)
+  1961→  -> Profile Photo Grid
+  1962→    -> Drag-to-reorder
+  1963→    -> Add photo (expo-image-picker)
+  1964→    -> Remove photo
+  1965→    -> Crop/edit (CropImageActivity)
+  1966→    -> Tier-based limits (imagesByTier)
+  1967→  -> Bio Editor (TextInput)
+  1968→  -> Interest Chips (FilterChip, editable)
+  1969→  -> Prompt/Answer Cards (editable)
+  1970→  -> Age/Gender/Location Settings
+  1971→  -> Photo Verification Status
+  1972→  -> Profile Analysis (AI)
+  1973→    -> /analyzing.tsx
+  1974→    -> Suggestions display
+  1975→  -> Edit Profile -> /profile.tsx (edit mode)
+  1976→
+  1977→Account Settings:
+  1978→  -> /account-login.tsx (account management)
+  1979→  -> Notification preferences
+  1980→  -> Privacy settings
+  1981→  -> Language selection (/language.tsx)
+  1982→  -> Theme (automatic/dark/light)
+  1983→  -> Help/FAQ
+  1984→  -> Terms of service
+  1985→  -> Privacy policy
+  1986→  -> Delete account (profile:deleteAccountConfirm)
+  1987→  -> Deactivate account
+  1988→```
+  1989→
+  1990→#### Flow 6: Subscription/Paywall
+  1991→
+  1992→```
+  1993→Paywall Trigger:
+  1994→  -> Free limit reached
+  1995→  -> Premium feature tapped (Super Like, Boost, unlimited swipes)
+  1996→  -> /paywall.tsx (modal presentation)
+  1997→    -> Svelte-based RevenueCat Paywall UI
+  1998→      -> Background video (.rc-bg-video, .rc-clip)
+  1999→      -> Tier comparison table (.rcb-pricing-table)
+  2000→      -> Pricing dropdown (.rcb-pricing-dropdown)
+
+[showing lines 1-2000 of 3096; use offset=2001 with limit to continue reading]

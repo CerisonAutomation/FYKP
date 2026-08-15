@@ -86,6 +86,20 @@ model User {
   // AI / chat quality
   detectedIntent String?
   chatQualityScore Float?
+  // Travel Mode (from ROMEO)
+  isTraveling    Boolean   @default(false)
+  travelCity     String?
+  travelCountry  String?
+  travelLat      Float?
+  travelLng      Float?
+  travelStart    DateTime?
+  travelEnd      DateTime?
+  // DND Schedule (from Grindr/OMOLINK)
+  dndEnabled     Boolean   @default(false)
+  dndStart       String?
+  dndEnd         String?
+  // Profile Hashtags (from Grindr)
+  hashtags       String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -121,6 +135,15 @@ model User {
   verifications    Verification[]
   sessions         UserSession[]
   profileFields    ProfileField[]
+  // New feature relations
+  circles          Circle[]
+  circleMemberships CircleMember[]  @relation("CircleMembership")
+  checkins         Checkin[]
+  wallet           Wallet?
+  savedPhrases     SavedPhrase[]
+  conversationParticipants ConversationParticipant[]
+  likedPhotos      LikedPhoto[]
+  contactFolders   ContactFolder[]
 }
 
 model Message {
@@ -517,4 +540,139 @@ model UserSession {
   lastSeen  DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CIRCLES (from Grindr) — Custom profile groups/categories
+// ═══════════════════════════════════════════════════════════════
+model Circle {
+  id        String   @id @default(cuid())
+  name      String
+  color     String   @default("#6366f1")
+  icon      String   @default("circle")
+  userId    String
+  createdAt DateTime @default(now())
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  members CircleMember[]
+}
+
+model CircleMember {
+  id           String   @id @default(cuid())
+  circleId     String
+  targetUserId String
+  userId       String
+  createdAt    DateTime @default(now())
+
+  circle  Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user    User   @relation("CircleMembership", fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([circleId, targetUserId])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHECK-IN (from OMOLINK) — Location check-in with venue
+// ═══════════════════════════════════════════════════════════════
+model Checkin {
+  id        String   @id @default(cuid())
+  userId    String
+  venueName String
+  lat       Float
+  lng       Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WALLET & TRANSACTIONS (from OMOLINK) — Virtual currency
+// ═══════════════════════════════════════════════════════════════
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  walletId    String
+  type        String
+  amount      Float
+  description String
+  referenceId String?
+  createdAt   DateTime @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SAVED PHRASES (from Grindr) — Quick reply templates
+// ═══════════════════════════════════════════════════════════════
+model SavedPhrase {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONVERSATION PARTICIPANT (from Grindr) — Mute, archive, pin
+// ═══════════════════════════════════════════════════════════════
+model ConversationParticipant {
+  id         String    @id @default(cuid())
+  userId     String
+  otherUserId String
+  isMuted    Boolean   @default(false)
+  mutedUntil DateTime?
+  isArchived Boolean   @default(false)
+  isPinned   Boolean   @default(false)
+  lastReadAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, otherUserId])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LIKED PHOTOS (from ROMEO) — Track individual photo likes
+// ═══════════════════════════════════════════════════════════════
+model LikedPhoto {
+  id        String   @id @default(cuid())
+  userId    String
+  photoId   String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, photoId])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONTACT FOLDERS (from ROMEO) — Organize contacts
+// ═══════════════════════════════════════════════════════════════
+model ContactFolder {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  createdAt DateTime @default(now())
+
+  user    User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  members ContactFolderMember[]
+}
+
+model ContactFolderMember {
+  id           String   @id @default(cuid())
+  folderId     String
+  targetUserId String
+  createdAt    DateTime @default(now())
+
+  folder ContactFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  @@unique([folderId, targetUserId])
 }

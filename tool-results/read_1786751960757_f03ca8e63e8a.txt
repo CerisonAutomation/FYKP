@@ -1,0 +1,2002 @@
+  1038→  const getPageTitle = () => {
+  1039→    const titles: Record<string, string> = {
+  1040→      events: 'Events & Agenda', viewed: 'Viewed Me', shouts: 'Shouts',
+  1041→      fansites: 'Fansites', videos: 'Videos', blogs: 'Blogs', groups: 'Groups',
+  1042→      albums: 'Albums', membership: 'Membership', verified: 'Verified',
+  1043→      professional: 'Professional', footprints: 'Footprints', notes: 'Notes',
+  1044→      boosts: 'Boosts', favorites: 'Favorites', account: 'Account',
+  1045→      preferences: 'Preferences', 'geo-settings': 'GEO Settings',
+  1046→      banners: 'Banners', sites: 'Sites', legal: 'Legal', faqs: 'FAQs',
+  1047→      abuse: 'Report & Block', advantages: 'Advantages', affiliation: 'Affiliation',
+  1048→      profile: 'My Profile', infer: 'INFER AI Analysis', more: 'More',
+  1049→    };
+  1050→    return titles[activeTab] || 'NEXUS';
+  1051→  };
+  1052→
+  1053→  // ═══════════════════════════════════════════════════════════════
+  1054→  // RENDER
+  1055→  // ═══════════════════════════════════════════════════════════════
+  1056→  return (
+  1057→    <TooltipProvider>
+  1058→    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+  1059→
+  1060→      {/* ═══ HEADER ═══ */}
+  1061→      <header className="h-14 flex items-center justify-between px-4 bg-card/80 backdrop-blur-lg border-b border-border shrink-0 z-50">
+  1062→        <div className="flex items-center gap-3">
+  1063→          {isMainTab(activeTab) ? (
+  1064→            <span className="text-lg font-bold gradient-text tracking-wider">NEXUS</span>
+  1065→          ) : (
+  1066→            <button onClick={() => setActiveTab('more')} className="p-1 hover:bg-secondary rounded-lg transition-colors">
+  1067→              <ArrowLeft className="w-4 h-4" />
+  1068→            </button>
+  1069→          )}
+  1070→          {activeTab === 'chat' && activeConversation && (
+  1071→            <button onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }} className="md:hidden p-1 hover:bg-secondary rounded-lg transition-colors">
+  1072→              <ChevronLeft className="w-5 h-5" />
+  1073→            </button>
+  1074→          )}
+  1075→          {!isMainTab(activeTab) && <span className="text-sm font-medium">{getPageTitle()}</span>}
+  1076→        </div>
+  1077→        <div className="flex items-center gap-1">
+  1078→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground"><Search className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Search</TooltipContent></Tooltip>
+  1079→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}><Settings className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Settings</TooltipContent></Tooltip>
+  1080→          <button onClick={() => currentUser && openProfile(currentUser.id)} className="ml-1">
+  1081→            <Avatar className="h-8 w-8 border-2 border-primary/50">
+  1082→              <AvatarImage src={getAvatar(currentUser)} alt={currentUser?.displayName || ''} />
+  1083→              <AvatarFallback className="text-xs">{currentUser?.displayName?.[0] || 'U'}</AvatarFallback>
+  1084→            </Avatar>
+  1085→          </button>
+  1086→        </div>
+  1087→      </header>
+  1088→
+  1089→      {/* ═══ MAIN CONTENT ═══ */}
+  1090→      <main className="flex-1 overflow-hidden relative">
+  1091→        {/* Offline Banner */}
+  1092→        {!isOnline && <div className="absolute top-0 inset-x-0 z-50 bg-destructive/90 text-destructive-foreground text-center text-[11px] py-1.5 font-medium"><WifiOff className="w-3 h-3 inline mr-1" />You are offline. Some features may not work.</div>}
+  1093→        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : activeTab === 'kinks' ? <KinksView /> : activeTab === 'circles' ? <CirclesView /> : activeTab === 'travel' ? <TravelView /> : activeTab === 'checkins' ? <CheckinsView /> : activeTab === 'wallet' ? <WalletView /> : activeTab === 'saved-phrases' ? <SavedPhrasesView /> : activeTab === 'liked-photos' ? <LikedPhotosView /> : <MoreView />}
+  1094→      </main>
+  1095→
+  1096→      {/* ═══ BOTTOM NAV ═══ */}
+  1097→      <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-0.5">
+  1098→        {MAIN_TABS.map(({ tab, icon: Icon, label, badge }) => (
+  1099→          <button key={tab} onClick={() => { setActiveTab(tab); setShowSettings(false); if (tab === 'chat') { setChatMobileView('list'); setActiveConversation(null); setActiveGroup(null); } }}
+  1100→            className={`h-12 flex flex-col items-center justify-center gap-0.5 relative transition-colors px-1 ${activeTab === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+  1101→            <Icon className="w-4 h-4" />
+  1102→            <span className="text-[9px] leading-none">{label}</span>
+  1103→            {activeTab === tab && <span className="absolute bottom-0 w-4 h-0.5 bg-primary rounded-full" />}
+  1104→            {badge > 0 && <span className="absolute -top-0.5 right-1/2 translate-x-4 min-w-[14px] h-3.5 flex items-center justify-center text-[8px] font-bold bg-primary text-primary-foreground rounded-full px-0.5">{badge > 99 ? '99+' : badge}</span>}
+  1105→          </button>
+  1106→        ))}
+  1107→      </nav>
+  1108→
+  1109→      {/* ═══ PROFILE DRAWER ═══ */}
+  1110→      <Sheet open={showProfileDrawer} onOpenChange={(open) => { if (!open) closeProfile(); }}>
+  1111→        <SheetContent side="right" className="w-full sm:max-w-md bg-card border-border p-0 overflow-y-auto">
+  1112→          {profileLoading ? <div className="p-6 space-y-4"><Skeleton className="h-64 w-full rounded-xl" /><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-32" /></div>
+  1113→            : profileUser ? <ProfileDrawerContent /> : null}
+  1114→        </SheetContent>
+  1115→      </Sheet>
+  1116→
+  1117→      {/* ═══ FANSITE DETAIL SHEET ═══ */}
+  1118→      <Sheet open={showFansiteSheet} onOpenChange={setShowFansiteSheet}>
+  1119→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+  1120→          {selectedFansite && <FansiteDetail />}
+  1121→        </SheetContent>
+  1122→      </Sheet>
+  1123→
+  1124→      {/* ═══ ALBUM DETAIL SHEET ═══ */}
+  1125→      <Sheet open={!!selectedAlbum} onOpenChange={(open) => { if (!open) setSelectedAlbum(null); }}>
+  1126→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+  1127→          {selectedAlbum && <AlbumDetail />}
+  1128→        </SheetContent>
+  1129→      </Sheet>
+  1130→
+  1131→      {/* ═══ BLOG DETAIL SHEET ═══ */}
+  1132→      <Sheet open={!!selectedBlog} onOpenChange={(open) => { if (!open) setSelectedBlog(null); }}>
+  1133→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+  1134→          {selectedBlog && <BlogDetail />}
+  1135→        </SheetContent>
+  1136→      </Sheet>
+  1137→
+  1138→      {/* ═══ RIZZ MODAL ═══ */}
+  1139→      <Dialog open={showRizzModal} onOpenChange={setShowRizzModal}>
+  1140→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1141→          <DialogHeader><DialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI Rizz Generator</DialogTitle></DialogHeader>
+  1142→          <div className="space-y-4 py-2">
+  1143→            <div className="flex flex-wrap gap-2">
+  1144→              {RIZZ_STYLES.map(s => (
+  1145→                <button key={s.value} onClick={() => setRizzStyle(s.value)}
+  1146→                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${rizzStyle === s.value ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-secondary-foreground border-border hover:border-primary/50'}`}>
+  1147→                  {s.icon} {s.label}
+  1148→                </button>
+  1149→              ))}
+  1150→            </div>
+  1151→            <Button onClick={handleRizz} disabled={rizzLoading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+  1152→              {rizzLoading ? 'Generating...' : 'Generate Pickup Line'}
+  1153→            </Button>
+  1154→            {rizzResult && (
+  1155→              <div className="p-4 rounded-xl bg-secondary border border-border space-y-3">
+  1156→                <p className="text-sm leading-relaxed">{rizzResult.line}</p>
+  1157→                {rizzResult.context && <p className="text-[11px] text-muted-foreground">{rizzResult.context}</p>}
+  1158→                <div className="flex gap-2">
+  1159→                  <Button variant="outline" size="sm" onClick={copyRizz} className="text-xs border-border"><Copy className="w-3 h-3 mr-1" /> Copy</Button>
+  1160→                  <Button size="sm" onClick={handleSendRizz} className="text-xs bg-primary text-primary-foreground"><Send className="w-3 h-3 mr-1" /> Send</Button>
+  1161→                </div>
+  1162→                {rizzResult.alternatives?.length > 0 && (
+  1163→                  <div className="space-y-1 pt-2 border-t border-border">
+  1164→                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Alternatives</p>
+  1165→                    {rizzResult.alternatives.map((alt: string, i: number) => (
+  1166→                      <p key={i} className="text-xs text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => setRizzResult({ ...rizzResult, line: alt })}>{alt}</p>
+  1167→                    ))}
+  1168→                  </div>
+  1169→                )}
+  1170→              </div>
+  1171→            )}
+  1172→          </div>
+  1173→        </DialogContent>
+  1174→      </Dialog>
+  1175→
+  1176→      {/* ═══ NOTE DIALOG ═══ */}
+  1177→      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
+  1178→        <DialogContent className="bg-card border-border sm:max-w-sm">
+  1179→          <DialogHeader><DialogTitle className="flex items-center gap-2"><StickyNote className="w-5 h-5 text-primary" /> Add Note</DialogTitle></DialogHeader>
+  1180→          <div className="space-y-3 py-2">
+  1181→            <Textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Write a private note..." className="bg-secondary border-border text-sm" rows={3} />
+  1182→            <div className="flex gap-2">
+  1183→              <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveNote} disabled={!noteContent.trim()}>Save</Button>
+  1184→              <Button size="sm" variant="outline" className="border-border" onClick={() => { setShowNoteDialog(false); setNoteContent(''); }}>Cancel</Button>
+  1185→            </div>
+  1186→          </div>
+  1187→        </DialogContent>
+  1188→      </Dialog>
+  1189→
+  1190→      {/* ═══ BLOCK ALERT ═══ */}
+  1191→      <AlertDialog open={showBlockAlert} onOpenChange={setShowBlockAlert}>
+  1192→        <AlertDialogContent className="bg-card border-border">
+  1193→          <AlertDialogHeader>
+  1194→            <AlertDialogTitle>Block this user?</AlertDialogTitle>
+  1195→            <AlertDialogDescription>This user won't be able to see your profile or message you.</AlertDialogDescription>
+  1196→          </AlertDialogHeader>
+  1197→          <AlertDialogFooter>
+  1198→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1199→            <AlertDialogAction onClick={() => profileUser && handleBlock(profileUser.id)} className="bg-destructive text-white">Block</AlertDialogAction>
+  1200→          </AlertDialogFooter>
+  1201→        </AlertDialogContent>
+  1202→      </AlertDialog>
+  1203→
+  1204→      {/* ═══ CREATE EVENT DIALOG ═══ */}
+  1205→      <Dialog open={showCreateEvent} onOpenChange={setShowCreateEvent}>
+  1206→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1207→          <DialogHeader><DialogTitle>Create Event</DialogTitle></DialogHeader>
+  1208→          <div className="space-y-3 py-2">
+  1209→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={eventForm.title} onChange={e => setEventForm(p => ({ ...p, title: e.target.value }))} placeholder="Event name" className="bg-secondary border-border" /></div>
+  1210→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={eventForm.description} onChange={e => setEventForm(p => ({ ...p, description: e.target.value }))} placeholder="What's this about?" className="bg-secondary border-border" rows={3} /></div>
+  1211→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Location</Label><Input value={eventForm.location} onChange={e => setEventForm(p => ({ ...p, location: e.target.value }))} placeholder="Venue" className="bg-secondary border-border" /></div>
+  1212→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date & Time</Label><Input type="datetime-local" value={eventForm.startDate} onChange={e => setEventForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+  1213→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Image URL</Label><Input value={eventForm.imageUrl} onChange={e => setEventForm(p => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." className="bg-secondary border-border" /></div>
+  1214→          </div>
+  1215→          <DialogFooter>
+  1216→            <Button variant="outline" onClick={() => setShowCreateEvent(false)} className="border-border">Cancel</Button>
+  1217→            <Button onClick={handleCreateEvent} className="bg-primary text-primary-foreground" disabled={!eventForm.title || !eventForm.startDate}>Create</Button>
+  1218→          </DialogFooter>
+  1219→        </DialogContent>
+  1220→      </Dialog>
+  1221→
+  1222→      {/* ═══ CREATE GROUP DIALOG ═══ */}
+  1223→      <Dialog open={showCreateGroup} onOpenChange={setShowCreateGroup}>
+  1224→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1225→          <DialogHeader><DialogTitle>Create Group</DialogTitle></DialogHeader>
+  1226→          <div className="space-y-3 py-2">
+  1227→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Group Name</Label><Input value={groupForm.name} onChange={e => setGroupForm(p => ({ ...p, name: e.target.value }))} placeholder="Group name" className="bg-secondary border-border" /></div>
+  1228→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={groupForm.description} onChange={e => setGroupForm(p => ({ ...p, description: e.target.value }))} placeholder="About this group" className="bg-secondary border-border" rows={2} /></div>
+  1229→          </div>
+  1230→          <DialogFooter>
+  1231→            <Button variant="outline" onClick={() => setShowCreateGroup(false)} className="border-border">Cancel</Button>
+  1232→            <Button onClick={handleCreateGroup} className="bg-primary text-primary-foreground" disabled={!groupForm.name.trim()}>Create</Button>
+  1233→          </DialogFooter>
+  1234→        </DialogContent>
+  1235→      </Dialog>
+  1236→
+  1237→      {/* ═══ CREATE CIRCLE DIALOG ═══ */}
+  1238→      <Dialog open={showCreateCircle} onOpenChange={setShowCreateCircle}>
+  1239→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1240→          <DialogHeader><DialogTitle>Create Circle</DialogTitle></DialogHeader>
+  1241→          <div className="space-y-3 py-2">
+  1242→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Circle Name</Label><Input value={circleForm.name} onChange={e => setCircleForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Hot Guys" className="bg-secondary border-border" /></div>
+  1243→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Color</Label><Input type="color" value={circleForm.color} onChange={e => setCircleForm(p => ({ ...p, color: e.target.value }))} className="h-10 w-16 bg-secondary border-border" /></div>
+  1244→          </div>
+  1245→          <DialogFooter>
+  1246→            <Button variant="outline" onClick={() => setShowCreateCircle(false)} className="border-border">Cancel</Button>
+  1247→            <Button onClick={async () => {
+  1248→              if (!circleForm.name.trim()) return;
+  1249→              try { const res = await fetch('/api/circles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(circleForm) }); const data = await res.json(); if (data.data) { setCircles(prev => [...prev, data.data]); setShowCreateCircle(false); setCircleForm({ name: '', color: '#6366f1', icon: 'users' }); } } catch {}
+  1250→            }} className="bg-primary text-primary-foreground" disabled={!circleForm.name.trim()}>Create</Button>
+  1251→          </DialogFooter>
+  1252→        </DialogContent>
+  1253→      </Dialog>
+  1254→
+  1255→      {/* ═══ ADD MEMBER TO CIRCLE DIALOG ═══ */}
+  1256→      <Dialog open={showAddMember} onOpenChange={setShowAddMember}>
+  1257→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1258→          <DialogHeader><DialogTitle>Add Member to Circle</DialogTitle></DialogHeader>
+  1259→          <div className="space-y-3 py-2">
+  1260→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">User ID</Label><Input value={addMemberId} onChange={e => setAddMemberId(e.target.value)} placeholder="Enter user ID" className="bg-secondary border-border" /></div>
+  1261→          </div>
+  1262→          <DialogFooter>
+  1263→            <Button variant="outline" onClick={() => setShowAddMember(false)} className="border-border">Cancel</Button>
+  1264→            <Button onClick={async () => {
+  1265→              if (!selectedCircle || !addMemberId.trim()) return;
+  1266→              try { await fetch(`/api/circles/${selectedCircle.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetUserId: addMemberId.trim() }) }); const res = await fetch(`/api/circles/${selectedCircle.id}`); const data = await res.json(); setCircleMembers(data.members || []); setShowAddMember(false); setAddMemberId(''); } catch {}
+  1267→            }} className="bg-primary text-primary-foreground" disabled={!addMemberId.trim()}>Add</Button>
+  1268→          </DialogFooter>
+  1269→        </DialogContent>
+  1270→      </Dialog>
+  1271→
+  1272→      {/* ═══ SET TRAVEL LOCATION DIALOG ═══ */}
+  1273→      <Dialog open={showSetTravel} onOpenChange={setShowSetTravel}>
+  1274→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1275→          <DialogHeader><DialogTitle className="flex items-center gap-2"><Plane className="w-5 h-5 text-primary" /> Set Travel Location</DialogTitle></DialogHeader>
+  1276→          <div className="space-y-3 py-2">
+  1277→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">City</Label><Input value={travelForm.city} onChange={e => setTravelForm(p => ({ ...p, city: e.target.value }))} placeholder="e.g. Berlin" className="bg-secondary border-border" /></div>
+  1278→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Country</Label><Input value={travelForm.country} onChange={e => setTravelForm(p => ({ ...p, country: e.target.value }))} placeholder="e.g. Germany" className="bg-secondary border-border" /></div>
+  1279→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Start Date</Label><Input type="date" value={travelForm.startDate} onChange={e => setTravelForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+  1280→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">End Date</Label><Input type="date" value={travelForm.endDate} onChange={e => setTravelForm(p => ({ ...p, endDate: e.target.value }))} className="bg-secondary border-border" /></div>
+  1281→          </div>
+  1282→          <DialogFooter>
+  1283→            <Button variant="outline" onClick={() => setShowSetTravel(false)} className="border-border">Cancel</Button>
+  1284→            <Button onClick={async () => {
+  1285→              if (!travelForm.city.trim()) return;
+  1286→              try { await fetch('/api/travel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(travelForm) }); const res = await fetch('/api/travel'); const data = await res.json(); setTravelData(data.data || null); setShowSetTravel(false); } catch {}
+  1287→            }} className="bg-primary text-primary-foreground" disabled={!travelForm.city.trim()}>Start Traveling</Button>
+  1288→          </DialogFooter>
+  1289→        </DialogContent>
+  1290→      </Dialog>
+  1291→
+  1292→      {/* ═══ CHECKIN DIALOG ═══ */}
+  1293→      <Dialog open={showCheckin} onOpenChange={setShowCheckin}>
+  1294→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1295→          <DialogHeader><DialogTitle className="flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> Check In</DialogTitle></DialogHeader>
+  1296→          <div className="space-y-3 py-2">
+  1297→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Venue Name</Label><Input value={checkinVenue} onChange={e => setCheckinVenue(e.target.value)} placeholder="e.g. The Alley Bar" className="bg-secondary border-border" /></div>
+  1298→          </div>
+  1299→          <DialogFooter>
+  1300→            <Button variant="outline" onClick={() => setShowCheckin(false)} className="border-border">Cancel</Button>
+  1301→            <Button onClick={async () => {
+  1302→              if (!checkinVenue.trim()) return;
+  1303→              try { await fetch('/api/checkins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ venueName: checkinVenue.trim(), lat: 35.9, lng: 14.4 }) }); const res = await fetch('/api/checkins'); const data = await res.json(); setCheckins(data.data || []); setShowCheckin(false); setCheckinVenue(''); } catch {}
+  1304→            }} className="bg-primary text-primary-foreground" disabled={!checkinVenue.trim()}>Check In</Button>
+  1305→          </DialogFooter>
+  1306→        </DialogContent>
+  1307→      </Dialog>
+  1308→
+  1309→      {/* ═══ SAVED PHRASE DIALOG ═══ */}
+  1310→      <Dialog open={showPhraseDialog} onOpenChange={(open) => { if (!open) { setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' }); } }}>
+  1311→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1312→          <DialogHeader><DialogTitle>{editingPhraseId ? 'Edit Phrase' : 'Create Phrase'}</DialogTitle></DialogHeader>
+  1313→          <div className="space-y-3 py-2">
+  1314→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={phraseForm.title} onChange={e => setPhraseForm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Greeting" className="bg-secondary border-border" /></div>
+  1315→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Content</Label><Textarea value={phraseForm.content} onChange={e => setPhraseForm(p => ({ ...p, content: e.target.value }))} placeholder="Hey! How are you?" className="bg-secondary border-border" rows={3} /></div>
+  1316→          </div>
+  1317→          <DialogFooter>
+  1318→            <Button variant="outline" onClick={() => { setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' }); }} className="border-border">Cancel</Button>
+  1319→            <Button onClick={async () => {
+  1320→              if (!phraseForm.title.trim() || !phraseForm.content.trim()) return;
+  1321→              try {
+  1322→                if (editingPhraseId) {
+  1323→                  await fetch(`/api/saved-phrases/${editingPhraseId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(phraseForm) });
+  1324→                } else {
+  1325→                  await fetch('/api/saved-phrases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(phraseForm) });
+  1326→                }
+  1327→                const res = await fetch('/api/saved-phrases'); const data = await res.json(); setSavedPhrases(data.data || []);
+  1328→                setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' });
+  1329→              } catch {}
+  1330→            }} className="bg-primary text-primary-foreground" disabled={!phraseForm.title.trim() || !phraseForm.content.trim()}>{editingPhraseId ? 'Save' : 'Create'}</Button>
+  1331→          </DialogFooter>
+  1332→        </DialogContent>
+  1333→      </Dialog>
+  1334→
+  1335→      {/* ═══ DELETE ACCOUNT ALERT ═══ */}
+  1336→      <AlertDialog open={showDeleteAccount} onOpenChange={setShowDeleteAccount}>
+  1337→        <AlertDialogContent className="bg-card border-border">
+  1338→          <AlertDialogHeader><AlertDialogTitle>Delete Account?</AlertDialogTitle><AlertDialogDescription>This is permanent and cannot be undone. All your data will be removed.</AlertDialogDescription></AlertDialogHeader>
+  1339→          <AlertDialogFooter>
+  1340→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1341→            <AlertDialogAction className="bg-destructive text-white" onClick={() => { setCurrentUser(null); setAuthed(false); setShowDeleteAccount(false); }}>Delete</AlertDialogAction>
+  1342→          </AlertDialogFooter>
+  1343→        </AlertDialogContent>
+  1344→      </AlertDialog>
+  1345→
+  1346→    </div>
+  1347→    </TooltipProvider>
+  1348→  );
+  1349→
+  1350→  // ═══════════════════════════════════════════════════════════════
+  1351→  // VIEW FUNCTIONS (hoisted — available throughout component)
+  1352→  // ═══════════════════════════════════════════════════════════════
+  1353→
+  1354→  // ─── DISCOVER ────────────────────────────────────────────────
+  1355→  function DiscoverView() {
+  1356→    if (discoverLoading) return <LoadingGrid />;
+  1357→    if (discoverUsers.length === 0) return <EmptyState icon={Compass} title="No profiles found" desc="Check back later for new people nearby" />;
+  1358→    return (
+  1359→      <div className="h-full flex flex-col">
+  1360→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1361→          <button onClick={() => setOnlineOnly(!onlineOnly)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${onlineOnly ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>🟢 Online</button>
+  1362→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{ageRange[0]}–{ageRange[1]}</button></PopoverTrigger>
+  1363→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Age Range</Label><Slider value={ageRange} onValueChange={setAgeRange} min={18} max={80} step={1} className="mt-2" /><div className="flex justify-between text-[11px] text-muted-foreground mt-1"><span>{ageRange[0]}</span><span>{ageRange[1]}</span></div></PopoverContent>
+  1364→          </Popover>
+  1365→          <Select value={lookingFor} onValueChange={setLookingFor}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All</SelectItem><SelectItem value="relationship">Relationship</SelectItem><SelectItem value="casual">Casual</SelectItem><SelectItem value="friends">Friends</SelectItem><SelectItem value="networking">Networking</SelectItem></SelectContent></Select>
+  1366→          <Select value={ethnicityFilter} onValueChange={setEthnicityFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Ethnicity" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Ethnicity</SelectItem><SelectItem value="white">White</SelectItem><SelectItem value="black">Black</SelectItem><SelectItem value="latino">Latino</SelectItem><SelectItem value="asian">Asian</SelectItem><SelectItem value="middle-eastern">Middle Eastern</SelectItem><SelectItem value="indian">Indian</SelectItem><SelectItem value="mixed">Mixed</SelectItem></SelectContent></Select>
+  1367→          <Select value={bodyTypeFilter} onValueChange={setBodyTypeFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Body" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Body Type</SelectItem><SelectItem value="slim">Slim</SelectItem><SelectItem value="average">Average</SelectItem><SelectItem value="athletic">Athletic</SelectItem><SelectItem value="muscular">Muscular</SelectItem><SelectItem value="curvy">Curvy</SelectItem></SelectContent></Select>
+  1368→          <div className="ml-auto flex gap-1 shrink-0">
+  1369→            <button onClick={() => setDiscoverView('grid')} className={`p-1.5 rounded-lg ${discoverView === 'grid' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Grid3X3 className="w-4 h-4" /></button>
+  1370→            <button onClick={() => setDiscoverView('cascade')} className={`p-1.5 rounded-lg ${discoverView === 'cascade' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Layers className="w-4 h-4" /></button>
+  1371→          </div>
+  1372→        </div>
+  1373→        <ScrollArea className="flex-1">
+  1374→          {discoverView === 'cascade' ? (
+  1375→            <div className="flex items-center justify-center p-6 h-full">
+  1376→              {cascadeUser ? (
+  1377→                <div key={cascadeUser.id} className="w-full max-w-sm cascade-animate">
+  1378→                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-secondary">
+  1379→                    {(cascadeUser.photos && cascadeUser.photos[0]) ? <img src={cascadeUser.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>}
+  1380→                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/60 to-transparent" />
+  1381→                    {cascadeUser.isPremium && <div className="absolute top-3 right-3"><Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge></div>}
+  1382→                    {cascadeUser.isVerified && <div className="absolute top-3 left-3"><Badge className="bg-blue-500/20 text-blue-400 text-[10px] border-blue-500/30"><ShieldCheck className="w-3 h-3" /></Badge></div>}
+  1383→                    {cascadeUser.online && cascadeUser.showOnline && <div className="absolute top-3 left-1/2 -translate-x-1/2"><span className="flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] text-green-400"><span className="w-1.5 h-1.5 bg-green-400 rounded-full online-pulse" /> Online</span></div>}
+  1384→                    <div className="absolute bottom-0 left-0 right-0 p-4">
+  1385→                      <h3 className="text-xl font-bold">{cascadeUser.displayName}{cascadeUser.age ? `, ${cascadeUser.age}` : ''}</h3>
+  1386→                      {cascadeUser.location && <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3" />{cascadeUser.location}</p>}
+  1387→                      {cascadeUser.bio && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{truncate(cascadeUser.bio, 100)}</p>}
+  1388→                      {cascadeUser.lookingFor && <Badge className="mt-2 bg-primary/20 text-primary text-[10px] border-primary/30 capitalize">{cascadeUser.lookingFor}</Badge>}
+  1389→                    </div>
+  1390→                  </div>
+  1391→                  <div className="flex gap-3 mt-4 justify-center">
+  1392→                    <button onClick={() => setCascadeIndex(i => i + 1)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+  1393→                    <button onClick={() => handleLike(cascadeUser.id)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><Heart className="w-5 h-5" /></button>
+  1394→                    <button onClick={() => openChat(cascadeUser)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><MessageCircle className="w-5 h-5" /></button>
+  1395→                    <button onClick={() => openProfile(cascadeUser.id)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Star className="w-5 h-5" /></button>
+  1396→                    <button onClick={() => { setRizzTargetBio(cascadeUser.bio || ''); setShowRizzModal(true); }} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Sparkles className="w-5 h-5" /></button>
+  1397→                  </div>
+  1398→                </div>
+  1399→              ) : <EmptyState icon={Compass} title="No more profiles" desc="Adjust your filters or check back later" />}
+  1400→            </div>
+  1401→          ) : (
+  1402→            <div className="grid grid-cols-2 gap-3 p-4">
+  1403→              {filteredDiscover.map(user => (
+  1404→                <button key={user.id} onClick={() => openProfile(user.id)} className="profile-card rounded-xl overflow-hidden bg-secondary border border-border text-left">
+  1405→                  <div className="aspect-[3/4] relative">
+  1406→                    {(user.photos && user.photos[0]) ? <img src={user.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-secondary"><User className="w-12 h-12 text-muted-foreground" /></div>}
+  1407→                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-secondary via-secondary/50 to-transparent" />
+  1408→                    {user.online && user.showOnline && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-secondary online-pulse" />}
+  1409→                    {user.isPremium && <Crown className="absolute top-2 left-2 w-3.5 h-3.5 text-yellow-400" />}
+  1410→                  </div>
+  1411→                  <div className="p-2.5 -mt-6 relative">
+  1412→                    <p className="text-[13px] font-semibold truncate">{user.displayName}{user.age ? `, ${user.age}` : ''}</p>
+  1413→                    <p className="text-[10px] text-muted-foreground truncate">{user.location || ''}</p>
+  1414→                    {user.distance != null && <p className="text-[10px] text-primary">{user.distance} km away</p>}
+  1415→                  </div>
+  1416→                </button>
+  1417→              ))}
+  1418→            </div>
+  1419→          )}
+  1420→        </ScrollArea>
+  1421→      </div>
+  1422→    );
+  1423→  }
+  1424→
+  1425→
+  1426→  // ─── MAP VIEW ───────────────────────────────────────────────
+  1427→  function MapView() {
+  1428→    const mapCenterLat = userLat || currentUser?.lat || 35.8989;
+  1429→    const mapCenterLng = userLng || currentUser?.lng || 14.5146;
+  1430→    return (
+  1431→      <div className="h-full flex flex-col">
+  1432→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1433→          <Select value={mapFilter} onValueChange={setMapFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All Users</SelectItem><SelectItem value="online">Online</SelectItem><SelectItem value="recent">Recent</SelectItem><SelectItem value="nearby">Nearby</SelectItem><SelectItem value="new">New</SelectItem><SelectItem value="verified">Verified</SelectItem><SelectItem value="premium">Premium</SelectItem></SelectContent></Select>
+  1434→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{mapRadius} km</button></PopoverTrigger>
+  1435→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Radius</Label><Slider value={[mapRadius]} onValueChange={([v]) => setMapRadius(v)} min={1} max={200} step={1} className="mt-2" /><p className="text-[11px] text-muted-foreground mt-1">{mapRadius} km</p></PopoverContent>
+  1436→          </Popover>
+  1437→          <button onClick={() => setMapHidden(!mapHidden)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 ${mapHidden ? 'bg-destructive/20 text-destructive border-destructive/30' : 'bg-secondary text-muted-foreground border-border'}`}>{mapHidden ? '👁 Hidden' : '👁 Visible'}</button>
+  1438→          <span className="ml-auto text-[11px] text-muted-foreground">{mapUsers.length} users</span>
+  1439→        </div>
+  1440→        <div className="flex-1 relative">
+  1441→          {mapLoading ? <div className="absolute inset-0 flex items-center justify-center"><Skeleton className="w-full h-full" /></div> : mapHidden ? (
+  1442→            <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/20 gap-3">
+  1443→              <MapPinOff className="w-12 h-12 text-muted-foreground" />
+  1444→              <p className="text-sm text-muted-foreground">Map hidden</p>
+  1445→              <p className="text-xs text-muted-foreground">Your location is not visible to others</p>
+  1446→            </div>
+  1447→          ) : (
+  1448→            <ErrorBoundary fallback={<div className="flex-1 flex items-center justify-center"><div className="text-center"><MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-2" /><p className="text-sm text-muted-foreground">Map unavailable in this environment</p></div></div>}>
+  1449→              <MapLeaflet users={mapUsers} centerLat={mapCenterLat} centerLng={mapCenterLng} radius={mapRadius} onUserClick={openProfile} />
+  1450→            </ErrorBoundary>
+  1451→          )}
+  1452→        </div>
+  1453→      </div>
+  1454→    );
+  1455→  }
+  1456→
+  1457→  // ─── CHAT VIEW ─────────────────────────────────────────────
+  1458→  function ChatView() {
+  1459→    if (chatLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1460→    return (
+  1461→      <div className="h-full flex flex-col">
+  1462→        {chatMobileView === 'chat' && (activeConversation || activeGroup) ? (
+  1463→          <NexusChat
+  1464→            msgInput={msgInput}
+  1465→            setMsgInput={setMsgInput}
+  1466→            sendMessage={sendMessage}
+  1467→            sendGroupMessage={sendGroupMessage}
+  1468→            activeConversation={activeConversation}
+  1469→            activeGroup={activeGroup}
+  1470→            messages={messages}
+  1471→            groupMessages={groupMessages}
+  1472→            setGroupMessages={setGroupMessages}
+  1473→            getAvatar={getAvatar}
+  1474→            openProfile={openProfile}
+  1475→            setActiveConversation={setActiveConversation}
+  1476→            setActiveGroup={setActiveGroup}
+  1477→            setChatMobileView={setChatMobileView}
+  1478→            msgEndRef={msgEndRef}
+  1479→            socket={socketRef.current}
+  1480→          />
+  1481→        ) : (
+  1482→          <ScrollArea className="flex-1">
+  1483→            <div className="p-4 space-y-4">
+  1484→            {/* Sort & AI Controls */}
+  1485→            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+  1486→              {CHAT_SORT_OPTIONS.map(mode => (
+  1487→                <button key={mode} onClick={() => setChatSortMode(mode)}
+  1488→                  className={`px-2.5 py-1 rounded-full text-[10px] font-medium border shrink-0 transition-all ${chatSortMode === mode ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1489→                  {mode === 'recent' && <Clock3 className="w-3 h-3 mr-1 inline" />}
+  1490→                  {mode === 'intent' && <Target className="w-3 h-3 mr-1 inline" />}
+  1491→                  {mode === 'quality' && <HeartPulse className="w-3 h-3 mr-1 inline" />}
+  1492→                  {mode === 'unread' && <MessageSquare className="w-3 h-3 mr-1 inline" />}
+  1493→                  {mode === 'online' && <Wifi className="w-3 h-3 mr-1 inline" />}
+  1494→                  {mode.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+  1495→                </button>
+  1496→              ))}
+  1497→              <button onClick={async () => { setAiLoading(true); try { const res = await fetch('/api/chat/ai-analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1' }) }); const data = await res.json(); setAiAnalysis(data); } catch {} setAiLoading(false); }}
+  1498→                className="ml-auto px-2.5 py-1 rounded-full text-[10px] font-medium border bg-primary/10 text-primary border-primary/30 shrink-0" disabled={aiLoading}>
+  1499→                <Bot className="w-3 h-3 mr-1 inline" />{aiLoading ? 'Analyzing...' : 'AI Analyze All'}
+  1500→              </button>
+  1501→            </div>
+  1502→            {/* Chat Requests */}
+  1503→            {chatRequests.length > 0 && (
+  1504→                <div className="space-y-2">
+  1505→                  <SectionHeader icon={Bell} label="Chat Requests" count={chatRequests.length} />
+  1506→                  {chatRequests.map(req => (
+  1507→                    <div key={req.id} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+  1508→                      <button onClick={() => openProfile(req.sender?.id || '')}><Avatar className="h-10 w-10"><AvatarImage src={getAvatar(req.sender)} /><AvatarFallback className="text-xs">{req.sender?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1509→                      <div className="flex-1 min-w-0">
+  1510→                        <p className="text-[12px] font-semibold">{req.sender?.displayName}</p>
+  1511→                        <p className="text-[11px] text-muted-foreground truncate">{req.message || 'Wants to chat with you'}</p>
+  1512→                      </div>
+  1513→                      <div className="flex gap-1.5 shrink-0">
+  1514→                        <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => handleChatRequest(req.id, 'accept')}>Accept</Button>
+  1515→                        <Button size="sm" variant="outline" className="h-7 text-[10px] border-border px-2" onClick={() => handleChatRequest(req.id, 'decline')}>Decline</Button>
+  1516→                      </div>
+  1517→                    </div>
+  1518→                  ))}
+  1519→                </div>
+  1520→              )}
+  1521→              {/* Conversations */}
+  1522→              <Tabs defaultValue="all">
+  1523→                <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  1524→                  <TabsTrigger value="all" className="text-[11px] flex-1 h-7">All</TabsTrigger>
+  1525→                  <TabsTrigger value="archived" className="text-[11px] flex-1 h-7"><Archive className="w-3 h-3 mr-1 inline" />Archived</TabsTrigger>
+  1526→                  <TabsTrigger value="groups" className="text-[11px] flex-1 h-7">Groups</TabsTrigger>
+  1527→                </TabsList>
+  1528→                <TabsContent value="all" className="mt-3 space-y-1">
+  1529→                  {conversations.length === 0 ? <EmptyState icon={MessageCircle} title="No messages yet" desc="Start a conversation from someone's profile" />
+  1530→                    : conversations.map(convo => (
+  1531→                      <div key={convo.otherUser.id} className="flex items-center gap-2">
+  1532→                        <button onClick={() => { setActiveConversation(convo); setChatMobileView('chat'); fetch(`/api/messages?userId=${convo.otherUser.id}`).then(r => r.json()).then(res => setMessages(res.data || [])).catch(() => {}); }}
+  1533→                          className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors flex-1">
+  1534→                          <div className="relative shrink-0">
+  1535→                            <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(convo.otherUser)} /><AvatarFallback className="text-xs">{convo.otherUser.displayName?.[0]}</AvatarFallback></Avatar>
+  1536→                            {convo.otherUser.online && convo.otherUser.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+  1537→                          </div>
+  1538→                          <div className="flex-1 min-w-0">
+  1539→                            <div className="flex items-center justify-between">
+  1540→                              <div className="flex items-center gap-1.5"><p className="text-[13px] font-semibold truncate">{convo.otherUser.displayName}</p>{convo.isMuted && <VolumeX className="w-3 h-3 text-muted-foreground" />}</div>
+  1541→                              <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(convo.lastMessage.createdAt)}</span>
+  1542→                            </div>
+  1543→                            <p className="text-[11px] text-muted-foreground truncate mt-0.5">{convo.lastMessage.content || '...'}</p>
+  1544→                          </div>
+  1545→                          {convo.unreadCount > 0 && <span className="min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground rounded-full">{convo.unreadCount}</span>}
+  1546→                        </button>
+  1547→                        <DropdownMenu>
+  1548→                          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger>
+  1549→                          <DropdownMenuContent align="end" className="bg-card border-border w-44">
+  1550→                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/mute', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch {} }}><BellOff className="w-4 h-4" /> {convo.isMuted ? 'Unmute' : 'Mute'}</DropdownMenuItem>
+  1551→                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/archive', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch {} }}><Archive className="w-4 h-4" /> Archive</DropdownMenuItem>
+  1552→                          </DropdownMenuContent>
+  1553→                        </DropdownMenu>
+  1554→                      </div>
+  1555→                    ))}
+  1556→                </TabsContent>
+  1557→                <TabsContent value="archived" className="mt-3">
+  1558→                  <EmptyState icon={Archive} title="Archived Chats" desc="Archived conversations will appear here" />
+  1559→                </TabsContent>
+  1560→                <TabsContent value="groups" className="mt-3 space-y-1">
+  1561→                  {groups.length === 0 ? <EmptyState icon={Users} title="No groups yet" desc="Create or join a group to get started" />
+  1562→                    : groups.filter((g: any) => !g.hidden).map(group => (
+  1563→                      <button key={group.id} onClick={() => { setActiveGroup(group); setGroupMessages([]); setChatMobileView('chat'); }}
+  1564→                        className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1565→                        <Avatar className="h-11 w-11"><AvatarImage src={group.avatar} /><AvatarFallback className="text-xs">{group.name?.[0]}</AvatarFallback></Avatar>
+  1566→                        <div className="flex-1 min-w-0">
+  1567→                          <p className="text-[13px] font-semibold truncate">{group.name}</p>
+  1568→                          <p className="text-[11px] text-muted-foreground">{group._count?.members || 0} members {group.geoName ? `· ${group.geoName}` : ''}</p>
+  1569→                        </div>
+  1570→                      </button>
+  1571→                    ))}
+  1572→                </TabsContent>
+  1573→              </Tabs>
+  1574→            </div>
+  1575→          </ScrollArea>
+  1576→        )}
+  1577→      </div>
+  1578→    );
+  1579→  }
+  1580→
+  1581→  // ─── LIKES VIEW ─────────────────────────────────────────────
+  1582→  function LikesView() {
+  1583→    if (likesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1584→    return (
+  1585→      <div className="h-full flex flex-col">
+  1586→        <Tabs value={likesTab} onValueChange={(v) => setLikesTab(v as 'received' | 'sent')} className="flex flex-col h-full">
+  1587→          <div className="px-4 pt-3 shrink-0">
+  1588→            <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  1589→              <TabsTrigger value="received" className="text-[11px] flex-1 h-7">Received ({receivedLikes.length})</TabsTrigger>
+  1590→              <TabsTrigger value="sent" className="text-[11px] flex-1 h-7">Sent ({sentLikes.length})</TabsTrigger>
+  1591→            </TabsList>
+  1592→          </div>
+  1593→          <ScrollArea className="flex-1">
+  1594→            <TabsContent value="received" className="mt-3 px-4">
+  1595→              {receivedLikes.length === 0 ? <EmptyState icon={Heart} title="No likes received" desc="When someone likes you, they'll appear here" />
+  1596→                : receivedLikes.map(like => like.sender && (
+  1597→                  <div key={like.id} className="mb-2">
+  1598→                    <UserRow user={like.sender} sub={<span>{timeAgo(like.createdAt)}</span>}
+  1599→                      onClick={() => openProfile(like.sender.id)}
+  1600→                      actions={
+  1601→                        <>
+  1602→                          <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => openChat(like.sender)}>Accept</Button>
+  1603→                          <Button size="sm" variant="ghost" className="h-7 text-[10px] text-muted-foreground px-2" onClick={() => handleUnlike(like.sender.id)}><X className="w-3 h-3" /></Button>
+  1604→                        </>
+  1605→                      } />
+  1606→                  </div>
+  1607→                ))}
+  1608→            </TabsContent>
+  1609→            <TabsContent value="sent" className="mt-3 px-4">
+  1610→              {sentLikes.length === 0 ? <EmptyState icon={Heart} title="No likes sent" desc="Like someone and they'll appear here" />
+  1611→                : sentLikes.map(like => like.receiver && (
+  1612→                  <div key={like.id} className="mb-2">
+  1613→                    <UserRow user={like.receiver} sub={<span>{timeAgo(like.createdAt)}</span>} onClick={() => openProfile(like.receiver.id)}
+  1614→                      actions={<Button size="sm" variant="ghost" className="h-7 text-[10px] text-destructive px-2" onClick={() => handleUnlike(like.receiver.id)}><X className="w-3 h-3" /></Button>} />
+  1615→                  </div>
+  1616→                ))}
+  1617→            </TabsContent>
+  1618→          </ScrollArea>
+  1619→        </Tabs>
+  1620→      </div>
+  1621→    );
+  1622→  }
+  1623→
+  1624→  // ─── MORE VIEW (Page Directory) ───────────────────────────
+  1625→  function MoreView() {
+  1626→    return (
+  1627→      <ScrollArea className="h-full">
+  1628→        <div className="p-4 space-y-6">
+  1629→          <p className="text-xs text-muted-foreground">Explore all features of NEXUS</p>
+  1630→          {Object.entries(PAGE_DIRECTORY).map(([category, pages]) => (
+  1631→            <div key={category}>
+  1632→              <h3 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-3">{category}</h3>
+  1633→              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  1634→                {pages.map(page => {
+  1635→                  const Icon = page.icon;
+  1636→                  return (
+  1637→                    <button key={page.id} onClick={() => setActiveTab(page.id)}
+  1638→                      className="flex flex-col items-start gap-2 p-3 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all text-left group">
+  1639→                      <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+  1640→                        <Icon className="w-4 h-4 text-primary" />
+  1641→                      </div>
+  1642→                      <div className="flex-1 min-w-0">
+  1643→                        <p className="text-[12px] font-semibold truncate">{page.label}</p>
+  1644→                        <p className="text-[10px] text-muted-foreground truncate">{page.description}</p>
+  1645→                      </div>
+  1646→                      {page.badge && <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />}
+  1647→                    </button>
+  1648→                  );
+  1649→                })}
+  1650→              </div>
+  1651→            </div>
+  1652→          ))}
+  1653→          <div className="h-4" />
+  1654→        </div>
+  1655→      </ScrollArea>
+  1656→    );
+  1657→  }
+  1658→
+  1659→  // ─── EVENTS VIEW ───────────────────────────────────────────
+  1660→  function EventsView() {
+  1661→    if (eventsLoading) return <LoadingGrid cols={1} rows={4} />;
+  1662→    const filteredEvents = events.filter((e: any) => {
+  1663→      if (agendaFilter === 'today') return isToday(new Date(e.startDate));
+  1664→      if (agendaFilter === 'this-week') return isThisWeek(new Date(e.startDate));
+  1665→      if (agendaFilter === 'this-month') return isThisMonth(new Date(e.startDate));
+  1666→      return true;
+  1667→    });
+  1668→    return (
+  1669→      <div className="h-full flex flex-col">
+  1670→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1671→          {(['all', 'today', 'this-week', 'this-month', 'nearby', 'my-events'] as const).map(f => (
+  1672→            <button key={f} onClick={() => setAgendaFilter(f)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${agendaFilter === f ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1673→              {f.replace('-', ' ')}
+  1674→            </button>
+  1675→          ))}
+  1676→          <div className="ml-auto flex gap-1 shrink-0">
+  1677→            <button onClick={() => setAgendaView('list')} className={`p-1.5 rounded-lg ${agendaView === 'list' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><FileText className="w-4 h-4" /></button>
+  1678→            <button onClick={() => setAgendaView('calendar')} className={`p-1.5 rounded-lg ${agendaView === 'calendar' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Calendar className="w-4 h-4" /></button>
+  1679→            <button onClick={() => setAgendaView('map')} className={`p-1.5 rounded-lg ${agendaView === 'map' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><MapPinned className="w-4 h-4" /></button>
+  1680→          </div>
+  1681→        </div>
+  1682→        <ScrollArea className="flex-1">
+  1683→          <div className="p-4 space-y-3">
+  1684→            <Button className="w-full bg-primary text-primary-foreground h-9 text-xs" onClick={() => setShowCreateEvent(true)}><Plus className="w-3.5 h-3.5 mr-1.5" /> Create Event</Button>
+  1685→            {filteredEvents.length === 0 ? <EmptyState icon={Calendar} title="No events found" desc="Create one or adjust filters" />
+  1686→              : filteredEvents.map((event: any) => (
+  1687→                <Card key={event.id} className="bg-secondary border-border overflow-hidden">
+  1688→                  {event.imageUrl && <img src={event.imageUrl} alt="" className="w-full h-32 object-cover" />}
+  1689→                  <CardContent className="p-3">
+  1690→                    <div className="flex items-start justify-between gap-2">
+  1691→                      <div className="flex-1 min-w-0">
+  1692→                        <h3 className="text-sm font-semibold">{event.title}</h3>
+  1693→                        {event.description && <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{event.description}</p>}
+  1694→                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-2">
+  1695→                          <span className="flex items-center gap-0.5"><Clock className="w-3 h-3" />{fmtDate(event.startDate)}</span>
+  1696→                          {event.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{truncate(event.location, 20)}</span>}
+  1697→                        </div>
+  1698→                      </div>
+  1699→                    </div>
+  1700→                    <div className="flex gap-1.5 mt-3">
+  1701→                      {(['going', 'maybe', 'interested', 'declined'] as const).map(status => (
+  1702→                        <button key={status} onClick={() => handleRsvp(event.id, status)}
+  1703→                          className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all ${userRsvps[event.id] === status ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1704→                          {status}
+  1705→                        </button>
+  1706→                      ))}
+  1707→                    </div>
+  1708→                  </CardContent>
+  1709→                </Card>
+  1710→              ))}
+  1711→          </div>
+  1712→        </ScrollArea>
+  1713→      </div>
+  1714→    );
+  1715→  }
+  1716→
+  1717→  // ─── VIEWED ME VIEW ────────────────────────────────────────
+  1718→  function ViewedMeView() {
+  1719→    if (viewsLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1720→    return (
+  1721→      <ScrollArea className="h-full">
+  1722→        <div className="p-4 space-y-1">
+  1723→          {profileViews.length === 0 ? <EmptyState icon={Eye} title="No profile views" desc="When someone views your profile, they'll appear here" />
+  1724→            : profileViews.map(view => view.viewer && (
+  1725→              <UserRow key={view.id} user={view.viewer} sub={<span>Viewed {timeAgo(view.createdAt)}</span>} onClick={() => openProfile(view.viewer.id)}
+  1726→                actions={<Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => openChat(view.viewer)}>Chat</Button>} />
+  1727→            ))}
+  1728→        </div>
+  1729→      </ScrollArea>
+  1730→    );
+  1731→  }
+  1732→
+  1733→  // ─── SHOUTS VIEW ───────────────────────────────────────────
+  1734→  function ShoutsView() {
+  1735→    if (shoutLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}</div>;
+  1736→    return (
+  1737→      <div className="h-full flex flex-col">
+  1738→        <ScrollArea className="flex-1">
+  1739→          <div className="p-4 space-y-4">
+  1740→            {/* Compose */}
+  1741→            <div className="p-3 rounded-xl bg-secondary border border-border space-y-2">
+  1742→              <Textarea value={shoutInput} onChange={e => setShoutInput(e.target.value)} placeholder="What's on your mind?" className="bg-background border-border text-sm resize-none" rows={2} />
+  1743→              <div className="flex items-center justify-between">
+  1744→                <div className="flex gap-1">
+  1745→                  <button onClick={() => setShoutType('text')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'text' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Text</button>
+  1746→                  <button onClick={() => setShoutType('image')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'image' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Image</button>
+  1747→                  <button onClick={() => setShoutType('video')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'video' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Video</button>
+  1748→                </div>
+  1749→                <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-3" onClick={handleShout} disabled={!shoutInput.trim()}><Megaphone className="w-3 h-3 mr-1" /> Shout</Button>
+  1750→              </div>
+  1751→              {/* Canned shouts */}
+  1752→              <div className="flex flex-wrap gap-1 pt-2 border-t border-border">
+  1753→                {CANNED_SHOUTS.map(cs => (
+  1754→                  <button key={cs.value} onClick={() => setShoutInput(cs.label)} className="px-2 py-1 rounded-full text-[10px] bg-background border border-border text-muted-foreground hover:border-primary/30 transition-all">
+  1755→                    {cs.emoji} {cs.label}
+  1756→                  </button>
+  1757→                ))}
+  1758→              </div>
+  1759→            </div>
+  1760→            {/* Feed */}
+  1761→            {shouts.length === 0 ? <EmptyState icon={Megaphone} title="No shouts yet" desc="Be the first to share something!" />
+  1762→              : shouts.map((shout: any) => (
+  1763→                <Card key={shout.id} className="bg-secondary border-border">
+  1764→                  <CardContent className="p-3">
+  1765→                    <div className="flex items-center gap-2 mb-2">
+  1766→                      <button onClick={() => shout.user && openProfile(shout.user.id)}><Avatar className="h-8 w-8"><AvatarImage src={getAvatar(shout.user)} /><AvatarFallback className="text-[10px]">{shout.user?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1767→                      <div className="flex-1 min-w-0">
+  1768→                        <p className="text-[12px] font-semibold">{shout.user?.displayName}</p>
+  1769→                        <p className="text-[10px] text-muted-foreground">{timeAgo(shout.createdAt)}</p>
+  1770→                      </div>
+  1771→                      <Badge className="text-[9px] bg-muted">{shout.type}</Badge>
+  1772→                    </div>
+  1773→                    <p className="text-[13px] leading-relaxed">{shout.content}</p>
+  1774→                    {shout.mediaUrl && <img src={shout.mediaUrl} alt="" className="mt-2 rounded-lg max-h-48 w-full object-cover" />}
+  1775→                  </CardContent>
+  1776→                </Card>
+  1777→              ))}
+  1778→          </div>
+  1779→        </ScrollArea>
+  1780→      </div>
+  1781→    );
+  1782→  }
+  1783→
+  1784→
+  1785→  // ─── FANSITES VIEW ──────────────────────────────────────────
+  1786→  function FansitesView() {
+  1787→    if (fansiteLoading) return <LoadingGrid />;
+  1788→    return (
+  1789→      <ScrollArea className="h-full">
+  1790→        <div className="p-4 space-y-3">
+  1791→          {fansites.length === 0 ? <EmptyState icon={Star} title="No fansites" desc="Creator pages will appear here" />
+  1792→            : fansites.map(fs => (
+  1793→              <Card key={fs.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => { setSelectedFansite(fs); setShowFansiteSheet(true); }}>
+  1794→                <div className="flex gap-3 p-3">
+  1795→                  <Avatar className="h-14 w-14 shrink-0"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-sm">{fs.user?.displayName?.[0]}</AvatarFallback></Avatar>
+  1796→                  <div className="flex-1 min-w-0">
+  1797→                    <div className="flex items-center gap-2">
+  1798→                      <h3 className="text-sm font-semibold truncate">{fs.name}</h3>
+  1799→                      {fs.status === 'active' && <Badge className="text-[9px] bg-green-400/20 text-green-400">Active</Badge>}
+  1800→                    </div>
+  1801→                    {fs.nick && <p className="text-[11px] text-muted-foreground">@{fs.nick}</p>}
+  1802→                    {fs.description && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{fs.description}</p>}
+  1803→                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-2">
+  1804→                      <span>{fs.links?.length || 0} links</span>
+  1805→                      <span>{fs.products?.length || 0} products</span>
+  1806→                    </div>
+  1807→                  </div>
+  1808→                </div>
+  1809→              </Card>
+  1810→            ))}
+  1811→        </div>
+  1812→      </ScrollArea>
+  1813→    );
+  1814→  }
+  1815→
+  1816→  function FansiteDetail() {
+  1817→    if (!selectedFansite) return null;
+  1818→    const fs = selectedFansite;
+  1819→    return (
+  1820→      <div className="space-y-4 p-4">
+  1821→        <div className="flex items-center gap-3">
+  1822→          <Avatar className="h-14 w-14"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-sm">{fs.user?.displayName?.[0]}</AvatarFallback></Avatar>
+  1823→          <div className="flex-1 min-w-0">
+  1824→            <h3 className="text-lg font-bold">{fs.name}</h3>
+  1825→            {fs.geoName && <p className="text-xs text-muted-foreground">{fs.geoName}</p>}
+  1826→          </div>
+  1827→          <Badge className={fs.status === 'active' ? 'bg-green-400/20 text-green-400' : 'bg-muted'}>{fs.status}</Badge>
+  1828→        </div>
+  1829→        {fs.description && <p className="text-sm text-muted-foreground">{fs.description}</p>}
+  1830→        {fs.trailerImageUrl && <img src={fs.trailerImageUrl} alt="" className="w-full rounded-xl" />}
+  1831→        {/* Links */}
+  1832→        {fs.links && fs.links.length > 0 && (
+  1833→          <div className="space-y-2">
+  1834→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Links</h4>
+  1835→            {fs.links.map(link => (
+  1836→              <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2.5 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all">
+  1837→                <ExternalLink className="w-4 h-4 text-primary shrink-0" />
+  1838→                <div className="flex-1 min-w-0"><p className="text-[12px] font-medium truncate">{link.label || link.type}</p><p className="text-[10px] text-muted-foreground truncate">{link.url}</p></div>
+  1839→              </a>
+  1840→            ))}
+  1841→          </div>
+  1842→        )}
+  1843→        {/* Products */}
+  1844→        {fs.products && fs.products.length > 0 && (
+  1845→          <div className="space-y-2">
+  1846→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Products</h4>
+  1847→            {fs.products.map(product => (
+  1848→              <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1849→                <div><p className="text-[12px] font-medium">{product.period}</p>{product.until && <p className="text-[10px] text-muted-foreground">Until {product.until}</p>}</div>
+  1850→                <div className="text-right">
+  1851→                  {product.priceOld && <p className="text-[10px] text-muted-foreground line-through">${product.priceOld}</p>}
+  1852→                  <p className="text-sm font-bold text-primary">${product.price}</p>
+  1853→                </div>
+  1854→              </div>
+  1855→            ))}
+  1856→          </div>
+  1857→        )}
+  1858→      </div>
+  1859→    );
+  1860→  }
+  1861→
+  1862→  // ─── VIDEOS VIEW ───────────────────────────────────────────
+  1863→  function VideosView() {
+  1864→    if (videosLoading) return <LoadingGrid />;
+  1865→    const filtered = videoSearch ? videos.filter((v: any) => v.title.toLowerCase().includes(videoSearch.toLowerCase())) : videos;
+  1866→    return (
+  1867→      <div className="h-full flex flex-col">
+  1868→        <div className="px-4 py-2 border-b border-border shrink-0">
+  1869→          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={videoSearch} onChange={e => setVideoSearch(e.target.value)} placeholder="Search videos..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1870→        </div>
+  1871→        <ScrollArea className="flex-1">
+  1872→          <div className="p-4 grid grid-cols-2 gap-3">
+  1873→            {filtered.length === 0 ? <div className="col-span-2"><EmptyState icon={Video} title="No videos" desc="Videos from the community will appear here" /></div>
+  1874→              : filtered.map((video: any) => (
+  1875→                <button key={video.id} className="rounded-xl overflow-hidden bg-secondary border border-border text-left group">
+  1876→                  <div className="aspect-video relative bg-card">
+  1877→                    {video.thumbnailUrl ? <img src={video.thumbnailUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Video className="w-8 h-8 text-muted-foreground" /></div>}
+  1878→                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><div className="w-10 h-10 rounded-full bg-primary/80 flex items-center justify-center"><Play className="w-5 h-5 text-primary-foreground fill-current ml-0.5" /></div></div>
+  1879→                    {video.duration && <Badge className="absolute bottom-1 right-1 text-[9px] bg-black/60">{Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}</Badge>}
+  1880→                  </div>
+  1881→                  <div className="p-2"><p className="text-[11px] font-medium truncate">{video.title}</p><p className="text-[10px] text-muted-foreground">{video.user?.displayName}</p></div>
+  1882→                </button>
+  1883→              ))}
+  1884→          </div>
+  1885→        </ScrollArea>
+  1886→      </div>
+  1887→    );
+  1888→  }
+  1889→
+  1890→  function Play(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>; }
+  1891→
+  1892→  // ─── BLOGS VIEW ─────────────────────────────────────────────
+  1893→  function BlogsView() {
+  1894→    if (blogsLoading) return <LoadingGrid cols={1} rows={3} />;
+  1895→    const filtered = blogSearch ? blogs.filter((b: any) => b.title.toLowerCase().includes(blogSearch.toLowerCase())) : blogs;
+  1896→    return (
+  1897→      <div className="h-full flex flex-col">
+  1898→        <div className="px-4 py-2 border-b border-border shrink-0">
+  1899→          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={blogSearch} onChange={e => setBlogSearch(e.target.value)} placeholder="Search blogs..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1900→        </div>
+  1901→        <ScrollArea className="flex-1">
+  1902→          <div className="p-4 space-y-3">
+  1903→            {filtered.length === 0 ? <EmptyState icon={FileText} title="No blogs" desc="Articles and stories will appear here" />
+  1904→              : filtered.map((blog: any) => (
+  1905→                <Card key={blog.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedBlog(blog)}>
+  1906→                  {blog.imageUrl && <img src={blog.imageUrl} alt="" className="w-full h-36 object-cover" />}
+  1907→                  <CardContent className="p-3">
+  1908→                    <h3 className="text-sm font-semibold">{blog.title}</h3>
+  1909→                    {blog.content && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{truncate(blog.content, 120)}</p>}
+  1910→                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-2">
+  1911→                      <span>{blog.user?.displayName}</span><span>·</span><span>{timeAgo(blog.createdAt)}</span>
+  1912→                    </div>
+  1913→                  </CardContent>
+  1914→                </Card>
+  1915→              ))}
+  1916→          </div>
+  1917→        </ScrollArea>
+  1918→      </div>
+  1919→    );
+  1920→  }
+  1921→
+  1922→  function BlogDetail() {
+  1923→    if (!selectedBlog) return null;
+  1924→    return (
+  1925→      <ScrollArea className="max-h-[70vh]">
+  1926→        <div className="space-y-4 p-4">
+  1927→          {selectedBlog.imageUrl && <img src={selectedBlog.imageUrl} alt="" className="w-full rounded-xl" />}
+  1928→          <h2 className="text-xl font-bold">{selectedBlog.title}</h2>
+  1929→          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+  1930→            <span>{selectedBlog.user?.displayName}</span><span>·</span><span>{fmtDate(selectedBlog.createdAt)}</span>
+  1931→          </div>
+  1932→          <Separator className="bg-border" />
+  1933→          <div className="text-sm leading-relaxed whitespace-pre-wrap">{selectedBlog.content}</div>
+  1934→        </div>
+  1935→      </ScrollArea>
+  1936→    );
+  1937→  }
+  1938→
+  1939→  // ─── GROUPS VIEW ───────────────────────────────────────────
+  1940→  function GroupsView() {
+  1941→    const filtered = groupSearch ? groups.filter((g: any) => g.name.toLowerCase().includes(groupSearch.toLowerCase())) : groups;
+  1942→    return (
+  1943→      <div className="h-full flex flex-col">
+  1944→        <div className="px-4 py-2 border-b border-border shrink-0 flex items-center gap-2">
+  1945→          <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={groupSearch} onChange={e => setGroupSearch(e.target.value)} placeholder="Search groups..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1946→          <Button size="sm" className="h-9 text-xs bg-primary text-primary-foreground shrink-0" onClick={() => setShowCreateGroup(true)}><Plus className="w-3.5 h-3.5 mr-1" /> New</Button>
+  1947→        </div>
+  1948→        <ScrollArea className="flex-1">
+  1949→          <div className="p-4 space-y-2">
+  1950→            {filtered.length === 0 ? <EmptyState icon={Users} title="No groups" desc="Create or join a group" />
+  1951→              : filtered.filter((g: any) => !g.hidden).map((group: any) => (
+  1952→                <Card key={group.id} className="bg-secondary border-border">
+  1953→                  <CardContent className="p-3">
+  1954→                    <div className="flex items-center gap-3">
+  1955→                      <Avatar className="h-11 w-11"><AvatarImage src={group.avatar} /><AvatarFallback className="text-xs">{group.name?.[0]}</AvatarFallback></Avatar>
+  1956→                      <div className="flex-1 min-w-0">
+  1957→                        <h3 className="text-[13px] font-semibold truncate">{group.name}</h3>
+  1958→                        <p className="text-[11px] text-muted-foreground">{group._count?.members || 0} members</p>
+  1959→                        {group.description && <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{group.description}</p>}
+  1960→                        {group.geoName && <Badge className="text-[9px] mt-1 bg-muted">{group.geoName}</Badge>}
+  1961→                      </div>
+  1962→                      <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => { setActiveGroup(group); setGroupMessages([]); setChatMobileView('chat'); setActiveTab('chat'); }}>Open</Button>
+  1963→                    </div>
+  1964→                  </CardContent>
+  1965→                </Card>
+  1966→              ))}
+  1967→          </div>
+  1968→        </ScrollArea>
+  1969→      </div>
+  1970→    );
+  1971→  }
+  1972→
+  1973→  // ─── ALBUMS VIEW ────────────────────────────────────────────
+  1974→  function AlbumsView() {
+  1975→    if (albumsLoading) return <LoadingGrid />;
+  1976→    return (
+  1977→      <ScrollArea className="h-full">
+  1978→        <div className="p-4 space-y-4">
+  1979→          {albums.length === 0 ? <EmptyState icon={ImageIcon} title="No albums" desc="Create albums to organize your photos" />
+  1980→            : albums.map(album => (
+  1981→              <Card key={album.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedAlbum(album)}>
+  1982→                <CardContent className="p-3">
+  1983→                  <div className="flex items-center gap-3">
+  1984→                    <div className="w-14 h-14 rounded-xl bg-card flex items-center justify-center overflow-hidden">
+  1985→                      {album.photos && album.photos[0] ? <img src={album.photos[0].url} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="w-6 h-6 text-muted-foreground" />}
+  1986→                    </div>
+  1987→                    <div className="flex-1 min-w-0">
+  1988→                      <h3 className="text-sm font-semibold">{album.name}</h3>
+  1989→                      <p className="text-[11px] text-muted-foreground">{album.photos?.length || 0} photos</p>
+  1990→                      {album.isPrivate && <Badge className="text-[9px] mt-1 bg-yellow-500/20 text-yellow-400"><Lock className="w-2.5 h-2.5 mr-0.5" /> Private</Badge>}
+  1991→                    </div>
+  1992→                  </div>
+  1993→                </CardContent>
+  1994→              </Card>
+  1995→            ))}
+  1996→        </div>
+  1997→      </ScrollArea>
+  1998→    );
+  1999→  }
+  2000→
+  2001→  function AlbumDetail() {
+  2002→    if (!selectedAlbum) return null;
+  2003→    return (
+  2004→      <ScrollArea className="max-h-[70vh]">
+  2005→        <div className="p-4 space-y-3">
+  2006→          <h3 className="text-lg font-bold">{selectedAlbum.name}</h3>
+  2007→          <div className="grid grid-cols-3 gap-2">
+  2008→            {(selectedAlbum.photos || []).map((photo: any) => (
+  2009→              <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-card">
+  2010→                <img src={photo.url} alt="" className="w-full h-full object-cover" />
+  2011→              </div>
+  2012→            ))}
+  2013→            {(!selectedAlbum.photos || selectedAlbum.photos.length === 0) && <p className="col-span-3 text-sm text-muted-foreground text-center py-8">No photos in this album</p>}
+  2014→          </div>
+  2015→        </div>
+  2016→      </ScrollArea>
+  2017→    );
+  2018→  }
+  2019→
+  2020→  // ─── MEMBERSHIP VIEW ───────────────────────────────────────
+  2021→  function MembershipView() {
+  2022→    return (
+  2023→      <ScrollArea className="h-full">
+  2024→        <div className="p-4 space-y-6">
+  2025→          <div className="text-center space-y-1">
+  2026→            <h2 className="text-lg font-bold gradient-text">Choose Your Plan</h2>
+  2027→            <p className="text-xs text-muted-foreground">Unlock premium features and stand out</p>
+  2028→          </div>
+  2029→          <div className="grid gap-3">
+  2030→            {SUBSCRIPTION_TIERS.map(tier => (
+  2031→              <Card key={tier.tier} className={`bg-secondary border ${tier.popular ? 'border-primary' : 'border-border'} relative overflow-hidden`}>
+  2032→                {tier.popular && <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">POPULAR</div>}
+  2033→                <CardContent className="p-4">
+  2034→                  <div className="flex items-center gap-3 mb-3">
+  2035→                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center`}><Crown className="w-5 h-5 text-white" /></div>
+  2036→                    <div><h3 className="text-base font-bold">{tier.label}</h3><p className="text-xs text-muted-foreground">{tier.price === 0 ? 'Free forever' : `$${tier.price}/month`}</p></div>
+  2037→                  </div>
+  2038→                  <ul className="space-y-1.5">
+  2039→                    {tier.features.map((f, i) => (
+  2040→                      <li key={i} className="flex items-center gap-2 text-[12px]"><Check className="w-3 h-3 text-primary shrink-0" /><span className="text-muted-foreground">{f}</span></li>
+  2041→                    ))}
+  2042→                  </ul>
+  2043→                  <Button className={`w-full mt-4 h-9 text-xs ${tier.popular ? 'bg-primary text-primary-foreground' : 'border border-border bg-card'}`} onClick={() => { if (tier.price > 0) setActiveTab('membership'); }}>
+  2044→                    {tier.price === 0 ? 'Current Plan' : 'Upgrade'}
+  2045→                  </Button>
+  2046→                </CardContent>
+  2047→              </Card>
+  2048→            ))}
+  2049→          </div>
+  2050→        </div>
+  2051→      </ScrollArea>
+  2052→    );
+  2053→  }
+  2054→
+  2055→  // ─── VERIFIED VIEW ─────────────────────────────────────────
+  2056→  function VerifiedView() {
+  2057→    const verTypes = ['age', 'photo', 'id', 'face', 'social'] as const;
+  2058→    return (
+  2059→      <ScrollArea className="h-full">
+  2060→        <div className="p-4 space-y-6">
+  2061→          {/* Status */}
+  2062→          <div className="flex items-center gap-4 p-4 rounded-xl bg-secondary border border-border">
+  2063→            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+  2064→              {myVerification?.status === 'verified' ? <ShieldCheck className="w-7 h-7 text-green-400" /> : <Shield className="w-7 h-7 text-muted-foreground" />}
+  2065→            </div>
+  2066→            <div>
+  2067→              <h3 className="text-base font-bold">{myVerification?.status === 'verified' ? 'Verified ✓' : myVerification?.status === 'pending' ? 'Pending Review' : 'Not Verified'}</h3>
+  2068→              <p className="text-xs text-muted-foreground">{myVerification?.status === 'verified' ? 'Your account is verified' : 'Get verified to increase trust and visibility'}</p>
+  2069→            </div>
+  2070→          </div>
+  2071→          {/* Verification types */}
+  2072→          <div className="space-y-3">
+  2073→            <h4 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Verification Methods</h4>
+  2074→            {verTypes.map(type => (
+  2075→              <div key={type} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  2076→                <div className="flex items-center gap-3">
+  2077→                  <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center"><Fingerprint className="w-4 h-4 text-primary" /></div>
+  2078→                  <div><p className="text-[12px] font-medium capitalize">{type} Verification</p><p className="text-[10px] text-muted-foreground">Verify your {type}</p></div>
+  2079→                </div>
+  2080→                <Button size="sm" variant="outline" className="h-7 text-[10px] border-border" onClick={async () => {
+  2081→                  if (!currentUser) return;
+  2082→                  try { await fetch(`/api/verification?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type }) }); } catch {}
+  2083→                }}>Submit</Button>
+  2084→              </div>
+  2085→            ))}
+  2086→          </div>
+  2087→        </div>
+  2088→      </ScrollArea>
+  2089→    );
+  2090→  }
+  2091→
+  2092→  // ─── PROFESSIONAL VIEW ─────────────────────────────────────
+  2093→  function ProfessionalView() {
+  2094→    return (
+  2095→      <ScrollArea className="h-full">
+  2096→        <div className="p-4 space-y-6">
+  2097→          <div className="flex items-center gap-4 p-4 rounded-xl bg-secondary border border-border">
+  2098→            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center"><Briefcase className="w-7 h-7 text-white" /></div>
+  2099→            <div>
+  2100→              <h3 className="text-base font-bold">Professional Account</h3>
+  2101→              <p className="text-xs text-muted-foreground">Monetize your content and grow your audience</p>
+  2102→            </div>
+  2103→          </div>
+  2104→          <Card className="bg-secondary border-border">
+  2105→            <CardContent className="p-4 space-y-3">
+  2106→              <h4 className="text-sm font-semibold">Requirements</h4>
+  2107→              <ul className="space-y-2 text-[12px] text-muted-foreground">
+  2108→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Verified account</li>
+  2109→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Active profile for 30+ days</li>
+  2110→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />10+ profile photos</li>
+  2111→                <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Clean community record</li>
+  2112→              </ul>
+  2113→              <Button className="w-full bg-primary text-primary-foreground text-xs" onClick={() => { fetch('/api/verification', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ userId: 'test-user-1', type: 'professional' }) }).catch(()=>{}); }}>Apply for Professional</Button>
+  2114→            </CardContent>
+  2115→          </Card>
+  2116→        </div>
+  2117→      </ScrollArea>
+  2118→    );
+  2119→  }
+  2120→
+  2121→  // ─── FOOTPRINTS VIEW ───────────────────────────────────────
+  2122→  function FootprintsView() {
+  2123→    if (footprintsLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  2124→    return (
+  2125→      <ScrollArea className="h-full">
+  2126→        <div className="p-4 space-y-1">
+  2127→          {footprints.length === 0 ? <EmptyState icon={FootprintsIcon} title="No footprints" desc="Profiles you visit will appear here" />
+  2128→            : footprints.map((fp: any) => fp.target && (
+  2129→              <UserRow key={fp.id} user={fp.target} sub={<span>Visited {timeAgo(fp.createdAt)}</span>} onClick={() => openProfile(fp.target.id)} />
+  2130→            ))}
+  2131→        </div>
+  2132→      </ScrollArea>
+  2133→    );
+  2134→  }
+  2135→
+  2136→
+  2137→  // ─── NOTES VIEW ────────────────────────────────────────────
+  2138→  function NotesView() {
+  2139→    return (
+  2140→      <ScrollArea className="h-full">
+  2141→        <div className="p-4 space-y-4">
+  2142→          <div className="flex items-center justify-between">
+  2143→            <h3 className="text-sm font-semibold">My Notes ({notes.length})</h3>
+  2144→            <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={() => { setNoteTargetId(''); setNoteContent(''); setShowNoteDialog(true); }}><Plus className="w-3.5 h-3.5 mr-1" /> Add</Button>
+  2145→          </div>
+  2146→          {notes.length === 0 ? <EmptyState icon={StickyNote} title="No notes" desc="Add notes to user profiles to remember details" />
+  2147→            : notes.map((note: any) => (
+  2148→              <Card key={note.id} className="bg-secondary border-border">
+  2149→                <CardContent className="p-3">
+  2150→                  <div className="flex items-center justify-between mb-1">
+  2151→                    <div className="flex items-center gap-2">
+  2152→                      {note.target && <button onClick={() => openProfile(note.target.id)} className="text-[12px] font-semibold hover:text-primary">{note.target.displayName}</button>}
+  2153→                      <Badge className="text-[9px] bg-muted">{note.type}</Badge>
+  2154→                    </div>
+  2155→                    <div className="flex gap-1">
+  2156→                      <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" onClick={() => handleDeleteNote(note.id)}><X className="w-3 h-3" /></Button>
+  2157→                    </div>
+  2158→                  </div>
+  2159→                  <p className="text-[12px] text-muted-foreground">{note.content}</p>
+  2160→                  <p className="text-[10px] text-muted-foreground mt-1">{timeAgo(note.createdAt)}</p>
+  2161→                </CardContent>
+  2162→              </Card>
+  2163→            ))}
+  2164→        </div>
+  2165→      </ScrollArea>
+  2166→    );
+  2167→  }
+  2168→
+  2169→  // ─── BOOSTS VIEW ────────────────────────────────────────────
+  2170→  function BoostsView() {
+  2171→    if (boostsLoading) return <LoadingGrid cols={1} rows={3} />;
+  2172→    const activeBoosts = allBoosts.filter((b: any) => b.isActive);
+  2173→    return (
+  2174→      <ScrollArea className="h-full">
+  2175→        <div className="p-4 space-y-6">
+  2176→          {/* Active boosts */}
+  2177→          <div className="space-y-3">
+  2178→            <SectionHeader icon={Zap} label="Active Boosts" count={activeBoosts.length} />
+  2179→            {activeBoosts.length === 0 ? <p className="text-xs text-muted-foreground">No active boosts</p>
+  2180→              : activeBoosts.map((boost: any) => (
+  2181→                <div key={boost.id} className="p-3 rounded-xl bg-secondary border border-border boost-glow">
+  2182→                  <div className="flex items-center justify-between mb-2">
+  2183→                    <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-primary" /><span className="text-[12px] font-semibold capitalize">{boost.type} Boost</span></div>
+  2184→                    <Badge className="bg-green-400/20 text-green-400 text-[9px]">Active</Badge>
+  2185→                  </div>
+  2186→                  <Progress value={boost.duration > 0 ? 50 : 100} className="h-1.5" />
+  2187→                  <p className="text-[10px] text-muted-foreground mt-1">Ends {timeAgo(boost.endsAt)}</p>
+  2188→                </div>
+  2189→              ))}
+  2190→          </div>
+  2191→          {/* Purchase */}
+  2192→          <div className="space-y-3">
+  2193→            <SectionHeader icon={Wallet} label="Purchase Boosts" />
+  2194→            <div className="grid gap-2">
+  2195→              {BOOST_TYPES.map(bt => (
+  2196→                <Card key={bt.type} className="bg-secondary border-border">
+  2197→                  <CardContent className="p-3">
+  2198→                    <div className="flex items-center gap-3">
+  2199→                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${bt.color} flex items-center justify-center shrink-0`}><Rocket className="w-5 h-5 text-white" /></div>
+  2200→                      <div className="flex-1 min-w-0">
+  2201→                        <h4 className="text-[12px] font-semibold">{bt.label} Boost</h4>
+  2202→                        <p className="text-[10px] text-muted-foreground">{bt.desc}</p>
+  2203→                      </div>
+  2204→                      <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground shrink-0" onClick={async () => {
+  2205→                        if (!currentUser) return;
+  2206→                        try { await fetch(`/api/boosts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: bt.type, duration: bt.duration }) }); } catch {}
+  2207→                      }}>${bt.price}</Button>
+  2208→                    </div>
+  2209→                  </CardContent>
+  2210→                </Card>
+  2211→              ))}
+  2212→            </div>
+  2213→          </div>
+  2214→          {/* History */}
+  2215→          <div className="space-y-3">
+  2216→            <SectionHeader icon={Clock} label="Boost History" count={allBoosts.length} />
+  2217→            {allBoosts.length === 0 ? <p className="text-xs text-muted-foreground">No boost history</p>
+  2218→              : allBoosts.slice(0, 10).map((boost: any) => (
+  2219→                <div key={boost.id} className="flex items-center justify-between p-2.5 rounded-lg bg-secondary/50">
+  2220→                  <div className="flex items-center gap-2">
+  2221→                    <span className="text-[12px] font-medium capitalize">{boost.type}</span>
+  2222→                    <Badge className={`text-[9px] ${boost.isActive ? 'bg-green-400/20 text-green-400' : 'bg-muted text-muted-foreground'}`}>{boost.isActive ? 'Active' : 'Expired'}</Badge>
+  2223→                  </div>
+  2224→                  <span className="text-[10px] text-muted-foreground">{timeAgo(boost.endsAt)}</span>
+  2225→                </div>
+  2226→              ))}
+  2227→          </div>
+  2228→        </div>
+  2229→      </ScrollArea>
+  2230→    );
+  2231→  }
+  2232→
+  2233→  // ─── FAVORITES VIEW ────────────────────────────────────────
+  2234→  function FavoritesView() {
+  2235→    if (favoritesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  2236→    return (
+  2237→      <div className="h-full flex flex-col">
+  2238→        <div className="px-4 pt-2 shrink-0">
+  2239→          <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  2240→            <TabsTrigger value="all" className={`text-[11px] flex-1 h-7 ${favViewMode === 'all' ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground' : ''}`} onClick={() => { setFavViewMode('all'); setSelectedFolder(null); }}>All Favorites ({favorites.length})</TabsTrigger>
+  2241→            <TabsTrigger value="folders" className={`text-[11px] flex-1 h-7 ${favViewMode === 'folders' ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground' : ''}`} onClick={() => setFavViewMode('folders')}>Folders ({contactFolders.length})</TabsTrigger>
+  2242→          </TabsList>
+  2243→        </div>
+  2244→        {favViewMode === 'all' ? (
+  2245→          <ScrollArea className="flex-1">
+  2246→            <div className="p-4 space-y-1">
+  2247→              {favorites.length === 0 ? <EmptyState icon={Bookmark} title="No favorites" desc="Add users to favorites from their profiles" />
+  2248→                : favorites.map((fav: any) => fav.target && (
+  2249→                  <div key={fav.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  2250→                    <button onClick={() => openProfile(fav.target.id)}>
+  2251→                      <div className="relative">
+  2252→                        <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-xs">{fav.target.displayName?.[0]}</AvatarFallback></Avatar>
+  2253→                        {fav.isSuper && <Star className="absolute -top-1 -right-1 w-4 h-4 text-yellow-400 fill-yellow-400" />}
+  2254→                      </div>
+  2255→                    </button>
+  2256→                    <div className="flex-1 min-w-0">
+  2257→                      <button onClick={() => openProfile(fav.target.id)} className="text-[13px] font-semibold hover:text-primary">{fav.target.displayName}</button>
+  2258→                      <p className="text-[10px] text-muted-foreground">{fav.isSuper ? '⭐ Super Favorite' : 'Favorite'} · {timeAgo(fav.createdAt)}</p>
+  2259→                    </div>
+  2260→                    <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/favorites?userId=${CURRENT_USER_ID}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: fav.targetId }) }); setFavorites(prev => prev.filter((f: any) => f.id !== fav.id)); } catch {} }}>Remove</Button>
+  2261→                  </div>
+  2262→                ))}
+  2263→            </div>
+  2264→          </ScrollArea>
+  2265→        ) : selectedFolder ? (
+  2266→          <div className="h-full flex flex-col">
+  2267→            <BackHeader title={selectedFolder.name} onBack={() => { setSelectedFolder(null); }} />
+  2268→            <ScrollArea className="flex-1">
+  2269→              <div className="p-4 space-y-1">
+  2270→                {(selectedFolder.members || []).length === 0 ? <EmptyState icon={FolderOpen} title="Empty folder" desc="Add members to this folder" />
+  2271→                  : selectedFolder.members.map((m: any) => m.user && (
+  2272→                    <div key={m.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  2273→                      <button onClick={() => openProfile(m.user.id)}><Avatar className="h-11 w-11"><AvatarImage src={getAvatar(m.user)} /><AvatarFallback className="text-xs">{m.user.displayName?.[0]}</AvatarFallback></Avatar></button>
+  2274→                      <div className="flex-1 min-w-0"><button onClick={() => openProfile(m.user.id)} className="text-[13px] font-semibold hover:text-primary">{m.user.displayName}</button></div>
+  2275→                      <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/contact-folders/${selectedFolder.id}?targetUserId=${m.user.id}`, { method: 'DELETE' }); const res = await fetch('/api/contact-folders'); const data = await res.json(); setContactFolders(data.data || []); const updated = (data.data || []).find((f: any) => f.id === selectedFolder.id); setSelectedFolder(updated || null); } catch {} }}>Remove</Button>
+  2276→                    </div>
+  2277→                  ))}
+  2278→              </div>
+  2279→            </ScrollArea>
+  2280→          </div>
+  2281→        ) : (
+  2282→          <ScrollArea className="flex-1">
+  2283→            <div className="p-4 space-y-3">
+  2284→              {contactFolders.length === 0 ? <EmptyState icon={FolderOpen} title="No folders" desc="Contact folders will appear here" />
+  2285→                : contactFolders.map((folder: any) => (
+  2286→                  <Card key={folder.id} className="bg-secondary border-border cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedFolder(folder)}>
+  2287→                    <CardContent className="p-3 flex items-center gap-3">
+  2288→                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><FolderOpen className="w-5 h-5 text-primary" /></div>
+  2289→                      <div className="flex-1 min-w-0"><h3 className="text-[13px] font-semibold">{folder.name}</h3><p className="text-[10px] text-muted-foreground">{folder._count?.members || 0} contacts</p></div>
+  2290→                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+  2291→                    </CardContent>
+  2292→                  </Card>
+  2293→                ))}
+  2294→            </div>
+  2295→          </ScrollArea>
+  2296→        )}
+  2297→      </div>
+  2298→    );
+  2299→  }
+  2300→
+  2301→  // ─── ACCOUNT VIEW ──────────────────────────────────────────
+  2302→  function AccountView() {
+  2303→    return (
+  2304→      <ScrollArea className="h-full">
+  2305→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2306→          <Card className="bg-secondary border-border">
+  2307→            <CardContent className="p-4 space-y-4">
+  2308→              <SectionHeader icon={Lock} label="Account Settings" />
+  2309→              {currentUser && <>
+  2310→                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Email</Label><Input value={currentUser.email} disabled className="bg-card border-border h-10 text-xs" /></div>
+  2311→                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Username</Label><Input value={currentUser.username} disabled className="bg-card border-border h-10 text-xs" /></div>
+  2312→                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Display Name</Label><Input value={editForm.displayName || currentUser.displayName} onChange={e => setEditForm(p => ({ ...p, displayName: e.target.value }))} className="bg-card border-border h-10 text-xs" /></div>
+  2313→                <Button className="bg-primary text-primary-foreground text-xs" onClick={handleSaveProfile}>Save Changes</Button>
+  2314→              </>}
+  2315→            </CardContent>
+  2316→          </Card>
+  2317→          <Card className="bg-secondary border-border">
+  2318→            <CardContent className="p-4 space-y-3">
+  2319→              <SectionHeader icon={Shield} label="Password" />
+  2320→              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Current Password</Label><Input type="password" placeholder="••••••••" className="bg-card border-border h-10 text-xs" /></div>
+  2321→              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">New Password</Label><Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="••••••••" className="bg-card border-border h-10 text-xs" /></div>
+  2322→              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Confirm Password</Label><Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" className="bg-card border-border h-10 text-xs" /></div>
+  2323→              <Button variant="outline" className="border-border text-xs" onClick={() => { if (!newPassword || newPassword !== confirmPassword) return; fetch('/api/auth', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'update-password', newPassword }) }).catch(()=>{}); setNewPassword(''); setConfirmPassword(''); }}>Update Password</Button>
+  2324→            </CardContent>
+  2325→          </Card>
+  2326→          <Card className="bg-destructive/10 border border-destructive/20">
+  2327→            <CardContent className="p-4 space-y-3">
+  2328→              <SectionHeader icon={AlertTriangle} label="Danger Zone" />
+  2329→              <p className="text-xs text-muted-foreground">Once you delete your account, there is no going back.</p>
+  2330→              <Button variant="outline" className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 text-xs" onClick={() => setShowDeleteAccount(true)}>Delete Account</Button>
+  2331→            </CardContent>
+  2332→          </Card>
+  2333→        </div>
+  2334→      </ScrollArea>
+  2335→    );
+  2336→  }
+  2337→
+  2338→  // ─── PREFERENCES VIEW ──────────────────────────────────────
+  2339→  function PreferencesView() {
+  2340→    const togglePref = (key: string) => setPrefs(p => ({ ...p, [key]: !(p as any)[key] }));
+  2341→    return (
+  2342→      <ScrollArea className="h-full">
+  2343→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2344→          {/* Geo & Display */}
+  2345→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2346→            <SectionHeader icon={MapPin} label="Location & Display" />
+  2347→            {[
+  2348→              { key: 'showOnline', label: 'Show Online Status', desc: 'Let others see when you are online' },
+  2349→              { key: 'showDistance', label: 'Show Distance', desc: 'Display distance to other users' },
+  2350→              { key: 'showAge', label: 'Show Age', desc: 'Display your age on profile' },
+  2351→              { key: 'showActivity', label: 'Show Activity', desc: 'Show your recent activity' },
+  2352→              { key: 'hidePicsOffline', label: 'Hide Pics Offline', desc: 'Hide photos when offline' },
+  2353→            ].map(item => (
+  2354→              <div key={item.key} className="flex items-center justify-between">
+  2355→                <div><p className="text-sm">{item.label}</p><p className="text-[10px] text-muted-foreground">{item.desc}</p></div>
+  2356→                <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
+  2357→              </div>
+  2358→            ))}
+  2359→          </CardContent></Card>
+  2360→          {/* Discover Settings */}
+  2361→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2362→            <SectionHeader icon={Search} label="Discover Preferences" />
+  2363→            <div className="flex items-center justify-between"><div><p className="text-sm">Age Range</p><p className="text-[10px] text-muted-foreground">{prefs.ageMin}–{prefs.ageMax}</p></div>
+  2364→              <Slider value={[prefs.ageMin, prefs.ageMax]} onValueChange={([min, max]) => setPrefs(p => ({ ...p, ageMin: min, ageMax: max }))} min={18} max={80} step={1} className="w-32" /></div>
+  2365→            <div className="flex items-center justify-between"><div><p className="text-sm">Units</p></div>
+  2366→              <Select value={prefs.displayUnits} onValueChange={v => setPrefs(p => ({ ...p, displayUnits: v }))}><SelectTrigger className="h-8 w-24 text-[11px] bg-card border-border"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="metric">Metric</SelectItem><SelectItem value="imperial">Imperial</SelectItem></SelectContent></Select>
+  2367→            </div>
+  2368→            <div className="flex items-center justify-between"><div><p className="text-sm">Language</p></div>
+  2369→              <Select value={prefs.lang} onValueChange={v => setPrefs(p => ({ ...p, lang: v }))}><SelectTrigger className="h-8 w-24 text-[11px] bg-card border-border"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="en">English</SelectItem><SelectItem value="es">Spanish</SelectItem><SelectItem value="fr">French</SelectItem><SelectItem value="de">German</SelectItem><SelectItem value="it">Italian</SelectItem></SelectContent></Select>
+  2370→            </div>
+  2371→          </CardContent></Card>
+  2372→          {/* Sound & Notifications */}
+  2373→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2374→            <SectionHeader icon={Bell} label="Notifications" />
+  2375→            {[
+  2376→              { key: 'soundOff', label: 'Sound Off', desc: 'Mute all app sounds' },
+  2377→              { key: 'notifPushOff', label: 'Push Notifications', desc: 'Disable push notifications' },
+  2378→              { key: 'notifEmailOff', label: 'Email Notifications', desc: 'Disable email notifications' },
+  2379→              { key: 'notifTelegramOff', label: 'Telegram Notifications', desc: 'Disable Telegram alerts' },
+  2380→            ].map(item => (
+  2381→              <div key={item.key} className="flex items-center justify-between">
+  2382→                <div><p className="text-sm">{item.label}</p><p className="text-[10px] text-muted-foreground">{item.desc}</p></div>
+  2383→                <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
+  2384→              </div>
+  2385→            ))}
+  2386→          </CardContent></Card>
+  2387→          {/* Privacy */}
+  2388→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2389→            <SectionHeader icon={Shield} label="Privacy" />
+  2390→            {[
+  2391→              { key: 'mailingInternal', label: 'Internal Mailing', desc: 'Receive internal communications' },
+  2392→              { key: 'mailingPartner', label: 'Partner Mailing', desc: 'Receive partner promotions' },
+  2393→              { key: 'profileOff', label: 'Profile Off', desc: 'Hide your profile temporarily' },
+  2394→              { key: 'privateAuto', label: 'Private Auto-Reply', desc: 'Auto-reply when private' },
+  2395→              { key: 'noPros', label: 'No Professionals', desc: 'Hide professional accounts' },
+  2396→              { key: 'noPub', label: 'No Public Content', desc: 'Hide public content' },
+  2397→            ].map(item => (
+  2398→              <div key={item.key} className="flex items-center justify-between">
+  2399→                <div><p className="text-sm">{item.label}</p><p className="text-[10px] text-muted-foreground">{item.desc}</p></div>
+  2400→                <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
+  2401→              </div>
+  2402→            ))}
+  2403→          </CardContent></Card>
+  2404→          {/* DND Schedule */}
+  2405→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2406→            <SectionHeader icon={BellOff} label="Do Not Disturb" />
+  2407→            <div className="flex items-center justify-between">
+  2408→              <div><p className="text-sm">Enable DND</p><p className="text-[10px] text-muted-foreground">Mute notifications during set hours</p></div>
+  2409→              <Switch checked={dndSettings.dndEnabled} onCheckedChange={async (v) => { setDndSettings(p => ({ ...p, dndEnabled: v })); try { await fetch('/api/dnd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dndSettings, dndEnabled: v }) }); } catch {} }} />
+  2410→            </div>
+  2411→            {dndSettings.dndEnabled && (<>
+  2412→              <div className="flex items-center justify-between"><div><p className="text-sm">Start Time</p></div><Input type="time" value={dndSettings.dndStart} onChange={e => { const v = e.target.value; setDndSettings(p => ({ ...p, dndStart: v })); fetch('/api/dnd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dndSettings, dndStart: v }) }).catch(() => {}); }} className="h-8 w-28 text-xs bg-card border-border" /></div>
+  2413→              <div className="flex items-center justify-between"><div><p className="text-sm">End Time</p></div><Input type="time" value={dndSettings.dndEnd} onChange={e => { const v = e.target.value; setDndSettings(p => ({ ...p, dndEnd: v })); fetch('/api/dnd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dndSettings, dndEnd: v }) }).catch(() => {}); }} className="h-8 w-28 text-xs bg-card border-border" /></div>
+  2414→            </>)}
+  2415→          </CardContent></Card>
+  2416→        </div>
+  2417→      </ScrollArea>
+  2418→    );
+  2419→  }
+  2420→
+  2421→  // ─── GEO SETTINGS VIEW ─────────────────────────────────────
+  2422→  function GeoSettingsView() {
+  2423→    const modes = [
+  2424→      { value: 'auto', label: 'Auto GPS', icon: Crosshair, desc: 'Use device GPS for precise location' },
+  2425→      { value: 'manual', label: 'Manual City', icon: MapPin, desc: 'Set a fixed city location' },
+  2426→      { value: 'fake', label: 'Fake Location', icon: MapPinOff, desc: 'Use a custom fake location' },
+  2427→      { value: 'hide', label: 'Hide Location', icon: EyeOff, desc: 'Hide your location completely' },
+  2428→    ];
+  2429→    return (
+  2430→      <ScrollArea className="h-full">
+  2431→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2432→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2433→            <SectionHeader icon={Navigation} label="Location Mode" />
+  2434→            {modes.map(mode => {
+  2435→              const Icon = mode.icon;
+  2436→              return (
+  2437→                <button key={mode.value} onClick={() => { setGeoMode(mode.value); setPrefs(p => ({ ...p, geoMode: mode.value })); }}
+  2438→                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all ${geoMode === mode.value ? 'bg-primary/10 border-primary/30' : 'bg-card border-border hover:border-primary/20'}`}>
+  2439→                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${geoMode === mode.value ? 'bg-primary/20' : 'bg-secondary'}`}><Icon className="w-4 h-4 text-primary" /></div>
+  2440→                  <div className="text-left"><p className="text-[12px] font-semibold">{mode.label}</p><p className="text-[10px] text-muted-foreground">{mode.desc}</p></div>
+  2441→                  {geoMode === mode.value && <Check className="w-4 h-4 text-primary ml-auto" />}
+  2442→                </button>
+  2443→              );
+  2444→            })}
+  2445→          </CardContent></Card>
+  2446→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2447→            <SectionHeader icon={MapPin} label="Geo Name" />
+  2448→            <p className="text-[10px] text-muted-foreground">This name displays instead of your real location</p>
+  2449→            <Input value={geoName} onChange={e => setGeoName(e.target.value)} placeholder="e.g. 'Somewhere fun'" className="bg-card border-border h-10 text-xs" />
+  2450→          </CardContent></Card>
+  2451→          {(geoMode === 'fake') && (
+  2452→            <Card className="bg-yellow-500/10 border border-yellow-500/20"><CardContent className="p-3 flex items-center gap-3">
+  2453→              <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0" />
+  2454→              <p className="text-xs text-yellow-400">Fake location mode is active. Other users may see this as suspicious.</p>
+  2455→            </CardContent></Card>
+  2456→          )}
+  2457→          {/* Map preview */}
+  2458→          <Card className="bg-secondary border-border">
+  2459→            <CardContent className="p-3">
+  2460→              <div className="aspect-video rounded-xl bg-card relative overflow-hidden">
+  2461→                <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 50%, oklch(0.22 0.01 285) 0%, oklch(0.15 0.005 285) 100%)' }}>
+  2462→                  <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid2)" /></svg>
+  2463→                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"><div className="w-5 h-5 bg-primary rounded-full border-3 border-card shadow-lg"><div className="w-full h-full bg-primary rounded-full animate-ping opacity-30" /></div></div>
+  2464→                </div>
+  2465→              </div>
+  2466→            </CardContent>
+  2467→          </Card>
+  2468→        </div>
+  2469→      </ScrollArea>
+  2470→    );
+  2471→  }
+  2472→
+  2473→  // ─── BANNERS VIEW ──────────────────────────────────────────
+  2474→  function BannersView() {
+  2475→    return (
+  2476→      <ScrollArea className="h-full">
+  2477→        <div className="p-4 space-y-4">
+  2478→          <div className="flex items-center justify-between">
+  2479→            <h3 className="text-sm font-semibold">Active Banners ({banners.length})</h3>
+  2480→            <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={handleCreateBanner}><Plus className="w-3.5 h-3.5 mr-1" /> Create</Button>
+  2481→          </div>
+  2482→          {banners.length === 0 ? <EmptyState icon={Layers} title="No banners" desc="Create promotional banners" />
+  2483→            : banners.map((banner: any) => (
+  2484→              <Card key={banner.id} className="bg-secondary border-border overflow-hidden">
+  2485→                {banner.imageUrl && <img src={banner.imageUrl} alt="" className="w-full h-32 object-cover" />}
+  2486→                <CardContent className="p-3">
+  2487→                  <div className="flex items-center justify-between">
+  2488→                    <div><p className="text-[12px] font-semibold">{banner.title}</p><p className="text-[10px] text-muted-foreground">Position: {banner.position} · {banner.isActive ? '✓ Active' : 'Inactive'}</p></div>
+  2489→                  </div>
+  2490→                </CardContent>
+  2491→              </Card>
+  2492→            ))}
+  2493→        </div>
+  2494→      </ScrollArea>
+  2495→    );
+  2496→  }
+  2497→
+  2498→  // ─── SITES VIEW ─────────────────────────────────────────────
+  2499→  function SitesView() {
+  2500→    const [sites, setSites] = useState<any[]>([]);
+  2501→    const [sitesLoading, setSitesLoading] = useState(true);
+  2502→    useEffect(() => {
+  2503→      fetch('/api/fansites?userId=test-user-1')
+  2504→        .then(r => r.json())
+  2505→        .then(res => setSites(res.data || []))
+  2506→        .catch(() => setSites([]))
+  2507→        .finally(() => setSitesLoading(false));
+  2508→    }, []);
+  2509→    if (sitesLoading) return <LoadingGrid cols={1} rows={3} />;
+  2510→    return (
+  2511→      <ScrollArea className="h-full">
+  2512→        <div className="p-4 space-y-4">
+  2513→          <h3 className="text-sm font-semibold">Connected Sites</h3>
+  2514→          {sites.length === 0 ? (
+  2515→            <EmptyState icon={Link2} title="No linked sites yet" desc="Connect your fansite or external links to appear here" />
+  2516→          ) : (
+  2517→            sites.map((site: any) => (
+  2518→              <a key={site.id} href={site.url || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all">
+  2519→                <div className="w-9 h-9 rounded-xl bg-card flex items-center justify-center text-lg">{site.icon || '🔗'}</div>
+  2520→                <div className="flex-1 min-w-0"><p className="text-[12px] font-semibold">{site.name || site.title || 'Untitled Site'}</p><p className="text-[10px] text-muted-foreground truncate">{site.url || ''}</p></div>
+  2521→                <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
+  2522→              </a>
+  2523→            ))
+  2524→          )}
+  2525→          <p className="text-[10px] text-muted-foreground text-center">Manage your connected sites and fansite links</p>
+  2526→        </div>
+  2527→      </ScrollArea>
+  2528→    );
+  2529→  }
+  2530→
+  2531→  // ─── LEGAL VIEW ─────────────────────────────────────────────
+  2532→  function LegalView() {
+  2533→    const [legalTab, setLegalTab] = useState('terms');
+  2534→    const legalContent: Record<string, string> = {
+  2535→      terms: `Terms of Service\n\nLast updated: January 2025\n\n1. Acceptance of Terms\nBy accessing and using NEXUS, you accept and agree to be bound by these Terms of Service.\n\n2. User Accounts\nYou must be at least 18 years old to create an account. You are responsible for maintaining the confidentiality of your account.\n\n3. User Conduct\nYou agree to use NEXUS in a respectful manner. Harassment, spam, and inappropriate content are prohibited.\n\n4. Content\nAll content you post on NEXUS remains your property. By posting, you grant NEXUS a license to display your content.\n\n5. Premium Services\nPremium subscriptions are billed monthly. You can cancel at any time. No refunds are provided for partial months.\n\n6. Termination\nNEXUS reserves the right to suspend or terminate accounts that violate these terms.`,
+  2536→      privacy: `Privacy Policy\n\nLast updated: January 2025\n\n1. Data Collection\nWe collect information you provide directly: name, email, age, location, photos, and preferences.\n\n2. Data Usage\nYour data is used to provide and improve our services, match you with other users, and personalize your experience.\n\n3. Location Data\nYour location is used for matching and distance calculation. You can control location sharing in settings.\n\n4. Third Parties\nWe do not sell your personal data. We may share anonymized analytics with partners.\n\n5. Data Security\nWe use industry-standard encryption to protect your data.\n\n6. Your Rights\nYou can request access to, correction of, or deletion of your personal data at any time.`,
+  2537→      cookies: `Cookie Policy\n\nLast updated: January 2025\n\n1. What Are Cookies\nCookies are small files stored on your device that help us provide a better experience.\n\n2. Types We Use\n• Essential cookies: Required for basic functionality\n• Analytics cookies: Help us understand usage patterns\n• Preference cookies: Remember your settings\n\n3. Management\nYou can manage cookie preferences in your browser settings.`,
+  2538→    };
+  2539→    return (
+  2540→      <ScrollArea className="h-full">
+  2541→        <div className="p-4 space-y-4">
+  2542→          <Tabs value={legalTab} onValueChange={setLegalTab}>
+  2543→            <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  2544→              <TabsTrigger value="terms" className="text-[11px] flex-1 h-7">Terms</TabsTrigger>
+  2545→              <TabsTrigger value="privacy" className="text-[11px] flex-1 h-7">Privacy</TabsTrigger>
+  2546→              <TabsTrigger value="cookies" className="text-[11px] flex-1 h-7">Cookies</TabsTrigger>
+  2547→            </TabsList>
+  2548→            <TabsContent value={legalTab} className="mt-3">
+  2549→              <Card className="bg-secondary border-border"><CardContent className="p-4"><pre className="text-xs text-muted-foreground whitespace-pre-wrap font-sans leading-relaxed">{legalContent[legalTab]}</pre></CardContent></Card>
+  2550→            </TabsContent>
+  2551→          </Tabs>
+  2552→        </div>
+  2553→      </ScrollArea>
+  2554→    );
+  2555→  }
+  2556→
+  2557→  // ─── FAQS VIEW ─────────────────────────────────────────────
+  2558→  function FaqsView() {
+  2559→    return (
+  2560→      <ScrollArea className="h-full">
+  2561→        <div className="p-4 space-y-3">
+  2562→          <h3 className="text-sm font-semibold mb-2">Frequently Asked Questions</h3>
+  2563→          <Accordion type="single" collapsible className="space-y-2">
+  2564→            {FAQ_DATA.map((faq, i) => (
+  2565→              <AccordionItem key={i} value={`faq-${i}`} className="bg-secondary border border-border rounded-xl overflow-hidden">
+  2566→                <AccordionTrigger className="px-4 py-3 text-[12px] font-medium hover:no-underline">{faq.q}</AccordionTrigger>
+  2567→                <AccordionContent className="px-4 pb-3 text-[11px] text-muted-foreground leading-relaxed">{faq.a}</AccordionContent>
+  2568→              </AccordionItem>
+  2569→            ))}
+  2570→          </Accordion>
+  2571→        </div>
+  2572→      </ScrollArea>
+  2573→    );
+  2574→  }
+  2575→
+  2576→  // ─── ABUSE VIEW ────────────────────────────────────────────
+  2577→  function AbuseView() {
+  2578→    const reportCategories = ['harassment', 'spam', 'inappropriate content', 'fake profile', 'scam', 'underage user', 'violence', 'other'];
+  2579→    return (
+  2580→      <ScrollArea className="h-full">
+  2581→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2582→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2583→            <SectionHeader icon={Flag} label="Report Abuse" />
+  2584→            <div className="space-y-1.5">
+  2585→              <Label className="text-xs text-muted-foreground">User ID or Username</Label>
+  2586→              <Input value={abuseForm.userId} onChange={e => setAbuseForm(p => ({ ...p, userId: e.target.value }))} placeholder="Enter user ID" className="bg-card border-border h-10 text-xs" />
+  2587→            </div>
+  2588→            <div className="space-y-1.5">
+  2589→              <Label className="text-xs text-muted-foreground">Category</Label>
+  2590→              <Select value={abuseForm.category} onValueChange={v => setAbuseForm(p => ({ ...p, category: v }))}>
+  2591→                <SelectTrigger className="h-10 text-xs bg-card border-border"><SelectValue /></SelectTrigger>
+  2592→                <SelectContent className="bg-card border-border">{reportCategories.map(c => <SelectItem key={c} value={c} className="capitalize">{c}</SelectItem>)}</SelectContent>
+  2593→              </Select>
+  2594→            </div>
+  2595→            <div className="space-y-1.5">
+  2596→              <Label className="text-xs text-muted-foreground">Description</Label>
+  2597→              <Textarea value={abuseForm.description} onChange={e => setAbuseForm(p => ({ ...p, description: e.target.value }))} placeholder="Describe the issue..." className="bg-card border-border text-xs" rows={4} />
+  2598→            </div>
+  2599→            <Button className="w-full bg-destructive text-white text-xs" disabled={!abuseForm.userId || !abuseForm.description} onClick={() => { alert('Report submitted. We will review it within 24 hours.'); setAbuseForm({ category: 'harassment', description: '', userId: '' }); }}>Submit Report</Button>
+  2600→          </CardContent></Card>
+  2601→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2602→            <SectionHeader icon={Block} label="Blocked Users" count={blockedUsers.length} />
+  2603→            {blockedUsers.length === 0 ? <p className="text-xs text-muted-foreground">No blocked users</p>
+  2604→              : blockedUsers.map((b: any) => (
+  2605→                <div key={b.id} className="flex items-center gap-3 p-2 rounded-lg">
+  2606→                  <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(b.blocked)} /><AvatarFallback className="text-[10px]">{(b.blocked as any)?.displayName?.[0]}</AvatarFallback></Avatar>
+  2607→                  <span className="text-xs flex-1">{(b.blocked as any)?.displayName || 'User'}</span>
+  2608→                  <Button size="sm" variant="ghost" className="text-[10px] text-muted-foreground" onClick={async () => { try { await fetch(`/api/blocks?blockedId=${(b.blocked as any)?.id}`, { method: 'DELETE' }); setBlockedUsers(prev => prev.filter((x: any) => x.id !== b.id)); } catch {} }}>Unblock</Button>
+  2609→                </div>
+  2610→              ))}
+  2611→          </CardContent></Card>
+  2612→        </div>
+  2613→      </ScrollArea>
+  2614→    );
+  2615→  }
+  2616→
+  2617→  // ─── ADVANTAGES VIEW ───────────────────────────────────────
+  2618→  function AdvantagesView() {
+  2619→    const features = [
+  2620→      { name: 'Unlimited Likes', free: '5/day', premium: 'Unlimited' },
+  2621→      { name: 'See Who Viewed You', free: false, premium: true },
+  2622→      { name: 'Advanced Filters', free: false, premium: true },
+  2623→      { name: 'INFER AI Analysis', free: false, premium: 'Basic' },
+  2624→      { name: 'Boost Discounts', free: false, premium: '20% off' },
+  2625→      { name: 'Anonymous Browsing', free: false, premium: true },
+  2626→      { name: 'Priority Support', free: false, premium: true },
+  2627→      { name: 'Video Calls', free: false, premium: true },
+  2628→      { name: 'Travel Mode', free: false, premium: true },
+  2629→      { name: 'Profile Themes', free: false, premium: true },
+  2630→      { name: 'Read Receipts', free: false, premium: true },
+  2631→      { name: 'Extended Match Radius', free: '50km', premium: '200km' },
+  2632→    ];
+  2633→    return (
+  2634→      <ScrollArea className="h-full">
+  2635→        <div className="p-4 space-y-6">
+  2636→          <div className="text-center space-y-1">
+  2637→            <h2 className="text-lg font-bold gradient-text">Why Go Premium?</h2>
+  2638→            <p className="text-xs text-muted-foreground">Unlock the full potential of NEXUS</p>
+  2639→          </div>
+  2640→          <Card className="bg-secondary border-border">
+  2641→            <CardContent className="p-4">
+  2642→              <div className="space-y-2">
+  2643→                <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-[11px]">
+  2644→                  <span className="font-semibold">Feature</span><span className="text-center">Free</span><span className="text-center text-primary">Premium</span>
+  2645→                </div>
+  2646→                {features.map(f => (
+  2647→                  <div key={f.name} className="grid grid-cols-[1fr_auto_auto] gap-2 text-[11px] py-1.5 border-t border-border">
+  2648→                    <span className="text-muted-foreground">{f.name}</span>
+  2649→                    <span className="text-center">{typeof f.free === 'boolean' ? (f.free ? '✓' : '✗') : f.free}</span>
+  2650→                    <span className="text-center font-medium text-primary">{typeof f.premium === 'boolean' ? (f.premium ? '✓' : '—') : f.premium}</span>
+  2651→                  </div>
+  2652→                ))}
+  2653→              </div>
+  2654→            </CardContent>
+  2655→          </Card>
+  2656→          <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm" onClick={() => setActiveTab('membership')}><Crown className="w-4 h-4 mr-2" /> Upgrade to Premium</Button>
+  2657→        </div>
+  2658→      </ScrollArea>
+  2659→    );
+  2660→  }
+  2661→
+  2662→  // ─── AFFILIATION VIEW ──────────────────────────────────────
+  2663→  function AffiliationView() {
+  2664→    const [affiliationStats, setAffiliationStats] = useState({ referrals: 0, converted: 0, earned: 0 });
+  2665→    useEffect(() => {
+  2666→      fetch('/api/subscriptions?userId=test-user-1')
+  2667→        .then(r => r.json())
+  2668→        .then(res => {
+  2669→          const subs = res.data || [];
+  2670→          const referrals = subs.length;
+  2671→          const converted = subs.filter((s: any) => s.isActive).length;
+  2672→          const earned = converted * 9.8;
+  2673→          setAffiliationStats({ referrals, converted, earned: Math.round(earned) });
+  2674→        })
+  2675→        .catch(() => {});
+  2676→    }, []);
+  2677→    return (
+  2678→      <ScrollArea className="h-full">
+  2679→        <div className="p-4 space-y-6">
+  2680→          <div className="text-center space-y-1">
+  2681→            <h2 className="text-lg font-bold gradient-text">Affiliate Program</h2>
+  2682→            <p className="text-xs text-muted-foreground">Earn rewards by referring friends to NEXUS</p>
+  2683→          </div>
+  2684→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2685→            <SectionHeader icon={Share2} label="Your Referral Link" />
+  2686→            <div className="flex items-center gap-2 p-3 rounded-xl bg-card border border-border">
+  2687→              <code className="flex-1 text-[11px] text-primary truncate">nexus.app/ref/test-user-1</code>
+  2688→              <Button size="sm" variant="outline" className="h-7 text-[10px] border-border shrink-0" onClick={() => navigator.clipboard.writeText('nexus.app/ref/test-user-1')}><Copy className="w-3 h-3 mr-1" /> Copy</Button>
+  2689→            </div>
+  2690→          </CardContent></Card>
+  2691→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2692→            <SectionHeader icon={TrendingUp} label="Your Stats" />
+  2693→            <div className="grid grid-cols-3 gap-3">
+  2694→              <div className="text-center p-3 rounded-xl bg-card"><p className="text-lg font-bold text-primary">{affiliationStats.referrals}</p><p className="text-[10px] text-muted-foreground">Referrals</p></div>
+  2695→              <div className="text-center p-3 rounded-xl bg-card"><p className="text-lg font-bold text-primary">{affiliationStats.converted}</p><p className="text-[10px] text-muted-foreground">Converted</p></div>
+  2696→              <div className="text-center p-3 rounded-xl bg-card"><p className="text-lg font-bold text-primary">${affiliationStats.earned}</p><p className="text-[10px] text-muted-foreground">Earned</p></div>
+  2697→            </div>
+  2698→          </CardContent></Card>
+  2699→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2700→            <SectionHeader icon={Gift} label="Commission Structure" />
+  2701→            <ul className="space-y-2 text-[12px] text-muted-foreground">
+  2702→              <li className="flex items-center gap-2"><span className="text-primary font-bold">20%</span> commission on Premium subscriptions</li>
+  2703→              <li className="flex items-center gap-2"><span className="text-primary font-bold">$5</span> bonus for each verified referral</li>
+  2704→              <li className="flex items-center gap-2"><span className="text-primary font-bold">10%</span> commission on boost purchases</li>
+  2705→              <li className="flex items-center gap-2"><span className="text-primary font-bold">$10</span> bonus after 10 referrals</li>
+  2706→            </ul>
+  2707→          </CardContent></Card>
+  2708→        </div>
+  2709→      </ScrollArea>
+  2710→    );
+  2711→  }
+  2712→
+  2713→
+  2714→  // ─── PROFILE VIEW ───────────────────────────────────────────
+  2715→  function ProfileView() {
+  2716→    if (!currentUser) return <EmptyState icon={User} title="Loading profile..." desc="" />;
+  2717→    const u = currentUser;
+  2718→    return (
+  2719→      <ScrollArea className="h-full">
+  2720→        <div className="space-y-0">
+  2721→          {/* Cover + Avatar */}
+  2722→          <div className="relative">
+  2723→            <div className="h-32 bg-gradient-to-br from-primary/30 to-purple-500/20" />
+  2724→            <div className="absolute -bottom-10 left-4">
+  2725→              <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
+  2726→                <AvatarImage src={getAvatar(u)} /><AvatarFallback className="text-xl">{u.displayName?.[0]}</AvatarFallback>
+  2727→              </Avatar>
+  2728→            </div>
+  2729→            <div className="absolute bottom-3 right-4 flex gap-2">
+  2730→              {u.isVerified && <Badge className="bg-blue-500/20 text-blue-400 text-[10px] border-blue-500/30"><ShieldCheck className="w-3 h-3" /> Verified</Badge>}
+  2731→              {u.isPremium && <Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3" /> Premium</Badge>}
+  2732→            </div>
+  2733→          </div>
+  2734→          <div className="px-4 pt-14 pb-4 space-y-4">
+  2735→            {/* Name + Online */}
+  2736→            <div className="flex items-start justify-between">
+  2737→              <div>
+  2738→                <h2 className="text-xl font-bold">{u.displayName}{u.age ? `, ${u.age}` : ''}</h2>
+  2739→                <div className="flex items-center gap-3 text-[12px] text-muted-foreground mt-1">
+  2740→                  <span>@{u.username}</span>
+  2741→                  {u.pronouns && <span>{u.pronouns}</span>}
+  2742→                  {u.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{u.location}</span>}
+  2743→                </div>
+  2744→                {u.online && u.showOnline && <span className="flex items-center gap-1.5 text-[11px] text-green-400 mt-1"><span className="w-2 h-2 bg-green-400 rounded-full online-pulse" /> Online now</span>}
+  2745→              </div>
+  2746→              <Button size="sm" variant="outline" className="h-8 text-[11px] border-border" onClick={() => setEditingProfile(true)}><Pencil className="w-3 h-3 mr-1" /> Edit</Button>
+  2747→            </div>
+  2748→            {/* Bio */}
+  2749→            {u.bio && <Card className="bg-secondary border-border"><CardContent className="p-3"><p className="text-sm leading-relaxed">{u.bio}</p></CardContent></Card>}
+  2750→            {/* About */}
+  2751→            {u.aboutMe && (
+  2752→              <Card className="bg-secondary border-border"><CardContent className="p-3">
+  2753→                <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">About Me</h4>
+  2754→                <p className="text-[13px] leading-relaxed">{u.aboutMe}</p>
+  2755→              </CardContent></Card>
+  2756→            )}
+  2757→            {/* Quick stats */}
+  2758→            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+  2759→              {[
+  2760→                { label: 'Photos', val: u._count?.photos || 0 },
+  2761→                { label: 'Likes', val: u._count?.receivedLikes || 0 },
+  2762→                { label: 'Views', val: u._count?.receivedViews || 0 },
+  2763→                { label: 'Shouts', val: u._count?.shouts || 0 },
+  2764→                { label: 'Messages', val: u._count?.sentMessages || 0 },
+  2765→              ].map(s => (
+  2766→                <div key={s.label} className="shrink-0 text-center p-2.5 rounded-xl bg-secondary border border-border min-w-[68px]">
+  2767→                  <p className="text-sm font-bold gradient-text">{s.val}</p>
+  2768→                  <p className="text-[9px] text-muted-foreground">{s.label}</p>
+  2769→                </div>
+  2770→              ))}
+  2771→            </div>
+  2772→            {/* Details */}
+  2773→            <Card className="bg-secondary border-border"><CardContent className="p-3">
+  2774→              <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Details</h4>
+  2775→              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+  2776→                {u.lookingFor && <DetailCell label="Looking for" value={u.lookingFor} />}
+  2777→                {u.height && <DetailCell label="Height" value={`${u.height} cm`} />}
+  2778→                {u.bodyType && <DetailCell label="Body type" value={u.bodyType} />}
+  2779→                {u.ethnicity && <DetailCell label="Ethnicity" value={u.ethnicity} />}
+  2780→                {u.relationshipStatus && <DetailCell label="Relationship" value={u.relationshipStatus} />}
+  2781→                {u.position && <DetailCell label="Position" value={u.position} />}
+  2782→              </div>
+  2783→            </CardContent></Card>
+  2784→            {/* Subscriptions */}
+  2785→            {mySubscriptions.length > 0 && (
+  2786→              <div className="space-y-2">
+  2787→                <SectionHeader icon={Crown} label="Subscriptions" count={mySubscriptions.length} />
+  2788→                {mySubscriptions.map((sub: any) => (
+  2789→                  <div key={sub.id} className="p-2.5 rounded-xl bg-secondary border border-border flex items-center justify-between">
+  2790→                    <span className="text-[12px] font-medium capitalize">{sub.tier} Plan</span>
+  2791→                    <Badge className={`text-[9px] ${sub.isActive ? 'bg-green-400/20 text-green-400' : 'bg-muted text-muted-foreground'}`}>{sub.isActive ? 'Active' : 'Expired'}</Badge>
+  2792→                  </div>
+  2793→                ))}
+  2794→              </div>
+  2795→            )}
+  2796→            {/* Active boosts */}
+  2797→            {myBoosts.length > 0 && (
+  2798→              <div className="space-y-2">
+  2799→                <SectionHeader icon={Zap} label="Active Boosts" count={myBoosts.length} />
+  2800→                {myBoosts.map((b: any) => (
+  2801→                  <div key={b.id} className="p-2.5 rounded-xl bg-secondary border border-border boost-glow flex items-center gap-2">
+  2802→                    <Zap className="w-4 h-4 text-primary" /><span className="text-[12px] font-medium capitalize">{b.type} Boost</span>
+  2803→                  </div>
+  2804→                ))}
+  2805→              </div>
+  2806→            )}
+  2807→            {/* Favorites */}
+  2808→            <div className="space-y-2">
+  2809→              <SectionHeader icon={Bookmark} label="Favorites" count={favorites.length} action={<Button variant="ghost" size="sm" className="text-[10px] text-primary h-6" onClick={() => setActiveTab('favorites')}>View all</Button>} />
+  2810→              {favorites.length > 0 ? favorites.slice(0, 5).map((fav: any) => (
+  2811→                <button key={fav.id} onClick={() => openProfile(fav.targetId)} className="flex items-center gap-2 p-2 rounded-lg hover:bg-secondary/50 transition-colors">
+  2812→                  <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-[10px]">{fav.target?.displayName?.[0]}</AvatarFallback></Avatar>
+  2813→                  <span className="text-[12px]">{fav.target?.displayName}</span>
+  2814→                  {fav.isSuper && <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />}
+  2815→                </button>
+  2816→              )) : <p className="text-xs text-muted-foreground">No favorites yet</p>}
+  2817→            </div>
+  2818→            {/* Notes */}
+  2819→            <div className="space-y-2">
+  2820→              <SectionHeader icon={StickyNote} label="Notes" count={notes.length} action={<Button variant="ghost" size="sm" className="text-[10px] text-primary h-6" onClick={() => setActiveTab('notes')}>View all</Button>} />
+  2821→              {notes.length > 0 ? notes.slice(0, 5).map((note: any) => (
+  2822→                <div key={note.id} className="p-2.5 rounded-xl bg-secondary border border-border">
+  2823→                  <div className="flex items-center gap-2 mb-1"><button onClick={() => openProfile(note.targetId)} className="text-[12px] font-semibold hover:underline">{note.target?.displayName}</button><Badge variant="secondary" className="text-[9px] bg-muted">{note.type}</Badge></div>
+  2824→                  <p className="text-[12px] text-muted-foreground line-clamp-2">{note.content}</p>
+  2825→                </div>
+  2826→              )) : <p className="text-xs text-muted-foreground">No notes yet</p>}
+  2827→            </div>
+  2828→            {/* Verification */}
+  2829→            <div className="space-y-2">
+  2830→              <SectionHeader icon={ShieldCheck} label="Verification" />
+  2831→              <div className="p-3 rounded-xl bg-secondary border border-border">
+  2832→                <div className="flex items-center gap-2">
+  2833→                  {myVerification?.status === 'verified' ? <ShieldCheck className="w-5 h-5 text-green-400" /> : myVerification?.status === 'pending' ? <Clock className="w-5 h-5 text-yellow-400" /> : <Shield className="w-5 h-5 text-muted-foreground" />}
+  2834→                  <span className={`text-sm font-medium ${myVerification?.status === 'verified' ? 'text-green-400' : 'text-muted-foreground'}`}>{myVerification?.status === 'verified' ? 'Verified' : myVerification?.status === 'pending' ? 'Pending Review' : 'Not Verified'}</span>
+  2835→                </div>
+  2836→              </div>
+  2837→            </div>
+  2838→            {/* Sessions */}
+  2839→            <div className="space-y-2">
+  2840→              <SectionHeader icon={MonitorSmartphone} label="Sessions" count={mySessions.length} />
+  2841→              {mySessions.length > 0 ? mySessions.slice(0, 5).map((sess: any) => (
+  2842→                <div key={sess.id} className="flex items-center justify-between p-2.5 rounded-xl bg-secondary border border-border">
+  2843→                  <div className="flex items-center gap-2">
+  2844→                    <MonitorSmartphone className="w-4 h-4 text-muted-foreground" />
+  2845→                    <div><p className="text-[12px] font-medium">{sess.platform || 'Unknown'}{sess.device ? ` · ${sess.device}` : ''}</p><p className="text-[10px] text-muted-foreground">{timeAgo(sess.lastSeen)}</p></div>
+  2846→                  </div>
+  2847→                  {sess.isActive && <Badge className="bg-green-400/20 text-green-400 text-[9px]">Active</Badge>}
+  2848→                </div>
+  2849→              )) : <p className="text-xs text-muted-foreground">No sessions</p>}
+  2850→            </div>
+  2851→            {/* Quick links */}
+  2852→            <div className="grid grid-cols-2 gap-2">
+  2853→              <Button variant="outline" className="border-border text-xs" onClick={() => setShowSettings(true)}><Settings className="w-3.5 h-3.5 mr-1.5" /> Settings</Button>
+  2854→              <Button variant="outline" className="border-border text-xs" onClick={() => setActiveTab('preferences')}><Sliders className="w-3.5 h-3.5 mr-1.5" /> Preferences</Button>
+  2855→            </div>
+  2856→            <div className="h-4" />
+  2857→          </div>
+  2858→        </div>
+  2859→      </ScrollArea>
+  2860→    );
+  2861→  }
+  2862→
+  2863→  function DetailCell({ label, value }: { label: string; value: string }) {
+  2864→    return (<div className="flex justify-between p-2 rounded-lg bg-card/50"><span className="text-muted-foreground text-[11px]">{label}</span><span className="text-[12px] font-medium capitalize">{value}</span></div>);
+  2865→  }
+  2866→
+  2867→  function Sliders(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 12H3"/><path d="M15 6H3"/><path d="M21 18H3"/><circle cx="15" cy="6" r="2"/><circle cx="21" cy="12" r="2"/><circle cx="15" cy="18" r="2"/></svg>; }
+  2868→
+  2869→  // ─── INFER VIEW (AI Analysis) ──────────────────────────────
+  2870→  function InferView() {
+  2871→    const allUsers = [...discoverUsers, ...receivedLikes.map(l => l.sender).filter(Boolean), ...favorites.map(f => f.target).filter(Boolean)];
+  2872→    const uniqueUsers = [...new Map(allUsers.filter(Boolean).map(u => [u.id, u])).values()] as User[];
+  2873→
+  2874→    return (
+  2875→      <div className="h-full flex flex-col">
+  2876→        {/* User Selector */}
+  2877→        <div className="px-4 py-3 border-b border-border shrink-0">
+  2878→          <div className="flex items-center gap-2 mb-2">
+  2879→            <Brain className="w-4 h-4 text-primary" />
+  2880→            <span className="text-xs font-semibold">Select a user to analyze</span>
+  2881→          </div>
+  2882→          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+  2883→            {uniqueUsers.slice(0, 15).map(u => (
+  2884→              <button key={u.id} onClick={() => { setInferTargetUser(u); setInferResultsMap({}); }}
+  2885→                className={`shrink-0 flex flex-col items-center gap-1 p-1.5 rounded-xl border transition-all ${inferTargetUser?.id === u.id ? 'bg-primary/10 border-primary/30' : 'bg-secondary border-border hover:border-primary/20'}`}>
+  2886→                <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(u)} /><AvatarFallback className="text-[9px]">{u.displayName?.[0]}</AvatarFallback></Avatar>
+  2887→                <span className="text-[9px] max-w-[48px] truncate">{u.displayName?.split(' ')[0]}</span>
+  2888→              </button>
+  2889→            ))}
+  2890→            {uniqueUsers.length === 0 && <p className="text-[11px] text-muted-foreground py-2">Discover or like some users first to analyze them</p>}
+  2891→          </div>
+  2892→        </div>
+  2893→        {inferTargetUser && (
+  2894→          <ScrollArea className="flex-1">
+  2895→            <div className="p-4 space-y-4">
+  2896→              {/* Target user info */}
+  2897→              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary border border-border">
+  2898→                <Avatar className="h-10 w-10"><AvatarImage src={getAvatar(inferTargetUser)} /><AvatarFallback className="text-xs">{inferTargetUser.displayName?.[0]}</AvatarFallback></Avatar>
+  2899→                <div className="flex-1 min-w-0">
+  2900→                  <p className="text-[13px] font-semibold">{inferTargetUser.displayName}{inferTargetUser.age ? `, ${inferTargetUser.age}` : ''}</p>
+  2901→                  <p className="text-[10px] text-muted-foreground truncate">{inferTargetUser.bio || 'No bio'}</p>
+  2902→                </div>
+  2903→              </div>
+  2904→              {/* Category tabs */}
+  2905→              <Tabs value={inferCategory} onValueChange={(v) => setInferCategory(v as InferCategory)}>
+  2906→                <TabsList className="bg-secondary border border-border w-full h-auto p-1 flex-wrap">
+  2907→                  {INFER_CATEGORIES.map(cat => {
+  2908→                    const Icon = cat.icon;
+  2909→                    return <TabsTrigger key={cat.id} value={cat.id} className={`text-[10px] flex-1 min-w-[80px] h-8 flex items-center gap-1 ${inferCategory === cat.id ? cat.color : ''}`}><Icon className="w-3 h-3" />{cat.label}</TabsTrigger>;
+  2910→                  })}
+  2911→                </TabsList>
+  2912→              </Tabs>
+  2913→              {/* Analyze buttons */}
+  2914→              <div className="flex gap-2">
+  2915→                <Button className="flex-1 bg-primary text-primary-foreground text-xs h-9" disabled={inferLoading} onClick={() => handleInfer(inferCategory)}>
+  2916→                  {inferLoading ? 'Analyzing...' : `Analyze ${INFER_CATEGORIES.find(c => c.id === inferCategory)?.label}`}
+  2917→                </Button>
+  2918→                <Button variant="outline" className="h-9 text-xs border-border" disabled={inferLoading} onClick={() => handleInfer()}>
+  2919→                  <Sparkles className="w-3.5 h-3.5 mr-1" /> Full Analysis
+  2920→                </Button>
+  2921→              </div>
+  2922→              {/* Results */}
+  2923→              {Object.keys(inferResultsMap).length > 0 && (
+  2924→                <div className="space-y-3">
+  2925→                  {Object.entries(inferResultsMap).map(([catId, result]: [string, any]) => {
+  2926→                    const cat = INFER_CATEGORIES.find(c => c.id === catId);
+  2927→                    if (!cat) return null;
+  2928→                    return (
+  2929→                      <Card key={catId} className={`bg-secondary border ${result.color === 'red' ? 'border-red-500/30' : result.color === 'green' ? 'border-green-500/30' : 'border-border'}`}>
+  2930→                        <CardContent className="p-4 space-y-3">
+  2931→                          <div className="flex items-center justify-between">
+  2932→                            <div className="flex items-center gap-2">
+  2933→                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${result.color === 'red' ? 'bg-red-500/20' : result.color === 'green' ? 'bg-green-500/20' : 'bg-primary/20'}`}>
+  2934→                                <cat.icon className={`w-4 h-4 ${result.color === 'red' ? 'text-red-400' : result.color === 'green' ? 'text-green-400' : 'text-primary'}`} />
+  2935→                              </div>
+  2936→                              <div><p className="text-[12px] font-semibold">{cat.label}</p><p className="text-[10px] text-muted-foreground">{cat.desc}</p></div>
+  2937→                            </div>
+  2938→                            <div className="text-right">
+  2939→                              <p className={`text-sm font-bold ${result.color === 'red' ? 'text-red-400' : result.color === 'green' ? 'text-green-400' : 'text-primary'}`}>{result.confidence}%</p>
+  2940→                              <p className="text-[9px] text-muted-foreground">confidence</p>
+  2941→                            </div>
+  2942→                          </div>
+  2943→                          <Progress value={result.confidence} className={`h-1.5 ${result.color === 'red' ? '[&>div]:bg-red-400' : result.color === 'green' ? '[&>div]:bg-green-400' : ''}`} />
+  2944→                          <div>
+  2945→                            <p className="text-[13px] font-medium">{result.title}</p>
+  2946→                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{result.content}</p>
+  2947→                          </div>
+  2948→                          {result.bulletPoints?.length > 0 && (
+  2949→                            <ul className="space-y-1.5">
+  2950→                              {result.bulletPoints.map((bp: string, i: number) => (
+  2951→                                <li key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground">
+  2952→                                  <span className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${result.color === 'red' ? 'bg-red-400' : result.color === 'green' ? 'bg-green-400' : 'bg-primary'}`} />
+  2953→                                  {bp}
+  2954→                                </li>
+  2955→                              ))}
+  2956→                            </ul>
+  2957→                          )}
+  2958→                        </CardContent>
+  2959→                      </Card>
+  2960→                    );
+  2961→                  })}
+  2962→                </div>
+  2963→              )}
+  2964→              {Object.keys(inferResultsMap).length === 0 && !inferLoading && (
+  2965→                <EmptyState icon={Brain} title="Select a category to analyze" desc="Choose an analysis category above or run a full analysis" />
+  2966→              )}
+  2967→            </div>
+  2968→          </ScrollArea>
+  2969→        )}
+  2970→        {!inferTargetUser && (
+  2971→          <div className="flex-1 flex items-center justify-center">
+  2972→            <EmptyState icon={Target} title="Select a user to analyze" desc="Pick someone from the selector above to run AI analysis" />
+  2973→          </div>
+  2974→        )}
+  2975→      </div>
+  2976→    );
+  2977→  }
+  2978→
+  2979→  // ─── PROFILE DRAWER CONTENT ────────────────────────────────
+  2980→  function ProfileDrawerContent() {
+  2981→    if (!profileUser) return null;
+  2982→    const u = profileUser;
+  2983→    const currentPhoto = profilePhotos[profileGalleryIndex];
+  2984→    return (
+  2985→      <div className="space-y-0">
+  2986→        <div className="relative bg-secondary">
+  2987→          <div className="aspect-square max-h-[55vh] relative">
+  2988→            {currentPhoto ? <img src={currentPhoto.url} alt={u.displayName} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>}
+  2989→            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/50 to-transparent" />
+  2990→          </div>
+  2991→          {profilePhotos.length > 1 && (
+  2992→            <>
+  2993→              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+  2994→                {profilePhotos.map((_, i) => (<button key={i} onClick={() => setProfileGalleryIndex(i)} className={`w-2 h-2 rounded-full transition-all ${i === profileGalleryIndex ? 'bg-primary w-4' : 'bg-white/40'}`} />))}
+  2995→              </div>
+  2996→              <button onClick={() => setProfileGalleryIndex(i => (i - 1 + profilePhotos.length) % profilePhotos.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white"><ChevronLeft className="w-5 h-5" /></button>
+  2997→              <button onClick={() => setProfileGalleryIndex(i => (i + 1) % profilePhotos.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white"><ChevronRight className="w-5 h-5" /></button>
+  2998→            </>
+  2999→          )}
+  3000→          <button onClick={closeProfile} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white"><X className="w-4 h-4" /></button>
+  3001→        </div>
+  3002→        <div className="px-4 -mt-8 relative z-10 space-y-4">
+  3003→          <div className="flex items-start gap-3">
+  3004→            <div className="flex-1">
+  3005→              <div className="flex items-center gap-2 flex-wrap">
+  3006→                <h2 className="text-xl font-bold">{u.displayName}{u.showAge !== false && u.age ? `, ${u.age}` : ''}</h2>
+  3007→                {u.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+  3008→                {u.isPremium && <Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge>}
+  3009→              </div>
+  3010→              <div className="flex items-center gap-3 text-[12px] text-muted-foreground mt-1">
+  3011→                <span>@{u.username}</span>{u.pronouns && <span>{u.pronouns}</span>}
+  3012→              </div>
+  3013→            </div>
+  3014→            <div className={`flex items-center gap-1.5 text-[11px] ${u.online ? 'text-green-400' : 'text-muted-foreground'}`}>
+  3015→              {u.online && u.showOnline && <span className="w-2 h-2 bg-green-400 rounded-full online-pulse" />}
+  3016→              {getLastSeenText(u)}
+  3017→            </div>
+  3018→          </div>
+  3019→          <div className="flex gap-2 overflow-x-auto pb-1">
+  3020→            {[
+  3021→              { val: u._count?.photos || 0, label: 'Photos' },
+  3022→              { val: u._count?.receivedViews || 0, label: 'Views' },
+  3023→              { val: u._count?.receivedLikes || 0, label: 'Likes' },
+  3024→            ].map(s => (
+  3025→              <div key={s.label} className="shrink-0 text-center p-2.5 rounded-xl bg-secondary border border-border min-w-[68px]">
+  3026→                <p className="text-sm font-bold gradient-text">{s.val}</p>
+  3027→                <p className="text-[9px] text-muted-foreground">{s.label}</p>
+  3028→              </div>
+  3029→            ))}
+  3030→          </div>
+  3031→          {u.lookingFor && (
+  3032→            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+  3033→              <Heart className="w-4 h-4 text-primary" /><span className="text-sm">Looking for: <span className="capitalize text-primary font-medium">{u.lookingFor}</span></span>
+  3034→            </div>
+  3035→          )}
+  3036→          <div className="space-y-1.5">
+  3037→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Details</h4>
+
+[showing lines 1038-3037 of 3469; use offset=3038 with limit to continue reading]

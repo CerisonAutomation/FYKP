@@ -101,3 +101,115 @@ Stage Summary:
 - NexusChat.tsx (2163 lines) implements all 60 chat features with real API calls
 - Seed data: 21 users, 80 messages, 60 likes, 80 profile views, 15 events, 10 shouts, 4 blogs, 5 videos, 3 groups, 2 fansites
 - NEXUS_PROJECT.json exported at /home/z/my-project/NEXUS_PROJECT.json
+
+---
+Task ID: 3a
+Agent: Schema-API-Agent
+Task: Add Travel, Circles, Checkin, Wallet, Saved Phrases, Chat Muting, DND, Pictures I Liked, Contact Folders, Hashtags
+
+Work Log:
+- Read worklog.md and current prisma/schema.prisma to understand existing schema (20 models, User with 50+ fields)
+- Added 7 new fields to User model: isTraveling, travelCity, travelCountry, travelLat, travelLng, travelStart, travelEnd (Travel Mode), dndEnabled, dndStart, dndEnd (DND Schedule), hashtags (Profile Hashtags)
+- Added 10 new models with proper relations and cascade deletes:
+  - Circle (id, name, color, icon, userId, createdAt) + CircleMember (id, circleId, targetUserId, userId, createdAt) with unique constraint
+  - Checkin (id, userId, venueName, lat, lng, createdAt)
+  - Wallet (id, userId @unique, balance, createdAt, updatedAt) + Transaction (id, walletId, type, amount, description, referenceId, createdAt)
+  - SavedPhrase (id, userId, title, content, sortOrder, createdAt)
+  - ConversationParticipant (id, userId, otherUserId, isMuted, mutedUntil, isArchived, isPinned, lastReadAt, createdAt) with unique constraint
+  - LikedPhoto (id, userId, photoId, createdAt) with unique constraint
+  - ContactFolder (id, userId, name, createdAt) + ContactFolderMember (id, folderId, targetUserId, createdAt) with unique constraint
+- Fixed Prisma relation errors: added @relation("CircleMembership") to User.circleMemberships, removed contactFolderMemberships (no opposite relation on ContactFolderMember)
+- Added mutedUntil (DateTime?) field to ConversationParticipant model
+- Ran `rm -f db/custom.db && npx prisma db push` — schema synced and client generated successfully
+- Updated prisma/seed.ts with comprehensive seed data:
+  - Travel Mode: test-user-1 traveling to Berlin (52.52, 13.405) for 7 days
+  - DND: test-user-1 enabled 22:00-08:00
+  - Hashtags: test-user-1 has "travel,gym,malta,coffee-lover,developer"; 7 demo users have hashtags
+  - 3 Circles: "Hot Guys" (red/flame, 3 members), "Friends" (green/users, 4 members), "Maybe Later" (amber/clock, 3 members)
+  - 5 Check-ins: The Alley Bar, Valletta Waterfront, Café Cordina, St. George's Beach, Manoel Theatre
+  - 1 Wallet: balance 100 for test-user-1
+  - 3 Transactions: purchase (+50), boost (-10), gift (-5)
+  - 5 Saved Phrases: Greeting, Coffee Invite, Busy Response, Flirty, Travel Question
+  - 3 Contact Folders: Gym Buddies (3), Potential Dates (3), Travel Friends (3)
+  - 5 Conversation Participants: 1 pinned, 2 muted (1 with mutedUntil), 1 archived, 1 normal
+  - Liked Photos: 12 photo likes (6 from test-user-1, 6 from other users)
+- Ran `bun run prisma/seed.ts` — completed successfully
+- Ran `bun run lint` — 0 errors
+- Dev server compiles and returns 200 on all routes
+
+Stage Summary:
+- 10 new models added to Prisma schema (Circle, CircleMember, Checkin, Wallet, Transaction, SavedPhrase, ConversationParticipant, LikedPhoto, ContactFolder, ContactFolderMember)
+- 7 new fields added to User model (travel mode x7, DND x3, hashtags)
+- Full seed data created for all 10 features with realistic values
+- Database has 30 models total, seed runs clean, lint passes, dev server stable
+
+---
+Task ID: 3b
+Agent: API-Routes-Agent
+Task: Create 14 API routes for new features
+
+Work Log:
+- Created 14 route files across 16 directories (including dynamic [id] routes)
+- `/api/circles/route.ts` — GET lists circles with _count and member user details; POST creates with name/color/icon
+- `/api/circles/[id]/route.ts` — GET returns circle with full members; PUT updates name/color/icon; DELETE removes circle or member (via ?targetUserId= query); POST adds member with duplicate check (P2002)
+- `/api/checkins/route.ts` — GET returns latest 20 checkins; POST creates with venueName/lat/lng validation
+- `/api/wallet/route.ts` — GET returns wallet with auto-creation if missing, includes last 20 transactions
+- `/api/saved-phrases/route.ts` — GET returns phrases sorted by sortOrder then createdAt; POST auto-calculates next sortOrder
+- `/api/saved-phrases/[id]/route.ts` — PUT updates title/content/sortOrder; DELETE with ownership check
+- `/api/chat/mute/route.ts` — POST uses upsert on ConversationParticipant, supports optional hours for timed mute with mutedUntil
+- `/api/chat/archive/route.ts` — POST toggles isArchived via upsert, reads existing state to flip
+- `/api/liked-photos/route.ts` — GET joins LikedPhoto with Photo model for full details; POST verifies photo exists, handles P2002; DELETE by ?photoId= query
+- `/api/contact-folders/route.ts` — GET enriches folders with member user profiles; POST creates folder
+- `/api/contact-folders/[id]/route.ts` — PUT renames; DELETE removes folder or member (?targetUserId=); POST adds member with P2002 handling
+- `/api/travel/route.ts` — GET returns travel fields from User; POST sets isTraveling=true with location; DELETE clears all 7 travel fields
+- `/api/dnd/route.ts` — GET returns dndEnabled/dndStart/dndEnd; POST sets DND schedule
+- `/api/chat/export/route.ts` — GET exports all messages between users as text/plain with Content-Disposition header, handles image/video/audio/gift/sticker/system types
+- All routes use `import { db } from '@/lib/db'` with NextRequest/NextResponse, CURRENT_USER='test-user-1'
+- All routes have proper 400/404/409/500 error handling
+- Verified: all 14 routes tested with real DB queries returning seed data (3 circles, 5 checkins, 100 balance/3 txns, 5 phrases, DND 22:00-08:00, Berlin travel, 6 liked photos, 3 contact folders, text chat export)
+- Verified: POST/PUT/DELETE mutations work (create circle, rename, add/remove member, cancel travel, toggle mute, toggle archive, update/delete phrase, like/unlike photo, create/rename/delete folder)
+- Ran `bun run lint` — 0 errors
+
+Stage Summary:
+- 14 new API route files created covering Circles, Checkins, Wallet, Saved Phrases, Chat Mute, Chat Archive, Liked Photos, Contact Folders, Travel Mode, DND Schedule, Chat Export
+- Total API routes: 54 (existing) + 14 (new) = 68 routes
+- All routes query real database via Prisma, no stubs or fakes
+- Proper error handling: 400 (validation), 404 (not found), 409 (duplicate), 500 (server error)
+- Lint passes cleanly, all routes tested end-to-end with real data
+
+---
+Task ID: 3c
+Agent: Main
+Task: Add 10 new UI features: Circles, Travel, Checkins, Wallet, Saved Phrases, Liked Photos, Contact Folders, DND, Chat Export, Chat Mute/Archive
+
+Work Log:
+- Updated src/types/index.ts: Added 6 new TabId values ('circles', 'travel', 'checkins', 'wallet', 'saved-phrases', 'liked-photos')
+- Updated src/app/page.tsx (~3460 lines, up from ~2959):
+  - Added 8 new lucide-react icon imports (Plane, CircleDot, WalletIcon, FolderOpen, BellOff, Archive, VolumeX, HeartOff)
+  - Added 6 new entries to PAGE_DIRECTORY: Circles (Social), Check-ins (Social), Liked Photos (Profile), Saved Phrases (Profile), Travel Mode (Settings), Wallet (Settings)
+  - Added 7 new page title mappings to getPageTitle()
+  - Added 50+ new state variables for circles, travel, checkins, wallet, saved phrases, liked photos, contact folders, DND, chat mute/archive
+  - Added 9 new useEffect hooks for data fetching (circles, circle members, travel, checkins, wallet, saved phrases, liked photos, contact folders, DND)
+  - Added 5 new dialog components: Create Circle, Add Member to Circle, Set Travel Location, Check In, Create/Edit Phrase
+  - Created 6 new view functions:
+    - CirclesView: Card list with member avatars, click to see members, add/remove members
+    - TravelView: Shows current travel status with city/dates/countdown, set/cancel travel
+    - CheckinsView: Timeline with venue name/time/map pin, check-in button with venue input
+    - WalletView: Balance display with coin icon, transaction history, top-up button
+    - SavedPhrasesView: List with create/edit/delete phrase dialogs
+    - LikedPhotosView: Photo grid with click-to-expand and unlike button
+  - Updated FavoritesView: Added All/Folders toggle with contact folder browsing
+  - Updated PreferencesView: Added DND section with enable switch and start/end time inputs
+  - Updated ChatView: Added Archived tab, mute/archive dropdown on each conversation
+  - Wired 6 new views into main render switch
+- Updated src/components/chat/NexusChat.tsx:
+  - Added "Export Chat" menu item in ChatHeader dropdown that calls /api/chat/export and triggers .txt download
+- All 14 API routes verified working via dev.log (200 responses)
+- Ran `bun run lint` — 0 errors
+
+Stage Summary:
+- 6 new tab views with full UI and real API integration
+- 4 enhancements to existing views (Favorites folders, DND, chat mute/archive, chat export)
+- 5 new dialog forms for data entry
+- All features call real backend API routes created in Task 3b
+- Lint clean, dev server compiles successfully, all routes return 200

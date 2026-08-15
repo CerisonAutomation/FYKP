@@ -1,0 +1,502 @@
+  2400→              <code className="flex-1 text-[11px] text-primary truncate">nexus.app/ref/test-user-1</code>
+  2401→              <Button size="sm" variant="outline" className="h-7 text-[10px] border-border shrink-0" onClick={() => navigator.clipboard.writeText('nexus.app/ref/test-user-1')}><Copy className="w-3 h-3 mr-1" /> Copy</Button>
+  2402→            </div>
+  2403→          </CardContent></Card>
+  2404→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2405→            <SectionHeader icon={TrendingUp} label="Your Stats" />
+  2406→            <div className="grid grid-cols-3 gap-3">
+  2407→              <div className="text-center p-3 rounded-xl bg-card"><p className="text-lg font-bold text-primary">{affiliationStats.referrals}</p><p className="text-[10px] text-muted-foreground">Referrals</p></div>
+  2408→              <div className="text-center p-3 rounded-xl bg-card"><p className="text-lg font-bold text-primary">{affiliationStats.converted}</p><p className="text-[10px] text-muted-foreground">Converted</p></div>
+  2409→              <div className="text-center p-3 rounded-xl bg-card"><p className="text-lg font-bold text-primary">${affiliationStats.earned}</p><p className="text-[10px] text-muted-foreground">Earned</p></div>
+  2410→            </div>
+  2411→          </CardContent></Card>
+  2412→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2413→            <SectionHeader icon={Gift} label="Commission Structure" />
+  2414→            <ul className="space-y-2 text-[12px] text-muted-foreground">
+  2415→              <li className="flex items-center gap-2"><span className="text-primary font-bold">20%</span> commission on Premium subscriptions</li>
+  2416→              <li className="flex items-center gap-2"><span className="text-primary font-bold">$5</span> bonus for each verified referral</li>
+  2417→              <li className="flex items-center gap-2"><span className="text-primary font-bold">10%</span> commission on boost purchases</li>
+  2418→              <li className="flex items-center gap-2"><span className="text-primary font-bold">$10</span> bonus after 10 referrals</li>
+  2419→            </ul>
+  2420→          </CardContent></Card>
+  2421→        </div>
+  2422→      </ScrollArea>
+  2423→    );
+  2424→  }
+  2425→
+  2426→
+  2427→  // ─── PROFILE VIEW ───────────────────────────────────────────
+  2428→  function ProfileView() {
+  2429→    if (!currentUser) return <EmptyState icon={User} title="Loading profile..." desc="" />;
+  2430→    const u = currentUser;
+  2431→    return (
+  2432→      <ScrollArea className="h-full">
+  2433→        <div className="space-y-0">
+  2434→          {/* Cover + Avatar */}
+  2435→          <div className="relative">
+  2436→            <div className="h-32 bg-gradient-to-br from-primary/30 to-purple-500/20" />
+  2437→            <div className="absolute -bottom-10 left-4">
+  2438→              <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
+  2439→                <AvatarImage src={getAvatar(u)} /><AvatarFallback className="text-xl">{u.displayName?.[0]}</AvatarFallback>
+  2440→              </Avatar>
+  2441→            </div>
+  2442→            <div className="absolute bottom-3 right-4 flex gap-2">
+  2443→              {u.isVerified && <Badge className="bg-blue-500/20 text-blue-400 text-[10px] border-blue-500/30"><ShieldCheck className="w-3 h-3" /> Verified</Badge>}
+  2444→              {u.isPremium && <Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3" /> Premium</Badge>}
+  2445→            </div>
+  2446→          </div>
+  2447→          <div className="px-4 pt-14 pb-4 space-y-4">
+  2448→            {/* Name + Online */}
+  2449→            <div className="flex items-start justify-between">
+  2450→              <div>
+  2451→                <h2 className="text-xl font-bold">{u.displayName}{u.age ? `, ${u.age}` : ''}</h2>
+  2452→                <div className="flex items-center gap-3 text-[12px] text-muted-foreground mt-1">
+  2453→                  <span>@{u.username}</span>
+  2454→                  {u.pronouns && <span>{u.pronouns}</span>}
+  2455→                  {u.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{u.location}</span>}
+  2456→                </div>
+  2457→                {u.online && u.showOnline && <span className="flex items-center gap-1.5 text-[11px] text-green-400 mt-1"><span className="w-2 h-2 bg-green-400 rounded-full online-pulse" /> Online now</span>}
+  2458→              </div>
+  2459→              <Button size="sm" variant="outline" className="h-8 text-[11px] border-border" onClick={() => setEditingProfile(true)}><Pencil className="w-3 h-3 mr-1" /> Edit</Button>
+  2460→            </div>
+  2461→            {/* Bio */}
+  2462→            {u.bio && <Card className="bg-secondary border-border"><CardContent className="p-3"><p className="text-sm leading-relaxed">{u.bio}</p></CardContent></Card>}
+  2463→            {/* About */}
+  2464→            {u.aboutMe && (
+  2465→              <Card className="bg-secondary border-border"><CardContent className="p-3">
+  2466→                <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">About Me</h4>
+  2467→                <p className="text-[13px] leading-relaxed">{u.aboutMe}</p>
+  2468→              </CardContent></Card>
+  2469→            )}
+  2470→            {/* Quick stats */}
+  2471→            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+  2472→              {[
+  2473→                { label: 'Photos', val: u._count?.photos || 0 },
+  2474→                { label: 'Likes', val: u._count?.receivedLikes || 0 },
+  2475→                { label: 'Views', val: u._count?.receivedViews || 0 },
+  2476→                { label: 'Shouts', val: u._count?.shouts || 0 },
+  2477→                { label: 'Messages', val: u._count?.sentMessages || 0 },
+  2478→              ].map(s => (
+  2479→                <div key={s.label} className="shrink-0 text-center p-2.5 rounded-xl bg-secondary border border-border min-w-[68px]">
+  2480→                  <p className="text-sm font-bold gradient-text">{s.val}</p>
+  2481→                  <p className="text-[9px] text-muted-foreground">{s.label}</p>
+  2482→                </div>
+  2483→              ))}
+  2484→            </div>
+  2485→            {/* Details */}
+  2486→            <Card className="bg-secondary border-border"><CardContent className="p-3">
+  2487→              <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Details</h4>
+  2488→              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+  2489→                {u.lookingFor && <DetailCell label="Looking for" value={u.lookingFor} />}
+  2490→                {u.height && <DetailCell label="Height" value={`${u.height} cm`} />}
+  2491→                {u.bodyType && <DetailCell label="Body type" value={u.bodyType} />}
+  2492→                {u.ethnicity && <DetailCell label="Ethnicity" value={u.ethnicity} />}
+  2493→                {u.relationshipStatus && <DetailCell label="Relationship" value={u.relationshipStatus} />}
+  2494→                {u.position && <DetailCell label="Position" value={u.position} />}
+  2495→              </div>
+  2496→            </CardContent></Card>
+  2497→            {/* Subscriptions */}
+  2498→            {mySubscriptions.length > 0 && (
+  2499→              <div className="space-y-2">
+  2500→                <SectionHeader icon={Crown} label="Subscriptions" count={mySubscriptions.length} />
+  2501→                {mySubscriptions.map((sub: any) => (
+  2502→                  <div key={sub.id} className="p-2.5 rounded-xl bg-secondary border border-border flex items-center justify-between">
+  2503→                    <span className="text-[12px] font-medium capitalize">{sub.tier} Plan</span>
+  2504→                    <Badge className={`text-[9px] ${sub.isActive ? 'bg-green-400/20 text-green-400' : 'bg-muted text-muted-foreground'}`}>{sub.isActive ? 'Active' : 'Expired'}</Badge>
+  2505→                  </div>
+  2506→                ))}
+  2507→              </div>
+  2508→            )}
+  2509→            {/* Active boosts */}
+  2510→            {myBoosts.length > 0 && (
+  2511→              <div className="space-y-2">
+  2512→                <SectionHeader icon={Zap} label="Active Boosts" count={myBoosts.length} />
+  2513→                {myBoosts.map((b: any) => (
+  2514→                  <div key={b.id} className="p-2.5 rounded-xl bg-secondary border border-border boost-glow flex items-center gap-2">
+  2515→                    <Zap className="w-4 h-4 text-primary" /><span className="text-[12px] font-medium capitalize">{b.type} Boost</span>
+  2516→                  </div>
+  2517→                ))}
+  2518→              </div>
+  2519→            )}
+  2520→            {/* Favorites */}
+  2521→            <div className="space-y-2">
+  2522→              <SectionHeader icon={Bookmark} label="Favorites" count={favorites.length} action={<Button variant="ghost" size="sm" className="text-[10px] text-primary h-6" onClick={() => setActiveTab('favorites')}>View all</Button>} />
+  2523→              {favorites.length > 0 ? favorites.slice(0, 5).map((fav: any) => (
+  2524→                <button key={fav.id} onClick={() => openProfile(fav.targetId)} className="flex items-center gap-2 p-2 rounded-lg hover:bg-secondary/50 transition-colors">
+  2525→                  <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-[10px]">{fav.target?.displayName?.[0]}</AvatarFallback></Avatar>
+  2526→                  <span className="text-[12px]">{fav.target?.displayName}</span>
+  2527→                  {fav.isSuper && <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />}
+  2528→                </button>
+  2529→              )) : <p className="text-xs text-muted-foreground">No favorites yet</p>}
+  2530→            </div>
+  2531→            {/* Notes */}
+  2532→            <div className="space-y-2">
+  2533→              <SectionHeader icon={StickyNote} label="Notes" count={notes.length} action={<Button variant="ghost" size="sm" className="text-[10px] text-primary h-6" onClick={() => setActiveTab('notes')}>View all</Button>} />
+  2534→              {notes.length > 0 ? notes.slice(0, 5).map((note: any) => (
+  2535→                <div key={note.id} className="p-2.5 rounded-xl bg-secondary border border-border">
+  2536→                  <div className="flex items-center gap-2 mb-1"><button onClick={() => openProfile(note.targetId)} className="text-[12px] font-semibold hover:underline">{note.target?.displayName}</button><Badge variant="secondary" className="text-[9px] bg-muted">{note.type}</Badge></div>
+  2537→                  <p className="text-[12px] text-muted-foreground line-clamp-2">{note.content}</p>
+  2538→                </div>
+  2539→              )) : <p className="text-xs text-muted-foreground">No notes yet</p>}
+  2540→            </div>
+  2541→            {/* Verification */}
+  2542→            <div className="space-y-2">
+  2543→              <SectionHeader icon={ShieldCheck} label="Verification" />
+  2544→              <div className="p-3 rounded-xl bg-secondary border border-border">
+  2545→                <div className="flex items-center gap-2">
+  2546→                  {myVerification?.status === 'verified' ? <ShieldCheck className="w-5 h-5 text-green-400" /> : myVerification?.status === 'pending' ? <Clock className="w-5 h-5 text-yellow-400" /> : <Shield className="w-5 h-5 text-muted-foreground" />}
+  2547→                  <span className={`text-sm font-medium ${myVerification?.status === 'verified' ? 'text-green-400' : 'text-muted-foreground'}`}>{myVerification?.status === 'verified' ? 'Verified' : myVerification?.status === 'pending' ? 'Pending Review' : 'Not Verified'}</span>
+  2548→                </div>
+  2549→              </div>
+  2550→            </div>
+  2551→            {/* Sessions */}
+  2552→            <div className="space-y-2">
+  2553→              <SectionHeader icon={MonitorSmartphone} label="Sessions" count={mySessions.length} />
+  2554→              {mySessions.length > 0 ? mySessions.slice(0, 5).map((sess: any) => (
+  2555→                <div key={sess.id} className="flex items-center justify-between p-2.5 rounded-xl bg-secondary border border-border">
+  2556→                  <div className="flex items-center gap-2">
+  2557→                    <MonitorSmartphone className="w-4 h-4 text-muted-foreground" />
+  2558→                    <div><p className="text-[12px] font-medium">{sess.platform || 'Unknown'}{sess.device ? ` · ${sess.device}` : ''}</p><p className="text-[10px] text-muted-foreground">{timeAgo(sess.lastSeen)}</p></div>
+  2559→                  </div>
+  2560→                  {sess.isActive && <Badge className="bg-green-400/20 text-green-400 text-[9px]">Active</Badge>}
+  2561→                </div>
+  2562→              )) : <p className="text-xs text-muted-foreground">No sessions</p>}
+  2563→            </div>
+  2564→            {/* Quick links */}
+  2565→            <div className="grid grid-cols-2 gap-2">
+  2566→              <Button variant="outline" className="border-border text-xs" onClick={() => setShowSettings(true)}><Settings className="w-3.5 h-3.5 mr-1.5" /> Settings</Button>
+  2567→              <Button variant="outline" className="border-border text-xs" onClick={() => setActiveTab('preferences')}><Sliders className="w-3.5 h-3.5 mr-1.5" /> Preferences</Button>
+  2568→            </div>
+  2569→            <div className="h-4" />
+  2570→          </div>
+  2571→        </div>
+  2572→      </ScrollArea>
+  2573→    );
+  2574→  }
+  2575→
+  2576→  function DetailCell({ label, value }: { label: string; value: string }) {
+  2577→    return (<div className="flex justify-between p-2 rounded-lg bg-card/50"><span className="text-muted-foreground text-[11px]">{label}</span><span className="text-[12px] font-medium capitalize">{value}</span></div>);
+  2578→  }
+  2579→
+  2580→  function Sliders(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 12H3"/><path d="M15 6H3"/><path d="M21 18H3"/><circle cx="15" cy="6" r="2"/><circle cx="21" cy="12" r="2"/><circle cx="15" cy="18" r="2"/></svg>; }
+  2581→
+  2582→  // ─── INFER VIEW (AI Analysis) ──────────────────────────────
+  2583→  function InferView() {
+  2584→    const allUsers = [...discoverUsers, ...receivedLikes.map(l => l.sender).filter(Boolean), ...favorites.map(f => f.target).filter(Boolean)];
+  2585→    const uniqueUsers = [...new Map(allUsers.filter(Boolean).map(u => [u.id, u])).values()] as User[];
+  2586→
+  2587→    return (
+  2588→      <div className="h-full flex flex-col">
+  2589→        {/* User Selector */}
+  2590→        <div className="px-4 py-3 border-b border-border shrink-0">
+  2591→          <div className="flex items-center gap-2 mb-2">
+  2592→            <Brain className="w-4 h-4 text-primary" />
+  2593→            <span className="text-xs font-semibold">Select a user to analyze</span>
+  2594→          </div>
+  2595→          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+  2596→            {uniqueUsers.slice(0, 15).map(u => (
+  2597→              <button key={u.id} onClick={() => { setInferTargetUser(u); setInferResultsMap({}); }}
+  2598→                className={`shrink-0 flex flex-col items-center gap-1 p-1.5 rounded-xl border transition-all ${inferTargetUser?.id === u.id ? 'bg-primary/10 border-primary/30' : 'bg-secondary border-border hover:border-primary/20'}`}>
+  2599→                <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(u)} /><AvatarFallback className="text-[9px]">{u.displayName?.[0]}</AvatarFallback></Avatar>
+  2600→                <span className="text-[9px] max-w-[48px] truncate">{u.displayName?.split(' ')[0]}</span>
+  2601→              </button>
+  2602→            ))}
+  2603→            {uniqueUsers.length === 0 && <p className="text-[11px] text-muted-foreground py-2">Discover or like some users first to analyze them</p>}
+  2604→          </div>
+  2605→        </div>
+  2606→        {inferTargetUser && (
+  2607→          <ScrollArea className="flex-1">
+  2608→            <div className="p-4 space-y-4">
+  2609→              {/* Target user info */}
+  2610→              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary border border-border">
+  2611→                <Avatar className="h-10 w-10"><AvatarImage src={getAvatar(inferTargetUser)} /><AvatarFallback className="text-xs">{inferTargetUser.displayName?.[0]}</AvatarFallback></Avatar>
+  2612→                <div className="flex-1 min-w-0">
+  2613→                  <p className="text-[13px] font-semibold">{inferTargetUser.displayName}{inferTargetUser.age ? `, ${inferTargetUser.age}` : ''}</p>
+  2614→                  <p className="text-[10px] text-muted-foreground truncate">{inferTargetUser.bio || 'No bio'}</p>
+  2615→                </div>
+  2616→              </div>
+  2617→              {/* Category tabs */}
+  2618→              <Tabs value={inferCategory} onValueChange={(v) => setInferCategory(v as InferCategory)}>
+  2619→                <TabsList className="bg-secondary border border-border w-full h-auto p-1 flex-wrap">
+  2620→                  {INFER_CATEGORIES.map(cat => {
+  2621→                    const Icon = cat.icon;
+  2622→                    return <TabsTrigger key={cat.id} value={cat.id} className={`text-[10px] flex-1 min-w-[80px] h-8 flex items-center gap-1 ${inferCategory === cat.id ? cat.color : ''}`}><Icon className="w-3 h-3" />{cat.label}</TabsTrigger>;
+  2623→                  })}
+  2624→                </TabsList>
+  2625→              </Tabs>
+  2626→              {/* Analyze buttons */}
+  2627→              <div className="flex gap-2">
+  2628→                <Button className="flex-1 bg-primary text-primary-foreground text-xs h-9" disabled={inferLoading} onClick={() => handleInfer(inferCategory)}>
+  2629→                  {inferLoading ? 'Analyzing...' : `Analyze ${INFER_CATEGORIES.find(c => c.id === inferCategory)?.label}`}
+  2630→                </Button>
+  2631→                <Button variant="outline" className="h-9 text-xs border-border" disabled={inferLoading} onClick={() => handleInfer()}>
+  2632→                  <Sparkles className="w-3.5 h-3.5 mr-1" /> Full Analysis
+  2633→                </Button>
+  2634→              </div>
+  2635→              {/* Results */}
+  2636→              {Object.keys(inferResultsMap).length > 0 && (
+  2637→                <div className="space-y-3">
+  2638→                  {Object.entries(inferResultsMap).map(([catId, result]: [string, any]) => {
+  2639→                    const cat = INFER_CATEGORIES.find(c => c.id === catId);
+  2640→                    if (!cat) return null;
+  2641→                    return (
+  2642→                      <Card key={catId} className={`bg-secondary border ${result.color === 'red' ? 'border-red-500/30' : result.color === 'green' ? 'border-green-500/30' : 'border-border'}`}>
+  2643→                        <CardContent className="p-4 space-y-3">
+  2644→                          <div className="flex items-center justify-between">
+  2645→                            <div className="flex items-center gap-2">
+  2646→                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${result.color === 'red' ? 'bg-red-500/20' : result.color === 'green' ? 'bg-green-500/20' : 'bg-primary/20'}`}>
+  2647→                                <cat.icon className={`w-4 h-4 ${result.color === 'red' ? 'text-red-400' : result.color === 'green' ? 'text-green-400' : 'text-primary'}`} />
+  2648→                              </div>
+  2649→                              <div><p className="text-[12px] font-semibold">{cat.label}</p><p className="text-[10px] text-muted-foreground">{cat.desc}</p></div>
+  2650→                            </div>
+  2651→                            <div className="text-right">
+  2652→                              <p className={`text-sm font-bold ${result.color === 'red' ? 'text-red-400' : result.color === 'green' ? 'text-green-400' : 'text-primary'}`}>{result.confidence}%</p>
+  2653→                              <p className="text-[9px] text-muted-foreground">confidence</p>
+  2654→                            </div>
+  2655→                          </div>
+  2656→                          <Progress value={result.confidence} className={`h-1.5 ${result.color === 'red' ? '[&>div]:bg-red-400' : result.color === 'green' ? '[&>div]:bg-green-400' : ''}`} />
+  2657→                          <div>
+  2658→                            <p className="text-[13px] font-medium">{result.title}</p>
+  2659→                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{result.content}</p>
+  2660→                          </div>
+  2661→                          {result.bulletPoints?.length > 0 && (
+  2662→                            <ul className="space-y-1.5">
+  2663→                              {result.bulletPoints.map((bp: string, i: number) => (
+  2664→                                <li key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground">
+  2665→                                  <span className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${result.color === 'red' ? 'bg-red-400' : result.color === 'green' ? 'bg-green-400' : 'bg-primary'}`} />
+  2666→                                  {bp}
+  2667→                                </li>
+  2668→                              ))}
+  2669→                            </ul>
+  2670→                          )}
+  2671→                        </CardContent>
+  2672→                      </Card>
+  2673→                    );
+  2674→                  })}
+  2675→                </div>
+  2676→              )}
+  2677→              {Object.keys(inferResultsMap).length === 0 && !inferLoading && (
+  2678→                <EmptyState icon={Brain} title="Select a category to analyze" desc="Choose an analysis category above or run a full analysis" />
+  2679→              )}
+  2680→            </div>
+  2681→          </ScrollArea>
+  2682→        )}
+  2683→        {!inferTargetUser && (
+  2684→          <div className="flex-1 flex items-center justify-center">
+  2685→            <EmptyState icon={Target} title="Select a user to analyze" desc="Pick someone from the selector above to run AI analysis" />
+  2686→          </div>
+  2687→        )}
+  2688→      </div>
+  2689→    );
+  2690→  }
+  2691→
+  2692→  // ─── PROFILE DRAWER CONTENT ────────────────────────────────
+  2693→  function ProfileDrawerContent() {
+  2694→    if (!profileUser) return null;
+  2695→    const u = profileUser;
+  2696→    const currentPhoto = profilePhotos[profileGalleryIndex];
+  2697→    return (
+  2698→      <div className="space-y-0">
+  2699→        <div className="relative bg-secondary">
+  2700→          <div className="aspect-square max-h-[55vh] relative">
+  2701→            {currentPhoto ? <img src={currentPhoto.url} alt={u.displayName} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>}
+  2702→            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/50 to-transparent" />
+  2703→          </div>
+  2704→          {profilePhotos.length > 1 && (
+  2705→            <>
+  2706→              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+  2707→                {profilePhotos.map((_, i) => (<button key={i} onClick={() => setProfileGalleryIndex(i)} className={`w-2 h-2 rounded-full transition-all ${i === profileGalleryIndex ? 'bg-primary w-4' : 'bg-white/40'}`} />))}
+  2708→              </div>
+  2709→              <button onClick={() => setProfileGalleryIndex(i => (i - 1 + profilePhotos.length) % profilePhotos.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white"><ChevronLeft className="w-5 h-5" /></button>
+  2710→              <button onClick={() => setProfileGalleryIndex(i => (i + 1) % profilePhotos.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white"><ChevronRight className="w-5 h-5" /></button>
+  2711→            </>
+  2712→          )}
+  2713→          <button onClick={closeProfile} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white"><X className="w-4 h-4" /></button>
+  2714→        </div>
+  2715→        <div className="px-4 -mt-8 relative z-10 space-y-4">
+  2716→          <div className="flex items-start gap-3">
+  2717→            <div className="flex-1">
+  2718→              <div className="flex items-center gap-2 flex-wrap">
+  2719→                <h2 className="text-xl font-bold">{u.displayName}{u.showAge !== false && u.age ? `, ${u.age}` : ''}</h2>
+  2720→                {u.isVerified && <Shield className="w-4 h-4 text-blue-400" />}
+  2721→                {u.isPremium && <Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge>}
+  2722→              </div>
+  2723→              <div className="flex items-center gap-3 text-[12px] text-muted-foreground mt-1">
+  2724→                <span>@{u.username}</span>{u.pronouns && <span>{u.pronouns}</span>}
+  2725→              </div>
+  2726→            </div>
+  2727→            <div className={`flex items-center gap-1.5 text-[11px] ${u.online ? 'text-green-400' : 'text-muted-foreground'}`}>
+  2728→              {u.online && u.showOnline && <span className="w-2 h-2 bg-green-400 rounded-full online-pulse" />}
+  2729→              {getLastSeenText(u)}
+  2730→            </div>
+  2731→          </div>
+  2732→          <div className="flex gap-2 overflow-x-auto pb-1">
+  2733→            {[
+  2734→              { val: u._count?.photos || 0, label: 'Photos' },
+  2735→              { val: u._count?.receivedViews || 0, label: 'Views' },
+  2736→              { val: u._count?.receivedLikes || 0, label: 'Likes' },
+  2737→            ].map(s => (
+  2738→              <div key={s.label} className="shrink-0 text-center p-2.5 rounded-xl bg-secondary border border-border min-w-[68px]">
+  2739→                <p className="text-sm font-bold gradient-text">{s.val}</p>
+  2740→                <p className="text-[9px] text-muted-foreground">{s.label}</p>
+  2741→              </div>
+  2742→            ))}
+  2743→          </div>
+  2744→          {u.lookingFor && (
+  2745→            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+  2746→              <Heart className="w-4 h-4 text-primary" /><span className="text-sm">Looking for: <span className="capitalize text-primary font-medium">{u.lookingFor}</span></span>
+  2747→            </div>
+  2748→          )}
+  2749→          <div className="space-y-1.5">
+  2750→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Details</h4>
+  2751→            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+  2752→              {u.height && <DetailCell label="Height" value={`${u.height} cm`} />}
+  2753→              {u.bodyType && <DetailCell label="Body type" value={u.bodyType} />}
+  2754→              {u.ethnicity && <DetailCell label="Ethnicity" value={u.ethnicity} />}
+  2755→              {u.position && <DetailCell label="Position" value={u.position} />}
+  2756→              {u.relationshipStatus && <DetailCell label="Relationship" value={u.relationshipStatus} />}
+  2757→              {u.location && <DetailCell label="Location" value={u.location} />}
+  2758→              <DetailCell label="Gender" value={u.gender} />
+  2759→            </div>
+  2760→          </div>
+  2761→          {u.aboutMe && (<div className="space-y-1"><h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">About Me</h4><p className="text-sm leading-relaxed">{u.aboutMe}</p></div>)}
+  2762→          {profilePhotos.length > 1 && (
+  2763→            <div className="space-y-2"><h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Photos</h4>
+  2764→              <div className="grid grid-cols-4 gap-1.5">{profilePhotos.map((p, i) => (<button key={p.id} onClick={() => setProfileGalleryIndex(i)} className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${i === profileGalleryIndex ? 'border-primary' : 'border-transparent'}`}><img src={p.url} alt="" className="w-full h-full object-cover" /></button>))}</div>
+  2765→            </div>
+  2766→          )}
+  2767→          <div className="flex gap-2 pt-2 pb-6">
+  2768→            <Button className="flex-1 bg-primary text-primary-foreground" onClick={() => { openChat(u); closeProfile(); }}><MessageCircle className="w-4 h-4 mr-2" /> Message</Button>
+  2769→            <Tooltip><TooltipTrigger asChild><Button variant="outline" className="border-border" onClick={() => handleFavorite(u.id)}><Bookmark className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Favorite</TooltipContent></Tooltip>
+  2770→            <Tooltip><TooltipTrigger asChild><Button variant="outline" className="border-border" onClick={() => { setNoteTargetId(u.id); setShowNoteDialog(true); }}><StickyNote className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Note</TooltipContent></Tooltip>
+  2771→            <Button variant="outline" className="border-border" onClick={() => handleLike(u.id)}><Heart className="w-4 h-4 mr-1" /></Button>
+  2772→            <Button variant="outline" className="border-border" onClick={() => { setRizzTargetBio(u.bio || ''); setShowRizzModal(true); }}><Sparkles className="w-4 h-4" /></Button>
+  2773→            <DropdownMenu>
+  2774→              <DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="border-border h-9 w-9"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger>
+  2775→              <DropdownMenuContent className="bg-card border-border" align="end">
+  2776→                <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setShowBlockAlert(true)}><Block className="w-4 h-4 mr-2" /> Block</DropdownMenuItem>
+  2777→                <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setActiveTab('abuse')}><Flag className="w-4 h-4 mr-2" /> Report</DropdownMenuItem>
+  2778→              </DropdownMenuContent>
+  2779→            </DropdownMenu>
+  2780→          </div>
+  2781→        </div>
+  2782→      </div>
+  2783→    );
+  2784→  }
+  2785→
+  2786→  // ─── KINKS & BEDROOM VIEW ─────────────────────────────
+  2787→  function KinksView() {
+  2788→    const toggleField = (key: string, value: string) => {
+  2789→      const current = kinkFields[key] || '';
+  2790→      const arr = current ? current.split(',') : [];
+  2791→      const idx = arr.indexOf(value);
+  2792→      if (idx >= 0) arr.splice(idx, 1); else arr.push(value);
+  2793→      const updated = { ...kinkFields, [key]: arr.join(',') };
+  2794→      setKinkFields(updated);
+  2795→      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1', fields: updated }) }).catch(() => {});
+  2796→    };
+  2797→    const setSingleField = (key: string, value: string) => {
+  2798→      const updated = { ...kinkFields, [key]: value };
+  2799→      setKinkFields(updated);
+  2800→      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1', fields: updated }) }).catch(() => {});
+  2801→    };
+  2802→    const ChipField = ({ label, key, options }: { label: string; key: string; options: readonly string[] }) => {
+  2803→      const current = (kinkFields[key] || '').split(',').filter(Boolean);
+  2804→      return (
+  2805→        <div className="space-y-2">
+  2806→          <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</h4>
+  2807→          <div className="flex flex-wrap gap-1.5">
+  2808→            {options.map(opt => (
+  2809→              <button key={opt} onClick={() => toggleField(key, opt)}
+  2810→                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${current.includes(opt) ? 'bg-primary/20 text-primary border-primary/40' : 'bg-secondary text-muted-foreground border-border hover:border-primary/20'}`}>
+  2811→                {opt.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+  2812→              </button>
+  2813→            ))}
+  2814→          </div>
+  2815→        </div>
+  2816→      );
+  2817→    };
+  2818→    const SingleField = ({ label, key, options }: { label: string; key: string; options: readonly string[] }) => {
+  2819→      return (
+  2820→        <div className="space-y-2">
+  2821→          <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</h4>
+  2822→          <div className="flex flex-wrap gap-1.5">
+  2823→            {options.map(opt => (
+  2824→              <button key={opt} onClick={() => setSingleField(key, opt)}
+  2825→                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${kinkFields[key] === opt ? 'bg-primary/20 text-primary border-primary/40' : 'bg-secondary text-muted-foreground border-border hover:border-primary/20'}`}>
+  2826→                {opt.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+  2827→              </button>
+  2828→            ))}
+  2829→          </div>
+  2830→        </div>
+  2831→      );
+  2832→    };
+  2833→    if (kinkLoading) return <LoadingGrid cols={1} rows={6} />;
+  2834→    const kinkTabs = [
+  2835→      { id: 'bedroom', label: 'Bedroom', icon: Cherry },
+  2836→      { id: 'appearance', label: 'Appearance', icon: Palette },
+  2837→      { id: 'interests', label: 'Interests', icon: Target },
+  2838→      { id: 'lifestyle', label: 'Lifestyle', icon: Briefcase },
+  2839→    ];
+  2840→    return (
+  2841→      <div className="h-full flex flex-col">
+  2842→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  2843→          {kinkTabs.map(t => {
+  2844→            const Icon = t.icon;
+  2845→            return <button key={t.id} onClick={() => setKinkTab(t.id)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${kinkTab === t.id ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}><Icon className="w-3 h-3 mr-1 inline" />{t.label}</button>;
+  2846→          })}
+  2847→        </div>
+  2848→        <ScrollArea className="flex-1">
+  2849→          <div className="p-4 space-y-6 max-w-2xl mx-auto">
+  2850→            {kinkTab === 'bedroom' && (<>
+  2851→              <SingleField label="Position" key="position" options={['top','bottom','versatile','versatile-top','versatile-bottom','side','no']} />
+  2852→              <SingleField label="FF / Fisting" key="ff_role" options={FF_ROLE_OPTIONS} />
+  2853→              <SingleField label="S&M Level" key="sm_level" options={SM_LEVEL_OPTIONS} />
+  2854→              <ChipField label="Fetish & Clothing" key="fetishes" options={FETISH_CLOTHING_OPTIONS} />
+  2855→              <SingleField label="Safer Sex" key="safer_sex" options={SAFER_SEX_OPTIONS} />
+  2856→              <SingleField label="Dick Size" key="dick_size" options={DICK_SIZE_OPTIONS} />
+  2857→              <SingleField label="Circumcision" key="circumcision" options={CIRCUMCISION_OPTIONS} />
+  2858→              <SingleField label="Dirty Sex" key="dirty_sex" options={DIRTY_SEX_OPTIONS} />
+  2859→              <SingleField label="Meet At" key="meet_at" options={MEET_AT_OPTIONS} />
+  2860→            </>)}
+  2861→            {kinkTab === 'appearance' && (<>
+  2862→              <ChipField label="Tribes" key="tribes" options={TRIBE_OPTIONS} />
+  2863→              <SingleField label="Hair Color" key="hair_color" options={HAIR_COLOR_OPTIONS} />
+  2864→              <SingleField label="Hair Length" key="hair_length" options={HAIR_LENGTH_OPTIONS} />
+  2865→              <SingleField label="Eye Color" key="eye_color" options={EYE_COLOR_OPTIONS} />
+  2866→              <SingleField label="Beard" key="beard" options={BEARD_OPTIONS} />
+  2867→              <SingleField label="Piercings" key="piercings" options={PIERCING_OPTIONS} />
+  2868→              <SingleField label="Tattoos" key="tattoos" options={TATTOO_OPTIONS} />
+  2869→            </>)}
+  2870→            {kinkTab === 'interests' && (<>
+  2871→              <ChipField label="Going Out" key="going_out" options={GOING_OUT_OPTIONS} />
+  2872→              <ChipField label="Music Genres" key="music_genres" options={MUSIC_GENRE_OPTIONS} />
+  2873→              <ChipField label="Sports" key="sports" options={SPORT_OPTIONS} />
+  2874→              <ChipField label="Food" key="food" options={FOOD_OPTIONS} />
+  2875→            </>)}
+  2876→            {kinkTab === 'lifestyle' && (<>
+  2877→              <ChipField label="Travel Style" key="travel_style" options={TRAVEL_STYLE_OPTIONS} />
+  2878→              <ChipField label="Profession" key="profession" options={PROFESSION_OPTIONS} />
+  2879→              <SingleField label="Smoker" key="smoker" options={['no','socially','yes']} />
+  2880→            </>)}
+  2881→          </div>
+  2882→        </ScrollArea>
+  2883→      </div>
+  2884→    );
+  2885→  }
+  2886→
+  2887→  // ─── SETTINGS PANEL ────────────────────────────────────────
+  2888→  function SettingsPanel() {
+  2889→    return (
+  2890→      <ScrollArea className="h-full">
+  2891→        <div className="max-w-lg mx-auto p-4 space-y-6">
+  2892→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2893→            <SectionHeader icon={User} label="Account" />
+  2894→            <div className="flex items-center justify-between"><div><p className="text-sm">Email</p><p className="text-[11px] text-muted-foreground">{currentUser?.email}</p></div><Badge variant="outline" className="text-[10px] border-border">Verified</Badge></div>
+  2895→            <Separator className="bg-border" />
+  2896→            <div className="flex items-center justify-between"><p className="text-sm">Username</p><p className="text-[11px] text-muted-foreground">@{currentUser?.username}</p></div>
+  2897→          </CardContent></Card>
+  2898→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2899→            <SectionHeader icon={Shield} label="Privacy" />
+
+[showing lines 2400-2899 of 2959; use offset=2900 with limit to continue reading]

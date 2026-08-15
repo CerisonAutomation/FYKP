@@ -1,0 +1,502 @@
+  1900→  }
+  1901→
+  1902→
+  1903→  // ─── NOTES VIEW ────────────────────────────────────────────
+  1904→  function NotesView() {
+  1905→    return (
+  1906→      <ScrollArea className="h-full">
+  1907→        <div className="p-4 space-y-4">
+  1908→          <div className="flex items-center justify-between">
+  1909→            <h3 className="text-sm font-semibold">My Notes ({notes.length})</h3>
+  1910→            <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={() => { setNoteTargetId(''); setNoteContent(''); setShowNoteDialog(true); }}><Plus className="w-3.5 h-3.5 mr-1" /> Add</Button>
+  1911→          </div>
+  1912→          {notes.length === 0 ? <EmptyState icon={StickyNote} title="No notes" desc="Add notes to user profiles to remember details" />
+  1913→            : notes.map((note: any) => (
+  1914→              <Card key={note.id} className="bg-secondary border-border">
+  1915→                <CardContent className="p-3">
+  1916→                  <div className="flex items-center justify-between mb-1">
+  1917→                    <div className="flex items-center gap-2">
+  1918→                      {note.target && <button onClick={() => openProfile(note.target.id)} className="text-[12px] font-semibold hover:text-primary">{note.target.displayName}</button>}
+  1919→                      <Badge className="text-[9px] bg-muted">{note.type}</Badge>
+  1920→                    </div>
+  1921→                    <div className="flex gap-1">
+  1922→                      <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" onClick={() => handleDeleteNote(note.id)}><X className="w-3 h-3" /></Button>
+  1923→                    </div>
+  1924→                  </div>
+  1925→                  <p className="text-[12px] text-muted-foreground">{note.content}</p>
+  1926→                  <p className="text-[10px] text-muted-foreground mt-1">{timeAgo(note.createdAt)}</p>
+  1927→                </CardContent>
+  1928→              </Card>
+  1929→            ))}
+  1930→        </div>
+  1931→      </ScrollArea>
+  1932→    );
+  1933→  }
+  1934→
+  1935→  // ─── BOOSTS VIEW ────────────────────────────────────────────
+  1936→  function BoostsView() {
+  1937→    if (boostsLoading) return <LoadingGrid cols={1} rows={3} />;
+  1938→    const activeBoosts = allBoosts.filter((b: any) => b.isActive);
+  1939→    return (
+  1940→      <ScrollArea className="h-full">
+  1941→        <div className="p-4 space-y-6">
+  1942→          {/* Active boosts */}
+  1943→          <div className="space-y-3">
+  1944→            <SectionHeader icon={Zap} label="Active Boosts" count={activeBoosts.length} />
+  1945→            {activeBoosts.length === 0 ? <p className="text-xs text-muted-foreground">No active boosts</p>
+  1946→              : activeBoosts.map((boost: any) => (
+  1947→                <div key={boost.id} className="p-3 rounded-xl bg-secondary border border-border boost-glow">
+  1948→                  <div className="flex items-center justify-between mb-2">
+  1949→                    <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-primary" /><span className="text-[12px] font-semibold capitalize">{boost.type} Boost</span></div>
+  1950→                    <Badge className="bg-green-400/20 text-green-400 text-[9px]">Active</Badge>
+  1951→                  </div>
+  1952→                  <Progress value={boost.duration > 0 ? 50 : 100} className="h-1.5" />
+  1953→                  <p className="text-[10px] text-muted-foreground mt-1">Ends {timeAgo(boost.endsAt)}</p>
+  1954→                </div>
+  1955→              ))}
+  1956→          </div>
+  1957→          {/* Purchase */}
+  1958→          <div className="space-y-3">
+  1959→            <SectionHeader icon={Wallet} label="Purchase Boosts" />
+  1960→            <div className="grid gap-2">
+  1961→              {BOOST_TYPES.map(bt => (
+  1962→                <Card key={bt.type} className="bg-secondary border-border">
+  1963→                  <CardContent className="p-3">
+  1964→                    <div className="flex items-center gap-3">
+  1965→                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${bt.color} flex items-center justify-center shrink-0`}><Rocket className="w-5 h-5 text-white" /></div>
+  1966→                      <div className="flex-1 min-w-0">
+  1967→                        <h4 className="text-[12px] font-semibold">{bt.label} Boost</h4>
+  1968→                        <p className="text-[10px] text-muted-foreground">{bt.desc}</p>
+  1969→                      </div>
+  1970→                      <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground shrink-0" onClick={async () => {
+  1971→                        if (!currentUser) return;
+  1972→                        try { await fetch(`/api/boosts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: bt.type, duration: bt.duration }) }); } catch {}
+  1973→                      }}>${bt.price}</Button>
+  1974→                    </div>
+  1975→                  </CardContent>
+  1976→                </Card>
+  1977→              ))}
+  1978→            </div>
+  1979→          </div>
+  1980→          {/* History */}
+  1981→          <div className="space-y-3">
+  1982→            <SectionHeader icon={Clock} label="Boost History" count={allBoosts.length} />
+  1983→            {allBoosts.length === 0 ? <p className="text-xs text-muted-foreground">No boost history</p>
+  1984→              : allBoosts.slice(0, 10).map((boost: any) => (
+  1985→                <div key={boost.id} className="flex items-center justify-between p-2.5 rounded-lg bg-secondary/50">
+  1986→                  <div className="flex items-center gap-2">
+  1987→                    <span className="text-[12px] font-medium capitalize">{boost.type}</span>
+  1988→                    <Badge className={`text-[9px] ${boost.isActive ? 'bg-green-400/20 text-green-400' : 'bg-muted text-muted-foreground'}`}>{boost.isActive ? 'Active' : 'Expired'}</Badge>
+  1989→                  </div>
+  1990→                  <span className="text-[10px] text-muted-foreground">{timeAgo(boost.endsAt)}</span>
+  1991→                </div>
+  1992→              ))}
+  1993→          </div>
+  1994→        </div>
+  1995→      </ScrollArea>
+  1996→    );
+  1997→  }
+  1998→
+  1999→  // ─── FAVORITES VIEW ────────────────────────────────────────
+  2000→  function FavoritesView() {
+  2001→    if (favoritesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  2002→    return (
+  2003→      <ScrollArea className="h-full">
+  2004→        <div className="p-4 space-y-1">
+  2005→          {favorites.length === 0 ? <EmptyState icon={Bookmark} title="No favorites" desc="Add users to favorites from their profiles" />
+  2006→            : favorites.map((fav: any) => fav.target && (
+  2007→              <div key={fav.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  2008→                <button onClick={() => openProfile(fav.target.id)}>
+  2009→                  <div className="relative">
+  2010→                    <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-xs">{fav.target.displayName?.[0]}</AvatarFallback></Avatar>
+  2011→                    {fav.isSuper && <Star className="absolute -top-1 -right-1 w-4 h-4 text-yellow-400 fill-yellow-400" />}
+  2012→                  </div>
+  2013→                </button>
+  2014→                <div className="flex-1 min-w-0">
+  2015→                  <button onClick={() => openProfile(fav.target.id)} className="text-[13px] font-semibold hover:text-primary">{fav.target.displayName}</button>
+  2016→                  <p className="text-[10px] text-muted-foreground">{fav.isSuper ? '⭐ Super Favorite' : 'Favorite'} · {timeAgo(fav.createdAt)}</p>
+  2017→                </div>
+  2018→                <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/favorites?userId=${CURRENT_USER_ID}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: fav.targetId }) }); setFavorites(prev => prev.filter((f: any) => f.id !== fav.id)); } catch {} }}>Remove</Button>
+  2019→              </div>
+  2020→            ))}
+  2021→        </div>
+  2022→      </ScrollArea>
+  2023→    );
+  2024→  }
+  2025→
+  2026→  // ─── ACCOUNT VIEW ──────────────────────────────────────────
+  2027→  function AccountView() {
+  2028→    return (
+  2029→      <ScrollArea className="h-full">
+  2030→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2031→          <Card className="bg-secondary border-border">
+  2032→            <CardContent className="p-4 space-y-4">
+  2033→              <SectionHeader icon={Lock} label="Account Settings" />
+  2034→              {currentUser && <>
+  2035→                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Email</Label><Input value={currentUser.email} disabled className="bg-card border-border h-10 text-xs" /></div>
+  2036→                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Username</Label><Input value={currentUser.username} disabled className="bg-card border-border h-10 text-xs" /></div>
+  2037→                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Display Name</Label><Input value={editForm.displayName || currentUser.displayName} onChange={e => setEditForm(p => ({ ...p, displayName: e.target.value }))} className="bg-card border-border h-10 text-xs" /></div>
+  2038→                <Button className="bg-primary text-primary-foreground text-xs" onClick={handleSaveProfile}>Save Changes</Button>
+  2039→              </>}
+  2040→            </CardContent>
+  2041→          </Card>
+  2042→          <Card className="bg-secondary border-border">
+  2043→            <CardContent className="p-4 space-y-3">
+  2044→              <SectionHeader icon={Shield} label="Password" />
+  2045→              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Current Password</Label><Input type="password" placeholder="••••••••" className="bg-card border-border h-10 text-xs" /></div>
+  2046→              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">New Password</Label><Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="••••••••" className="bg-card border-border h-10 text-xs" /></div>
+  2047→              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Confirm Password</Label><Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" className="bg-card border-border h-10 text-xs" /></div>
+  2048→              <Button variant="outline" className="border-border text-xs" onClick={() => { if (!newPassword || newPassword !== confirmPassword) return; fetch('/api/auth', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'update-password', newPassword }) }).catch(()=>{}); setNewPassword(''); setConfirmPassword(''); }}>Update Password</Button>
+  2049→            </CardContent>
+  2050→          </Card>
+  2051→          <Card className="bg-destructive/10 border border-destructive/20">
+  2052→            <CardContent className="p-4 space-y-3">
+  2053→              <SectionHeader icon={AlertTriangle} label="Danger Zone" />
+  2054→              <p className="text-xs text-muted-foreground">Once you delete your account, there is no going back.</p>
+  2055→              <Button variant="outline" className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 text-xs" onClick={() => setShowDeleteAccount(true)}>Delete Account</Button>
+  2056→            </CardContent>
+  2057→          </Card>
+  2058→        </div>
+  2059→      </ScrollArea>
+  2060→    );
+  2061→  }
+  2062→
+  2063→  // ─── PREFERENCES VIEW ──────────────────────────────────────
+  2064→  function PreferencesView() {
+  2065→    const togglePref = (key: string) => setPrefs(p => ({ ...p, [key]: !(p as any)[key] }));
+  2066→    return (
+  2067→      <ScrollArea className="h-full">
+  2068→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2069→          {/* Geo & Display */}
+  2070→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2071→            <SectionHeader icon={MapPin} label="Location & Display" />
+  2072→            {[
+  2073→              { key: 'showOnline', label: 'Show Online Status', desc: 'Let others see when you are online' },
+  2074→              { key: 'showDistance', label: 'Show Distance', desc: 'Display distance to other users' },
+  2075→              { key: 'showAge', label: 'Show Age', desc: 'Display your age on profile' },
+  2076→              { key: 'showActivity', label: 'Show Activity', desc: 'Show your recent activity' },
+  2077→              { key: 'hidePicsOffline', label: 'Hide Pics Offline', desc: 'Hide photos when offline' },
+  2078→            ].map(item => (
+  2079→              <div key={item.key} className="flex items-center justify-between">
+  2080→                <div><p className="text-sm">{item.label}</p><p className="text-[10px] text-muted-foreground">{item.desc}</p></div>
+  2081→                <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
+  2082→              </div>
+  2083→            ))}
+  2084→          </CardContent></Card>
+  2085→          {/* Discover Settings */}
+  2086→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2087→            <SectionHeader icon={Search} label="Discover Preferences" />
+  2088→            <div className="flex items-center justify-between"><div><p className="text-sm">Age Range</p><p className="text-[10px] text-muted-foreground">{prefs.ageMin}–{prefs.ageMax}</p></div>
+  2089→              <Slider value={[prefs.ageMin, prefs.ageMax]} onValueChange={([min, max]) => setPrefs(p => ({ ...p, ageMin: min, ageMax: max }))} min={18} max={80} step={1} className="w-32" /></div>
+  2090→            <div className="flex items-center justify-between"><div><p className="text-sm">Units</p></div>
+  2091→              <Select value={prefs.displayUnits} onValueChange={v => setPrefs(p => ({ ...p, displayUnits: v }))}><SelectTrigger className="h-8 w-24 text-[11px] bg-card border-border"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="metric">Metric</SelectItem><SelectItem value="imperial">Imperial</SelectItem></SelectContent></Select>
+  2092→            </div>
+  2093→            <div className="flex items-center justify-between"><div><p className="text-sm">Language</p></div>
+  2094→              <Select value={prefs.lang} onValueChange={v => setPrefs(p => ({ ...p, lang: v }))}><SelectTrigger className="h-8 w-24 text-[11px] bg-card border-border"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="en">English</SelectItem><SelectItem value="es">Spanish</SelectItem><SelectItem value="fr">French</SelectItem><SelectItem value="de">German</SelectItem><SelectItem value="it">Italian</SelectItem></SelectContent></Select>
+  2095→            </div>
+  2096→          </CardContent></Card>
+  2097→          {/* Sound & Notifications */}
+  2098→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2099→            <SectionHeader icon={Bell} label="Notifications" />
+  2100→            {[
+  2101→              { key: 'soundOff', label: 'Sound Off', desc: 'Mute all app sounds' },
+  2102→              { key: 'notifPushOff', label: 'Push Notifications', desc: 'Disable push notifications' },
+  2103→              { key: 'notifEmailOff', label: 'Email Notifications', desc: 'Disable email notifications' },
+  2104→              { key: 'notifTelegramOff', label: 'Telegram Notifications', desc: 'Disable Telegram alerts' },
+  2105→            ].map(item => (
+  2106→              <div key={item.key} className="flex items-center justify-between">
+  2107→                <div><p className="text-sm">{item.label}</p><p className="text-[10px] text-muted-foreground">{item.desc}</p></div>
+  2108→                <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
+  2109→              </div>
+  2110→            ))}
+  2111→          </CardContent></Card>
+  2112→          {/* Privacy */}
+  2113→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2114→            <SectionHeader icon={Shield} label="Privacy" />
+  2115→            {[
+  2116→              { key: 'mailingInternal', label: 'Internal Mailing', desc: 'Receive internal communications' },
+  2117→              { key: 'mailingPartner', label: 'Partner Mailing', desc: 'Receive partner promotions' },
+  2118→              { key: 'profileOff', label: 'Profile Off', desc: 'Hide your profile temporarily' },
+  2119→              { key: 'privateAuto', label: 'Private Auto-Reply', desc: 'Auto-reply when private' },
+  2120→              { key: 'noPros', label: 'No Professionals', desc: 'Hide professional accounts' },
+  2121→              { key: 'noPub', label: 'No Public Content', desc: 'Hide public content' },
+  2122→            ].map(item => (
+  2123→              <div key={item.key} className="flex items-center justify-between">
+  2124→                <div><p className="text-sm">{item.label}</p><p className="text-[10px] text-muted-foreground">{item.desc}</p></div>
+  2125→                <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
+  2126→              </div>
+  2127→            ))}
+  2128→          </CardContent></Card>
+  2129→        </div>
+  2130→      </ScrollArea>
+  2131→    );
+  2132→  }
+  2133→
+  2134→  // ─── GEO SETTINGS VIEW ─────────────────────────────────────
+  2135→  function GeoSettingsView() {
+  2136→    const modes = [
+  2137→      { value: 'auto', label: 'Auto GPS', icon: Crosshair, desc: 'Use device GPS for precise location' },
+  2138→      { value: 'manual', label: 'Manual City', icon: MapPin, desc: 'Set a fixed city location' },
+  2139→      { value: 'fake', label: 'Fake Location', icon: MapPinOff, desc: 'Use a custom fake location' },
+  2140→      { value: 'hide', label: 'Hide Location', icon: EyeOff, desc: 'Hide your location completely' },
+  2141→    ];
+  2142→    return (
+  2143→      <ScrollArea className="h-full">
+  2144→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2145→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2146→            <SectionHeader icon={Navigation} label="Location Mode" />
+  2147→            {modes.map(mode => {
+  2148→              const Icon = mode.icon;
+  2149→              return (
+  2150→                <button key={mode.value} onClick={() => { setGeoMode(mode.value); setPrefs(p => ({ ...p, geoMode: mode.value })); }}
+  2151→                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all ${geoMode === mode.value ? 'bg-primary/10 border-primary/30' : 'bg-card border-border hover:border-primary/20'}`}>
+  2152→                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${geoMode === mode.value ? 'bg-primary/20' : 'bg-secondary'}`}><Icon className="w-4 h-4 text-primary" /></div>
+  2153→                  <div className="text-left"><p className="text-[12px] font-semibold">{mode.label}</p><p className="text-[10px] text-muted-foreground">{mode.desc}</p></div>
+  2154→                  {geoMode === mode.value && <Check className="w-4 h-4 text-primary ml-auto" />}
+  2155→                </button>
+  2156→              );
+  2157→            })}
+  2158→          </CardContent></Card>
+  2159→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2160→            <SectionHeader icon={MapPin} label="Geo Name" />
+  2161→            <p className="text-[10px] text-muted-foreground">This name displays instead of your real location</p>
+  2162→            <Input value={geoName} onChange={e => setGeoName(e.target.value)} placeholder="e.g. 'Somewhere fun'" className="bg-card border-border h-10 text-xs" />
+  2163→          </CardContent></Card>
+  2164→          {(geoMode === 'fake') && (
+  2165→            <Card className="bg-yellow-500/10 border border-yellow-500/20"><CardContent className="p-3 flex items-center gap-3">
+  2166→              <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0" />
+  2167→              <p className="text-xs text-yellow-400">Fake location mode is active. Other users may see this as suspicious.</p>
+  2168→            </CardContent></Card>
+  2169→          )}
+  2170→          {/* Map preview */}
+  2171→          <Card className="bg-secondary border-border">
+  2172→            <CardContent className="p-3">
+  2173→              <div className="aspect-video rounded-xl bg-card relative overflow-hidden">
+  2174→                <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 50%, oklch(0.22 0.01 285) 0%, oklch(0.15 0.005 285) 100%)' }}>
+  2175→                  <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid2)" /></svg>
+  2176→                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"><div className="w-5 h-5 bg-primary rounded-full border-3 border-card shadow-lg"><div className="w-full h-full bg-primary rounded-full animate-ping opacity-30" /></div></div>
+  2177→                </div>
+  2178→              </div>
+  2179→            </CardContent>
+  2180→          </Card>
+  2181→        </div>
+  2182→      </ScrollArea>
+  2183→    );
+  2184→  }
+  2185→
+  2186→  // ─── BANNERS VIEW ──────────────────────────────────────────
+  2187→  function BannersView() {
+  2188→    return (
+  2189→      <ScrollArea className="h-full">
+  2190→        <div className="p-4 space-y-4">
+  2191→          <div className="flex items-center justify-between">
+  2192→            <h3 className="text-sm font-semibold">Active Banners ({banners.length})</h3>
+  2193→            <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={handleCreateBanner}><Plus className="w-3.5 h-3.5 mr-1" /> Create</Button>
+  2194→          </div>
+  2195→          {banners.length === 0 ? <EmptyState icon={Layers} title="No banners" desc="Create promotional banners" />
+  2196→            : banners.map((banner: any) => (
+  2197→              <Card key={banner.id} className="bg-secondary border-border overflow-hidden">
+  2198→                {banner.imageUrl && <img src={banner.imageUrl} alt="" className="w-full h-32 object-cover" />}
+  2199→                <CardContent className="p-3">
+  2200→                  <div className="flex items-center justify-between">
+  2201→                    <div><p className="text-[12px] font-semibold">{banner.title}</p><p className="text-[10px] text-muted-foreground">Position: {banner.position} · {banner.isActive ? '✓ Active' : 'Inactive'}</p></div>
+  2202→                  </div>
+  2203→                </CardContent>
+  2204→              </Card>
+  2205→            ))}
+  2206→        </div>
+  2207→      </ScrollArea>
+  2208→    );
+  2209→  }
+  2210→
+  2211→  // ─── SITES VIEW ─────────────────────────────────────────────
+  2212→  function SitesView() {
+  2213→    const [sites, setSites] = useState<any[]>([]);
+  2214→    const [sitesLoading, setSitesLoading] = useState(true);
+  2215→    useEffect(() => {
+  2216→      fetch('/api/fansites?userId=test-user-1')
+  2217→        .then(r => r.json())
+  2218→        .then(res => setSites(res.data || []))
+  2219→        .catch(() => setSites([]))
+  2220→        .finally(() => setSitesLoading(false));
+  2221→    }, []);
+  2222→    if (sitesLoading) return <LoadingGrid cols={1} rows={3} />;
+  2223→    return (
+  2224→      <ScrollArea className="h-full">
+  2225→        <div className="p-4 space-y-4">
+  2226→          <h3 className="text-sm font-semibold">Connected Sites</h3>
+  2227→          {sites.length === 0 ? (
+  2228→            <EmptyState icon={Link2} title="No linked sites yet" desc="Connect your fansite or external links to appear here" />
+  2229→          ) : (
+  2230→            sites.map((site: any) => (
+  2231→              <a key={site.id} href={site.url || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all">
+  2232→                <div className="w-9 h-9 rounded-xl bg-card flex items-center justify-center text-lg">{site.icon || '🔗'}</div>
+  2233→                <div className="flex-1 min-w-0"><p className="text-[12px] font-semibold">{site.name || site.title || 'Untitled Site'}</p><p className="text-[10px] text-muted-foreground truncate">{site.url || ''}</p></div>
+  2234→                <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
+  2235→              </a>
+  2236→            ))
+  2237→          )}
+  2238→          <p className="text-[10px] text-muted-foreground text-center">Manage your connected sites and fansite links</p>
+  2239→        </div>
+  2240→      </ScrollArea>
+  2241→    );
+  2242→  }
+  2243→
+  2244→  // ─── LEGAL VIEW ─────────────────────────────────────────────
+  2245→  function LegalView() {
+  2246→    const [legalTab, setLegalTab] = useState('terms');
+  2247→    const legalContent: Record<string, string> = {
+  2248→      terms: `Terms of Service\n\nLast updated: January 2025\n\n1. Acceptance of Terms\nBy accessing and using NEXUS, you accept and agree to be bound by these Terms of Service.\n\n2. User Accounts\nYou must be at least 18 years old to create an account. You are responsible for maintaining the confidentiality of your account.\n\n3. User Conduct\nYou agree to use NEXUS in a respectful manner. Harassment, spam, and inappropriate content are prohibited.\n\n4. Content\nAll content you post on NEXUS remains your property. By posting, you grant NEXUS a license to display your content.\n\n5. Premium Services\nPremium subscriptions are billed monthly. You can cancel at any time. No refunds are provided for partial months.\n\n6. Termination\nNEXUS reserves the right to suspend or terminate accounts that violate these terms.`,
+  2249→      privacy: `Privacy Policy\n\nLast updated: January 2025\n\n1. Data Collection\nWe collect information you provide directly: name, email, age, location, photos, and preferences.\n\n2. Data Usage\nYour data is used to provide and improve our services, match you with other users, and personalize your experience.\n\n3. Location Data\nYour location is used for matching and distance calculation. You can control location sharing in settings.\n\n4. Third Parties\nWe do not sell your personal data. We may share anonymized analytics with partners.\n\n5. Data Security\nWe use industry-standard encryption to protect your data.\n\n6. Your Rights\nYou can request access to, correction of, or deletion of your personal data at any time.`,
+  2250→      cookies: `Cookie Policy\n\nLast updated: January 2025\n\n1. What Are Cookies\nCookies are small files stored on your device that help us provide a better experience.\n\n2. Types We Use\n• Essential cookies: Required for basic functionality\n• Analytics cookies: Help us understand usage patterns\n• Preference cookies: Remember your settings\n\n3. Management\nYou can manage cookie preferences in your browser settings.`,
+  2251→    };
+  2252→    return (
+  2253→      <ScrollArea className="h-full">
+  2254→        <div className="p-4 space-y-4">
+  2255→          <Tabs value={legalTab} onValueChange={setLegalTab}>
+  2256→            <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  2257→              <TabsTrigger value="terms" className="text-[11px] flex-1 h-7">Terms</TabsTrigger>
+  2258→              <TabsTrigger value="privacy" className="text-[11px] flex-1 h-7">Privacy</TabsTrigger>
+  2259→              <TabsTrigger value="cookies" className="text-[11px] flex-1 h-7">Cookies</TabsTrigger>
+  2260→            </TabsList>
+  2261→            <TabsContent value={legalTab} className="mt-3">
+  2262→              <Card className="bg-secondary border-border"><CardContent className="p-4"><pre className="text-xs text-muted-foreground whitespace-pre-wrap font-sans leading-relaxed">{legalContent[legalTab]}</pre></CardContent></Card>
+  2263→            </TabsContent>
+  2264→          </Tabs>
+  2265→        </div>
+  2266→      </ScrollArea>
+  2267→    );
+  2268→  }
+  2269→
+  2270→  // ─── FAQS VIEW ─────────────────────────────────────────────
+  2271→  function FaqsView() {
+  2272→    return (
+  2273→      <ScrollArea className="h-full">
+  2274→        <div className="p-4 space-y-3">
+  2275→          <h3 className="text-sm font-semibold mb-2">Frequently Asked Questions</h3>
+  2276→          <Accordion type="single" collapsible className="space-y-2">
+  2277→            {FAQ_DATA.map((faq, i) => (
+  2278→              <AccordionItem key={i} value={`faq-${i}`} className="bg-secondary border border-border rounded-xl overflow-hidden">
+  2279→                <AccordionTrigger className="px-4 py-3 text-[12px] font-medium hover:no-underline">{faq.q}</AccordionTrigger>
+  2280→                <AccordionContent className="px-4 pb-3 text-[11px] text-muted-foreground leading-relaxed">{faq.a}</AccordionContent>
+  2281→              </AccordionItem>
+  2282→            ))}
+  2283→          </Accordion>
+  2284→        </div>
+  2285→      </ScrollArea>
+  2286→    );
+  2287→  }
+  2288→
+  2289→  // ─── ABUSE VIEW ────────────────────────────────────────────
+  2290→  function AbuseView() {
+  2291→    const reportCategories = ['harassment', 'spam', 'inappropriate content', 'fake profile', 'scam', 'underage user', 'violence', 'other'];
+  2292→    return (
+  2293→      <ScrollArea className="h-full">
+  2294→        <div className="p-4 space-y-6 max-w-lg mx-auto">
+  2295→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2296→            <SectionHeader icon={Flag} label="Report Abuse" />
+  2297→            <div className="space-y-1.5">
+  2298→              <Label className="text-xs text-muted-foreground">User ID or Username</Label>
+  2299→              <Input value={abuseForm.userId} onChange={e => setAbuseForm(p => ({ ...p, userId: e.target.value }))} placeholder="Enter user ID" className="bg-card border-border h-10 text-xs" />
+  2300→            </div>
+  2301→            <div className="space-y-1.5">
+  2302→              <Label className="text-xs text-muted-foreground">Category</Label>
+  2303→              <Select value={abuseForm.category} onValueChange={v => setAbuseForm(p => ({ ...p, category: v }))}>
+  2304→                <SelectTrigger className="h-10 text-xs bg-card border-border"><SelectValue /></SelectTrigger>
+  2305→                <SelectContent className="bg-card border-border">{reportCategories.map(c => <SelectItem key={c} value={c} className="capitalize">{c}</SelectItem>)}</SelectContent>
+  2306→              </Select>
+  2307→            </div>
+  2308→            <div className="space-y-1.5">
+  2309→              <Label className="text-xs text-muted-foreground">Description</Label>
+  2310→              <Textarea value={abuseForm.description} onChange={e => setAbuseForm(p => ({ ...p, description: e.target.value }))} placeholder="Describe the issue..." className="bg-card border-border text-xs" rows={4} />
+  2311→            </div>
+  2312→            <Button className="w-full bg-destructive text-white text-xs" disabled={!abuseForm.userId || !abuseForm.description} onClick={() => { alert('Report submitted. We will review it within 24 hours.'); setAbuseForm({ category: 'harassment', description: '', userId: '' }); }}>Submit Report</Button>
+  2313→          </CardContent></Card>
+  2314→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2315→            <SectionHeader icon={Block} label="Blocked Users" count={blockedUsers.length} />
+  2316→            {blockedUsers.length === 0 ? <p className="text-xs text-muted-foreground">No blocked users</p>
+  2317→              : blockedUsers.map((b: any) => (
+  2318→                <div key={b.id} className="flex items-center gap-3 p-2 rounded-lg">
+  2319→                  <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(b.blocked)} /><AvatarFallback className="text-[10px]">{(b.blocked as any)?.displayName?.[0]}</AvatarFallback></Avatar>
+  2320→                  <span className="text-xs flex-1">{(b.blocked as any)?.displayName || 'User'}</span>
+  2321→                  <Button size="sm" variant="ghost" className="text-[10px] text-muted-foreground" onClick={async () => { try { await fetch(`/api/blocks?blockedId=${(b.blocked as any)?.id}`, { method: 'DELETE' }); setBlockedUsers(prev => prev.filter((x: any) => x.id !== b.id)); } catch {} }}>Unblock</Button>
+  2322→                </div>
+  2323→              ))}
+  2324→          </CardContent></Card>
+  2325→        </div>
+  2326→      </ScrollArea>
+  2327→    );
+  2328→  }
+  2329→
+  2330→  // ─── ADVANTAGES VIEW ───────────────────────────────────────
+  2331→  function AdvantagesView() {
+  2332→    const features = [
+  2333→      { name: 'Unlimited Likes', free: '5/day', premium: 'Unlimited' },
+  2334→      { name: 'See Who Viewed You', free: false, premium: true },
+  2335→      { name: 'Advanced Filters', free: false, premium: true },
+  2336→      { name: 'INFER AI Analysis', free: false, premium: 'Basic' },
+  2337→      { name: 'Boost Discounts', free: false, premium: '20% off' },
+  2338→      { name: 'Anonymous Browsing', free: false, premium: true },
+  2339→      { name: 'Priority Support', free: false, premium: true },
+  2340→      { name: 'Video Calls', free: false, premium: true },
+  2341→      { name: 'Travel Mode', free: false, premium: true },
+  2342→      { name: 'Profile Themes', free: false, premium: true },
+  2343→      { name: 'Read Receipts', free: false, premium: true },
+  2344→      { name: 'Extended Match Radius', free: '50km', premium: '200km' },
+  2345→    ];
+  2346→    return (
+  2347→      <ScrollArea className="h-full">
+  2348→        <div className="p-4 space-y-6">
+  2349→          <div className="text-center space-y-1">
+  2350→            <h2 className="text-lg font-bold gradient-text">Why Go Premium?</h2>
+  2351→            <p className="text-xs text-muted-foreground">Unlock the full potential of NEXUS</p>
+  2352→          </div>
+  2353→          <Card className="bg-secondary border-border">
+  2354→            <CardContent className="p-4">
+  2355→              <div className="space-y-2">
+  2356→                <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-[11px]">
+  2357→                  <span className="font-semibold">Feature</span><span className="text-center">Free</span><span className="text-center text-primary">Premium</span>
+  2358→                </div>
+  2359→                {features.map(f => (
+  2360→                  <div key={f.name} className="grid grid-cols-[1fr_auto_auto] gap-2 text-[11px] py-1.5 border-t border-border">
+  2361→                    <span className="text-muted-foreground">{f.name}</span>
+  2362→                    <span className="text-center">{typeof f.free === 'boolean' ? (f.free ? '✓' : '✗') : f.free}</span>
+  2363→                    <span className="text-center font-medium text-primary">{typeof f.premium === 'boolean' ? (f.premium ? '✓' : '—') : f.premium}</span>
+  2364→                  </div>
+  2365→                ))}
+  2366→              </div>
+  2367→            </CardContent>
+  2368→          </Card>
+  2369→          <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm" onClick={() => setActiveTab('membership')}><Crown className="w-4 h-4 mr-2" /> Upgrade to Premium</Button>
+  2370→        </div>
+  2371→      </ScrollArea>
+  2372→    );
+  2373→  }
+  2374→
+  2375→  // ─── AFFILIATION VIEW ──────────────────────────────────────
+  2376→  function AffiliationView() {
+  2377→    const [affiliationStats, setAffiliationStats] = useState({ referrals: 0, converted: 0, earned: 0 });
+  2378→    useEffect(() => {
+  2379→      fetch('/api/subscriptions?userId=test-user-1')
+  2380→        .then(r => r.json())
+  2381→        .then(res => {
+  2382→          const subs = res.data || [];
+  2383→          const referrals = subs.length;
+  2384→          const converted = subs.filter((s: any) => s.isActive).length;
+  2385→          const earned = converted * 9.8;
+  2386→          setAffiliationStats({ referrals, converted, earned: Math.round(earned) });
+  2387→        })
+  2388→        .catch(() => {});
+  2389→    }, []);
+  2390→    return (
+  2391→      <ScrollArea className="h-full">
+  2392→        <div className="p-4 space-y-6">
+  2393→          <div className="text-center space-y-1">
+  2394→            <h2 className="text-lg font-bold gradient-text">Affiliate Program</h2>
+  2395→            <p className="text-xs text-muted-foreground">Earn rewards by referring friends to NEXUS</p>
+  2396→          </div>
+  2397→          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+  2398→            <SectionHeader icon={Share2} label="Your Referral Link" />
+  2399→            <div className="flex items-center gap-2 p-3 rounded-xl bg-card border border-border">
+
+[showing lines 1900-2399 of 2959; use offset=2400 with limit to continue reading]

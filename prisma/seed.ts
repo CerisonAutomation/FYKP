@@ -121,6 +121,20 @@ async function main() {
       lang: 'en',
       isProfessional: false,
       professionalStatus: 'none',
+      // Travel Mode
+      isTraveling: true,
+      travelCity: 'Berlin',
+      travelCountry: 'Germany',
+      travelLat: 52.5200,
+      travelLng: 13.4050,
+      travelStart: new Date(Date.now() - 86400000 * 2),
+      travelEnd: new Date(Date.now() + 86400000 * 5),
+      // DND Schedule
+      dndEnabled: true,
+      dndStart: '22:00',
+      dndEnd: '08:00',
+      // Hashtags
+      hashtags: 'travel,gym,malta,coffee-lover,developer',
     },
   });
   console.log('Created test user:', testUser.id);
@@ -186,6 +200,7 @@ async function main() {
         position: rand(POSITIONS),
         pronouns: rand(['he/him', 'he/they', 'they/them', 'she/her']),
         verificationStatus: Math.random() > 0.5 ? 'verified' : 'none',
+        hashtags: i % 3 === 0 ? ['fitness,travel,music', 'gym,foodie,nightlife', 'art,photography,nature', 'tech,gaming,coffee', 'dance,yoga,wellness', 'surfing,hiking,outdoors'][i % 6] : null,
       },
     });
     userIds.push(user.id);
@@ -395,6 +410,119 @@ async function main() {
   // Test user albums for others too
   for (let i = 0; i < 5; i++) {
     await db.album.create({ data: { name: ['My Photos', 'Travel Pics', 'Gym Progress', 'Night Out', 'Nature'][i], isPrivate: Math.random() > 0.6, userId: otherUsers[i] } });
+  }
+
+  // ═══ NEW FEATURES SEED DATA ═══
+
+  // --- Circles (3 circles for test-user-1 with members) ---
+  const hotGuysCircle = await db.circle.create({
+    data: { name: 'Hot Guys', color: '#ef4444', icon: 'flame', userId: testUser.id },
+  });
+  const friendsCircle = await db.circle.create({
+    data: { name: 'Friends', color: '#22c55e', icon: 'users', userId: testUser.id },
+  });
+  const maybeLaterCircle = await db.circle.create({
+    data: { name: 'Maybe Later', color: '#f59e0b', icon: 'clock', userId: testUser.id },
+  });
+
+  // Add members to circles
+  await db.circleMember.createMany({
+    data: [
+      { circleId: hotGuysCircle.id, targetUserId: otherUsers[0], userId: testUser.id },
+      { circleId: hotGuysCircle.id, targetUserId: otherUsers[3], userId: testUser.id },
+      { circleId: hotGuysCircle.id, targetUserId: otherUsers[7], userId: testUser.id },
+      { circleId: friendsCircle.id, targetUserId: otherUsers[1], userId: testUser.id },
+      { circleId: friendsCircle.id, targetUserId: otherUsers[4], userId: testUser.id },
+      { circleId: friendsCircle.id, targetUserId: otherUsers[9], userId: testUser.id },
+      { circleId: friendsCircle.id, targetUserId: otherUsers[12], userId: testUser.id },
+      { circleId: maybeLaterCircle.id, targetUserId: otherUsers[2], userId: testUser.id },
+      { circleId: maybeLaterCircle.id, targetUserId: otherUsers[5], userId: testUser.id },
+      { circleId: maybeLaterCircle.id, targetUserId: otherUsers[8], userId: testUser.id },
+    ],
+  });
+
+  // --- Check-ins (5 for test-user-1) ---
+  const checkinData = [
+    { userId: testUser.id, venueName: 'The Alley Bar', lat: 35.8995, lng: 14.5130 },
+    { userId: testUser.id, venueName: 'Valletta Waterfront', lat: 35.8980, lng: 14.5180 },
+    { userId: testUser.id, venueName: 'Café Cordina', lat: 35.8988, lng: 14.5148 },
+    { userId: testUser.id, venueName: 'St. George\'s Beach', lat: 35.9150, lng: 14.4850 },
+    { userId: testUser.id, venueName: 'Manoel Theatre', lat: 35.8995, lng: 14.5155 },
+  ];
+  for (const c of checkinData) {
+    await db.checkin.create({ data: { ...c, createdAt: new Date(Date.now() - Math.random() * 86400000 * 7) } });
+  }
+
+  // --- Wallet (balance 100 for test-user-1) ---
+  const testWallet = await db.wallet.create({
+    data: { userId: testUser.id, balance: 100 },
+  });
+
+  // --- Transactions (3 for test-user-1) ---
+  await db.transaction.createMany({
+    data: [
+      { walletId: testWallet.id, type: 'purchase', amount: 50, description: 'Purchased 50 credits', referenceId: 'txn_001' },
+      { walletId: testWallet.id, type: 'boost', amount: -10, description: 'Super Boost - 60 min', referenceId: 'boost_001' },
+      { walletId: testWallet.id, type: 'gift', amount: -5, description: 'Sent virtual gift to Marcus Chen', referenceId: 'gift_001' },
+    ],
+  });
+
+  // --- Saved Phrases (5 for test-user-1) ---
+  await db.savedPhrase.createMany({
+    data: [
+      { userId: testUser.id, title: 'Greeting', content: 'Hey! Love your profile. How\'s your day going?', sortOrder: 0 },
+      { userId: testUser.id, title: 'Coffee Invite', content: 'Would you be down for a coffee this week? I know a great spot.', sortOrder: 1 },
+      { userId: testUser.id, title: 'Busy Response', content: 'Hey, sorry for the late reply! I\'ve been swamped. How are you?', sortOrder: 2 },
+      { userId: testUser.id, title: 'Flirty', content: 'Just saw your new photos... you look amazing! 😏', sortOrder: 3 },
+      { userId: testUser.id, title: 'Travel Question', content: 'I see you\'re into traveling! What\'s your next destination?', sortOrder: 4 },
+    ],
+  });
+
+  // --- Contact Folders (3 for test-user-1) ---
+  const folderBuddies = await db.contactFolder.create({ data: { name: 'Gym Buddies', userId: testUser.id } });
+  const folderDates = await db.contactFolder.create({ data: { name: 'Potential Dates', userId: testUser.id } });
+  const folderTravel = await db.contactFolder.create({ data: { name: 'Travel Friends', userId: testUser.id } });
+
+  await db.contactFolderMember.createMany({
+    data: [
+      { folderId: folderBuddies.id, targetUserId: otherUsers[3] },
+      { folderId: folderBuddies.id, targetUserId: otherUsers[8] },
+      { folderId: folderBuddies.id, targetUserId: otherUsers[15] },
+      { folderId: folderDates.id, targetUserId: otherUsers[0] },
+      { folderId: folderDates.id, targetUserId: otherUsers[5] },
+      { folderId: folderDates.id, targetUserId: otherUsers[11] },
+      { folderId: folderTravel.id, targetUserId: otherUsers[2] },
+      { folderId: folderTravel.id, targetUserId: otherUsers[9] },
+      { folderId: folderTravel.id, targetUserId: otherUsers[18] },
+    ],
+  });
+
+  // --- Conversation Participants (mute settings) ---
+  await db.conversationParticipant.createMany({
+    data: [
+      { userId: testUser.id, otherUserId: otherUsers[0], isMuted: false, isArchived: false, isPinned: true, lastReadAt: new Date() },
+      { userId: testUser.id, otherUserId: otherUsers[1], isMuted: true, isArchived: false, isPinned: false, mutedUntil: new Date(Date.now() + 86400000 * 3) },
+      { userId: testUser.id, otherUserId: otherUsers[2], isMuted: false, isArchived: true, isPinned: false, lastReadAt: new Date(Date.now() - 86400000) },
+      { userId: testUser.id, otherUserId: otherUsers[3], isMuted: false, isArchived: false, isPinned: false, lastReadAt: new Date(Date.now() - 3600000) },
+      { userId: testUser.id, otherUserId: otherUsers[5], isMuted: true, isArchived: false, isPinned: false },
+    ],
+  });
+
+  // --- Liked Photos ---
+  // Get some photos to like
+  const photosToLike = await db.photo.findMany({
+    where: { userId: { in: otherUsers.slice(0, 10) } },
+    take: 12,
+  });
+  for (let i = 0; i < photosToLike.length; i++) {
+    try {
+      await db.likedPhoto.create({
+        data: {
+          userId: i < 6 ? testUser.id : otherUsers[i % 10],
+          photoId: photosToLike[i].id,
+        },
+      });
+    } catch {}
   }
 
   console.log('Seed completed! 1 test user + 20 demo users with full data.');

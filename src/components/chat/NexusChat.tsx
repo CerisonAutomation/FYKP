@@ -1298,6 +1298,9 @@ export default function NexusChat(props: NexusChatProps) {
               <DropdownMenuItem onClick={() => setShowThemeModal(true)} className="gap-2 text-foreground cursor-pointer">
                 <Palette className="w-4 h-4" /> Theme
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { const userId = activeConversation?.otherUser?.id; if (!userId) return; fetch(`/api/chat/export?otherUserId=${userId}`).then(r => r.blob()).then(blob => { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `chat-${userId}-${Date.now()}.txt`; a.click(); URL.revokeObjectURL(url); }).catch(() => {}); }} className="gap-2 text-foreground cursor-pointer">
+                <FileText className="w-4 h-4" /> Export Chat
+              </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem onClick={toggleNsfwFilter} className="gap-2 text-foreground cursor-pointer">
                 <EyeOff className="w-4 h-4" /> {nsfwFilter ? 'Show Explicit' : 'Filter Explicit'}

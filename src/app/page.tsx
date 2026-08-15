@@ -62,6 +62,8 @@ import {
   Smartphone, FlameIcon,
   Shirt, Utensils, ScanSearch, BookmarkCheck,
   Bot, HeartPulse, Clock3,
+  Plane, CircleDot, Wallet as WalletIcon, FolderOpen, BellOff, Archive, VolumeX,
+  HeartOff,
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════════
@@ -110,6 +112,8 @@ const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: st
     { id: 'shouts', label: 'Shouts', description: 'Community feed', icon: Megaphone },
     { id: 'groups', label: 'Groups', description: 'Group chats & communities', icon: Users },
     { id: 'blogs', label: 'Blogs', description: 'Articles & stories', icon: FileText },
+    { id: 'circles', label: 'Circles', description: 'Profile groups', icon: CircleDot, isNew: true },
+    { id: 'checkins', label: 'Check-ins', description: 'Location feed', icon: MapPin, isNew: true },
   ],
   Content: [
     { id: 'fansites', label: 'Fansites', description: 'Creator pages', icon: Star },
@@ -125,6 +129,8 @@ const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: st
     { id: 'footprints', label: 'Footprints', description: 'Visit history', icon: FootprintsIcon },
     { id: 'infer', label: 'INFER AI', description: 'AI profile analysis', icon: Brain, badge: 1 },
     { id: 'kinks', label: 'Kinks & Bedroom', description: 'Sexual profile & kinks', icon: Cherry, isNew: true },
+    { id: 'liked-photos', label: 'Liked Photos', description: 'Gallery of liked photos', icon: Heart, isNew: true },
+    { id: 'saved-phrases', label: 'Saved Phrases', description: 'Quick reply templates', icon: MessageSquare, isNew: true },
   ],
   Premium: [
     { id: 'membership', label: 'Membership', description: 'Plans & pricing', icon: Crown },
@@ -137,6 +143,8 @@ const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: st
     { id: 'account', label: 'Account', description: 'Email, password, username', icon: Lock },
     { id: 'preferences', label: 'Preferences', description: 'All app settings', icon: Settings },
     { id: 'geo-settings', label: 'GEO Settings', description: 'Location & privacy', icon: MapPin },
+    { id: 'travel', label: 'Travel Mode', description: 'Set travel location', icon: Plane, isNew: true },
+    { id: 'wallet', label: 'Wallet', description: 'Virtual wallet & balance', icon: WalletIcon, isNew: true },
   ],
   Info: [
     { id: 'legal', label: 'Legal', description: 'Terms & policies', icon: Scale },
@@ -471,6 +479,58 @@ export default function NexusApp() {
   // ── Shout type ──
   const [shoutType, setShoutType] = useState<'text' | 'image' | 'video'>('text');
 
+  // ── Circles state ──
+  const [circles, setCircles] = useState<any[]>([]);
+  const [circlesLoading, setirclesLoading] = useState(true);
+  const [selectedCircle, setSelectedCircle] = useState<any>(null);
+  const [showCreateCircle, setShowCreateCircle] = useState(false);
+  const [circleForm, setCircleForm] = useState({ name: '', color: '#6366f1', icon: 'users' });
+  const [circleMembers, setCircleMembers] = useState<any[]>([]);
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [addMemberId, setAddMemberId] = useState('');
+
+  // ── Travel state ──
+  const [travelData, setTravelData] = useState<any>(null);
+  const [travelLoading, setTravelLoading] = useState(false);
+  const [showSetTravel, setShowSetTravel] = useState(false);
+  const [travelForm, setTravelForm] = useState({ city: '', country: '', startDate: '', endDate: '' });
+
+  // ── Checkins state ──
+  const [checkins, setCheckins] = useState<any[]>([]);
+  const [checkinsLoading, setCheckinsLoading] = useState(true);
+  const [showCheckin, setShowCheckin] = useState(false);
+  const [checkinVenue, setCheckinVenue] = useState('');
+
+  // ── Wallet state ──
+  const [walletData, setWalletData] = useState<any>(null);
+  const [walletLoading, setWalletLoading] = useState(true);
+  const [transactions, setTransactions] = useState<any[]>([]);
+
+  // ── Saved Phrases state ──
+  const [savedPhrases, setSavedPhrases] = useState<any[]>([]);
+  const [phrasesLoading, setPhrasesLoading] = useState(true);
+  const [showPhraseDialog, setShowPhraseDialog] = useState(false);
+  const [phraseForm, setPhraseForm] = useState({ title: '', content: '' });
+  const [editingPhraseId, setEditingPhraseId] = useState<string | null>(null);
+
+  // ── Liked Photos state ──
+  const [likedPhotos, setLikedPhotos] = useState<any[]>([]);
+  const [likedPhotosLoading, setLikedPhotosLoading] = useState(true);
+  const [selectedLikedPhoto, setSelectedLikedPhoto] = useState<any>(null);
+
+  // ── Contact Folders state ──
+  const [contactFolders, setContactFolders] = useState<any[]>([]);
+  const [contactFoldersLoading, setContactFoldersLoading] = useState(false);
+  const [favViewMode, setFavViewMode] = useState<'all' | 'folders'>('all');
+  const [selectedFolder, setSelectedFolder] = useState<any>(null);
+
+  // ── DND state ──
+  const [dndSettings, setDndSettings] = useState({ dndEnabled: false, dndStart: '22:00', dndEnd: '08:00' });
+
+  // ── Chat Mute/Archive state ──
+  const [chatTab, setChatTab] = useState<'all' | 'archived'>('all');
+  const [chatMenuOpen, setChatMenuOpen] = useState<string | null>(null);
+
   // ═══════════════════════════════════════════════════════════════
   // EFFECTS — Data Fetching
   // ═══════════════════════════════════════════════════════════════
@@ -689,6 +749,69 @@ export default function NexusApp() {
     if (!authed || activeTab !== 'groups') return;
     fetch('/api/groups').then(r => r.json()).then(res => setGroups(res.data || [])).catch(() => {});
   }, [authed, activeTab]);
+
+  // Circles
+  useEffect(() => {
+    if (!authed || activeTab !== 'circles') return;
+    setirclesLoading(true);
+    fetch('/api/circles').then(r => r.json()).then(res => setCircles(res.data || [])).catch(() => {}).finally(() => setirclesLoading(false));
+  }, [authed, activeTab]);
+
+  // Selected Circle Members
+  useEffect(() => {
+    if (!selectedCircle) return;
+    fetch(`/api/circles/${selectedCircle.id}`).then(r => r.json()).then(res => setCircleMembers(res.members || [])).catch(() => {});
+  }, [selectedCircle]);
+
+  // Travel
+  useEffect(() => {
+    if (!authed || activeTab !== 'travel') return;
+    setTravelLoading(true);
+    fetch('/api/travel').then(r => r.json()).then(res => setTravelData(res.data || null)).catch(() => {}).finally(() => setTravelLoading(false));
+  }, [authed, activeTab]);
+
+  // Checkins
+  useEffect(() => {
+    if (!authed || activeTab !== 'checkins') return;
+    setCheckinsLoading(true);
+    fetch('/api/checkins').then(r => r.json()).then(res => setCheckins(res.data || [])).catch(() => {}).finally(() => setCheckinsLoading(false));
+  }, [authed, activeTab]);
+
+  // Wallet
+  useEffect(() => {
+    if (!authed || activeTab !== 'wallet') return;
+    setWalletLoading(true);
+    fetch('/api/wallet').then(r => r.json()).then(res => { setWalletData(res.data); setTransactions(res.data?.transactions || []); }).catch(() => {}).finally(() => setWalletLoading(false));
+  }, [authed, activeTab]);
+
+  // Saved Phrases
+  useEffect(() => {
+    if (!authed || activeTab !== 'saved-phrases') return;
+    setPhrasesLoading(true);
+    fetch('/api/saved-phrases').then(r => r.json()).then(res => setSavedPhrases(res.data || [])).catch(() => {}).finally(() => setPhrasesLoading(false));
+  }, [authed, activeTab]);
+
+  // Liked Photos
+  useEffect(() => {
+    if (!authed || activeTab !== 'liked-photos') return;
+    setLikedPhotosLoading(true);
+    fetch('/api/liked-photos').then(r => r.json()).then(res => setLikedPhotos(res.data || [])).catch(() => {}).finally(() => setLikedPhotosLoading(false));
+  }, [authed, activeTab]);
+
+  // Contact Folders
+  useEffect(() => {
+    if (!authed || activeTab !== 'favorites') return;
+    setContactFoldersLoading(true);
+    fetch('/api/contact-folders').then(r => r.json()).then(res => setContactFolders(res.data || [])).catch(() => {}).finally(() => setContactFoldersLoading(false));
+  }, [authed, activeTab]);
+
+  // DND Settings
+  useEffect(() => {
+    if (!authed) return;
+    fetch('/api/dnd').then(r => r.json()).then(res => {
+      if (res.data) setDndSettings({ dndEnabled: res.data.dndEnabled ?? false, dndStart: res.data.dndStart || '22:00', dndEnd: res.data.dndEnd || '08:00' });
+    }).catch(() => {});
+  }, [authed]);
 
   // Messages scroll
   useEffect(() => { msgEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, groupMessages]);
@@ -923,6 +1046,9 @@ export default function NexusApp() {
       banners: 'Banners', sites: 'Sites', legal: 'Legal', faqs: 'FAQs',
       abuse: 'Report & Block', advantages: 'Advantages', affiliation: 'Affiliation',
       profile: 'My Profile', infer: 'INFER AI Analysis', more: 'More',
+      kinks: 'Kinks & Bedroom', circles: 'Circles', travel: 'Travel Mode',
+      checkins: 'Check-ins', wallet: 'Wallet', 'saved-phrases': 'Saved Phrases',
+      'liked-photos': 'Liked Photos',
     };
     return titles[activeTab] || 'NEXUS';
   };
@@ -967,7 +1093,7 @@ export default function NexusApp() {
       <main className="flex-1 overflow-hidden relative">
         {/* Offline Banner */}
         {!isOnline && <div className="absolute top-0 inset-x-0 z-50 bg-destructive/90 text-destructive-foreground text-center text-[11px] py-1.5 font-medium"><WifiOff className="w-3 h-3 inline mr-1" />You are offline. Some features may not work.</div>}
-        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : activeTab === 'kinks' ? <KinksView /> : <MoreView />}
+        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : activeTab === 'kinks' ? <KinksView /> : activeTab === 'circles' ? <CirclesView /> : activeTab === 'travel' ? <TravelView /> : activeTab === 'checkins' ? <CheckinsView /> : activeTab === 'wallet' ? <WalletView /> : activeTab === 'saved-phrases' ? <SavedPhrasesView /> : activeTab === 'liked-photos' ? <LikedPhotosView /> : <MoreView />}
       </main>
 
       {/* ═══ BOTTOM NAV ═══ */}
@@ -1107,6 +1233,104 @@ export default function NexusApp() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreateGroup(false)} className="border-border">Cancel</Button>
             <Button onClick={handleCreateGroup} className="bg-primary text-primary-foreground" disabled={!groupForm.name.trim()}>Create</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ CREATE CIRCLE DIALOG ═══ */}
+      <Dialog open={showCreateCircle} onOpenChange={setShowCreateCircle}>
+        <DialogContent className="bg-card border-border sm:max-w-md">
+          <DialogHeader><DialogTitle>Create Circle</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Circle Name</Label><Input value={circleForm.name} onChange={e => setCircleForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Hot Guys" className="bg-secondary border-border" /></div>
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Color</Label><Input type="color" value={circleForm.color} onChange={e => setCircleForm(p => ({ ...p, color: e.target.value }))} className="h-10 w-16 bg-secondary border-border" /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateCircle(false)} className="border-border">Cancel</Button>
+            <Button onClick={async () => {
+              if (!circleForm.name.trim()) return;
+              try { const res = await fetch('/api/circles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(circleForm) }); const data = await res.json(); if (data.data) { setCircles(prev => [...prev, data.data]); setShowCreateCircle(false); setCircleForm({ name: '', color: '#6366f1', icon: 'users' }); } } catch {}
+            }} className="bg-primary text-primary-foreground" disabled={!circleForm.name.trim()}>Create</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ ADD MEMBER TO CIRCLE DIALOG ═══ */}
+      <Dialog open={showAddMember} onOpenChange={setShowAddMember}>
+        <DialogContent className="bg-card border-border sm:max-w-md">
+          <DialogHeader><DialogTitle>Add Member to Circle</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">User ID</Label><Input value={addMemberId} onChange={e => setAddMemberId(e.target.value)} placeholder="Enter user ID" className="bg-secondary border-border" /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddMember(false)} className="border-border">Cancel</Button>
+            <Button onClick={async () => {
+              if (!selectedCircle || !addMemberId.trim()) return;
+              try { await fetch(`/api/circles/${selectedCircle.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetUserId: addMemberId.trim() }) }); const res = await fetch(`/api/circles/${selectedCircle.id}`); const data = await res.json(); setCircleMembers(data.members || []); setShowAddMember(false); setAddMemberId(''); } catch {}
+            }} className="bg-primary text-primary-foreground" disabled={!addMemberId.trim()}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ SET TRAVEL LOCATION DIALOG ═══ */}
+      <Dialog open={showSetTravel} onOpenChange={setShowSetTravel}>
+        <DialogContent className="bg-card border-border sm:max-w-md">
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><Plane className="w-5 h-5 text-primary" /> Set Travel Location</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">City</Label><Input value={travelForm.city} onChange={e => setTravelForm(p => ({ ...p, city: e.target.value }))} placeholder="e.g. Berlin" className="bg-secondary border-border" /></div>
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Country</Label><Input value={travelForm.country} onChange={e => setTravelForm(p => ({ ...p, country: e.target.value }))} placeholder="e.g. Germany" className="bg-secondary border-border" /></div>
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Start Date</Label><Input type="date" value={travelForm.startDate} onChange={e => setTravelForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">End Date</Label><Input type="date" value={travelForm.endDate} onChange={e => setTravelForm(p => ({ ...p, endDate: e.target.value }))} className="bg-secondary border-border" /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSetTravel(false)} className="border-border">Cancel</Button>
+            <Button onClick={async () => {
+              if (!travelForm.city.trim()) return;
+              try { await fetch('/api/travel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(travelForm) }); const res = await fetch('/api/travel'); const data = await res.json(); setTravelData(data.data || null); setShowSetTravel(false); } catch {}
+            }} className="bg-primary text-primary-foreground" disabled={!travelForm.city.trim()}>Start Traveling</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ CHECKIN DIALOG ═══ */}
+      <Dialog open={showCheckin} onOpenChange={setShowCheckin}>
+        <DialogContent className="bg-card border-border sm:max-w-md">
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> Check In</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Venue Name</Label><Input value={checkinVenue} onChange={e => setCheckinVenue(e.target.value)} placeholder="e.g. The Alley Bar" className="bg-secondary border-border" /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCheckin(false)} className="border-border">Cancel</Button>
+            <Button onClick={async () => {
+              if (!checkinVenue.trim()) return;
+              try { await fetch('/api/checkins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ venueName: checkinVenue.trim(), lat: 35.9, lng: 14.4 }) }); const res = await fetch('/api/checkins'); const data = await res.json(); setCheckins(data.data || []); setShowCheckin(false); setCheckinVenue(''); } catch {}
+            }} className="bg-primary text-primary-foreground" disabled={!checkinVenue.trim()}>Check In</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ SAVED PHRASE DIALOG ═══ */}
+      <Dialog open={showPhraseDialog} onOpenChange={(open) => { if (!open) { setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' }); } }}>
+        <DialogContent className="bg-card border-border sm:max-w-md">
+          <DialogHeader><DialogTitle>{editingPhraseId ? 'Edit Phrase' : 'Create Phrase'}</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={phraseForm.title} onChange={e => setPhraseForm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Greeting" className="bg-secondary border-border" /></div>
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Content</Label><Textarea value={phraseForm.content} onChange={e => setPhraseForm(p => ({ ...p, content: e.target.value }))} placeholder="Hey! How are you?" className="bg-secondary border-border" rows={3} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' }); }} className="border-border">Cancel</Button>
+            <Button onClick={async () => {
+              if (!phraseForm.title.trim() || !phraseForm.content.trim()) return;
+              try {
+                if (editingPhraseId) {
+                  await fetch(`/api/saved-phrases/${editingPhraseId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(phraseForm) });
+                } else {
+                  await fetch('/api/saved-phrases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(phraseForm) });
+                }
+                const res = await fetch('/api/saved-phrases'); const data = await res.json(); setSavedPhrases(data.data || []);
+                setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' });
+              } catch {}
+            }} className="bg-primary text-primary-foreground" disabled={!phraseForm.title.trim() || !phraseForm.content.trim()}>{editingPhraseId ? 'Save' : 'Create'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1298,30 +1522,43 @@ export default function NexusApp() {
                 </div>
               )}
               {/* Conversations */}
-              <Tabs defaultValue="direct">
+              <Tabs defaultValue="all">
                 <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
-                  <TabsTrigger value="direct" className="text-[11px] flex-1 h-7">Messages</TabsTrigger>
+                  <TabsTrigger value="all" className="text-[11px] flex-1 h-7">All</TabsTrigger>
+                  <TabsTrigger value="archived" className="text-[11px] flex-1 h-7"><Archive className="w-3 h-3 mr-1 inline" />Archived</TabsTrigger>
                   <TabsTrigger value="groups" className="text-[11px] flex-1 h-7">Groups</TabsTrigger>
                 </TabsList>
-                <TabsContent value="direct" className="mt-3 space-y-1">
+                <TabsContent value="all" className="mt-3 space-y-1">
                   {conversations.length === 0 ? <EmptyState icon={MessageCircle} title="No messages yet" desc="Start a conversation from someone's profile" />
                     : conversations.map(convo => (
-                      <button key={convo.otherUser.id} onClick={() => { setActiveConversation(convo); setChatMobileView('chat'); fetch(`/api/messages?userId=${convo.otherUser.id}`).then(r => r.json()).then(res => setMessages(res.data || [])).catch(() => {}); }}
-                        className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
-                        <div className="relative shrink-0">
-                          <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(convo.otherUser)} /><AvatarFallback className="text-xs">{convo.otherUser.displayName?.[0]}</AvatarFallback></Avatar>
-                          {convo.otherUser.online && convo.otherUser.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="text-[13px] font-semibold truncate">{convo.otherUser.displayName}</p>
-                            <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(convo.lastMessage.createdAt)}</span>
+                      <div key={convo.otherUser.id} className="flex items-center gap-2">
+                        <button onClick={() => { setActiveConversation(convo); setChatMobileView('chat'); fetch(`/api/messages?userId=${convo.otherUser.id}`).then(r => r.json()).then(res => setMessages(res.data || [])).catch(() => {}); }}
+                          className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors flex-1">
+                          <div className="relative shrink-0">
+                            <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(convo.otherUser)} /><AvatarFallback className="text-xs">{convo.otherUser.displayName?.[0]}</AvatarFallback></Avatar>
+                            {convo.otherUser.online && convo.otherUser.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
                           </div>
-                          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{convo.lastMessage.content || '...'}</p>
-                        </div>
-                        {convo.unreadCount > 0 && <span className="min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground rounded-full">{convo.unreadCount}</span>}
-                      </button>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5"><p className="text-[13px] font-semibold truncate">{convo.otherUser.displayName}</p>{convo.isMuted && <VolumeX className="w-3 h-3 text-muted-foreground" />}</div>
+                              <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(convo.lastMessage.createdAt)}</span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground truncate mt-0.5">{convo.lastMessage.content || '...'}</p>
+                          </div>
+                          {convo.unreadCount > 0 && <span className="min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground rounded-full">{convo.unreadCount}</span>}
+                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-card border-border w-44">
+                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/mute', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch {} }}><BellOff className="w-4 h-4" /> {convo.isMuted ? 'Unmute' : 'Mute'}</DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/archive', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch {} }}><Archive className="w-4 h-4" /> Archive</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     ))}
+                </TabsContent>
+                <TabsContent value="archived" className="mt-3">
+                  <EmptyState icon={Archive} title="Archived Chats" desc="Archived conversations will appear here" />
                 </TabsContent>
                 <TabsContent value="groups" className="mt-3 space-y-1">
                   {groups.length === 0 ? <EmptyState icon={Users} title="No groups yet" desc="Create or join a group to get started" />
@@ -2000,26 +2237,67 @@ export default function NexusApp() {
   function FavoritesView() {
     if (favoritesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
     return (
-      <ScrollArea className="h-full">
-        <div className="p-4 space-y-1">
-          {favorites.length === 0 ? <EmptyState icon={Bookmark} title="No favorites" desc="Add users to favorites from their profiles" />
-            : favorites.map((fav: any) => fav.target && (
-              <div key={fav.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
-                <button onClick={() => openProfile(fav.target.id)}>
-                  <div className="relative">
-                    <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-xs">{fav.target.displayName?.[0]}</AvatarFallback></Avatar>
-                    {fav.isSuper && <Star className="absolute -top-1 -right-1 w-4 h-4 text-yellow-400 fill-yellow-400" />}
-                  </div>
-                </button>
-                <div className="flex-1 min-w-0">
-                  <button onClick={() => openProfile(fav.target.id)} className="text-[13px] font-semibold hover:text-primary">{fav.target.displayName}</button>
-                  <p className="text-[10px] text-muted-foreground">{fav.isSuper ? '⭐ Super Favorite' : 'Favorite'} · {timeAgo(fav.createdAt)}</p>
-                </div>
-                <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/favorites?userId=${CURRENT_USER_ID}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: fav.targetId }) }); setFavorites(prev => prev.filter((f: any) => f.id !== fav.id)); } catch {} }}>Remove</Button>
-              </div>
-            ))}
+      <div className="h-full flex flex-col">
+        <div className="px-4 pt-2 shrink-0">
+          <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+            <TabsTrigger value="all" className={`text-[11px] flex-1 h-7 ${favViewMode === 'all' ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground' : ''}`} onClick={() => { setFavViewMode('all'); setSelectedFolder(null); }}>All Favorites ({favorites.length})</TabsTrigger>
+            <TabsTrigger value="folders" className={`text-[11px] flex-1 h-7 ${favViewMode === 'folders' ? 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground' : ''}`} onClick={() => setFavViewMode('folders')}>Folders ({contactFolders.length})</TabsTrigger>
+          </TabsList>
         </div>
-      </ScrollArea>
+        {favViewMode === 'all' ? (
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-1">
+              {favorites.length === 0 ? <EmptyState icon={Bookmark} title="No favorites" desc="Add users to favorites from their profiles" />
+                : favorites.map((fav: any) => fav.target && (
+                  <div key={fav.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+                    <button onClick={() => openProfile(fav.target.id)}>
+                      <div className="relative">
+                        <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(fav.target)} /><AvatarFallback className="text-xs">{fav.target.displayName?.[0]}</AvatarFallback></Avatar>
+                        {fav.isSuper && <Star className="absolute -top-1 -right-1 w-4 h-4 text-yellow-400 fill-yellow-400" />}
+                      </div>
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <button onClick={() => openProfile(fav.target.id)} className="text-[13px] font-semibold hover:text-primary">{fav.target.displayName}</button>
+                      <p className="text-[10px] text-muted-foreground">{fav.isSuper ? '⭐ Super Favorite' : 'Favorite'} · {timeAgo(fav.createdAt)}</p>
+                    </div>
+                    <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/favorites?userId=${CURRENT_USER_ID}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: fav.targetId }) }); setFavorites(prev => prev.filter((f: any) => f.id !== fav.id)); } catch {} }}>Remove</Button>
+                  </div>
+                ))}
+            </div>
+          </ScrollArea>
+        ) : selectedFolder ? (
+          <div className="h-full flex flex-col">
+            <BackHeader title={selectedFolder.name} onBack={() => { setSelectedFolder(null); }} />
+            <ScrollArea className="flex-1">
+              <div className="p-4 space-y-1">
+                {(selectedFolder.members || []).length === 0 ? <EmptyState icon={FolderOpen} title="Empty folder" desc="Add members to this folder" />
+                  : selectedFolder.members.map((m: any) => m.user && (
+                    <div key={m.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+                      <button onClick={() => openProfile(m.user.id)}><Avatar className="h-11 w-11"><AvatarImage src={getAvatar(m.user)} /><AvatarFallback className="text-xs">{m.user.displayName?.[0]}</AvatarFallback></Avatar></button>
+                      <div className="flex-1 min-w-0"><button onClick={() => openProfile(m.user.id)} className="text-[13px] font-semibold hover:text-primary">{m.user.displayName}</button></div>
+                      <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/contact-folders/${selectedFolder.id}?targetUserId=${m.user.id}`, { method: 'DELETE' }); const res = await fetch('/api/contact-folders'); const data = await res.json(); setContactFolders(data.data || []); const updated = (data.data || []).find((f: any) => f.id === selectedFolder.id); setSelectedFolder(updated || null); } catch {} }}>Remove</Button>
+                    </div>
+                  ))}
+              </div>
+            </ScrollArea>
+          </div>
+        ) : (
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-3">
+              {contactFolders.length === 0 ? <EmptyState icon={FolderOpen} title="No folders" desc="Contact folders will appear here" />
+                : contactFolders.map((folder: any) => (
+                  <Card key={folder.id} className="bg-secondary border-border cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedFolder(folder)}>
+                    <CardContent className="p-3 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><FolderOpen className="w-5 h-5 text-primary" /></div>
+                      <div className="flex-1 min-w-0"><h3 className="text-[13px] font-semibold">{folder.name}</h3><p className="text-[10px] text-muted-foreground">{folder._count?.members || 0} contacts</p></div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </CardContent>
+                  </Card>
+                ))}
+            </div>
+          </ScrollArea>
+        )}
+      </div>
     );
   }
 
@@ -2125,6 +2403,18 @@ export default function NexusApp() {
                 <Switch checked={(prefs as any)[item.key]} onCheckedChange={() => togglePref(item.key)} />
               </div>
             ))}
+          </CardContent></Card>
+          {/* DND Schedule */}
+          <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
+            <SectionHeader icon={BellOff} label="Do Not Disturb" />
+            <div className="flex items-center justify-between">
+              <div><p className="text-sm">Enable DND</p><p className="text-[10px] text-muted-foreground">Mute notifications during set hours</p></div>
+              <Switch checked={dndSettings.dndEnabled} onCheckedChange={async (v) => { setDndSettings(p => ({ ...p, dndEnabled: v })); try { await fetch('/api/dnd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dndSettings, dndEnabled: v }) }); } catch {} }} />
+            </div>
+            {dndSettings.dndEnabled && (<>
+              <div className="flex items-center justify-between"><div><p className="text-sm">Start Time</p></div><Input type="time" value={dndSettings.dndStart} onChange={e => { const v = e.target.value; setDndSettings(p => ({ ...p, dndStart: v })); fetch('/api/dnd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dndSettings, dndStart: v }) }).catch(() => {}); }} className="h-8 w-28 text-xs bg-card border-border" /></div>
+              <div className="flex items-center justify-between"><div><p className="text-sm">End Time</p></div><Input type="time" value={dndSettings.dndEnd} onChange={e => { const v = e.target.value; setDndSettings(p => ({ ...p, dndEnd: v })); fetch('/api/dnd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dndSettings, dndEnd: v }) }).catch(() => {}); }} className="h-8 w-28 text-xs bg-card border-border" /></div>
+            </>)}
           </CardContent></Card>
         </div>
       </ScrollArea>
@@ -2779,6 +3069,229 @@ export default function NexusApp() {
             </DropdownMenu>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // ─── CIRCLES VIEW ─────────────────────────────────
+  function CirclesView() {
+    if (circlesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)}</div>;
+    if (selectedCircle) {
+      return (
+        <div className="h-full flex flex-col">
+          <BackHeader title={selectedCircle.name} onBack={() => { setSelectedCircle(null); setCircleMembers([]); }} action={<Button size="sm" className="h-8 text-[10px] bg-primary text-primary-foreground" onClick={() => setShowAddMember(true)}><Plus className="w-3 h-3 mr-1" /> Add</Button>} />
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-1">
+              {circleMembers.length === 0 ? <EmptyState icon={Users} title="No members" desc="Add members to this circle" />
+                : circleMembers.map((m: any) => m.user && (
+                  <div key={m.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+                    <button onClick={() => openProfile(m.user.id)}><Avatar className="h-11 w-11"><AvatarImage src={getAvatar(m.user)} /><AvatarFallback className="text-xs">{m.user.displayName?.[0]}</AvatarFallback></Avatar></button>
+                    <div className="flex-1 min-w-0"><button onClick={() => openProfile(m.user.id)} className="text-[13px] font-semibold hover:text-primary">{m.user.displayName}</button><p className="text-[10px] text-muted-foreground">Added {timeAgo(m.createdAt)}</p></div>
+                    <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/circles/${selectedCircle.id}?targetUserId=${m.user.id}`, { method: 'DELETE' }); setCircleMembers(prev => prev.filter((x: any) => x.id !== m.id)); } catch {} }}>Remove</Button>
+                  </div>
+                ))}
+            </div>
+          </ScrollArea>
+        </div>
+      );
+    }
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-2 border-b border-border shrink-0 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">My Circles ({circles.length})</h3>
+          <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={() => setShowCreateCircle(true)}><Plus className="w-3.5 h-3.5 mr-1" /> New</Button>
+        </div>
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-3">
+            {circles.length === 0 ? <EmptyState icon={CircleDot} title="No circles" desc="Create circles to organize your connections" />
+              : circles.map((circle: any) => (
+                <Card key={circle.id} className="bg-secondary border-border cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedCircle(circle)}>
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: circle.color + '20' }}><CircleDot className="w-6 h-6" style={{ color: circle.color }} /></div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-[13px] font-semibold">{circle.name}</h3>
+                        <p className="text-[10px] text-muted-foreground">{circle._count?.members || 0} members</p>
+                      </div>
+                      <div className="flex -space-x-2">
+                        {(circle.members || []).slice(0, 4).map((m: any) => (
+                          <Avatar key={m.id} className="h-7 w-7 border-2 border-card"><AvatarImage src={getAvatar(m.user)} /><AvatarFallback className="text-[8px]">{m.user?.displayName?.[0]}</AvatarFallback></Avatar>
+                        ))}
+                        {(circle._count?.members || 0) > 4 && <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center text-[9px] font-bold border-2 border-card">+{(circle._count?.members || 0) - 4}</div>}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
+
+  // ─── TRAVEL VIEW ───────────────────────────────────────
+  function TravelView() {
+    if (travelLoading) return <div className="p-4 space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}</div>;
+    const isActive = travelData?.isTraveling;
+    const endDate = travelData?.travelEnd ? new Date(travelData.travelEnd) : null;
+    const daysLeft = endDate ? Math.max(0, Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
+    return (
+      <ScrollArea className="h-full">
+        <div className="p-4 space-y-6">
+          {isActive ? (
+            <>
+              <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center"><Plane className="w-6 h-6 text-primary" /></div>
+                  <div>
+                    <p className="text-sm font-semibold">Traveling to {travelData.travelCity}</p>
+                    {travelData.travelCountry && <p className="text-[11px] text-muted-foreground">{travelData.travelCountry}</p>}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-xl bg-card"><p className="text-[10px] text-muted-foreground">Days Left</p><p className="text-lg font-bold text-primary">{daysLeft}</p></div>
+                  <div className="p-3 rounded-xl bg-card"><p className="text-[10px] text-muted-foreground">Ends</p><p className="text-sm font-semibold">{endDate ? fmtDateShort(endDate.toISOString()) : 'N/A'}</p></div>
+                </div>
+              </div>
+              {travelData.travelStart && <Card className="bg-secondary border-border"><CardContent className="p-3"><SectionHeader icon={Calendar} label="Trip Details" /><div className="text-[12px] text-muted-foreground space-y-1 mt-2"><p>Started: {fmtDate(travelData.travelStart)}</p>{endDate && <p>Ends: {fmtDate(endDate.toISOString())}</p>}</div></CardContent></Card>}
+              <Button variant="outline" className="w-full border-destructive/30 text-destructive hover:bg-destructive/10" onClick={async () => { try { await fetch('/api/travel', { method: 'DELETE' }); setTravelData(null); } catch {} }}>Cancel Travel</Button>
+            </>
+          ) : (
+            <div className="text-center space-y-4 py-8">
+              <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto"><Plane className="w-8 h-8 text-muted-foreground" /></div>
+              <div><p className="text-sm font-semibold">Not Traveling</p><p className="text-xs text-muted-foreground mt-1">Set a travel location to appear in that city's discover grid</p></div>
+              <Button className="bg-primary text-primary-foreground" onClick={() => { setTravelForm({ city: '', country: '', startDate: '', endDate: '' }); setShowSetTravel(true); }}><Plane className="w-4 h-4 mr-2" /> Set Travel Location</Button>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+    );
+  }
+
+  // ─── CHECKINS VIEW ─────────────────────────────────────
+  function CheckinsView() {
+    if (checkinsLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-2 border-b border-border shrink-0 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">Recent Check-ins</h3>
+          <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={() => { setCheckinVenue(''); setShowCheckin(true); }}><MapPin className="w-3.5 h-3.5 mr-1" /> Check In</Button>
+        </div>
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-1">
+            {checkins.length === 0 ? <EmptyState icon={MapPin} title="No check-ins yet" desc="Check in at venues to share your location" />
+              : checkins.map((ci: any) => (
+                <div key={ci.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-secondary/50 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0"><MapPin className="w-5 h-5 text-primary" /></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold">{ci.venueName}</p>
+                    <p className="text-[10px] text-muted-foreground">{timeAgo(ci.createdAt)}</p>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => window.open(`https://www.google.com/maps?q=${ci.lat},${ci.lng}`, '_blank')}><ExternalLink className="w-3.5 h-3.5" /></Button>
+                </div>
+              ))}
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
+
+  // ─── WALLET VIEW ────────────────────────────────────────
+  function WalletView() {
+    if (walletLoading) return <div className="p-4 space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}</div>;
+    const balance = walletData?.balance ?? 0;
+    return (
+      <ScrollArea className="h-full">
+        <div className="p-4 space-y-6">
+          <div className="p-6 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-3"><WalletIcon className="w-7 h-7 text-primary" /></div>
+            <p className="text-xs text-muted-foreground mb-1">Balance</p>
+            <p className="text-3xl font-bold gradient-text">{balance} <span className="text-base font-normal text-muted-foreground">coins</span></p>
+            <Button className="mt-4 bg-primary text-primary-foreground text-xs" onClick={async () => { try { await fetch('/api/wallet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: 50, type: 'topup', description: 'Top up 50 coins' }) }); const res = await fetch('/api/wallet'); const data = await res.json(); setWalletData(data.data); setTransactions(data.data?.transactions || []); } catch {} }}><Plus className="w-3.5 h-3.5 mr-1" /> Top Up</Button>
+          </div>
+          <div className="space-y-4">
+            <SectionHeader icon={Clock3} label="Transactions" count={transactions.length} />
+            {transactions.length === 0 ? <p className="text-xs text-muted-foreground text-center py-4">No transactions yet</p>
+              : transactions.map((tx: any) => (
+                <Card key={tx.id} className="bg-secondary border-border">
+                  <CardContent className="p-3 flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${tx.type === 'purchase' || tx.type === 'earned' ? 'bg-green-500/10' : tx.type === 'boost' ? 'bg-orange-500/10' : 'bg-pink-500/10'}`}>
+                      {tx.type === 'purchase' || tx.type === 'earned' ? <ThumbsUp className="w-4 h-4 text-green-400" /> : tx.type === 'boost' ? <Zap className="w-4 h-4 text-orange-400" /> : <Gift className="w-4 h-4 text-pink-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] font-medium">{tx.description || tx.type}</p>
+                      <p className="text-[10px] text-muted-foreground">{timeAgo(tx.createdAt)}</p>
+                    </div>
+                    <p className={`text-sm font-bold ${tx.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>{tx.amount > 0 ? '+' : ''}{tx.amount}</p>
+                  </CardContent>
+                </Card>
+              ))}
+          </div>
+        </div>
+      </ScrollArea>
+    );
+  }
+
+  // ─── SAVED PHRASES VIEW ────────────────────────────────
+  function SavedPhrasesView() {
+    if (phrasesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}</div>;
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-2 border-b border-border shrink-0 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">Saved Phrases ({savedPhrases.length})</h3>
+          <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground" onClick={() => { setEditingPhraseId(null); setPhraseForm({ title: '', content: '' }); setShowPhraseDialog(true); }}><Plus className="w-3.5 h-3.5 mr-1" /> New</Button>
+        </div>
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-2">
+            {savedPhrases.length === 0 ? <EmptyState icon={MessageSquare} title="No saved phrases" desc="Create quick reply templates for faster chatting" />
+              : savedPhrases.map((phrase: any) => (
+                <Card key={phrase.id} className="bg-secondary border-border">
+                  <CardContent className="p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-[12px] font-semibold">{phrase.title}</p>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" onClick={() => { setEditingPhraseId(phrase.id); setPhraseForm({ title: phrase.title, content: phrase.content }); setShowPhraseDialog(true); }}><Pencil className="w-3 h-3" /></Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={async () => { try { await fetch(`/api/saved-phrases/${phrase.id}`, { method: 'DELETE' }); setSavedPhrases(prev => prev.filter((p: any) => p.id !== phrase.id)); } catch {} }}><X className="w-3 h-3" /></Button>
+                      </div>
+                    </div>
+                    <p className="text-[12px] text-muted-foreground">{phrase.content}</p>
+                  </CardContent>
+                </Card>
+              ))}
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
+
+  // ─── LIKED PHOTOS VIEW ─────────────────────────────────
+  function LikedPhotosView() {
+    if (likedPhotosLoading) return <div className="p-4"><div className="grid grid-cols-3 gap-1.5">{Array.from({ length: 9 }).map((_, i) => <Skeleton key={i} className="aspect-square rounded-lg" />)}</div></div>;
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-2 border-b border-border shrink-0"><h3 className="text-sm font-semibold">Liked Photos ({likedPhotos.length})</h3></div>
+        <ScrollArea className="flex-1">
+          {likedPhotos.length === 0 ? <EmptyState icon={Heart} title="No liked photos" desc="Like photos from profiles and they'll appear here" />
+            : <div className="p-4 grid grid-cols-3 gap-1.5">{likedPhotos.map((lp: any) => (
+              <button key={lp.id} className="aspect-square rounded-lg overflow-hidden relative group" onClick={() => setSelectedLikedPhoto(lp)}>
+                <img src={lp.photo?.url || lp.url} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center"><Heart className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity fill-white" /></div>
+              </button>
+            ))}</div>}
+        </ScrollArea>
+        <Sheet open={!!selectedLikedPhoto} onOpenChange={(open) => { if (!open) setSelectedLikedPhoto(null); }}>
+          <SheetContent side="bottom" className="max-h-[80vh] bg-card border-border rounded-t-2xl">
+            {selectedLikedPhoto && (
+              <div className="p-4 space-y-4">
+                <img src={selectedLikedPhoto.photo?.url || selectedLikedPhoto.url} alt="" className="w-full rounded-xl max-h-[60vh] object-contain" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">{selectedLikedPhoto.photo?.user && <button onClick={() => openProfile(selectedLikedPhoto.photo.user.id)} className="text-[12px] font-semibold hover:text-primary">{selectedLikedPhoto.photo.user.displayName}</button>}</div>
+                  <Button variant="outline" className="border-border text-destructive hover:bg-destructive/10 text-xs" onClick={async () => { try { await fetch(`/api/liked-photos?photoId=${selectedLikedPhoto.photoId}`, { method: 'DELETE' }); setLikedPhotos(prev => prev.filter((p: any) => p.id !== selectedLikedPhoto.id)); setSelectedLikedPhoto(null); } catch {} }}><HeartOff className="w-3.5 h-3.5 mr-1" /> Unlike</Button>
+                </div>
+              </div>
+            )}
+          </SheetContent>
+        </Sheet>
       </div>
     );
   }
