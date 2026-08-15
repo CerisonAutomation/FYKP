@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { Socket } from 'socket.io-client';
 import { formatDistanceToNow } from 'date-fns';
 import { useAppStore } from '@/store/app';
@@ -21,6 +21,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ContextMenuSeparator } from '@/components/ui/context-menu';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import {
   Send, Paperclip, ChevronLeft, Sparkles, Pin, PinOff, Star, StarOff,
   Search, Mic, MicOff, MapPin, Image as ImageIcon, Video, Phone, Clock, Calendar,
@@ -49,7 +50,7 @@ interface NexusChatProps {
   getAvatar: (u?: User | null) => string;
   openProfile: (userId: string) => void;
   setActiveConversation: (c: Conversation | null) => void;
-  setActiveGroup: (g: any) => void;
+  setActiveGroup: (g: GroupChat | null) => void;
   setChatMobileView: (v: 'list' | 'chat') => void;
   msgEndRef: React.RefObject<HTMLDivElement>;
   socket: Socket | null;
@@ -58,8 +59,7 @@ interface NexusChatProps {
 // ═══════════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════
-const REACTION_EMOJIS = ['\u2764\uFE0F', '\uD83D\uDE02', '\uD83D\uDD25', '\uD83D\uDC4D', '\uD83D\uDE2E', '\uD83D\uDE31'];
-const REACTION_DISPLAY = ['\u2764\uFE0F', '\uD83D\uDE02', '\uD83D\uDD25', '\uD83D\uDC4D', '\uD83D\uDE2E', '\uD83D\uDE31'];
+const REACTION_EMOJIS = ['❤️', '😂', '🔥', '👍', '😱', '😦'];
 
 const DISAPPEAR_OPTIONS = [
   { label: '5s', value: '5s' },
@@ -78,7 +78,7 @@ const CHAT_THEMES = [
   { id: 'rose', label: 'Rose', ownBg: 'bg-pink-600', ownText: 'text-white', otherBg: 'bg-rose-950', otherBorder: 'border-rose-900' },
 ];
 
-const MEET_NOW_ICONS: Record<string, { icon: any; label: string; color: string }> = {
+const MEET_NOW_ICONS: Record<string, { icon: React.ComponentType<{ className?: string }>; label: string; color: string }> = {
   coffee: { icon: Coffee, label: 'Coffee', color: 'bg-amber-600' },
   drinks: { icon: Wine, label: 'Drinks', color: 'bg-violet-600' },
   gym: { icon: Dumbbell, label: 'Gym', color: 'bg-emerald-600' },
@@ -115,6 +115,26 @@ function WaveformBars({ playing, duration }: { playing: boolean; duration: numbe
       })}
     </div>
   );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+function formatDuration(s: number): string {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+function timeAgo(dateStr: string): string {
+  try { return formatDistanceToNow(new Date(dateStr), { addSuffix: true }); }
+  catch { return ''; }
+}
+
+function parseJsonData<T>(str?: string | null): T | null {
+  if (!str) return null;
+  try { return JSON.parse(str) as T; }
+  catch { return null; }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -216,8 +236,8 @@ export default function NexusChat(props: NexusChatProps) {
   const [locationName, setLocationName] = useState('');
   const [forwardTarget, setForwardTarget] = useState('');
   const [conversationsForForward, setConversationsForForward] = useState<Conversation[]>([]);
-  const [albums, setAlbums] = useState<any[]>([]);
-  const [selectedAlbum, setSelectedAlbum] = useState<any>(null);
+  const [albums, setAlbums] = useState<Array<{ id: string; name: string; _count?: { photos: number } }>>([]);
+  const [selectedAlbum, setSelectedAlbum] = useState<{ id: string; name: string } | null>(null);
   const [autoReplyLoading, setAutoReplyLoading] = useState(false);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [meetupLoading, setMeetupLoading] = useState(false);
@@ -230,12 +250,14 @@ export default function NexusChat(props: NexusChatProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // ═══ Typing indicator from socket ═══
+  const typingTimeoutsRef = useRef<Record<string, NodeJS.Timeout>>({});
   useEffect(() => {
     if (!socket) return;
     const handleTyping = (data: { userId: string; chatId: string }) => {
       if (data.chatId === otherUserId) {
         setTypingUsers({ [data.userId]: true });
-        setTimeout(() => setTypingUsers((prev: Record<string, boolean>) => {
+        if (typingTimeoutsRef.current[data.userId]) clearTimeout(typingTimeoutsRef.current[data.userId]);
+        typingTimeoutsRef.current[data.userId] = setTimeout(() => setTypingUsers((prev: Record<string, boolean>) => {
           const next = { ...prev };
           delete next[data.userId];
           return next;
@@ -243,7 +265,10 @@ export default function NexusChat(props: NexusChatProps) {
       }
     };
     socket.on('typing', handleTyping);
-    return () => { socket.off('typing', handleTyping); };
+    return () => {
+      socket.off('typing', handleTyping);
+      Object.values(typingTimeoutsRef.current).forEach(clearTimeout);
+    };
   }, [socket, otherUserId, setTypingUsers]);
 
   // ═══ Emit typing when user types ═══
@@ -262,33 +287,42 @@ export default function NexusChat(props: NexusChatProps) {
         const expires = new Date(msg.expiresAt).getTime();
         const now = Date.now();
         if (expires > now) {
-          disappearingTimersRef.current[msg.id] = setTimeout(() => {
-            setGroupMessages(chatMessages.filter((m) => m.id !== msg.id));
-            delete disappearingTimersRef.current[msg.id];
+          const msgId = msg.id;
+          disappearingTimersRef.current[msgId] = setTimeout(() => {
+            setGroupMessages((prev) => prev.filter((m) => m.id !== msgId));
+            delete disappearingTimersRef.current[msgId];
           }, expires - now);
         }
       }
     });
-  }, [chatMessages]);
+  }, [chatMessages, setGroupMessages]);
 
   // ═══ Cleanup timers ═══
   useEffect(() => {
     return () => {
       Object.values(disappearingTimersRef.current).forEach(clearTimeout);
+      Object.values(typingTimeoutsRef.current).forEach(clearTimeout);
       if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
     };
   }, []);
 
+  // ═══ Clear per-conversation state on conversation switch ═══
+  useEffect(() => {
+    setTranslations({});
+    setRevealedImages({});
+    setPollVotes({});
+  }, [otherUserId]);
+
   // ═══ Filtered messages ═══
-  const displayMessages = (chatMessages || []).filter((msg) => {
+  const displayMessages = useMemo(() => (chatMessages || []).filter((msg) => {
     if (favoritedFilter && !msg.isFavorited) return false;
     if (showChatSearch && chatSearchQuery) {
       return (msg.content || '').toLowerCase().includes(chatSearchQuery.toLowerCase());
     }
     return true;
-  });
+  }), [chatMessages, favoritedFilter, showChatSearch, chatSearchQuery]);
 
-  const pinnedMessages = (chatMessages || []).filter((m) => m.isPinned);
+  const pinnedMessages = useMemo(() => (chatMessages || []).filter((m) => m.isPinned), [chatMessages]);
 
   // ═══ HANDLERS ═══
 
@@ -341,7 +375,7 @@ export default function NexusChat(props: NexusChatProps) {
       const expiresAt = new Date(Date.now() + seconds * 1000).toISOString();
       try {
         const endpoint = isGroup ? `/api/groups/${otherUserId}` : '/api/messages';
-        await fetch(endpoint, {
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -351,11 +385,15 @@ export default function NexusChat(props: NexusChatProps) {
             expiresAt,
           }),
         });
+        if (!res.ok) {
+          toast.error('Failed to send message');
+          return;
+        }
         setMsgInput('');
         setShowDisappearingTimer(null);
         setTimeout(() => fetchAutoReplies(), 500);
-      } catch (e) {
-        console.error('Disappearing send error:', e);
+      } catch {
+        toast.error('Failed to send message');
       }
     } else {
       handleSendAndSuggest();
@@ -372,11 +410,14 @@ export default function NexusChat(props: NexusChatProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: msg.content, targetLang: 'en' }),
       });
+      if (!res.ok) { toast.error('Translation failed'); return; }
       const data = await res.json();
       if (data.translatedText) {
         setTranslations((prev) => ({ ...prev, [msg.id]: data.translatedText }));
       }
-    } catch { /* silent */ } finally {
+    } catch {
+      toast.error('Translation failed');
+    } finally {
       setLoadingAction(null);
     }
   };
@@ -473,12 +514,15 @@ export default function NexusChat(props: NexusChatProps) {
   const togglePin = async (msg: Message) => {
     setLoadingAction(`pin-${msg.id}`);
     try {
-      await fetch('/api/chat/pin', {
+      const res = await fetch('/api/chat/pin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messageId: msg.id }),
       });
-    } catch { /* silent */ } finally {
+      if (!res.ok) { toast.error('Pin failed'); return; }
+    } catch {
+      toast.error('Pin failed');
+    } finally {
       setLoadingAction(null);
     }
   };
@@ -487,12 +531,15 @@ export default function NexusChat(props: NexusChatProps) {
   const recallMessage = async (msg: Message) => {
     setLoadingAction(`recall-${msg.id}`);
     try {
-      await fetch('/api/chat/recall', {
+      const res = await fetch('/api/chat/recall', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messageId: msg.id }),
       });
-    } catch { /* silent */ } finally {
+      if (!res.ok) { toast.error('Recall failed'); return; }
+    } catch {
+      toast.error('Recall failed');
+    } finally {
       setLoadingAction(null);
     }
   };
@@ -501,12 +548,15 @@ export default function NexusChat(props: NexusChatProps) {
   const toggleFavorite = async (msg: Message) => {
     setLoadingAction(`fav-${msg.id}`);
     try {
-      await fetch('/api/chat/favorite-message', {
+      const res = await fetch('/api/chat/favorite-message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messageId: msg.id }),
       });
-    } catch { /* silent */ } finally {
+      if (!res.ok) { toast.error('Favorite failed'); return; }
+    } catch {
+      toast.error('Favorite failed');
+    } finally {
       setLoadingAction(null);
     }
   };
@@ -554,12 +604,15 @@ export default function NexusChat(props: NexusChatProps) {
     if (!forwardMessage || !forwardTarget) return;
     setLoadingAction('forward');
     try {
-      await fetch('/api/chat/forward', {
+      const res = await fetch('/api/chat/forward', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messageId: forwardMessage.id, toReceiverId: forwardTarget }),
       });
-    } catch { /* silent */ } finally {
+      if (!res.ok) { toast.error('Forward failed'); return; }
+    } catch {
+      toast.error('Forward failed');
+    } finally {
       setLoadingAction(null);
       setShowForwardModal(false);
       setForwardMessage(null);
@@ -596,7 +649,9 @@ export default function NexusChat(props: NexusChatProps) {
         body: JSON.stringify({ messageId: msgId, optionIndex }),
       });
       setPollVotes((prev) => ({ ...prev, [`${msgId}-${optionIndex}`]: optionIndex }));
-    } catch { /* silent */ }
+    } catch {
+      toast.error('Vote failed');
+    }
   };
 
   // #22 Call Link
@@ -609,7 +664,9 @@ export default function NexusChat(props: NexusChatProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct', callType: type }),
       });
-    } catch { /* silent */ } finally {
+    } catch {
+      toast.error('Call failed');
+    } finally {
       setCallLoading(false);
       setShowCallModal(false);
     }
@@ -637,6 +694,25 @@ export default function NexusChat(props: NexusChatProps) {
       setMeetupSuggestions([]);
     } finally {
       setMeetupLoading(false);
+    }
+  };
+
+  // Export chat as .txt
+  const exportChat = async () => {
+    const userId = activeConversation?.otherUser?.id;
+    if (!userId) return;
+    try {
+      const res = await fetch(`/api/chat/export?otherUserId=${userId}`);
+      if (!res.ok) { toast.error('Export failed'); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chat-${userId}-${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Export failed');
     }
   };
 
@@ -722,46 +798,8 @@ export default function NexusChat(props: NexusChatProps) {
     }
   };
 
-  // Format recording duration
-  const formatDuration = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, '0')}`;
-  };
-
-  // Get time ago
-  const timeAgo = (dateStr: string) => {
-    try { return formatDistanceToNow(new Date(dateStr), { addSuffix: true }); }
-    catch { return ''; }
-  };
-
-  // Parse poll data
-  const parsePollData = (pollDataStr?: string) => {
-    if (!pollDataStr) return null;
-    try { return JSON.parse(pollDataStr); }
-    catch { return null; }
-  };
-
-  // Parse location data
-  const parseLocationData = (locStr?: string) => {
-    if (!locStr) return null;
-    try { return JSON.parse(locStr); }
-    catch { return null; }
-  };
-
-  // Parse call data
-  const parseCallData = (callStr?: string) => {
-    if (!callStr) return null;
-    try { return JSON.parse(callStr); }
-    catch { return null; }
-  };
-
-  // Parse reactions
-  const parseReactions = (reactionsStr?: string): string[] => {
-    if (!reactionsStr) return [];
-    try { return JSON.parse(reactionsStr); }
-    catch { return []; }
-  };
+  // Format recording duration (delegates to external utility)
+  // timeAgo and parseJsonData are defined outside the component
 
   // ═══════════════════════════════════════════════════════════════
   // RENDER HELPERS
@@ -769,7 +807,7 @@ export default function NexusChat(props: NexusChatProps) {
 
   // Message type badge
   const MessageTypeBadge = ({ msg }: { msg: Message }) => {
-    if (msg.type === 'location' && parseLocationData(msg.locationData)) {
+    if (msg.type === 'location' && parseJsonData(msg.locationData)) {
       return <Badge variant="outline" className="text-[10px] gap-1 border-amber-500/50 text-amber-400"><MapPin className="w-3 h-3" /> Location</Badge>;
     }
     if (msg.type === 'audio' || msg.voiceDuration) {
@@ -779,7 +817,7 @@ export default function NexusChat(props: NexusChatProps) {
       return <Badge variant="outline" className="text-[10px] gap-1 border-violet-500/50 text-violet-400"><Vote className="w-3 h-3" /> Poll</Badge>;
     }
     if (msg.callData) {
-      const cd = parseCallData(msg.callData);
+      const cd = parseJsonData<{callType?: string; link?: string}>(msg.callData);
       return <Badge variant="outline" className="text-[10px] gap-1 border-emerald-500/50 text-emerald-400">{cd?.callType === 'video' ? <Video className="w-3 h-3" /> : <Phone className="w-3 h-3" />} {cd?.callType === 'video' ? 'Video' : 'Voice'} Call</Badge>;
     }
     if (msg.albumId) {
@@ -793,7 +831,7 @@ export default function NexusChat(props: NexusChatProps) {
 
   // Reactions chips
   const ReactionChips = ({ msgId, reactionsStr }: { msgId: string; reactionsStr?: string }) => {
-    const reactions = parseReactions(reactionsStr);
+    const reactions = parseJsonData<string[]>(reactionsStr) || [];
     if (reactions.length === 0) return null;
     const counts: Record<string, number> = {};
     reactions.forEach((r: string) => { counts[r] = (counts[r] || 0) + 1; });
@@ -822,7 +860,7 @@ export default function NexusChat(props: NexusChatProps) {
           <p className="text-[10px] font-semibold text-primary truncate">{msg.sender?.displayName || 'Unknown'}</p>
           <p className="text-[11px] text-muted-foreground truncate">{msg.content}</p>
         </div>
-        <button onClick={cancelReply} className="p-1 hover:bg-secondary rounded-full">
+        <button onClick={cancelReply} aria-label="Cancel reply" className="p-1 hover:bg-secondary rounded-full">
           <X className="w-3 h-3 text-muted-foreground" />
         </button>
       </motion.div>
@@ -831,7 +869,7 @@ export default function NexusChat(props: NexusChatProps) {
 
   // Location card
   const LocationCard = ({ msg }: { msg: Message }) => {
-    const loc = parseLocationData(msg.locationData);
+    const loc = parseJsonData<{name?: string; lat?: number; lng?: number}>(msg.locationData);
     if (!loc) return null;
     return (
       <div className="mt-2 p-2 rounded-lg bg-background/10 border border-border/50">
@@ -851,7 +889,7 @@ export default function NexusChat(props: NexusChatProps) {
     const playing = voicePlaying === msg.id;
     return (
       <div className="flex items-center gap-3 mt-1 min-w-[200px]">
-        <button onClick={() => setVoicePlaying(playing ? null : msg.id)} className="p-1.5 rounded-full bg-background/20 hover:bg-background/30 transition-colors">
+        <button onClick={() => setVoicePlaying(playing ? null : msg.id)} aria-label={playing ? 'Pause' : 'Play'} className="p-1.5 rounded-full bg-background/20 hover:bg-background/30 transition-colors">
           {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
         </button>
         <div className="flex-1">
@@ -864,10 +902,10 @@ export default function NexusChat(props: NexusChatProps) {
 
   // Poll card
   const PollCard = ({ msg }: { msg: Message }) => {
-    const poll = parsePollData(msg.pollData);
+    const poll = parseJsonData<{question?: string; options?: string[]; votes?: number[]; userVote?: number}>(msg.pollData);
     if (!poll) return null;
     const totalVotes = (poll.votes || []).reduce((a: number, b: number) => a + b, 0);
-    const userVote = pollVotes[`${msg.id}-0`] ?? poll.userVote ?? -1;
+    const userVote = Object.entries(pollVotes).find(([k]) => k.startsWith(msg.id))?.[1] ?? poll.userVote ?? -1;
     return (
       <div className="mt-2 space-y-2">
         <p className="text-[12px] font-semibold">{poll.question}</p>
@@ -896,7 +934,7 @@ export default function NexusChat(props: NexusChatProps) {
 
   // Call card
   const CallCard = ({ msg }: { msg: Message }) => {
-    const cd = parseCallData(msg.callData);
+    const cd = parseJsonData<{callType?: string; link?: string}>(msg.callData);
     if (!cd) return null;
     const isVideo = cd.callType === 'video';
     return (
@@ -927,7 +965,7 @@ export default function NexusChat(props: NexusChatProps) {
           className="fixed z-[100] bg-card border border-border rounded-xl p-3 shadow-xl w-64"
           style={{ top: quickContextCard.y, left: Math.min(quickContextCard.x, window.innerWidth - 280) }}
         >
-          <button onClick={() => setQuickContextCard(null)} className="absolute top-2 right-2 p-1 hover:bg-secondary rounded-full">
+          <button onClick={() => setQuickContextCard(null)} aria-label="Close" className="absolute top-2 right-2 p-1 hover:bg-secondary rounded-full">
             <X className="w-3 h-3 text-muted-foreground" />
           </button>
           <div className="flex items-center gap-3 mb-2">
@@ -968,7 +1006,7 @@ export default function NexusChat(props: NexusChatProps) {
     const isImage = msg.type === 'image' && msg.mediaUrl;
     const isVideo = msg.type === 'video' && msg.mediaUrl;
     const blurred = nsfwFilter && isImage && !revealedImages[msg.id];
-    const loc = parseLocationData(msg.locationData);
+    const loc = parseJsonData<{name?: string; lat?: number; lng?: number}>(msg.locationData);
     const isLocationType = msg.type === 'location' || loc;
     const isVoice = msg.type === 'audio' || msg.voiceDuration;
     const isPoll = !!msg.pollData;
@@ -1152,10 +1190,10 @@ export default function NexusChat(props: NexusChatProps) {
                     exit={{ opacity: 0, scale: 0.8, y: 5 }}
                     className={`absolute ${isMine ? 'bottom-full right-0' : 'bottom-full left-0'} mb-2 bg-card border border-border rounded-full px-2 py-1 flex gap-1 shadow-xl z-20`}
                   >
-                    {REACTION_DISPLAY.map((emoji, i) => (
+                    {REACTION_EMOJIS.map((emoji, i) => (
                       <button
                         key={i}
-                        onClick={() => toggleReaction(msg.id, REACTION_EMOJIS[i])}
+                        onClick={() => toggleReaction(msg.id, emoji)}
                         className="w-8 h-8 flex items-center justify-center hover:bg-secondary rounded-full transition-transform hover:scale-125 text-lg"
                       >
                         {emoji}
@@ -1204,6 +1242,7 @@ export default function NexusChat(props: NexusChatProps) {
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0 bg-card">
         <button
           onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }}
+          aria-label="Back to conversations"
           className="md:hidden p-1.5 hover:bg-secondary rounded-lg transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -1298,7 +1337,7 @@ export default function NexusChat(props: NexusChatProps) {
               <DropdownMenuItem onClick={() => setShowThemeModal(true)} className="gap-2 text-foreground cursor-pointer">
                 <Palette className="w-4 h-4" /> Theme
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { const userId = activeConversation?.otherUser?.id; if (!userId) return; fetch(`/api/chat/export?otherUserId=${userId}`).then(r => r.blob()).then(blob => { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `chat-${userId}-${Date.now()}.txt`; a.click(); URL.revokeObjectURL(url); }).catch(() => {}); }} className="gap-2 text-foreground cursor-pointer">
+              <DropdownMenuItem onClick={exportChat} className="gap-2 text-foreground cursor-pointer">
                 <FileText className="w-4 h-4" /> Export Chat
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
@@ -1394,7 +1433,7 @@ export default function NexusChat(props: NexusChatProps) {
             variant="ghost"
             className="h-6 px-2 text-[10px] text-violet-400 hover:text-violet-300 hover:bg-violet-600/20"
             onClick={createEventFromDetection}
-            disabled={!!loadingAction === true}
+            disabled={!!loadingAction}
           >
             {loadingAction === 'create-event' ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Create'}
           </Button>
@@ -1705,12 +1744,28 @@ export default function NexusChat(props: NexusChatProps) {
           <Button
             onClick={async () => {
               try {
+                let lat = currentUser?.lat;
+                let lng = currentUser?.lng;
+                if (!lat || !lng) {
+                  try {
+                    const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+                      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 }),
+                    );
+                    lat = pos.coords.latitude;
+                    lng = pos.coords.longitude;
+                  } catch {
+                    lat = 35.8969;
+                    lng = 14.4425;
+                  }
+                }
                 await fetch('/api/chat/location', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct', lat: 40.758, lng: -73.985, name: locationName || 'My Location' }),
+                  body: JSON.stringify({ receiverId: otherUserId, chatType: isGroup ? 'group' : 'direct', lat, lng, name: locationName || 'My Location' }),
                 });
-              } catch { /* silent */ }
+              } catch {
+                toast.error('Location sharing failed');
+              }
               setShowLocationPicker(false);
               setLocationName('');
             }}
@@ -2087,7 +2142,7 @@ export default function NexusChat(props: NexusChatProps) {
   // ═══════════════════════════════════════════════════════════════
   return (
     <TooltipProvider>
-      <div className="h-full flex flex-col relative" onContextMenu={(e) => {
+      <div className="h-full flex flex-col relative" role="main" aria-label="Chat conversation" onContextMenu={(e) => {
         // Only show stats on long press in empty area (not on a message)
         if ((e.target as HTMLElement).closest('[data-message]')) return;
       }}>
@@ -2098,9 +2153,9 @@ export default function NexusChat(props: NexusChatProps) {
         <PinnedMessagesBar />
 
         {/* Message List */}
-        <ScrollArea className="flex-1" ref={scrollContainerRef}>
+        <ScrollArea className="flex-1" ref={scrollContainerRef} role="log" aria-live="polite" aria-label="Chat messages">
           <div className="px-3 py-4 space-y-2">
-            {displayMessages.length === 0 && !showChatSearch && (
+            {displayMessages.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12">
                 <MessageSquare className="w-12 h-12 text-muted-foreground/30 mb-3" />
                 <p className="text-[13px] text-muted-foreground">
@@ -2152,13 +2207,6 @@ export default function NexusChat(props: NexusChatProps) {
         <MediaGalleryModal />
         <ChatThemeModal />
         <MessageStatsModal />
-
-        {/* Long-press empty area → stats (mobile) */}
-        <div
-          className="hidden"
-          onContextMenu={(e) => { e.preventDefault(); setShowStatsModal(true); }}
-          onTouchStart={() => { /* handled by empty area long press */ }}
-        />
       </div>
     </TooltipProvider>
   );

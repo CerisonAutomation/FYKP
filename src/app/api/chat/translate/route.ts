@@ -7,6 +7,7 @@ interface TranslateBody {
   targetLang: string;
 }
 
+// NOTE: This is a dev endpoint without rate limiting. Add rate limiting before production use.
 // POST /api/chat/translate - translate message content using LLM
 export async function POST(request: NextRequest) {
   try {

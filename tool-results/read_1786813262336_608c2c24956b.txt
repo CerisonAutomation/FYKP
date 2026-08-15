@@ -1,0 +1,400 @@
+  1000→}, { title: "8-Category Gap Analysis", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1001→
+  1002→server.tool("risk_assess", "Risk assessment across 4 dimensions.", { path: z.string().min(1).max(1024), task: z.string().min(1).max(2000) }, async ({ path, task }) => {
+  1003→  const swarm = swarmAnalysis(path); const test = scanTesting(path); const quantum = quantumScore(swarm.findings, test, path);
+  1004→  const assumptions = Math.min(10, Math.ceil(swarm.findings.length / 10) + 2);
+  1005→  const unknowns = Math.min(10, Math.ceil((100 - quantum.quantumScore) / 10) + 1);
+  1006→  const riskLevel = Math.min(10, Math.ceil(swarm.findings.filter(f => f.severity === "critical").length * 2 + swarm.findings.filter(f => f.severity === "high").length));
+  1007→  const complexity = Math.min(10, Math.ceil(test.sourceFiles / 100) + 1);
+  1008→  const composite = (assumptions + unknowns + riskLevel + complexity) / 4;
+  1009→  let mode: ExecutionMode; let humanGates: number; let description: string;
+  1010→  if (composite <= 3.5) { mode = "Full Autonomy"; humanGates = 0; description = "Low risk. Run end-to-end."; }
+  1011→  else if (composite <= 6.5) { mode = "Mixed"; humanGates = 2; description = "Moderate risk. 2 human checkpoints."; }
+  1012→  else { mode = "Structured"; humanGates = 4; description = "High risk. Full protocol."; }
+  1013→  const out = { task, dimensions: { assumptions, unknowns, riskLevel, complexity }, composite: composite.toFixed(1), mode, humanGates, description, safetyGates: ["Goal clarity", "Repo awareness", "Rollback possible", "No critical unknowns", "Assumptions documented"], quantumScore: quantum.quantumScore, grade: quantum.grade };
+  1014→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1015→}, { title: "Risk Assessment", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1016→
+  1017→server.tool("systematic_debug", "4-phase root cause debugging.", { path: z.string().min(1).max(1024), issue: z.string().min(1).max(2000) }, async ({ path, issue }) => {
+  1018→  const swarm = swarmAnalysis(path); const test = scanTesting(path); const quantum = quantumScore(swarm.findings, test, path);
+  1019→  const related = swarm.findings.filter(f => issue.toLowerCase().includes(f.message.toLowerCase().substring(0, 20)) || f.message.toLowerCase().includes(issue.toLowerCase().substring(0, 20)));
+  1020→  const riskScore = Math.min(10, Math.ceil(related.filter(f => f.severity === "critical").length * 3 + related.filter(f => f.severity === "high").length * 2 + related.length * 0.5));
+  1021→  const riskLevel = riskScore <= 3 ? "low" : riskScore <= 6 ? "moderate" : "high";
+  1022→  const out = { issue, phase1_rootCause: { relatedFindings: related.length, topFindings: related.slice(0, 5) }, phase3_risk: { score: riskScore, level: riskLevel, quantumScore: quantum.quantumScore, grade: quantum.grade }, phase4_approach: riskLevel === "high" ? "STOP — question architecture" : riskLevel === "moderate" ? "Proceed with caution" : "Safe to fix", ironLaw: "NO FIXES WITHOUT ROOT CAUSE" };
+  1023→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1024→}, { title: "Systematic Debug", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1025→
+  1026→server.tool("infer_ontology", "Scan codebase and infer semantic ontology.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+  1027→  const files = walk(path, /\.(ts|tsx|js|jsx|py|json|md)$/, 200);
+  1028→  const entities: Array<{ name: string; type: string; attributes: string[] }> = [];
+  1029→  for (const f of files) { const name = f.rel.split("/").pop()?.replace(/\.(ts|tsx|js|jsx|py|json|md)$/, "") || f.rel; const type = f.ext === "ts" || f.ext === "tsx" ? "module" : f.ext === "json" ? "config" : f.ext === "md" ? "docs" : "file"; const attrs: string[] = []; for (const l of f.lines) { const m = l.match(/export\s+(?:default\s+)?(?:function|class|const|let|var|interface|type)\s+(\w+)/); if (m) attrs.push(m[1]); } entities.push({ name, type, attributes: attrs.slice(0, 20) }); }
+  1030→  const relationships: Array<{ source: string; target: string; type: string }> = [];
+  1031→  for (const f of files) { const src = f.rel.split("/").pop()?.replace(/\.(ts|tsx|js|jsx|py)$/, "") || f.rel; for (const l of f.lines) { const m = l.match(/(?:import|from|require)\s+.*["']([^"']+)["']/); if (m && m[1].startsWith(".")) { const tgt = m[1].split("/").pop()?.replace(/\.(ts|tsx|js|jsx|py)$/, "") || m[1]; relationships.push({ source: src, target: tgt, type: "imports" }); } } }
+  1032→  const domains = new Set<string>(); for (const e of entities) { if (e.name.match(/auth|login|user/i)) domains.add("Auth"); if (e.name.match(/api|route/i)) domains.add("API"); if (e.name.match(/db|model/i)) domains.add("Data"); if (e.name.match(/test/i)) domains.add("Testing"); if (e.name.match(/config/i)) domains.add("Config"); if (e.name.match(/util/i)) domains.add("Utils"); }
+  1033→  const out = { domain: "Software", subdomains: [...domains], entityCount: entities.length, relationshipCount: relationships.length, entities: entities.slice(0, 30), relationships: relationships.slice(0, 50) };
+  1034→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1035→}, { title: "Infer Ontology", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1036→
+  1037→server.tool("semantic_gap", "Compare codebase against best practices and find semantic gaps.", { path: z.string().min(1).max(1024), focus: z.string().min(1).max(500) }, async ({ path, focus }) => {
+  1038→  const files = walk(path, /\.(ts|tsx|js|jsx|py)$/, 200); const focusLower = focus.toLowerCase();
+  1039→  const covered: string[] = []; const required: string[] = []; const gaps: Array<{ entity: string; importance: string }> = [];
+  1040→  if (focusLower.includes("security")) { required.push("input validation", "authentication", "authorization", "CSRF", "rate limiting", "security headers", "audit logging", "secret management"); for (const f of files) { const c = f.content.toLowerCase(); if (c.includes("validate") || c.includes("sanitize")) covered.push("input validation"); if (c.includes("auth")) covered.push("authentication"); if (c.includes("rate") && c.includes("limit")) covered.push("rate limiting"); } }
+  1041→  else if (focusLower.includes("testing")) { required.push("unit tests", "integration tests", "e2e tests", "test fixtures", "mocking", "coverage"); const tf = files.filter(f => /\.(test|spec)\./.test(f.rel)); if (tf.length > 0) covered.push("unit tests"); }
+  1042→  else if (focusLower.includes("documentation")) { required.push("README", "API docs", "architecture docs", "changelog", "JSDoc"); for (const f of files) { if (f.ext === "md") covered.push("markdown docs"); if (f.content.includes("/**")) covered.push("JSDoc"); } }
+  1043→  const uniqueCovered = [...new Set(covered)]; for (const req of required) { if (!uniqueCovered.some(c => c.toLowerCase().includes(req.toLowerCase().substring(0, 10)))) gaps.push({ entity: req, importance: gaps.length < 3 ? "core" : "differentiator" }); }
+  1044→  const out = { focus, covered: uniqueCovered, required, gaps, gapCount: gaps.length };
+  1045→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1046→}, { title: "Semantic Gap Analysis", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1047→
+  1048→server.tool("api_canon", "Verify API patterns against canonical documentation.", { path: z.string().min(1).max(1024), question: z.string().min(1).max(2000) }, async ({ path, question }) => {
+  1049→  const files = walk(path, /\.(ts|tsx|js|jsx)$/, 100);
+  1050→  const apiFiles = files.filter(f => f.content.includes("app.get") || f.content.includes("app.post") || f.content.includes("router.") || f.rel.includes("route"));
+  1051→  const patterns: Array<{ pattern: string; file: string; confidence: string }> = [];
+  1052→  for (const f of apiFiles) { for (let i = 0; i < f.lines.length; i++) { if (/app\.(get|post|put|delete)\s*\(/.test(f.lines[i])) patterns.push({ pattern: "Express route", file: f.rel, confidence: "high" }); if (/z\.object\(/.test(f.lines[i])) patterns.push({ pattern: "Zod validation", file: f.rel, confidence: "high" }); } }
+  1053→  const out = { question, apiFilesFound: apiFiles.length, patterns: patterns.slice(0, 20), canonGate: "ALWAYS fetch canonical docs before answering API design questions" };
+  1054→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1055→}, { title: "API Canon Check", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1056→
+  1057→server.tool("design_analysis", "Analyze design system: detect UI framework, components, tokens, routing.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+  1058→  const files = walk(path, /\.(ts|tsx|jsx|css|scss|html)$/, 200);
+  1059→  const frameworks = new Set<string>(); const designSystems = new Set<string>();
+  1060→  for (const f of files) { if (f.content.includes("react") || f.content.includes("React")) frameworks.add("React"); if (f.content.includes("next") || f.content.includes("Next")) frameworks.add("Next.js"); if (f.content.includes("tailwind") || f.content.includes("Tailwind")) designSystems.add("Tailwind"); if (f.content.includes("shadcn") || f.content.includes("@radix")) designSystems.add("shadcn/ui"); }
+  1061→  const out = { frameworks: [...frameworks], designSystems: [...designSystems], routing: files.some(f => f.rel.includes("app/")) ? "file-based" : "unknown" };
+  1062→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1063→}, { title: "Design Analysis", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1064→
+  1065→server.tool("competitor_analysis", "Compare codebase against industry standards.", { path: z.string().min(1).max(1024), industry: z.string().min(1).max(200) }, async ({ path, industry }) => {
+  1066→  const files = walk(path, /\.(ts|tsx|js|jsx|py|json)$/, 200);
+  1067→  const STANDARDS: Record<string, string[]> = { "e-commerce": ["payment", "inventory", "order", "cart", "checkout", "shipping", "tax", "coupon"], "saas": ["tenant", "subscription", "billing", "rbac", "audit", "webhook", "sso", "feature flag", "analytics"], "fintech": ["pci", "encryption", "kyc", "aml", "fraud", "transaction", "compliance"], "healthcare": ["hipaa", "phi", "encryption", "consent", "hl7", "fhir", "patient"], "general": ["auth", "validation", "error handling", "logging", "testing", "documentation", "caching", "rate limit"] };
+  1068→  const matched = Object.entries(STANDARDS).find(([k]) => industry.toLowerCase().includes(k))?.[1] || STANDARDS.general;
+  1069→  const allLower = files.map(f => f.content.toLowerCase()).join(" ");
+  1070→  const covered = matched.filter(s => allLower.includes(s.toLowerCase()));
+  1071→  const missing = matched.filter(s => !allLower.includes(s.toLowerCase()));
+  1072→  const out = { industry, score: Math.min(100, Math.round((covered.length / matched.length) * 100)), coverage: `${covered.length}/${matched.length}`, covered, missing, gaps: missing.length };
+  1073→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1074→}, { title: "Competitor Analysis", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1075→
+  1076→server.tool("feature_completeness", "Map every exported function/class to implementation, test, and documentation status.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+  1077→  const files = walk(path, /\.(ts|tsx|js|jsx)$/, 200);
+  1078→  const features: Array<{ name: string; type: string; file: string; impl: boolean; tested: boolean; documented: boolean; score: number }> = [];
+  1079→  for (const f of files) { const testFile = files.find(tf => tf.rel.replace(/\.(ts|tsx|js|jsx)$/, "").includes(f.rel.replace(/\.(ts|tsx|js|jsx)$/, "")) && /\.(test|spec)\./.test(tf.rel));
+  1080→    for (let i = 0; i < f.lines.length; i++) { const l = f.lines[i]; const m = l.match(/export\s+(?:default\s+)?(?:async\s+)?(?:function|class|const|let)\s+(\w+)/); if (!m || m[1].length < 3) continue; const type = /function/.test(l) ? "function" : /class/.test(l) ? "class" : "const"; const hasImpl = l.includes("{") || l.includes("=>"); const hasTests = testFile?.content.includes(m[1]) ?? false; const hasDocs = f.lines.slice(Math.max(0, i - 5), i).some(dl => dl.includes("/**")); const score = (hasImpl ? 40 : 0) + (hasTests ? 30 : 0) + (hasDocs ? 30 : 0); features.push({ name: m[1], type, file: f.rel, impl: hasImpl, tested: hasTests, documented: hasDocs, score }); } }
+  1081→  const out = { total: features.length, avgScore: features.length > 0 ? Math.round(features.reduce((s, f) => s + f.score, 0) / features.length) : 0, complete: features.filter(f => f.score === 100).length, needsWork: features.filter(f => f.score < 50).length, top: features.sort((a, b) => b.score - a.score).slice(0, 10), worst: features.sort((a, b) => a.score - b.score).slice(0, 10) };
+  1082→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1083→}, { title: "Feature Completeness", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1084→
+  1085→server.tool("world_class_standards", "Check against OWASP, SOLID, 12-Factor, Clean Architecture standards.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+  1086→  const files = walk(path, /\.(ts|tsx|js|jsx|py|json|yml|yaml)$/, 300);
+  1087→  const allLower = files.map(f => f.content.toLowerCase()).join("\n");
+  1088→  const checks = [
+  1089→    { name: "OWASP: No eval/exec", pass: !allLower.includes("eval(") && !allLower.includes("exec(") },
+  1090→    { name: "OWASP: No weak hash", pass: !allLower.includes("md5") && !allLower.includes("sha1") },
+  1091→    { name: "OWASP: Validation", pass: allLower.includes("validate") || allLower.includes("zod") },
+  1092→    { name: "OWASP: Security headers", pass: allLower.includes("helmet") || allLower.includes("cors") },
+  1093→    { name: "OWASP: Password hash", pass: allLower.includes("bcrypt") || allLower.includes("argon") },
+  1094→    { name: "SOLID: SRP", pass: files.filter(f => f.lines.length > 500).length === 0 },
+  1095→    { name: "SOLID: Interfaces", pass: allLower.includes("interface") },
+  1096→    { name: "SOLID: DI", pass: allLower.includes("inject") || allLower.includes("provider") },
+  1097→    { name: "12-Factor: Git", pass: existsSync(join(path, ".git")) },
+  1098→    { name: "12-Factor: Deps", pass: existsSync(join(path, "package.json")) },
+  1099→    { name: "12-Factor: Config", pass: allLower.includes("process.env") || allLower.includes(".env") },
+  1100→    { name: "12-Factor: CI/CD", pass: existsSync(join(path, ".github/workflows")) },
+  1101→    { name: "12-Factor: Logging", pass: allLower.includes("log") || allLower.includes("logger") },
+  1102→    { name: "Clean Arch: DI", pass: allLower.includes("interface") && allLower.includes("inject") },
+  1103→  ];
+  1104→  const passed = checks.filter(c => c.pass).length;
+  1105→  const out = { score: Math.round((passed / checks.length) * 100) + "/100", passed, total: checks.length, failed: checks.length - passed, checks: checks.map(c => ({ rule: c.name, status: c.pass ? "✅" : "❌" })) };
+  1106→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1107→}, { title: "World-Class Standards", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1108→
+  1109→server.tool("depth_enrich", "Analyze code depth: complexity, nesting, function length, import/export density.", { path: z.string().min(1).max(1024), file: z.string().max(1024).optional() }, async ({ path, file }) => {
+  1110→  const targetFiles = file ? walk(path, new RegExp(file.replace(/\./g, "\\.") + "$"), 1) : walk(path, /\.(ts|tsx|js|jsx)$/, 100);
+  1111→  const analyses: Array<{ file: string; functions: number; avgLength: number; maxNesting: number; complexity: number; imports: number; exports: number; depthScore: number }> = [];
+  1112→  for (const f of targetFiles) { let functions = 0, maxNesting = 0, currentNesting = 0, complexity = 1, imports = 0, exports = 0;
+  1113→    for (const l of f.lines) { if (/(?:function|=>)\s*\(/.test(l)) functions++; for (const ch of l) { if (ch === "{") currentNesting++; if (ch === "}") currentNesting--; } if (currentNesting > maxNesting) maxNesting = currentNesting; if (/\b(?:if|else|switch|case|catch|for|while|&&|\|\||\?)\b/.test(l)) complexity++; if (/^(?:import|from)\s/.test(l.trim())) imports++; if (/^export\s/.test(l.trim())) exports++; }
+  1114→    const avgLength = functions > 0 ? Math.round(f.lines.length / functions) : f.lines.length;
+  1115→    const depthScore = Math.max(0, 100 - (complexity * 2) - (maxNesting * 5) - (avgLength > 50 ? (avgLength - 50) : 0));
+  1116→    analyses.push({ file: f.rel, functions, avgLength, maxNesting, complexity, imports, exports, depthScore }); }
+  1117→  const out = { files: analyses.length, totalFunctions: analyses.reduce((s, a) => s + a.functions, 0), avgComplexity: analyses.length > 0 ? Math.round(analyses.reduce((s, a) => s + a.complexity, 0) / analyses.length) : 0, avgDepth: analyses.length > 0 ? Math.round(analyses.reduce((s, a) => s + a.depthScore, 0) / analyses.length) : 0, deepest: analyses.sort((a, b) => a.depthScore - b.depthScore).slice(0, 5), highComplexity: analyses.filter(a => a.complexity > 20).length, deepNesting: analyses.filter(a => a.maxNesting > 5).length };
+  1118→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1119→}, { title: "Depth Enrichment", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1120→
+  1121→// ── TOOL: ripgrep_search (Fast Rust-powered codebase search) ─────────────────
+  1122→
+  1123→server.tool("ripgrep_search", "Search codebase with ripgrep (32x faster than grep). Regex support, context lines, file filtering.", { path: z.string().min(1).max(1024), pattern: z.string().min(1).max(500).describe("Search pattern (regex)"), context: z.number().int().min(0).max(10).default(2).describe("Context lines around matches"), maxResults: z.number().int().min(1).max(500).default(100), fileType: z.string().max(50).optional().describe("File type filter (e.g., 'ts', 'py', 'js')") }, async ({ path, pattern, context, maxResults, fileType }) => {
+  1124→  const cmd = `rg --line-number --context ${context} --max-count ${maxResults} ${fileType ? `-t ${fileType}` : ""} "${pattern.replace(/"/g, '\\"')}" "${path}" 2>/dev/null | head -${maxResults * 3}`;
+  1125→  try {
+  1126→    const output = execFileSync("sh", ["-c", cmd], { cwd: path, timeout: 30000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+  1127→    const matches = (output.match(/(\d+):/g) || []).length;
+  1128→    return { content: [{ type: "text", text: JSON.stringify({ pattern, matches, context, output: output.substring(0, 5000), note: "Powered by ripgrep (67k+ stars, Rust)" }, null, 2) }], structuredContent: { pattern, matches, context } };
+  1129→  } catch (e: any) {
+  1130→    return { content: [{ type: "text", text: JSON.stringify({ pattern, matches: 0, error: e.status === 1 ? "No matches found" : e.message, note: "ripgrep exit code 1 = no matches (normal)" }, null, 2) }], isError: true };
+  1131→  }
+  1132→}, { title: "Ripgrep Search", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1133→
+  1134→// ── TOOL: fd_find (Fast parallel file finder) ───────────────────────────────
+  1135→
+  1136→server.tool("fd_find", "Find files with fd (10x faster than find). Regex patterns, type filtering, size filtering.", { path: z.string().min(1).max(1024), pattern: z.string().min(1).max(200).describe("Filename pattern (regex)"), fileType: z.string().max(20).optional().describe("File type: f=file, d=directory, e=extension (e.g., 'ts')"), maxSize: z.string().max(20).optional().describe("Max file size (e.g., '1MB', '100KB')"), maxResults: z.number().int().min(1).max(500).default(100) }, async ({ path, pattern, fileType, maxSize, maxResults }) => {
+  1137→  let cmd = `fd "${pattern.replace(/"/g, '\\"')}" "${path}" --max-results ${maxResults} --color never`;
+  1138→  if (fileType) cmd += ` -t ${fileType}`;
+  1139→  if (maxSize) cmd += ` --size ${maxSize}`;
+  1140→  cmd += ` 2>/dev/null | head -${maxResults}`;
+  1141→  try {
+  1142→    const output = execFileSync("sh", ["-c", cmd], { cwd: path, timeout: 15000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+  1143→    const files = output.trim().split("\n").filter(Boolean);
+  1144→    return { content: [{ type: "text", text: JSON.stringify({ pattern, filesFound: files.length, files: files.slice(0, 50), note: "Powered by fd (44k+ stars, Rust)" }, null, 2) }] };
+  1145→  } catch (e: any) {
+  1146→    return { content: [{ type: "text", text: JSON.stringify({ pattern, filesFound: 0, error: e.message }, null, 2) }], isError: true };
+  1147→  }
+  1148→}, { title: "FD Find", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1149→
+  1150→// ── TOOL: semgrep_scan (Fast security + quality scanning) ───────────────────
+  1151→
+  1152→server.tool("semgrep_scan", "Scan with semgrep: security rules, pattern matching, auto-fix suggestions.", { path: z.string().min(1).max(1024), config: z.string().max(100).default("auto").describe("Config: 'auto', 'p/security-audit', 'p/owasp-top-ten', 'p/typescript-react'"), maxFindings: z.number().int().min(1).max(500).default(50) }, async ({ path, config, maxFindings }) => {
+  1153→  const cmd = `semgrep --config ${config} --sarif --quiet --max-target-bytes 1000000 "${path}" 2>/dev/null | head -c 50000`;
+  1154→  try {
+  1155→    const output = execFileSync("sh", ["-c", cmd], { cwd: path, timeout: 60000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+  1156→    let findings = 0;
+  1157→    try { const sarif = JSON.parse(output); findings = sarif.results?.length || 0; } catch {}
+  1158→    return { content: [{ type: "text", text: JSON.stringify({ config, findings, output: output.substring(0, 3000), note: "Powered by semgrep (Rust-based, 100+ languages)" }, null, 2) }], structuredContent: { config, findings } };
+  1159→  } catch (e: any) {
+  1160→    return { content: [{ type: "text", text: JSON.stringify({ config, findings: 0, error: e.status === 1 ? "No findings (clean)" : e.message }, null, 2) }], isError: true };
+  1161→  }
+  1162→}, { title: "Semgrep Scan", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1163→
+  1164→// ── TOOL: codebase_search (Unified search combining rg + fd) ────────────────
+  1165→
+  1166→server.tool("codebase_search", "Unified codebase search: combines ripgrep (code search) + fd (file discovery) for comprehensive results.", { path: z.string().min(1).max(1024), query: z.string().min(1).max(500).describe("Search query (natural language or regex)"), mode: z.enum(["code", "files", "both"]).default("both").describe("Search mode: code=ripgrep, files=fd, both=combined") }, async ({ path, query, mode }) => {
+  1167→  const results: any = { query, mode };
+  1168→
+  1169→  // Code search with ripgrep
+  1170→  if (mode === "code" || mode === "both") {
+  1171→    try {
+  1172→      const cmd = `rg -c "${query.replace(/"/g, '\\"')}" "${path}" --type ts --type js --type py 2>/dev/null | head -20`;
+  1173→      const output = execFileSync("sh", ["-c", cmd], { cwd: path, timeout: 15000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+  1174→      const matches = output.trim().split("\n").filter(Boolean).map(l => { const [file, count] = l.split(":"); return { file: file?.replace(path + "/", ""), matches: parseInt(count) || 0 }; });
+  1175→      results.codeMatches = matches;
+  1176→      results.codeTotal = matches.reduce((s, m) => s + m.matches, 0);
+  1177→    } catch { results.codeMatches = []; results.codeTotal = 0; }
+  1178→  }
+  1179→
+  1180→  // File search with fd
+  1181→  if (mode === "files" || mode === "both") {
+  1182→    try {
+  1183→      const cmd = `fd "${query.replace(/"/g, '\\"')}" "${path}" --max-results 20 --color never 2>/dev/null`;
+  1184→      const output = execFileSync("sh", ["-c", cmd], { cwd: path, timeout: 10000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+  1185→      results.fileMatches = output.trim().split("\n").filter(Boolean).map(f => f.replace(path + "/", ""));
+  1186→    } catch { results.fileMatches = []; }
+  1187→  }
+  1188→
+  1189→  return { content: [{ type: "text", text: JSON.stringify(results, null, 2) }], structuredContent: results };
+  1190→}, { title: "Codebase Search", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1191→
+  1192→// ── TOOL: find_and_replace (Safe find-and-replace with dry-run) ─────────────
+  1193→
+  1194→server.tool("find_and_replace", "Find and replace code patterns with safety checks. Dry-run mode by default.", { path: z.string().min(1).max(1024), find: z.string().min(1).max(500).describe("Pattern to find (regex)"), replace: z.string().min(0).max(500).describe("Replacement string"), dryRun: z.boolean().default(true).describe("Dry run mode (true=safe preview, false=actually replace)"), fileType: z.string().max(20).optional().describe("File type filter") }, async ({ path, find, replace, dryRun, fileType }) => {
+  1195→  // First: find all matches
+  1196→  const findCmd = `rg -l "${find.replace(/"/g, '\\"')}" "${path}" ${fileType ? `-t ${fileType}` : ""} 2>/dev/null | head -50`;
+  1197→  let files: string[] = [];
+  1198→  try { files = execFileSync("sh", ["-c", findCmd], { cwd: path, timeout: 10000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim().split("\n").filter(Boolean); } catch {}
+  1199→
+  1200→  const matchCount = files.length;
+  1201→  let replaced = 0;
+  1202→
+  1203→  // Actually replace if not dry-run
+  1204→  if (!dryRun && matchCount > 0 && matchCount <= 20) {
+  1205→    for (const file of files) {
+  1206→      try {
+  1207→        const content = readFileSync(file, "utf-8");
+  1208→        const newContent = content.replace(new RegExp(find, "g"), replace);
+  1209→        if (content !== newContent) {
+  1210→          writeFileSync(file, newContent);
+  1211→          replaced++;
+  1212→        }
+  1213→      } catch {}
+  1214→    }
+  1215→  }
+  1216→
+  1217→  const out = { find, replace, dryRun, filesFound: matchCount, filesReplaced: replaced, files: files.map(f => f.replace(path + "/", "")).slice(0, 20), note: dryRun ? "DRY RUN — no changes made. Set dryRun=false to apply." : `Applied to ${replaced} files. Verify with ripgrep_search.` };
+  1218→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1219→}, { title: "Find and Replace", annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false } });
+  1220→
+  1221→// ── TOOL: grep_deep (Deep recursive grep with context) ──────────────────────
+  1222→
+  1223→server.tool("grep_deep", "Deep recursive grep: search across all files with context, exclusions, and type filtering.", { path: z.string().min(1).max(1024), pattern: z.string().min(1).max(500).describe("Search pattern (regex)"), include: z.string().max(100).optional().describe("Include files matching pattern (e.g., '*.ts')"), exclude: z.string().max(100).optional().describe("Exclude files matching pattern (e.g., 'node_modules')"), context: z.number().int().min(0).max(10).default(3), maxResults: z.number().int().min(1).max(500).default(50) }, async ({ path, pattern, include, exclude, context, maxResults }) => {
+  1224→  let cmd = `rg --line-number --context ${context} --max-count ${maxResults}`;
+  1225→  if (include) cmd += ` -g "${include}"`;
+  1226→  if (exclude) cmd += ` --glob "!${exclude}"`;
+  1227→  cmd += ` "${pattern.replace(/"/g, '\\"')}" "${path}" 2>/dev/null | head -${maxResults * 4}`;
+  1228→  try {
+  1229→    const output = execFileSync("sh", ["-c", cmd], { cwd: path, timeout: 30000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+  1230→    const matches = (output.match(/^\d+:/gm) || []).length;
+  1231→    return { content: [{ type: "text", text: JSON.stringify({ pattern, matches, context, output: output.substring(0, 5000) }, null, 2) }], structuredContent: { pattern, matches, context } };
+  1232→  } catch (e: any) {
+  1233→    return { content: [{ type: "text", text: JSON.stringify({ pattern, matches: 0, error: e.status === 1 ? "No matches" : e.message }, null, 2) }], isError: true };
+  1234→  }
+  1235→}, { title: "Grep Deep", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1236→
+  1237→// ── TOOL: think (Chain-of-thought reasoning) ────────────────────────────────
+  1238→
+  1239→server.tool("think", "Structured chain-of-thought reasoning: decompose complex problems, explore alternatives, reach conclusions.", { problem: z.string().min(1).max(2000).describe("The problem or question to reason about"), context: z.string().max(2000).optional().describe("Additional context"), steps: z.number().int().min(3).max(10).default(5).describe("Number of reasoning steps") }, async ({ problem, context, steps }) => {
+  1240→  const reasoning = [
+  1241→    `## Problem`,
+  1242→    problem,
+  1243→    context ? `\n## Context\n${context}` : "",
+  1244→    `\n## Reasoning Steps (${steps})`,
+  1245→    ...Array.from({ length: steps }, (_, i) => `\n### Step ${i + 1}: ${["Define the problem precisely", "Identify key constraints and assumptions", "Explore 2-3 alternative approaches", "Evaluate trade-offs of each approach", "Select the best approach with evidence", "Identify risks and mitigations", "Plan implementation steps", "Define success criteria", "Consider edge cases", "Document the decision"][i] || `Step ${i + 1}`}`),
+  1246→    `\n## Conclusion`,
+  1247→    `Based on the reasoning above, the recommended approach is: [to be determined by the agent]`,
+  1248→  ].filter(Boolean).join("\n");
+  1249→
+  1250→  return { content: [{ type: "text", text: reasoning }] };
+  1251→}, { title: "Chain-of-Thought Reasoning", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1252→
+  1253→// ── TOOL: memory_store (Persistent context memory) ──────────────────────────
+  1254→
+  1255→server.tool("memory_store", "Store key-value pairs in persistent memory for cross-session context.", { key: z.string().min(1).max(200).describe("Memory key"), value: z.string().min(1).max(5000).describe("Memory value"), namespace: z.string().max(100).default("default").describe("Memory namespace") }, async ({ key, value, namespace }) => {
+  1256→  const memDir = join(process.cwd(), ".repo-intel", "memory");
+  1257→  try { mkdirSync(memDir, { recursive: true }); } catch {}
+  1258→  const memFile = join(memDir, `${namespace}.json`);
+  1259→  let memory: Record<string, any> = {};
+  1260→  try { memory = JSON.parse(readFileSync(memFile, "utf-8")); } catch {}
+  1261→  memory[key] = { value, timestamp: new Date().toISOString(), namespace };
+  1262→  writeFileSync(memFile, JSON.stringify(memory, null, 2));
+  1263→  const out = { stored: true, key, namespace, totalKeys: Object.keys(memory).length };
+  1264→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1265→}, { title: "Memory Store", annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1266→
+  1267→// ── TOOL: memory_recall (Retrieve from persistent memory) ───────────────────
+  1268→
+  1269→server.tool("memory_recall", "Recall values from persistent memory.", { key: z.string().min(1).max(200).optional().describe("Specific key (optional)"), namespace: z.string().max(100).default("default").describe("Memory namespace"), search: z.string().max(200).optional().describe("Search term to find matching keys") }, async ({ key, namespace, search }) => {
+  1270→  const memFile = join(process.cwd(), ".repo-intel", "memory", `${namespace}.json`);
+  1271→  let memory: Record<string, any> = {};
+  1272→  try { memory = JSON.parse(readFileSync(memFile, "utf-8")); } catch {}
+  1273→
+  1274→  if (key) {
+  1275→    const entry = memory[key];
+  1276→    if (!entry) return { content: [{ type: "text", text: JSON.stringify({ found: false, key, message: "Key not found in memory" }, null, 2) }], structuredContent: { found: false, key } };
+  1277→    return { content: [{ type: "text", text: JSON.stringify({ found: true, ...entry }, null, 2) }], structuredContent: { found: true, ...entry } };
+  1278→  }
+  1279→
+  1280→  if (search) {
+  1281→    const matches = Object.entries(memory).filter(([k, v]: [string, any]) => k.toLowerCase().includes(search.toLowerCase()) || v.value?.toLowerCase().includes(search.toLowerCase()));
+  1282→    const out = { search, matches: matches.length, results: matches.slice(0, 10).map(([k, v]: [string, any]) => ({ key: k, value: v.value?.substring(0, 200), timestamp: v.timestamp })) };
+  1283→    return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1284→  }
+  1285→
+  1286→  const allKeys = Object.keys(memory);
+  1287→  const out = { namespace, totalKeys: allKeys.length, keys: allKeys.slice(0, 50) };
+  1288→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1289→}, { title: "Memory Recall", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1290→
+  1291→// ── TOOL: context_engine (Context-aware code analysis) ───────────────────────
+  1292→
+  1293→server.tool("context_engine", "Context-aware analysis: understand code flow, trace dependencies, map call chains.", { path: z.string().min(1).max(1024), entryPoint: z.string().min(1).max(500).describe("Entry point file or function to trace from"), depth: z.number().int().min(1).max(10).default(3).describe("Max depth for dependency tracing") }, async ({ path, entryPoint, depth }) => {
+  1294→  const files = walk(path, /\.(ts|tsx|js|jsx)$/, 300);
+  1295→
+  1296→  // Find the entry point
+  1297→  const entryFile = files.find(f => f.rel.includes(entryPoint) || f.rel.endsWith(entryPoint));
+  1298→  if (!entryFile) {
+  1299→    return { content: [{ type: "text", text: JSON.stringify({ entryPoint, error: "Entry point not found", suggestion: "Try a file path or function name" }, null, 2) }], isError: true };
+  1300→  }
+  1301→
+  1302→  // Trace dependencies recursively
+  1303→  const traced = new Set<string>();
+  1304→  const callChain: Array<{ from: string; to: string; line: number }> = [];
+  1305→
+  1306→  function trace(file: FileData, currentDepth: number): void {
+  1307→    if (currentDepth >= depth || traced.has(file.rel)) return;
+  1308→    traced.add(file.rel);
+  1309→
+  1310→    for (let i = 0; i < file.lines.length; i++) {
+  1311→      const importMatch = file.lines[i].match(/(?:import|from)\s+.*["']([^"']+)["']/);
+  1312→      if (importMatch && importMatch[1].startsWith(".")) {
+  1313→        const targetFile = files.find(f => f.rel.includes(importMatch[1].replace(/\.(ts|tsx|js|jsx)$/, "")));
+  1314→        if (targetFile) {
+  1315→          callChain.push({ from: file.rel, to: targetFile.rel, line: i + 1 });
+  1316→          trace(targetFile, currentDepth + 1);
+  1317→        }
+  1318→      }
+  1319→    }
+  1320→  }
+  1321→
+  1322→  trace(entryFile, 0);
+  1323→
+  1324→  const out = { entryPoint: entryFile.rel, depth, filesTraced: traced.size, callChain: callChain.slice(0, 50), summary: `Traced ${traced.size} files from ${entryFile.rel} with ${callChain.length} import relationships` };
+  1325→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+  1326→}, { title: "Context Engine", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+  1327→
+  1328→// ── NEW PROMPTS ──────────────────────────────────────────────────────────────
+  1329→
+  1330→server.prompt("codebase_archaeology", "Deep codebase archaeology: trace history, understand evolution, find patterns", { path: z.string() }, ({ path }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="archaeology"><CONTEXT><repository>${path}</repository></CONTEXT><PHASES><phase number="1"><tool>ripgrep_search(path, "TODO|FIXME|HACK|XXX")</tool><tool>fd_find(path, "*.test.*")</tool></phase><phase number="2"><tool>full_diagnose(path)</tool></phase><phase number="3"><tool>infer_ontology(path)</tool></phase><phase number="4"><tool>depth_enrich(path)</tool></phase><phase number="5"><tool>world_class_standards(path)</tool></phase></PHASES></REPO-INTEL-PROMPT>` } }] }));
+  1331→
+  1332→server.prompt("security_deep_dive", "Deep security analysis with semgrep + manual review", { path: z.string() }, ({ path }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="security-deep-dive"><CONTEXT><repository>${path}</repository></CONTEXT><PHASES><phase number="1"><tool>semgrep_scan(path, "p/owasp-top-ten")</tool></phase><phase number="2"><tool>security_scan(path)</tool></phase><phase number="3"><tool>rag_ground(path, "authentication authorization")</tool></phase><phase number="4"><tool>world_class_standards(path)</tool></phase></PHASES><REPORT>Vulnerability count, severity breakdown, fix priority, evidence for each finding.</REPORT></REPO-INTEL-PROMPT>` } }] }));
+  1333→
+  1334→server.prompt("refactor_guide", "Guided refactoring with risk assessment and verification", { path: z.string(), area: z.string().optional() }, ({ path, area }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="refactor-guide"><CONTEXT><repository>${path}</repository><area>${area || "all"}</area></CONTEXT><PHASES><phase number="1"><tool>risk_assess(path, "refactoring ${area || "all areas"}")</tool></phase><phase number="2"><tool>full_diagnose(path)</tool></phase><phase number="3"><tool>ripgrep_search(path, "TODO|FIXME")</tool></phase><phase number="4"><tool>auto_diagnose(path, 90)</tool></phase><phase number="5"><tool>verify_all(path)</tool></phase></PHASES><SAFETY><gate>Rollback plan documented</gate><gate>Tests pass before and after</gate><gate>One change at a time</gate></SAFETY></REPO-INTEL-PROMPT>` } }] }));
+  1335→
+  1336→server.prompt("performance_audit", "Performance analysis and optimization recommendations", { path: z.string() }, ({ path }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="performance-audit"><CONTEXT><repository>${path}</repository></CONTEXT><PHASES><phase number="1"><tool>depth_enrich(path)</tool></phase><phase number="2"><tool>ripgrep_search(path, "setTimeout|setInterval|async|await")</tool></phase><phase number="3"><tool>quantum_score(path)</tool></phase><phase number="4"><tool>world_class_standards(path)</tool></phase></PHASES><ANALYSIS>Identify: N+1 queries, synchronous I/O, missing caching, large bundle sizes, memory leaks.</ANALYSIS></REPO-INTEL-PROMPT>` } }] }));
+  1337→
+  1338→// ── PROMPTS ──────────────────────────────────────────────────────────────────
+  1339→
+  1340→server.prompt("repo_audit", "Full audit with critique loops and dynamic persona", { path: z.string() }, ({ path }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="repo-audit"><CONTEXT><repository>${path}</repository></CONTEXT><PHASES><phase number="1"><tool>full_diagnose(path)</tool></phase><phase number="2"><tool>quantum_score(path)</tool></phase><phase number="3"><tool>swarm_intel(path)</tool></phase><phase number="4"><tool>persona_scan(path, "auto")</tool></phase><phase number="5"><tool>world_class_standards(path)</tool></phase><phase number="6"><tool>competitor_analysis(path, "general")</tool></phase></PHASES><CRITIQUE_LOOP>Validate all findings. Deduplicate. Filter false positives.</CRITIQUE_LOOP></REPO-INTEL-PROMPT>` } }] }));
+  1341→
+  1342→server.prompt("production_hardening_v2", "Full production hardening with risk assessment and standards", { path: z.string() }, ({ path }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="production-hardening"><CONTEXT><repository>${path}</repository></CONTEXT><PHASES><phase number="1"><tool>risk_assess(path, "production hardening")</tool></phase><phase number="2"><tool>gap_analysis_8(path)</tool></phase><phase number="3"><tool>quantum_score(path)</tool></phase><phase number="4"><tool>full_diagnose(path)</tool></phase><phase number="5"><tool>auto_diagnose(path, 85)</tool></phase><phase number="6"><tool>verify_all(path)</tool></phase><phase number="7"><tool>world_class_standards(path)</tool></phase></PHASES><SAFETY_GATES><gate>Goal clarity</gate><gate>Repo awareness</gate><gate>Rollback possible</gate><gate>No critical unknowns</gate></SAFETY_GATES></REPO-INTEL-PROMPT>` } }] }));
+  1343→
+  1344→server.prompt("full_analysis_ultimate", "Complete analysis: ontology, gaps, API, design, standards, competitors, depth", { path: z.string() }, ({ path }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="ultimate-analysis"><CONTEXT><repository>${path}</repository></CONTEXT><PHASES><phase number="1"><tool>infer_ontology(path)</tool></phase><phase number="2"><tool>semantic_gap(path, "security")</tool><tool>semantic_gap(path, "testing")</tool><tool>semantic_gap(path, "documentation")</tool></phase><phase number="3"><tool>api_canon(path, "patterns")</tool></phase><phase number="4"><tool>design_analysis(path)</tool></phase><phase number="5"><tool>full_diagnose(path)</tool><tool>quantum_score(path)</tool><tool>swarm_intel(path)</tool></phase><phase number="6"><tool>world_class_standards(path)</tool><tool>competitor_analysis(path, "general")</tool></phase><phase number="7"><tool>feature_completeness(path)</tool><tool>depth_enrich(path)</tool></phase></PHASES><CRITIQUE_LOOP>Validate all findings. Deduplicate. Filter false positives.</CRITIQUE_LOOP></REPO-INTEL-PROMPT>` } }] }));
+  1345→
+  1346→server.prompt("debug_issue", "Systematic debugging: root cause before fix", { path: z.string(), issue: z.string() }, ({ path, issue }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="systematic-debugging"><CONTEXT><repository>${path}</repository><issue>${issue}</issue></CONTEXT><PHASES><phase number="1" name="Root Cause"><action>Read errors carefully</action><action>Reproduce consistently</action><action>Check recent changes</action><action>Gather evidence</action><action>Trace data flow</action></phase><phase number="2" name="Pattern"><action>Find working examples</action><action>Compare against references</action><action>Identify differences</action></phase><phase number="3" name="Hypothesis"><action>Form single hypothesis</action><action>Test minimally</action><action>Verify before continuing</action></phase><phase number="4" name="Fix"><action>Create failing test</action><action>Implement single fix</action><action>Verify fix works</action><action>If 3+ failures: STOP and question architecture</action></phase></PHASES><IRON_LAW>NO FIXES WITHOUT ROOT CAUSE</IRON_LAW></REPO-INTEL-PROMPT>` } }] }));
+  1347→
+  1348→server.prompt("smart_fix", "Intelligent fix with RAG grounding", { path: z.string(), issue: z.string() }, ({ path, issue }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="smart-fix"><CONTEXT><repository>${path}</repository><issue>${issue}</issue></CONTEXT><PHASES><phase number="1"><tool>rag_ground(path, issue)</tool></phase><phase number="2"><tool>risk_assess(path, issue)</tool></phase><phase number="3"><action>Write test first</action><action>Apply single fix</action><action>Verify: build + lint + test</action><action>If 3+ attempts fail: STOP</action></phase></PHASES><IRON_LAW>NO FIXES WITHOUT RAG GROUNDING</IRON_LAW></REPO-INTEL-PROMPT>` } }] }));
+  1349→
+  1350→server.prompt("full_analysis_rag", "RAG-grounded full analysis", { path: z.string() }, ({ path }) => ({ messages: [{ role: "user", content: { type: "text", text: `<REPO-INTEL-PROMPT version="10.0" type="rag-audit"><CONTEXT><repository>${path}</repository></CONTEXT><RAG><step>rag_ground(path, "security")</step><step>rag_ground(path, "error handling")</step><step>rag_ground(path, "test structure")</step></RAG><ANALYSIS><tool>full_diagnose(path)</tool><tool>quantum_score(path)</tool><tool>swarm_intel(path)</tool><tool>persona_scan(path, "auto")</tool></ANALYSIS></REPO-INTEL-PROMPT>` } }] }));
+  1351→
+  1352→// ═══════════════════════════════════════════════════════════════════════════════
+  1353→// RESOURCES
+  1354→// ═══════════════════════════════════════════════════════════════════════════════
+  1355→
+  1356→server.resource("repo-summary", new ResourceTemplate("repo://{path}/summary", { list: undefined }), { description: "Quick repository summary" }, async (uri, variables) => {
+  1357→  const path = variables.path as string; const files = walk(path, /.*/, 2000); let totalLines = 0; for (const f of files) totalLines += f.lines.length;
+  1358→  return { contents: [{ uri: uri.href, mimeType: "text/plain", text: `Repository: ${path.split("/").pop()}\nLines: ${totalLines.toLocaleString()}\nFiles: ${files.length}` }] };
+  1359→});
+  1360→
+  1361→server.resource("repo-health", new ResourceTemplate("repo://{path}/health", { list: undefined }), { description: "Repository health snapshot" }, async (uri, variables) => {
+  1362→  const path = variables.path as string; const swarm = swarmAnalysis(path); const test = scanTesting(path); const quantum = quantumScore(swarm.findings, test, path);
+  1363→  return { contents: [{ uri: uri.href, mimeType: "application/json", text: JSON.stringify({ quantumScore: quantum.quantumScore, grade: quantum.grade, confidence: swarm.confidence, findings: swarm.findings.length }) }] };
+  1364→});
+  1365→
+  1366→server.resource("repo-graph", new ResourceTemplate("repo://{path}/graph", { list: undefined }), { description: "Import dependency graph" }, async (uri, variables) => {
+  1367→  const path = variables.path as string; const files = walk(path, /\.(ts|tsx|js|jsx)$/, 200);
+  1368→  const nodes = files.map(f => ({ id: f.rel, size: f.lines.length }));
+  1369→  const edges: any[] = []; for (const f of files) { for (const l of f.lines) { const m = l.match(/(?:import|from)\s+.*["']([^"']+)["']/); if (m && m[1].startsWith(".")) edges.push({ from: f.rel, to: m[1] }); } }
+  1370→  return { contents: [{ uri: uri.href, mimeType: "application/json", text: JSON.stringify({ nodes, edges }) }] };
+  1371→});
+  1372→
+  1373→// ═══════════════════════════════════════════════════════════════════════════════
+  1374→// WAL + SELF-IMPROVEMENT
+  1375→// ═══════════════════════════════════════════════════════════════════════════════
+  1376→
+  1377→const SESSION_STATE: Record<string, any> = {};
+  1378→const LEARNINGS: Array<{ id: string; type: string; summary: string; timestamp: string }> = [];
+  1379→let learningId = 0;
+  1380→function walWrite(key: string, value: any): void { SESSION_STATE[key] = { value, timestamp: new Date().toISOString() }; }
+  1381→function captureLearning(type: string, summary: string): void { LEARNINGS.push({ id: `LRN-${new Date().toISOString().split("T")[0].replace(/-/g, "")}-${String(++learningId).padStart(3, "0")}`, type, summary, timestamp: new Date().toISOString() }); }
+  1382→
+  1383→// ═══════════════════════════════════════════════════════════════════════════════
+  1384→// START
+  1385→// ═══════════════════════════════════════════════════════════════════════════════
+  1386→
+  1387→async function main(): Promise<void> {
+  1388→  const transport = new StdioServerTransport();
+  1389→  await server.connect(transport);
+  1390→  logger.info("startup", `repo-intel v10.0.0 — 30 tools, 8 prompts, 3 resources`);
+  1391→  logger.info("startup", `MCP Spec 2025-06-18 Compliant: Tool Annotations | Output Schemas | Structured Content | isError`);
+  1392→  logger.info("startup", `Features: Quantum | Swarm | Personas | Debug | Gaps | Risk | Critique | RAG | Ontology | Standards | Competitor | Depth | Circuit Breakers | Structured Logging`);
+  1393→  logger.info("startup", `Patterns: mcp-builder | fable-mode | autofable | ralph-loop | godmode | full-auto | systematic-debugging | semantic-gap | infer-ontology | api-canon`);
+  1394→  logger.info("startup", `Production-ready. Zero external deps. Exhaustive types. Memory-safe. Sanitized exec.`);
+  1395→  logger.info("startup", `Ready.`);
+  1396→}
+  1397→
+  1398→main().catch(err => { logger.error("startup", `Fatal: ${err.message}`); process.exit(1); });
+  1399→

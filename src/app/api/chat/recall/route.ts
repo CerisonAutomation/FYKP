@@ -34,6 +34,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Only allow recall within 60 seconds of sending
+    const SIXTY_SECONDS = 60_000;
+    if (Date.now() - new Date(message.createdAt).getTime() > SIXTY_SECONDS) {
+      return NextResponse.json(
+        { error: 'Cannot recall messages older than 60 seconds' },
+        { status: 400 }
+      );
+    }
+
     await db.message.update({
       where: { id: messageId },
       data: {

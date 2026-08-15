@@ -37,6 +37,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
+import { toast } from 'sonner';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -105,7 +106,7 @@ const FAQ_DATA = [
   { q: 'How do I delete my account?', a: 'Go to More → Account and scroll to the bottom to find "Delete Account". This action is permanent and cannot be undone. All your data will be permanently removed.' },
 ];
 
-const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: string; icon: any; badge?: number; isNew?: boolean }[]> = {
+const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: string; icon: React.ComponentType<{ className?: string }>; badge?: number; isNew?: boolean }[]> = {
   Social: [
     { id: 'events', label: 'Events', description: 'Find and create events', icon: Calendar },
     { id: 'viewed', label: 'Viewed Me', description: 'Who checked your profile', icon: Eye },
@@ -181,7 +182,6 @@ const INFER_CATEGORIES: { id: InferCategory; label: string; icon: any; color: st
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face';
 const DEFAULT_COVER = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&h=400&fit=crop';
-const CURRENT_USER_ID = 'test-user-1';
 
 // Dynamically import Leaflet map (no SSR - requires window)
 const MapLeaflet = dynamic(() => import('@/components/MapViewComponent'), { ssr: false, loading: () => <div className="w-full h-full bg-secondary/30 animate-pulse" /> });
@@ -197,7 +197,7 @@ class ErrorBoundary extends React.Component<{ fallback: React.ReactNode }, { has
 // HELPER COMPONENTS & FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
 
-function FootprintsIcon(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 16v-2.38C4 11.5 2.97 9.5 3 8c.07-2.48 1.52-4 4-4 2 0 3 1 4 3 1-2 2-3 4-3 2.48 0 3.93 1.52 4 4 .03 1.5-1 3.5-1 5.62V16"/><path d="M4 16c0 2 1.5 4 3 4 1.5 0 2-1 3-2s2.5-2 4-2 3 1 4 2 1.5 2 3 2c1.5 0 3-2 3-4"/></svg>; }
+function FootprintsIcon(props: React.SVGProps<SVGSVGElement>) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 16v-2.38C4 11.5 2.97 9.5 3 8c.07-2.48 1.52-4 4-4 2 0 3 1 4 3 1-2 2-3 4-3 2.48 0 3.93 1.52 4 4 .03 1.5-1 3.5-1 5.62V16"/><path d="M4 16c0 2 1.5 4 3 4 1.5 0 2-1 3-2s2.5-2 4-2 3 1 4 2 1.5 2 3 2c1.5 0 3-2 3-4"/></svg>; }
 
 function timeAgo(dateStr: string): string {
   try { return formatDistanceToNow(new Date(dateStr), { addSuffix: true }); } catch { return ''; }
@@ -226,7 +226,7 @@ function getLastSeenText(user: User): string {
   return 'Offline';
 }
 
-function SectionHeader({ icon: Icon, label, count, action }: { icon: any; label: string; count?: number; action?: React.ReactNode }) {
+function SectionHeader({ icon: Icon, label, count, action }: { icon: React.ComponentType<{ className?: string }>; label: string; count?: number; action?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between mb-3">
       <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2">
@@ -481,7 +481,7 @@ export default function NexusApp() {
 
   // ── Circles state ──
   const [circles, setCircles] = useState<any[]>([]);
-  const [circlesLoading, setirclesLoading] = useState(true);
+  const [circlesLoading, setCirclesLoading] = useState(true);
   const [selectedCircle, setSelectedCircle] = useState<any>(null);
   const [showCreateCircle, setShowCreateCircle] = useState(false);
   const [circleForm, setCircleForm] = useState({ name: '', color: '#6366f1', icon: 'users' });
@@ -540,7 +540,7 @@ export default function NexusApp() {
     fetch('/api/auth')
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(res => { setCurrentUser(res.data); setAuthed(true); })
-      .catch(() => setAuthLoading(false))
+      .catch(() => setAuthed(false))
       .finally(() => setAuthLoading(false));
   }, []);
 
@@ -589,7 +589,7 @@ export default function NexusApp() {
   useEffect(() => {
     if (!authed || activeTab !== 'kinks') return;
     setKinkLoading(true);
-    fetch('/api/profile-data?userId=test-user-1').then(r => r.json()).then(res => {
+    fetch(`/api/profile-data?userId=${currentUser.id}`).then(r => r.json()).then(res => {
       const fields: Record<string, string> = {};
       (res.data || []).forEach((f: any) => { fields[f.key] = f.value; });
       setKinkFields(fields);
@@ -714,34 +714,34 @@ export default function NexusApp() {
   useEffect(() => {
     if (!authed || activeTab !== 'footprints') return;
     setFootprintsLoading(true);
-    fetch('/api/footprints?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setFootprints(res.data || [])).catch(() => {}).finally(() => setFootprintsLoading(false));
+    fetch(`/api/footprints?userId=${currentUser?.id}`).then(r => r.json()).then(res => setFootprints(res.data || [])).catch(() => {}).finally(() => setFootprintsLoading(false));
   }, [authed, activeTab]);
 
   // Favorites
   useEffect(() => {
     if (!authed || activeTab !== 'favorites') return;
     setFavoritesLoading(true);
-    fetch('/api/favorites?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setFavorites(res.data || [])).catch(() => {}).finally(() => setFavoritesLoading(false));
+    fetch(`/api/favorites?userId=${currentUser?.id}`).then(r => r.json()).then(res => setFavorites(res.data || [])).catch(() => {}).finally(() => setFavoritesLoading(false));
   }, [authed, activeTab]);
 
   // Notes
   useEffect(() => {
     if (!authed || activeTab !== 'notes') return;
-    fetch('/api/notes?writerId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setNotes(res.data || [])).catch(() => {});
+    fetch(`/api/notes?writerId=${currentUser?.id}`).then(r => r.json()).then(res => setNotes(res.data || [])).catch(() => {});
   }, [authed, activeTab]);
 
   // Boosts
   useEffect(() => {
     if (!authed || activeTab !== 'boosts') return;
     setBoostsLoading(true);
-    fetch('/api/boosts?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setAllBoosts(res.data || [])).catch(() => {}).finally(() => setBoostsLoading(false));
+    fetch(`/api/boosts?userId=${currentUser?.id}`).then(r => r.json()).then(res => setAllBoosts(res.data || [])).catch(() => {}).finally(() => setBoostsLoading(false));
   }, [authed, activeTab]);
 
   // Albums
   useEffect(() => {
     if (!authed || activeTab !== 'albums') return;
     setAlbumsLoading(true);
-    fetch('/api/albums?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setAlbums(res.data || [])).catch(() => {}).finally(() => setAlbumsLoading(false));
+    fetch(`/api/albums?userId=${currentUser?.id}`).then(r => r.json()).then(res => setAlbums(res.data || [])).catch(() => {}).finally(() => setAlbumsLoading(false));
   }, [authed, activeTab]);
 
   // Groups
@@ -753,8 +753,8 @@ export default function NexusApp() {
   // Circles
   useEffect(() => {
     if (!authed || activeTab !== 'circles') return;
-    setirclesLoading(true);
-    fetch('/api/circles').then(r => r.json()).then(res => setCircles(res.data || [])).catch(() => {}).finally(() => setirclesLoading(false));
+    setCirclesLoading(true);
+    fetch('/api/circles').then(r => r.json()).then(res => setCircles(res.data || [])).catch(() => {}).finally(() => setCirclesLoading(false));
   }, [authed, activeTab]);
 
   // Selected Circle Members
@@ -857,15 +857,15 @@ export default function NexusApp() {
   }, [msgInput, activeGroup, currentUser]);
 
   const handleLike = useCallback(async (receiverId: string) => {
-    try { await fetch('/api/likes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ receiverId }) }); triggerRefreshDiscover(); } catch {}
+    try { await fetch('/api/likes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ receiverId }) }); triggerRefreshDiscover(); } catch { toast.error('Operation failed'); }
   }, []);
 
   const handleUnlike = useCallback(async (receiverId: string) => {
-    try { await fetch(`/api/likes?receiverId=${receiverId}`, { method: 'DELETE' }); triggerRefreshDiscover(); } catch {}
+    try { await fetch(`/api/likes?receiverId=${receiverId}`, { method: 'DELETE' }); triggerRefreshDiscover(); } catch { toast.error('Operation failed'); }
   }, []);
 
   const handleBlock = useCallback(async (userId: string) => {
-    try { await fetch('/api/blocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blockedId: userId }) }); setShowBlockAlert(false); closeProfile(); } catch {}
+    try { await fetch('/api/blocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blockedId: userId }) }); setShowBlockAlert(false); closeProfile(); } catch { toast.error('Operation failed'); }
   }, [closeProfile]);
 
   const handleRizz = useCallback(async () => {
@@ -886,14 +886,14 @@ export default function NexusApp() {
   }, [rizzResult, activeConversation, profileUser, openChat]);
 
   const handleRsvp = useCallback(async (eventId: string, status: string) => {
-    try { await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'rsvp', eventId, status }) }); setUserRsvps(prev => ({ ...prev, [eventId]: status })); } catch {}
+    try { await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'rsvp', eventId, status }) }); setUserRsvps(prev => ({ ...prev, [eventId]: status })); } catch { toast.error('Operation failed'); }
   }, []);
 
   const handleCreateEvent = useCallback(async () => {
     try {
       const res = await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(eventForm) });
       if (res.ok) { const data = await res.json(); setEvents(prev => [data.data, ...prev]); setShowCreateEvent(false); setEventForm({ title: '', description: '', location: '', startDate: '', imageUrl: '' }); }
-    } catch {}
+    } catch { toast.error('Operation failed'); }
   }, [eventForm]);
 
   const handleSaveProfile = useCallback(async () => {
@@ -903,16 +903,16 @@ export default function NexusApp() {
       for (const [k, v] of Object.entries(editForm)) { if (v !== '' && v !== undefined) { if (k === 'height' || k === 'weight') payload[k] = parseInt(v); else payload[k] = v; } }
       const res = await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (res.ok) { const data = await res.json(); setCurrentUser(data.data); setEditingProfile(false); }
-    } catch {}
+    } catch { toast.error('Operation failed'); }
   }, [currentUser, editForm]);
 
   const handleSaveSettings = useCallback(async () => {
     if (!currentUser) return;
-    try { await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settingsPrivacy) }); setCurrentUser({ ...currentUser, ...settingsPrivacy }); } catch {}
+    try { await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settingsPrivacy) }); setCurrentUser({ ...currentUser, ...settingsPrivacy }); } catch { toast.error('Operation failed'); }
   }, [currentUser, settingsPrivacy]);
 
   const handleChatRequest = useCallback(async (requestId: string, action: 'accept' | 'decline') => {
-    try { await fetch('/api/chat-requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestId, action }) }); setChatRequests(prev => prev.filter(r => r.id !== requestId)); setPendingRequestCount(prev => Math.max(0, prev - 1)); } catch {}
+    try { await fetch('/api/chat-requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestId, action }) }); setChatRequests(prev => prev.filter(r => r.id !== requestId)); setPendingRequestCount(prev => Math.max(0, prev - 1)); } catch { toast.error('Operation failed'); }
   }, []);
 
   const handleShout = useCallback(async () => {
@@ -920,7 +920,7 @@ export default function NexusApp() {
     try {
       const res = await fetch(`/api/shouts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: shoutInput.trim(), type: shoutType }) });
       if (res.ok) { const data = await res.json(); if (data.data) addShout(data.data); setShoutInput(''); }
-    } catch {}
+    } catch { toast.error('Operation failed'); }
   }, [shoutInput, currentUser, shoutType]);
 
   const handleFetchMap = useCallback(async () => {
@@ -928,24 +928,24 @@ export default function NexusApp() {
     const lng = userLng || currentUser?.lng || 14.42;
     setMapLoading(true);
     try {
-      const res = await fetch(`/api/user-map?lat=${lat}&lng=${lng}&radius=${mapRadius}&userId=${CURRENT_USER_ID}`);
+      const res = await fetch(`/api/user-map?lat=${lat}&lng=${lng}&radius=${mapRadius}&userId=${currentUser?.id}`);
       const data = await res.json();
       setMapUsers(data.users || []);
-    } catch {} finally { setMapLoading(false); }
+    } catch { /* handled by loading state */ } finally { setMapLoading(false); }
   }, [currentUser, userLat, userLng, mapRadius]);
 
   const handleFavorite = useCallback(async (targetId: string, isSuper: boolean = false) => {
     if (!currentUser) return;
-    try { await fetch(`/api/favorites?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId, isSuper }) }); } catch {}
+    try { await fetch(`/api/favorites?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId, isSuper }) }); } catch { toast.error('Operation failed'); }
   }, [currentUser]);
 
   const handleSaveNote = useCallback(async () => {
     if (!currentUser || !noteTargetId || !noteContent.trim()) return;
-    try { await fetch(`/api/notes?writerId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: noteTargetId, content: noteContent.trim() }) }); setShowNoteDialog(false); setNoteContent(''); setNoteTargetId(null); } catch {}
+    try { await fetch(`/api/notes?writerId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: noteTargetId, content: noteContent.trim() }) }); setShowNoteDialog(false); setNoteContent(''); setNoteTargetId(null); } catch { toast.error('Operation failed'); }
   }, [currentUser, noteTargetId, noteContent]);
 
   const handleDeleteNote = useCallback(async (noteId: string) => {
-    try { await fetch(`/api/notes/${noteId}`, { method: 'DELETE' }); setNotes(prev => prev.filter((n: any) => n.id !== noteId)); } catch {}
+    try { await fetch(`/api/notes/${noteId}`, { method: 'DELETE' }); setNotes(prev => prev.filter((n: any) => n.id !== noteId)); } catch { toast.error('Operation failed'); }
   }, []);
 
   const handleInfer = useCallback(async (category?: InferCategory) => {
@@ -972,7 +972,7 @@ export default function NexusApp() {
     try {
       const res = await fetch('/api/groups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(groupForm) });
       if (res.ok) { const data = await res.json(); setGroups(prev => [data.data, ...prev]); setShowCreateGroup(false); setGroupForm({ name: '', description: '', isPublic: true }); }
-    } catch {}
+    } catch { toast.error('Operation failed'); }
   }, [currentUser, groupForm]);
 
   const handleCreateBanner = useCallback(async () => {
@@ -980,7 +980,7 @@ export default function NexusApp() {
     try {
       const res = await fetch('/api/banners', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'My Banner', imageUrl: DEFAULT_COVER, position: 0 }) });
       if (res.ok) { const data = await res.json(); setBanners(prev => [...prev, data.data]); }
-    } catch {}
+    } catch { toast.error('Operation failed'); }
   }, [currentUser]);
 
   // Filtered discover users
@@ -1013,7 +1013,7 @@ export default function NexusApp() {
         <div className="text-4xl font-bold gradient-text mb-2">NEXUS</div>
         <p className="text-muted-foreground text-sm mb-8">Connect. Discover. Thrive.</p>
         <Card className="w-full max-w-sm bg-card border-border"><CardContent className="p-6">
-          <button onClick={() => { setCurrentUser({ id: CURRENT_USER_ID, username: 'testuser', displayName: 'Test User', email: 'test@nexus.app', avatar: DEFAULT_AVATAR, bio: 'Love adventures and good coffee ☕', age: 28, gender: 'male', location: 'Valletta, Malta', lat: 35.8989, lng: 14.5146, geoCity: 'Valletta', geoRegion: 'Central Region', geoCountry: 'Malta', online: true, lastSeen: new Date().toISOString(), isPremium: true, isVerified: true, showOnline: true, showDistance: true, showAge: true, showActivity: true, hidePicsOffline: false, lookingFor: 'relationship', aboutMe: 'Adventurous soul looking for meaningful connections. I love hiking, photography, and trying new cuisines. Always up for a good conversation over coffee or wine.', height: 180, weight: 75, ethnicity: 'white', bodyType: 'athletic', relationshipStatus: 'single', position: 'versatile', pronouns: 'he/him', displayUnits: 'metric', lang: 'en', soundOff: false, notifPushOff: false, notifEmailOff: false, notifTelegramOff: false, mailingInternal: true, mailingPartner: true, profileOff: false, privateAuto: false, noPros: false, noPub: false, isProfessional: false, professionalStatus: 'none', verificationStatus: 'verified', voucher: null, _count: { photos: 12, receivedLikes: 47, receivedViews: 234, shouts: 5, favorites: 18, blogs: 2, videos: 1, sentMessages: 89, receivedMessages: 76, notesWritten: 8 } } as any); setAuthed(true); }} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium">
+          <button onClick={() => { setCurrentUser({ id: 'demo-user', username: 'testuser', displayName: 'Test User', email: 'test@nexus.app', avatar: DEFAULT_AVATAR, bio: 'Love adventures and good coffee ☕', age: 28, gender: 'male', location: 'Valletta, Malta', lat: 35.8989, lng: 14.5146, geoCity: 'Valletta', geoRegion: 'Central Region', geoCountry: 'Malta', online: true, lastSeen: new Date().toISOString(), isPremium: true, isVerified: true, showOnline: true, showDistance: true, showAge: true, showActivity: true, hidePicsOffline: false, lookingFor: 'relationship', aboutMe: 'Adventurous soul looking for meaningful connections. I love hiking, photography, and trying new cuisines. Always up for a good conversation over coffee or wine.', height: 180, weight: 75, ethnicity: 'white', bodyType: 'athletic', relationshipStatus: 'single', position: 'versatile', pronouns: 'he/him', displayUnits: 'metric', lang: 'en', soundOff: false, notifPushOff: false, notifEmailOff: false, notifTelegramOff: false, mailingInternal: true, mailingPartner: true, profileOff: false, privateAuto: false, noPros: false, noPub: false, isProfessional: false, professionalStatus: 'none', verificationStatus: 'verified', voucher: null, _count: { photos: 12, receivedLikes: 47, receivedViews: 234, shouts: 5, favorites: 18, blogs: 2, videos: 1, sentMessages: 89, receivedMessages: 76, notesWritten: 8 } }); setAuthed(true); }} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium">
             Quick Login as Test User
           </button>
         </CardContent></Card>
@@ -1249,7 +1249,7 @@ export default function NexusApp() {
             <Button variant="outline" onClick={() => setShowCreateCircle(false)} className="border-border">Cancel</Button>
             <Button onClick={async () => {
               if (!circleForm.name.trim()) return;
-              try { const res = await fetch('/api/circles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(circleForm) }); const data = await res.json(); if (data.data) { setCircles(prev => [...prev, data.data]); setShowCreateCircle(false); setCircleForm({ name: '', color: '#6366f1', icon: 'users' }); } } catch {}
+              try { const res = await fetch('/api/circles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(circleForm) }); const data = await res.json(); if (data.data) { setCircles(prev => [...prev, data.data]); setShowCreateCircle(false); setCircleForm({ name: '', color: '#6366f1', icon: 'users' }); } } catch { toast.error('Operation failed'); }
             }} className="bg-primary text-primary-foreground" disabled={!circleForm.name.trim()}>Create</Button>
           </DialogFooter>
         </DialogContent>
@@ -1266,7 +1266,7 @@ export default function NexusApp() {
             <Button variant="outline" onClick={() => setShowAddMember(false)} className="border-border">Cancel</Button>
             <Button onClick={async () => {
               if (!selectedCircle || !addMemberId.trim()) return;
-              try { await fetch(`/api/circles/${selectedCircle.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetUserId: addMemberId.trim() }) }); const res = await fetch(`/api/circles/${selectedCircle.id}`); const data = await res.json(); setCircleMembers(data.members || []); setShowAddMember(false); setAddMemberId(''); } catch {}
+              try { await fetch(`/api/circles/${selectedCircle.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetUserId: addMemberId.trim() }) }); const res = await fetch(`/api/circles/${selectedCircle.id}`); const data = await res.json(); setCircleMembers(data.members || []); setShowAddMember(false); setAddMemberId(''); } catch { toast.error('Operation failed'); }
             }} className="bg-primary text-primary-foreground" disabled={!addMemberId.trim()}>Add</Button>
           </DialogFooter>
         </DialogContent>
@@ -1286,7 +1286,7 @@ export default function NexusApp() {
             <Button variant="outline" onClick={() => setShowSetTravel(false)} className="border-border">Cancel</Button>
             <Button onClick={async () => {
               if (!travelForm.city.trim()) return;
-              try { await fetch('/api/travel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(travelForm) }); const res = await fetch('/api/travel'); const data = await res.json(); setTravelData(data.data || null); setShowSetTravel(false); } catch {}
+              try { await fetch('/api/travel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(travelForm) }); const res = await fetch('/api/travel'); const data = await res.json(); setTravelData(data.data || null); setShowSetTravel(false); } catch { toast.error('Operation failed'); }
             }} className="bg-primary text-primary-foreground" disabled={!travelForm.city.trim()}>Start Traveling</Button>
           </DialogFooter>
         </DialogContent>
@@ -1303,7 +1303,7 @@ export default function NexusApp() {
             <Button variant="outline" onClick={() => setShowCheckin(false)} className="border-border">Cancel</Button>
             <Button onClick={async () => {
               if (!checkinVenue.trim()) return;
-              try { await fetch('/api/checkins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ venueName: checkinVenue.trim(), lat: 35.9, lng: 14.4 }) }); const res = await fetch('/api/checkins'); const data = await res.json(); setCheckins(data.data || []); setShowCheckin(false); setCheckinVenue(''); } catch {}
+              try { await fetch('/api/checkins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ venueName: checkinVenue.trim(), lat: currentUser?.lat || 35.8989, lng: currentUser?.lng || 14.5146 }) }); const res = await fetch('/api/checkins'); const data = await res.json(); setCheckins(data.data || []); setShowCheckin(false); setCheckinVenue(''); } catch { toast.error('Operation failed'); }
             }} className="bg-primary text-primary-foreground" disabled={!checkinVenue.trim()}>Check In</Button>
           </DialogFooter>
         </DialogContent>
@@ -1329,7 +1329,7 @@ export default function NexusApp() {
                 }
                 const res = await fetch('/api/saved-phrases'); const data = await res.json(); setSavedPhrases(data.data || []);
                 setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' });
-              } catch {}
+              } catch { toast.error('Operation failed'); }
             }} className="bg-primary text-primary-foreground" disabled={!phraseForm.title.trim() || !phraseForm.content.trim()}>{editingPhraseId ? 'Save' : 'Create'}</Button>
           </DialogFooter>
         </DialogContent>
@@ -1497,7 +1497,7 @@ export default function NexusApp() {
                   {mode.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                 </button>
               ))}
-              <button onClick={async () => { setAiLoading(true); try { const res = await fetch('/api/chat/ai-analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1' }) }); const data = await res.json(); setAiAnalysis(data); } catch {} setAiLoading(false); }}
+              <button onClick={async () => { setAiLoading(true); try { const res = await fetch('/api/chat/ai-analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: currentUser.id }) }); const data = await res.json(); setAiAnalysis(data); } catch { toast.error('Operation failed'); } setAiLoading(false); }}
                 className="ml-auto px-2.5 py-1 rounded-full text-[10px] font-medium border bg-primary/10 text-primary border-primary/30 shrink-0" disabled={aiLoading}>
                 <Bot className="w-3 h-3 mr-1 inline" />{aiLoading ? 'Analyzing...' : 'AI Analyze All'}
               </button>
@@ -1550,8 +1550,8 @@ export default function NexusApp() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="bg-card border-border w-44">
-                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/mute', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch {} }}><BellOff className="w-4 h-4" /> {convo.isMuted ? 'Unmute' : 'Mute'}</DropdownMenuItem>
-                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/archive', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch {} }}><Archive className="w-4 h-4" /> Archive</DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/mute', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch { toast.error('Operation failed'); } }}><BellOff className="w-4 h-4" /> {convo.isMuted ? 'Unmute' : 'Mute'}</DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/archive', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch { toast.error('Operation failed'); } }}><Archive className="w-4 h-4" /> Archive</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -1890,7 +1890,7 @@ export default function NexusApp() {
     );
   }
 
-  function Play(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>; }
+  function Play(props: React.SVGProps<SVGSVGElement>) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>; }
 
   // ─── BLOGS VIEW ─────────────────────────────────────────────
   function BlogsView() {
@@ -2082,7 +2082,7 @@ export default function NexusApp() {
                 </div>
                 <Button size="sm" variant="outline" className="h-7 text-[10px] border-border" onClick={async () => {
                   if (!currentUser) return;
-                  try { await fetch(`/api/verification?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type }) }); } catch {}
+                  try { await fetch(`/api/verification?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type }) }); } catch { toast.error('Operation failed'); }
                 }}>Submit</Button>
               </div>
             ))}
@@ -2113,7 +2113,7 @@ export default function NexusApp() {
                 <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />10+ profile photos</li>
                 <li className="flex items-center gap-2"><Check className="w-3 h-3 text-primary" />Clean community record</li>
               </ul>
-              <Button className="w-full bg-primary text-primary-foreground text-xs" onClick={() => { fetch('/api/verification', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ userId: 'test-user-1', type: 'professional' }) }).catch(()=>{}); }}>Apply for Professional</Button>
+              <Button className="w-full bg-primary text-primary-foreground text-xs" onClick={() => { fetch('/api/verification', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ userId: currentUser.id, type: 'professional' }) }).catch(()=>{}); }}>Apply for Professional</Button>
             </CardContent>
           </Card>
         </div>
@@ -2206,7 +2206,7 @@ export default function NexusApp() {
                       </div>
                       <Button size="sm" className="h-8 text-[11px] bg-primary text-primary-foreground shrink-0" onClick={async () => {
                         if (!currentUser) return;
-                        try { await fetch(`/api/boosts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: bt.type, duration: bt.duration }) }); } catch {}
+                        try { await fetch(`/api/boosts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: bt.type, duration: bt.duration }) }); } catch { toast.error('Operation failed'); }
                       }}>${bt.price}</Button>
                     </div>
                   </CardContent>
@@ -2260,7 +2260,7 @@ export default function NexusApp() {
                       <button onClick={() => openProfile(fav.target.id)} className="text-[13px] font-semibold hover:text-primary">{fav.target.displayName}</button>
                       <p className="text-[10px] text-muted-foreground">{fav.isSuper ? '⭐ Super Favorite' : 'Favorite'} · {timeAgo(fav.createdAt)}</p>
                     </div>
-                    <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/favorites?userId=${CURRENT_USER_ID}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: fav.targetId }) }); setFavorites(prev => prev.filter((f: any) => f.id !== fav.id)); } catch {} }}>Remove</Button>
+                    <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/favorites?userId=${currentUser?.id}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: fav.targetId }) }); setFavorites(prev => prev.filter((f: any) => f.id !== fav.id)); } catch { toast.error('Operation failed'); } }}>Remove</Button>
                   </div>
                 ))}
             </div>
@@ -2275,7 +2275,7 @@ export default function NexusApp() {
                     <div key={m.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
                       <button onClick={() => openProfile(m.user.id)}><Avatar className="h-11 w-11"><AvatarImage src={getAvatar(m.user)} /><AvatarFallback className="text-xs">{m.user.displayName?.[0]}</AvatarFallback></Avatar></button>
                       <div className="flex-1 min-w-0"><button onClick={() => openProfile(m.user.id)} className="text-[13px] font-semibold hover:text-primary">{m.user.displayName}</button></div>
-                      <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/contact-folders/${selectedFolder.id}?targetUserId=${m.user.id}`, { method: 'DELETE' }); const res = await fetch('/api/contact-folders'); const data = await res.json(); setContactFolders(data.data || []); const updated = (data.data || []).find((f: any) => f.id === selectedFolder.id); setSelectedFolder(updated || null); } catch {} }}>Remove</Button>
+                      <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/contact-folders/${selectedFolder.id}?targetUserId=${m.user.id}`, { method: 'DELETE' }); const res = await fetch('/api/contact-folders'); const data = await res.json(); setContactFolders(data.data || []); const updated = (data.data || []).find((f: any) => f.id === selectedFolder.id); setSelectedFolder(updated || null); } catch { toast.error('Operation failed'); } }}>Remove</Button>
                     </div>
                   ))}
               </div>
@@ -2409,7 +2409,7 @@ export default function NexusApp() {
             <SectionHeader icon={BellOff} label="Do Not Disturb" />
             <div className="flex items-center justify-between">
               <div><p className="text-sm">Enable DND</p><p className="text-[10px] text-muted-foreground">Mute notifications during set hours</p></div>
-              <Switch checked={dndSettings.dndEnabled} onCheckedChange={async (v) => { setDndSettings(p => ({ ...p, dndEnabled: v })); try { await fetch('/api/dnd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dndSettings, dndEnabled: v }) }); } catch {} }} />
+              <Switch checked={dndSettings.dndEnabled} onCheckedChange={async (v) => { setDndSettings(p => ({ ...p, dndEnabled: v })); try { await fetch('/api/dnd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dndSettings, dndEnabled: v }) }); } catch { toast.error('Operation failed'); } }} />
             </div>
             {dndSettings.dndEnabled && (<>
               <div className="flex items-center justify-between"><div><p className="text-sm">Start Time</p></div><Input type="time" value={dndSettings.dndStart} onChange={e => { const v = e.target.value; setDndSettings(p => ({ ...p, dndStart: v })); fetch('/api/dnd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dndSettings, dndStart: v }) }).catch(() => {}); }} className="h-8 w-28 text-xs bg-card border-border" /></div>
@@ -2503,7 +2503,7 @@ export default function NexusApp() {
     const [sites, setSites] = useState<any[]>([]);
     const [sitesLoading, setSitesLoading] = useState(true);
     useEffect(() => {
-      fetch('/api/fansites?userId=test-user-1')
+      fetch(`/api/fansites?userId=${currentUser.id}`)
         .then(r => r.json())
         .then(res => setSites(res.data || []))
         .catch(() => setSites([]))
@@ -2599,7 +2599,7 @@ export default function NexusApp() {
               <Label className="text-xs text-muted-foreground">Description</Label>
               <Textarea value={abuseForm.description} onChange={e => setAbuseForm(p => ({ ...p, description: e.target.value }))} placeholder="Describe the issue..." className="bg-card border-border text-xs" rows={4} />
             </div>
-            <Button className="w-full bg-destructive text-white text-xs" disabled={!abuseForm.userId || !abuseForm.description} onClick={() => { alert('Report submitted. We will review it within 24 hours.'); setAbuseForm({ category: 'harassment', description: '', userId: '' }); }}>Submit Report</Button>
+            <Button className="w-full bg-destructive text-white text-xs" disabled={!abuseForm.userId || !abuseForm.description} onClick={async () => { try { await fetch('/api/reports', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(abuseForm) }); toast.success('Report submitted. We will review it within 24 hours.'); setAbuseForm({ category: 'harassment', description: '', userId: '' }); } catch { toast.error('Failed to submit report.'); } }}>Submit Report</Button>
           </CardContent></Card>
           <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
             <SectionHeader icon={Block} label="Blocked Users" count={blockedUsers.length} />
@@ -2608,7 +2608,7 @@ export default function NexusApp() {
                 <div key={b.id} className="flex items-center gap-3 p-2 rounded-lg">
                   <Avatar className="h-8 w-8"><AvatarImage src={getAvatar(b.blocked)} /><AvatarFallback className="text-[10px]">{(b.blocked as any)?.displayName?.[0]}</AvatarFallback></Avatar>
                   <span className="text-xs flex-1">{(b.blocked as any)?.displayName || 'User'}</span>
-                  <Button size="sm" variant="ghost" className="text-[10px] text-muted-foreground" onClick={async () => { try { await fetch(`/api/blocks?blockedId=${(b.blocked as any)?.id}`, { method: 'DELETE' }); setBlockedUsers(prev => prev.filter((x: any) => x.id !== b.id)); } catch {} }}>Unblock</Button>
+                  <Button size="sm" variant="ghost" className="text-[10px] text-muted-foreground" onClick={async () => { try { await fetch(`/api/blocks?blockedId=${(b.blocked as any)?.id}`, { method: 'DELETE' }); setBlockedUsers(prev => prev.filter((x: any) => x.id !== b.id)); } catch { toast.error('Operation failed'); } }}>Unblock</Button>
                 </div>
               ))}
           </CardContent></Card>
@@ -2666,7 +2666,7 @@ export default function NexusApp() {
   function AffiliationView() {
     const [affiliationStats, setAffiliationStats] = useState({ referrals: 0, converted: 0, earned: 0 });
     useEffect(() => {
-      fetch('/api/subscriptions?userId=test-user-1')
+      fetch(`/api/subscriptions?userId=${currentUser.id}`)
         .then(r => r.json())
         .then(res => {
           const subs = res.data || [];
@@ -2687,8 +2687,8 @@ export default function NexusApp() {
           <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
             <SectionHeader icon={Share2} label="Your Referral Link" />
             <div className="flex items-center gap-2 p-3 rounded-xl bg-card border border-border">
-              <code className="flex-1 text-[11px] text-primary truncate">nexus.app/ref/test-user-1</code>
-              <Button size="sm" variant="outline" className="h-7 text-[10px] border-border shrink-0" onClick={() => navigator.clipboard.writeText('nexus.app/ref/test-user-1')}><Copy className="w-3 h-3 mr-1" /> Copy</Button>
+              <code className="flex-1 text-[11px] text-primary truncate">nexus.app/ref/${currentUser.id}</code>
+              <Button size="sm" variant="outline" className="h-7 text-[10px] border-border shrink-0" onClick={() => navigator.clipboard.writeText(`nexus.app/ref/${currentUser.id}`)}><Copy className="w-3 h-3 mr-1" /> Copy</Button>
             </div>
           </CardContent></Card>
           <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-3">
@@ -2854,7 +2854,7 @@ export default function NexusApp() {
             {/* Quick links */}
             <div className="grid grid-cols-2 gap-2">
               <Button variant="outline" className="border-border text-xs" onClick={() => setShowSettings(true)}><Settings className="w-3.5 h-3.5 mr-1.5" /> Settings</Button>
-              <Button variant="outline" className="border-border text-xs" onClick={() => setActiveTab('preferences')}><Sliders className="w-3.5 h-3.5 mr-1.5" /> Preferences</Button>
+              <Button variant="outline" className="border-border text-xs" onClick={() => setActiveTab('preferences')}><SlidersIcon className="w-3.5 h-3.5 mr-1.5" /> Preferences</Button>
             </div>
             <div className="h-4" />
           </div>
@@ -2867,7 +2867,7 @@ export default function NexusApp() {
     return (<div className="flex justify-between p-2 rounded-lg bg-card/50"><span className="text-muted-foreground text-[11px]">{label}</span><span className="text-[12px] font-medium capitalize">{value}</span></div>);
   }
 
-  function Sliders(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 12H3"/><path d="M15 6H3"/><path d="M21 18H3"/><circle cx="15" cy="6" r="2"/><circle cx="21" cy="12" r="2"/><circle cx="15" cy="18" r="2"/></svg>; }
+  function SlidersIcon(props: React.SVGProps<SVGSVGElement>) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 12H3"/><path d="M15 6H3"/><path d="M21 18H3"/><circle cx="15" cy="6" r="2"/><circle cx="21" cy="12" r="2"/><circle cx="15" cy="18" r="2"/></svg>; }
 
   // ─── INFER VIEW (AI Analysis) ──────────────────────────────
   function InferView() {
@@ -3087,7 +3087,7 @@ export default function NexusApp() {
                   <div key={m.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
                     <button onClick={() => openProfile(m.user.id)}><Avatar className="h-11 w-11"><AvatarImage src={getAvatar(m.user)} /><AvatarFallback className="text-xs">{m.user.displayName?.[0]}</AvatarFallback></Avatar></button>
                     <div className="flex-1 min-w-0"><button onClick={() => openProfile(m.user.id)} className="text-[13px] font-semibold hover:text-primary">{m.user.displayName}</button><p className="text-[10px] text-muted-foreground">Added {timeAgo(m.createdAt)}</p></div>
-                    <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/circles/${selectedCircle.id}?targetUserId=${m.user.id}`, { method: 'DELETE' }); setCircleMembers(prev => prev.filter((x: any) => x.id !== m.id)); } catch {} }}>Remove</Button>
+                    <Button variant="ghost" size="sm" className="h-7 text-[10px] text-destructive" onClick={async () => { try { await fetch(`/api/circles/${selectedCircle.id}?targetUserId=${m.user.id}`, { method: 'DELETE' }); setCircleMembers(prev => prev.filter((x: any) => x.id !== m.id)); } catch { toast.error('Operation failed'); } }}>Remove</Button>
                   </div>
                 ))}
             </div>
@@ -3154,7 +3154,7 @@ export default function NexusApp() {
                 </div>
               </div>
               {travelData.travelStart && <Card className="bg-secondary border-border"><CardContent className="p-3"><SectionHeader icon={Calendar} label="Trip Details" /><div className="text-[12px] text-muted-foreground space-y-1 mt-2"><p>Started: {fmtDate(travelData.travelStart)}</p>{endDate && <p>Ends: {fmtDate(endDate.toISOString())}</p>}</div></CardContent></Card>}
-              <Button variant="outline" className="w-full border-destructive/30 text-destructive hover:bg-destructive/10" onClick={async () => { try { await fetch('/api/travel', { method: 'DELETE' }); setTravelData(null); } catch {} }}>Cancel Travel</Button>
+              <Button variant="outline" className="w-full border-destructive/30 text-destructive hover:bg-destructive/10" onClick={async () => { try { await fetch('/api/travel', { method: 'DELETE' }); setTravelData(null); } catch { toast.error('Operation failed'); } }}>Cancel Travel</Button>
             </>
           ) : (
             <div className="text-center space-y-4 py-8">
@@ -3207,7 +3207,7 @@ export default function NexusApp() {
             <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-3"><WalletIcon className="w-7 h-7 text-primary" /></div>
             <p className="text-xs text-muted-foreground mb-1">Balance</p>
             <p className="text-3xl font-bold gradient-text">{balance} <span className="text-base font-normal text-muted-foreground">coins</span></p>
-            <Button className="mt-4 bg-primary text-primary-foreground text-xs" onClick={async () => { try { await fetch('/api/wallet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: 50, type: 'topup', description: 'Top up 50 coins' }) }); const res = await fetch('/api/wallet'); const data = await res.json(); setWalletData(data.data); setTransactions(data.data?.transactions || []); } catch {} }}><Plus className="w-3.5 h-3.5 mr-1" /> Top Up</Button>
+            <Button className="mt-4 bg-primary text-primary-foreground text-xs" onClick={async () => { try { await fetch('/api/wallet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: 50, type: 'topup', description: 'Top up 50 coins' }) }); const res = await fetch('/api/wallet'); const data = await res.json(); setWalletData(data.data); setTransactions(data.data?.transactions || []); } catch { toast.error('Operation failed'); } }}><Plus className="w-3.5 h-3.5 mr-1" /> Top Up</Button>
           </div>
           <div className="space-y-4">
             <SectionHeader icon={Clock3} label="Transactions" count={transactions.length} />
@@ -3251,7 +3251,7 @@ export default function NexusApp() {
                       <p className="text-[12px] font-semibold">{phrase.title}</p>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" onClick={() => { setEditingPhraseId(phrase.id); setPhraseForm({ title: phrase.title, content: phrase.content }); setShowPhraseDialog(true); }}><Pencil className="w-3 h-3" /></Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={async () => { try { await fetch(`/api/saved-phrases/${phrase.id}`, { method: 'DELETE' }); setSavedPhrases(prev => prev.filter((p: any) => p.id !== phrase.id)); } catch {} }}><X className="w-3 h-3" /></Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={async () => { try { await fetch(`/api/saved-phrases/${phrase.id}`, { method: 'DELETE' }); setSavedPhrases(prev => prev.filter((p: any) => p.id !== phrase.id)); } catch { toast.error('Operation failed'); } }}><X className="w-3 h-3" /></Button>
                       </div>
                     </div>
                     <p className="text-[12px] text-muted-foreground">{phrase.content}</p>
@@ -3286,7 +3286,7 @@ export default function NexusApp() {
                 <img src={selectedLikedPhoto.photo?.url || selectedLikedPhoto.url} alt="" className="w-full rounded-xl max-h-[60vh] object-contain" />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">{selectedLikedPhoto.photo?.user && <button onClick={() => openProfile(selectedLikedPhoto.photo.user.id)} className="text-[12px] font-semibold hover:text-primary">{selectedLikedPhoto.photo.user.displayName}</button>}</div>
-                  <Button variant="outline" className="border-border text-destructive hover:bg-destructive/10 text-xs" onClick={async () => { try { await fetch(`/api/liked-photos?photoId=${selectedLikedPhoto.photoId}`, { method: 'DELETE' }); setLikedPhotos(prev => prev.filter((p: any) => p.id !== selectedLikedPhoto.id)); setSelectedLikedPhoto(null); } catch {} }}><HeartOff className="w-3.5 h-3.5 mr-1" /> Unlike</Button>
+                  <Button variant="outline" className="border-border text-destructive hover:bg-destructive/10 text-xs" onClick={async () => { try { await fetch(`/api/liked-photos?photoId=${selectedLikedPhoto.photoId}`, { method: 'DELETE' }); setLikedPhotos(prev => prev.filter((p: any) => p.id !== selectedLikedPhoto.id)); setSelectedLikedPhoto(null); } catch { toast.error('Operation failed'); } }}><HeartOff className="w-3.5 h-3.5 mr-1" /> Unlike</Button>
                 </div>
               </div>
             )}
@@ -3305,12 +3305,12 @@ export default function NexusApp() {
       if (idx >= 0) arr.splice(idx, 1); else arr.push(value);
       const updated = { ...kinkFields, [key]: arr.join(',') };
       setKinkFields(updated);
-      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1', fields: updated }) }).catch(() => {});
+      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: currentUser.id, fields: updated }) }).catch(() => {});
     };
     const setSingleField = (key: string, value: string) => {
       const updated = { ...kinkFields, [key]: value };
       setKinkFields(updated);
-      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1', fields: updated }) }).catch(() => {});
+      fetch('/api/profile-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: currentUser.id, fields: updated }) }).catch(() => {});
     };
     const ChipField = ({ label, key, options }: { label: string; key: string; options: readonly string[] }) => {
       const current = (kinkFields[key] || '').split(',').filter(Boolean);
@@ -3452,7 +3452,7 @@ export default function NexusApp() {
             {blockedUsers.length > 0 ? blockedUsers.map((b: any) => (
               <div key={b.id} className="flex items-center gap-3 p-2 rounded-lg"><Avatar className="h-8 w-8"><AvatarImage src={getAvatar(b.blocked)} /><AvatarFallback className="text-[10px]">{(b.blocked as any)?.displayName?.[0]}</AvatarFallback></Avatar>
                 <span className="text-sm flex-1">{(b.blocked as any)?.displayName || 'User'}</span>
-                <Button size="sm" variant="ghost" className="text-xs text-destructive" onClick={async () => { try { await fetch(`/api/blocks?blockedId=${(b.blocked as any)?.id}`, { method: 'DELETE' }); setBlockedUsers(prev => prev.filter((x: any) => x.id !== b.id)); } catch {} }}>Unblock</Button></div>
+                <Button size="sm" variant="ghost" className="text-xs text-destructive" onClick={async () => { try { await fetch(`/api/blocks?blockedId=${(b.blocked as any)?.id}`, { method: 'DELETE' }); setBlockedUsers(prev => prev.filter((x: any) => x.id !== b.id)); } catch { toast.error('Operation failed'); } }}>Unblock</Button></div>
             )) : <p className="text-xs text-muted-foreground">No blocked users</p>}
           </CardContent></Card>
           <Card className="bg-secondary border-border"><CardContent className="p-4 space-y-2">

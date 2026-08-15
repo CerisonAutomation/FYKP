@@ -18,8 +18,10 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number): numb
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const pageStr = searchParams.get('page') || '1';
+    const limitStr = searchParams.get('limit') || '20';
+    const page = Math.max(1, parseInt(pageStr) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(limitStr) || 20));
     const search = searchParams.get('search') || '';
     const lookingFor = searchParams.get('lookingFor') || '';
     const minAge = parseInt(searchParams.get('minAge') || '0');

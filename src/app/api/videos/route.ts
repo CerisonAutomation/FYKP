@@ -16,7 +16,11 @@ export async function GET(request: NextRequest) {
     const [videos, total] = await Promise.all([
       db.video.findMany({
         where,
-        include: { user: true },
+        include: {
+          user: {
+            select: { id: true, username: true, displayName: true, avatar: true, age: true, gender: true, location: true, isVerified: true, isPremium: true, online: true, lastSeen: true },
+          },
+        },
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
@@ -70,7 +74,11 @@ export async function POST(request: NextRequest) {
         userId,
         isPrivate: isPrivate ?? false,
       },
-      include: { user: true },
+      include: {
+        user: {
+          select: { id: true, username: true, displayName: true, avatar: true, age: true, gender: true, location: true, isVerified: true, isPremium: true, online: true, lastSeen: true },
+        },
+      },
     });
 
     return NextResponse.json(video, { status: 201 });

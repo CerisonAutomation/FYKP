@@ -20,7 +20,11 @@ export async function GET(request: NextRequest) {
     const [blogs, total] = await Promise.all([
       db.blog.findMany({
         where: { isPublished: true },
-        include: { user: true },
+        include: {
+          user: {
+            select: { id: true, username: true, displayName: true, avatar: true, age: true, gender: true, location: true, isVerified: true, isPremium: true, online: true, lastSeen: true },
+          },
+        },
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
@@ -76,7 +80,11 @@ export async function POST(request: NextRequest) {
         userId,
         isPublished: isPublished ?? true,
       },
-      include: { user: true },
+      include: {
+        user: {
+          select: { id: true, username: true, displayName: true, avatar: true, age: true, gender: true, location: true, isVerified: true, isPremium: true, online: true, lastSeen: true },
+        },
+      },
     });
 
     return NextResponse.json(blog, { status: 201 });

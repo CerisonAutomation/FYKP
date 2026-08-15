@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Fetch all messages between the two users
+    // Fetch last 1000 messages between the two users (limit to prevent OOM)
     const messages = await db.message.findMany({
       where: {
         OR: [
@@ -33,11 +33,15 @@ export async function GET(request: NextRequest) {
         isDeleted: false,
         chatType: 'direct',
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
+      take: 1000,
       include: {
         sender: { select: { displayName: true, username: true } },
       },
     });
+
+    // Reverse to get chronological order for export
+    messages.reverse();
 
     // Build text export
     const lines: string[] = [];

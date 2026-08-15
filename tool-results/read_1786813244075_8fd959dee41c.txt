@@ -1,0 +1,502 @@
+     1→   501→   501→      }
+     2→   502→   502→
+     3→   503→   503→      // console.log in production (not tests, not scanner code)
+     4→   504→   504→      if (!isTest && /console\.(log|debug|info)\s*\(/.test(l) && !/^\s*\/\//.test(l)) {
+     5→   505→   505→        findings.push(createFinding("low", f.rel, i + 1, "console.log/debug/info in production code", "logging", "quality", true));
+     6→   506→   506→        break; // One per file
+     7→   507→   507→      }
+     8→   508→   508→
+     9→   509→   509→      // TypeScript suppression
+    10→   510→   510→      if (/@ts-ignore|@ts-expect-error|@ts-nocheck/.test(l)) {
+    11→   511→   511→        findings.push(createFinding("medium", f.rel, i + 1, "TypeScript suppression directive — hides type errors", "type-safety", "quality", false));
+    12→   512→   512→      }
+    13→   513→   513→
+    14→   514→   514→      // ESLint disable
+    15→   515→   515→      if (/eslint-disable(?!\s*-next-line)/.test(l)) {
+    16→   516→   516→        findings.push(createFinding("low", f.rel, i + 1, "ESLint disable (broad suppression)", "linting", "quality", true));
+    17→   517→   517→      }
+    18→   518→   518→
+    19→   519→   519→      // TODO/FIXME/HACK
+    20→   520→   520→      const todoMatch = l.match(/\/\/\s*(TODO|FIXME|HACK|XXX|TEMP)\b/i);
+    21→   521→   521→      if (todoMatch) {
+    22→   522→   522→        findings.push(createFinding("low", f.rel, i + 1, `Unresolved ${todoMatch[1]} comment — technical debt`, "debt", "quality", false));
+    23→   523→   523→      }
+    24→   524→   524→
+    25→   525→   525→      // Magic numbers (heuristic: >4 digits, not in constants/imports)
+    26→   526→   526→      if (!/^\s*\/\//.test(l) && /\b\d{5,}\b/.test(l) && !/const|let|var|import|require|version|port|timeout|limit|copyright|20\d{2}/i.test(l)) {
+    27→   527→   527→        findings.push(createFinding("low", f.rel, i + 1, "Magic number — extract to named constant", "magic-numbers", "quality", true));
+    28→   528→   528→      }
+    29→   529→   529→    }
+    30→   530→   530→
+    31→   531→   531→    // File-level checks
+    32→   532→   532→    if (f.lines.length > 500) {
+    33→   533→   533→      findings.push(createFinding("medium", f.rel, undefined, `Large file (${f.lines.length} lines) — consider splitting`, "modularity", "quality", false));
+    34→   534→   534→    }
+    35→   535→   535→    if (f.size > 50000) {
+    36→   536→   536→      findings.push(createFinding("medium", f.rel, undefined, `Oversized file (${(f.size / 1024).toFixed(0)}KB) — consider splitting`, "modularity", "quality", false));
+    37→   537→   537→    }
+    38→   538→   538→  }
+    39→   539→   539→
+    40→   540→   540→  cb.recordSuccess();
+    41→   541→   541→  logger.info("scanQuality", `Found ${findings.length} quality issues across ${files.length} files`);
+    42→   542→   542→  return findings;
+    43→   543→   543→}
+    44→   544→   544→
+    45→   545→   545→function scanArchitecture(root: string): readonly Finding[] {
+    46→   546→   546→  const cb = getCircuitBreaker("scanArchitecture");
+    47→   547→   547→  if (!cb.canExecute()) { logger.warn("scanArchitecture", "Circuit breaker open"); return []; }
+    48→   548→   548→
+    49→   549→   549→  const findings: Finding[] = [];
+    50→   550→   550→
+    51→   551→   551→  // Deep nesting detection
+    52→   552→   552→  let deepDirs = 0;
+    53→   553→   553→  function checkDepth(dir: string, d: number): void {
+    54→   554→   554→    if (d > 7) { deepDirs++; return; }
+    55→   555→   555→    let entries: string[];
+    56→   556→   556→    try { entries = readdirSync(dir); } catch { return; }
+    57→   557→   557→    for (const entry of entries) {
+    58→   558→   558→      if (EXCLUDE.has(entry) || entry.startsWith(".")) continue;
+    59→   559→   559→      const fp = join(dir, entry);
+    60→   560→   560→      try { if (statSync(fp).isDirectory()) checkDepth(fp, d + 1); } catch {}
+    61→   561→   561→    }
+    62→   562→   562→  }
+    63→   563→   563→  checkDepth(root, 0);
+    64→   564→   564→  if (deepDirs > 0) {
+    65→   565→   565→    findings.push(createFinding("medium", "(directory structure)", undefined, `${deepDirs} directories deeper than 7 levels — consider flattening`, "nesting", "architecture", false));
+    66→   566→   566→  }
+    67→   567→   567→
+    68→   568→   568→  cb.recordSuccess();
+    69→   569→   569→  return findings;
+    70→   570→   570→}
+    71→   571→   571→
+    72→   572→   572→function scanMemoryLeaks(root: string, maxFiles: number = 300): readonly Finding[] {
+    73→   573→   573→  const cb = getCircuitBreaker("scanMemoryLeaks");
+    74→   574→   574→  if (!cb.canExecute()) { logger.warn("scanMemoryLeaks", "Circuit breaker open"); return []; }
+    75→   575→   575→
+    76→   576→   576→  const findings: Finding[] = [];
+    77→   577→   577→  const files = walk(root, /\.(ts|tsx|js|jsx)$/, maxFiles);
+    78→   578→   578→
+    79→   579→   579→  for (const f of files) {
+    80→   580→   580→    if (isScannerCode(f.rel)) continue;
+    81→   581→   581→
+    82→   582→   582→    for (let i = 0; i < f.lines.length; i++) {
+    83→   583→   583→      const l = f.lines[i];
+    84→   584→   584→
+    85→   585→   585→      // addEventListener without removeEventListener
+    86→   586→   586→      if (/\.addEventListener\s*\(/.test(l)) {
+    87→   587→   587→        const hasRemove = f.lines.some((x, j) => j !== i && /\.removeEventListener\s*\(/.test(x));
+    88→   588→   588→        if (!hasRemove) {
+    89→   589→   589→          findings.push(createFinding("high", f.rel, i + 1, "addEventListener without matching removeEventListener", "memory-leak", "memory", true));
+    90→   590→   590→        }
+    91→   591→   591→      }
+    92→   592→   592→
+    93→   593→   593→      // useEffect without cleanup return
+    94→   594→   594→      if (/useEffect\s*\(/.test(l)) {
+    95→   595→   595→        let depth = 0;
+    96→   596→   596→        let hasReturn = false;
+    97→   597→   597→        for (let j = i; j < Math.min(i + 60, f.lines.length); j++) {
+    98→   598→   598→          depth += (f.lines[j].match(/{/g) || []).length;
+    99→   599→   599→          depth -= (f.lines[j].match(/}/g) || []).length;
+   100→   600→   600→          if (/return\s*(?:\(|function|\()/m.test(f.lines[j])) hasReturn = true;
+   101→   601→   601→          if (depth <= 0 && j > i) break;
+   102→   602→   602→        }
+   103→   603→   603→        if (!hasReturn) {
+   104→   604→   604→          findings.push(createFinding("high", f.rel, i + 1, "useEffect without cleanup return — subscriptions/timers may leak", "memory-leak", "memory", true));
+   105→   605→   605→        }
+   106→   606→   606→      }
+   107→   607→   607→    }
+   108→   608→   608→  }
+   109→   609→   609→
+   110→   610→   610→  cb.recordSuccess();
+   111→   611→   611→  return findings;
+   112→   612→   612→}
+   113→   613→   613→
+   114→   614→   614→function scanCleanup(root: string, maxFiles: number = 300): readonly Finding[] {
+   115→   615→   615→  const cb = getCircuitBreaker("scanCleanup");
+   116→   616→   616→  if (!cb.canExecute()) { logger.warn("scanCleanup", "Circuit breaker open"); return []; }
+   117→   617→   617→
+   118→   618→   618→  const findings: Finding[] = [];
+   119→   619→   619→  const files = walk(root, /\.(ts|tsx|js|jsx|json|md|yaml|yml|css|html)$/, maxFiles);
+   120→   620→   620→
+   121→   621→   621→  for (const f of files) {
+   122→   622→   622→    if (f.content.includes("@generated") || f.content.includes("AUTO GENERATED") || f.content.includes("do not edit")) {
+   123→   623→   623→      findings.push(createFinding("medium", f.rel, undefined, "Auto-generated file in source tree", "cleanup", "cleanup", true));
+   124→   624→   624→    }
+   125→   625→   625→    if (f.content.trim().length === 0 || f.content.trim().match(/^(\/\/|#|\/\*|\*\/?\s*)*$/)) {
+   126→   626→   626→      findings.push(createFinding("low", f.rel, undefined, "Empty or comment-only file", "cleanup", "cleanup", true));
+   127→   627→   627→    }
+   128→   628→   628→    if (f.rel.match(/\.(bak|backup|old|orig|save|tmp)$/) && statSync(f.path).mtimeMs < Date.now() - 30 * 86400000) {
+   129→   629→   629→      findings.push(createFinding("low", f.rel, undefined, "Stale backup file (>30 days old)", "cleanup", "cleanup", true));
+   130→   630→   630→    }
+   131→   631→   631→    const todoCount = (f.content.match(/(?:TODO|FIXME|HACK|XXX)/gi) || []).length;
+   132→   632→   632→    if (todoCount > 5) {
+   133→   633→   633→      findings.push(createFinding("medium", f.rel, undefined, `${todoCount} TODO/FIXME comments — accumulated tech debt`, "debt", "cleanup", false));
+   134→   634→   634→    }
+   135→   635→   635→  }
+   136→   636→   636→
+   137→   637→   637→  cb.recordSuccess();
+   138→   638→   638→  return findings;
+   139→   639→   639→}
+   140→   640→   640→
+   141→   641→   641→function scanGaps(root: string): readonly Finding[] {
+   142→   642→   642→  const findings: Finding[] = [];
+   143→   643→   643→
+   144→   644→   644→  if (!existsSync(join(root, "tsconfig.json"))) findings.push(createFinding("medium", "tsconfig.json", undefined, "No TypeScript configuration", "gap", "gap", true));
+   145→   645→   645→  if (!existsSync(join(root, ".eslintrc.js")) && !existsSync(join(root, "eslint.config.js"))) findings.push(createFinding("medium", ".eslintrc", undefined, "No linter configured", "gap", "gap", true));
+   146→   646→   646→  if (!existsSync(join(root, ".github/workflows"))) findings.push(createFinding("high", ".github/workflows", undefined, "No CI/CD pipeline", "gap", "gap", false));
+   147→   647→   647→  if (!existsSync(join(root, "README.md"))) findings.push(createFinding("high", "README.md", undefined, "No README documentation", "gap", "gap", true));
+   148→   648→   648→  if (!existsSync(join(root, ".gitignore"))) findings.push(createFinding("high", ".gitignore", undefined, "No .gitignore", "gap", "gap", true));
+   149→   649→   649→  if (existsSync(join(root, "package.json"))) {
+   150→   650→   650→    try {
+   151→   651→   651→      const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf-8"));
+   152→   652→   652→      if (!pkg.scripts?.test) findings.push(createFinding("medium", "package.json", undefined, "No test script configured", "gap", "gap", false));
+   153→   653→   653→      if (!pkg.scripts?.lint) findings.push(createFinding("low", "package.json", undefined, "No lint script configured", "gap", "gap", false));
+   154→   654→   654→    } catch { /* JSON parse error — skip */ }
+   155→   655→   655→  }
+   156→   656→   656→
+   157→   657→   657→  return findings;
+   158→   658→   658→}
+   159→   659→   659→
+   160→   660→   660→function scanTesting(root: string): TestResult {
+   161→   661→   661→  const findings: Finding[] = [];
+   162→   662→   662→  const testFiles = walk(root, /\.(test|spec)\.(ts|tsx|js|jsx)$/, 500);
+   163→   663→   663→  const sourceFiles = walk(root, /\.(ts|tsx|js|jsx)$/, 2000).filter(f => ! /\.(test|spec)\./.test(f.rel));
+   164→   664→   664→  const ratio = sourceFiles.length > 0 ? testFiles.length / sourceFiles.length : 0;
+   165→   665→   665→
+   166→   666→   666→  for (const tf of testFiles) {
+   167→   667→   667→    const hasAssert = tf.lines.some(l => /(?:expect|assert|should|\.toBe|\.toEqual|\.toMatch|\.toThrow|\.toHaveBeenCalled|\.resolves|\.rejects)/.test(l));
+   168→   668→   668→    if (!hasAssert && tf.lines.length > 10) {
+   169→   669→   669→      findings.push(createFinding("high", tf.rel, undefined, "Test file has no assertions — passes by not throwing", "test-quality", "testing", false));
+   170→   670→   670→    }
+   171→   671→   671→  }
+   172→   672→   672→
+   173→   673→   673→  for (const tf of testFiles) {
+   174→   674→   674→    for (const l of tf.lines) {
+   175→   675→   675→      if (/\b(xit|xtest|\.skip|pending|@ignore|@Disabled|\.only)\b/.test(l)) {
+   176→   676→   676→        findings.push(createFinding("medium", tf.rel, undefined, "Test is disabled/skipped/only", "test-coverage", "testing", false));
+   177→   677→   677→        break;
+   178→   678→   678→      }
+   179→   679→   679→    }
+   180→   680→   680→  }
+   181→   681→   681→
+   182→   682→   682→  return { testFiles: testFiles.length, sourceFiles: sourceFiles.length, ratio, findings };
+   183→   683→   683→}
+   184→   684→   684→
+   185→   685→   685→// ═══════════════════════════════════════════════════════════════════════════════
+   186→   686→   686→// SECTION 8: VERIFICATION ENGINE
+   187→   687→   687→// ═══════════════════════════════════════════════════════════════════════════════
+   188→   688→   688→
+   189→   689→   689→function verifyAll(root: string): VerifyResult {
+   190→   690→   690→  const checks: VerifyCheck[] = [];
+   191→   691→   691→  let scripts: Record<string, string> = {};
+   192→   692→   692→  if (existsSync(join(root, "package.json"))) {
+   193→   693→   693→    try { scripts = JSON.parse(readFileSync(join(root, "package.json"), "utf-8")).scripts || {}; } catch {}
+   194→   694→   694→  }
+   195→   695→   695→
+   196→   696→   696→  if (scripts.build) checks.push(safeExec(root, "build", "npm run build 2>&1 | tail -5"));
+   197→   697→   697→  else if (existsSync(join(root, "tsconfig.json"))) checks.push(safeExec(root, "typecheck", "npx tsc --noEmit 2>&1 | head -10"));
+   198→   698→   698→  else checks.push({ name: "build", status: "skip", output: "No build script or tsconfig" });
+   199→   699→   699→
+   200→   700→   700→  if (scripts.lint) checks.push(safeExec(root, "lint", "npm run lint 2>&1 | head -5"));
+   201→   701→   701→  else checks.push({ name: "lint", status: "skip", output: "No lint script" });
+   202→   702→   702→
+   203→   703→   703→  if (scripts.test) checks.push(safeExec(root, "test", "npm test 2>&1 | tail -5"));
+   204→   704→   704→  else checks.push({ name: "test", status: "skip", output: "No test script" });
+   205→   705→   705→
+   206→   706→   706→  checks.push(safeExec(root, "secrets", 'grep -rn "sk-\\|api_key\\|password=" --include="*.ts" --include="*.js" . 2>/dev/null | grep -v node_modules | head -5'));
+   207→   707→   707→
+   208→   708→   708→  const passed = checks.filter(c => c.status === "pass").length;
+   209→   709→   709→  const failed = checks.filter(c => c.status === "fail").length;
+   210→   710→   710→  return { overall: failed === 0 ? "pass" : "fail", checks, summary: `${passed} passed, ${failed} failed` };
+   211→   711→   711→}
+   212→   712→   712→
+   213→   713→   713→// ═══════════════════════════════════════════════════════════════════════════════
+   214→   714→   714→// SECTION 9: QUANTUM SCORING (Mathematically Sound)
+   215→   715→   715→// ═══════════════════════════════════════════════════════════════════════════════
+   216→   716→   716→
+   217→   717→   717→function quantumScore(findings: readonly Finding[], testResult: TestResult, root: string): QuantumResult {
+   218→   718→   718→  const sec = findings.filter(f => f.message.match(/secret|eval|innerHTML|SQL|injection|shell|traversal|crypto|tls|prototype/));
+   219→   719→   719→  const qual = findings.filter(f => f.message.match(/catch|console|suppress|eslint|TODO|magic|modularity|oversized/));
+   220→   720→   720→  const mem = findings.filter(f => f.message.match(/addEventListener|useEffect|cleanup|memory/));
+   221→   721→   721→
+   222→   722→   722→  const secCritical = sec.filter(f => f.severity === "critical").length;
+   223→   723→   723→  const secHigh = sec.filter(f => f.severity === "high").length;
+   224→   724→   724→  const qualEmpty = qual.filter(f => f.message.includes("catch")).length;
+   225→   725→   725→
+   226→   726→   726→  // Mathematically sound weighting: weights sum to 1.0
+   227→   727→   727→  const dimensions: DimensionScore[] = [
+   228→   728→   728→    { name: "Security", score: Math.max(0, 100 - secCritical * 25 - secHigh * 10 - sec.length * 2), weight: 0.20 },
+   229→   729→   729→    { name: "Quality", score: Math.max(0, 100 - qualEmpty * 10 - qual.length), weight: 0.15 },
+   230→   730→   730→    { name: "Testing", score: Math.min(100, Math.round(testResult.ratio * 500)), weight: 0.15 },
+   231→   731→   731→    { name: "Architecture", score: Math.max(0, 100 - findings.filter(f => f.category === "nesting" || f.category === "modularity").length * 5), weight: 0.10 },
+   232→   732→   732→    { name: "Performance", score: 85, weight: 0.10 },
+   233→   733→   733→    { name: "Reliability", score: Math.max(0, 100 - qualEmpty * 8 - mem.length * 5), weight: 0.10 },
+   234→   734→   734→    { name: "Maintainability", score: Math.max(0, 100 - qual.filter(f => f.category === "modularity" || f.category === "magic-numbers" || f.category === "debt").length * 3), weight: 0.05 },
+   235→   735→   735→    { name: "Memory", score: Math.max(0, 100 - mem.length * 10), weight: 0.05 },
+   236→   736→   736→    { name: "Documentation", score: existsSync(join(root, "README.md")) ? 85 : 40, weight: 0.03 },
+   237→   737→   737→    { name: "Deployability", score: existsSync(join(root, ".github/workflows")) ? 90 : (existsSync(join(root, "package.json")) ? 60 : 30), weight: 0.02 },
+   238→   738→   738→  ];
+   239→   739→   739→
+   240→   740→   740→  // Verify weights sum to 1.0
+   241→   741→   741→  const weightSum = dimensions.reduce((s, d) => s + d.weight, 0);
+   242→   742→   742→  if (Math.abs(weightSum - 1.0) > 0.001) {
+   243→   743→   743→    logger.warn("quantumScore", `Weights sum to ${weightSum}, expected 1.0 — normalizing`);
+   244→   744→   744→    dimensions.forEach(d => { d.weight = d.weight / weightSum; });
+   245→   745→   745→  }
+   246→   746→   746→
+   247→   747→   747→  // Weighted average with 1.5x multiplier for "exceeding expectations"
+   248→   748→   748→  const raw = dimensions.reduce((s, d) => s + d.score * d.weight, 0);
+   249→   749→   749→  const quantum = Math.round(raw * 1.5);
+   250→   750→   750→
+   251→   751→   751→  let grade: Grade;
+   252→   752→   752→  if (quantum >= 150) grade = "S";
+   253→   753→   753→  else if (quantum >= 120) grade = "A";
+   254→   754→   754→  else if (quantum >= 90) grade = "B";
+   255→   755→   755→  else if (quantum >= 70) grade = "C";
+   256→   756→   756→  else if (quantum >= 50) grade = "D";
+   257→   757→   757→  else grade = "F";
+   258→   758→   758→
+   259→   759→   759→  return { quantumScore: quantum, grade, dimensions, totalIssues: findings.length };
+   260→   760→   760→}
+   261→   761→   761→
+   262→   762→   762→// ═══════════════════════════════════════════════════════════════════════════════
+   263→   763→   763→// SECTION 10: SWARM ANALYSIS
+   264→   764→   764→// ═══════════════════════════════════════════════════════════════════════════════
+   265→   765→   765→
+   266→   766→   766→function swarmAnalysis(root: string): SwarmResult {
+   267→   767→   767→  const sec = scanSecurity(root, 300);
+   268→   768→   768→  const qual = scanQuality(root, 300);
+   269→   769→   769→  const arch = scanArchitecture(root);
+   270→   770→   770→  const mem = scanMemoryLeaks(root, 200);
+   271→   771→   771→  const clean = scanCleanup(root, 200);
+   272→   772→   772→  const gaps = scanGaps(root);
+   273→   773→   773→  const test = scanTesting(root);
+   274→   774→   774→
+   275→   775→   775→  const all = [...sec, ...qual, ...arch, ...mem, ...clean, ...gaps, ...test.findings];
+   276→   776→   776→  const { validated, falsePositives, confidence } = critiqueFindings(all);
+   277→   777→   777→
+   278→   778→   778→  const byAgent: Record<string, number> = {};
+   279→   779→   779→  const bySeverity: Record<string, number> = {};
+   280→   780→   780→  for (const f of validated) {
+   281→   781→   781→    byAgent[f.agent] = (byAgent[f.agent] ?? 0) + 1;
+   282→   782→   782→    bySeverity[f.severity] = (bySeverity[f.severity] ?? 0) + 1;
+   283→   783→   783→  }
+   284→   784→   784→
+   285→   785→   785→  // Cross-agent correlations
+   286→   786→   786→  const correlations: string[] = [];
+   287→   787→   787→  const secFiles = new Set(sec.map(f => f.file));
+   288→   788→   788→  const memFiles = new Set(mem.map(f => f.file));
+   289→   789→   789→  const overlap = [...secFiles].filter(f => memFiles.has(f));
+   290→   790→   790→  if (overlap.length > 0) correlations.push(`${overlap.length} files have both security and memory issues`);
+   291→   791→   791→
+   292→   792→   792→  return { findings: validated, falsePositives, confidence, byAgent, bySeverity, correlations, testResult: test };
+   293→   793→   793→}
+   294→   794→   794→
+   295→   795→   795→// ═══════════════════════════════════════════════════════════════════════════════
+   296→   796→   796→// SECTION 11: DYNAMIC PERSONA
+   297→   797→   797→// ═══════════════════════════════════════════════════════════════════════════════
+   298→   798→   798→
+   299→   799→   799→function dynamicPersona(findings: readonly Finding[], scores: Record<string, number>): { recommended: string; weakest: { dimension: string; score: number }; strongest: { dimension: string; score: number }; rationale: string } {
+   300→   800→   800→  const dims = Object.entries(scores).sort((a, b) => a[1] - b[1]);
+   301→   801→   801→  const weakest = dims[0]; const strongest = dims[dims.length - 1];
+   302→   802→   802→  const personaMap: Record<string, string> = { security: "Security Engineer", quality: "Senior Developer", testing: "QA Lead", architecture: "CTO", reliability: "SRE", maintainability: "Senior Developer", memory: "SRE", documentation: "Product Manager", deployability: "SRE" };
+   303→   803→   803→  const recommended = personaMap[weakest[0]] || "Senior Developer";
+   304→   804→   804→  return { recommended, weakest: { dimension: weakest[0], score: weakest[1] }, strongest: { dimension: strongest[0], score: strongest[1] }, rationale: `Weakest area: ${weakest[0]} (${weakest[1]}/100). ${recommended} persona focuses on this area.` };
+   305→   805→   805→}
+   306→   806→   806→
+   307→   807→   807→// ═══════════════════════════════════════════════════════════════════════════════
+   308→   808→   808→// SECTION 12: AUTO-DIAGNOSE LOOP
+   309→   809→   809→// ═══════════════════════════════════════════════════════════════════════════════
+   310→   810→   810→
+   311→   811→   811→function autoDiagnose(root: string, targetScore: number = 85, maxIter: number = 10): { history: readonly { iteration: number; score: number; grade: Grade; fixes: number; findings: number; confidence: number }[]; totalFixes: number; finalScore: number } {
+   312→   812→   812→  const history: Array<{ iteration: number; score: number; grade: Grade; fixes: number; findings: number; confidence: number }> = [];
+   313→   813→   813→  let totalFixes = 0;
+   314→   814→   814→
+   315→   815→   815→  for (let iter = 1; iter <= maxIter; iter++) {
+   316→   816→   816→    const swarm = swarmAnalysis(root);
+   317→   817→   817→    const test = scanTesting(root);
+   318→   818→   818→    const quantum = quantumScore(swarm.findings, test, root);
+   319→   819→   819→    const prevScore = history.length > 0 ? history[history.length - 1].score : 0;
+   320→   820→   820→
+   321→   821→   821→    // Auto-fix safe issues
+   322→   822→   822→    let fixes = 0;
+   323→   823→   823→    for (const issue of swarm.findings.filter(f => f.fixable)) {
+   324→   824→   824→      try {
+   325→   825→   825→        const fp = join(root, issue.file);
+   326→   826→   826→        if (!existsSync(fp)) continue;
+   327→   827→   827→        const content = readFileSync(fp, "utf-8");
+   328→   828→   828→        const lines = content.split("\n");
+   329→   829→   829→
+   330→   830→   830→        if (issue.line && issue.line <= lines.length) {
+   331→   831→   831→          const line = lines[issue.line - 1];
+   332→   832→   832→          let fixed = false;
+   333→   833→   833→
+   334→   834→   834→          if (issue.message.includes("console.log")) {
+   335→   835→   835→            lines[issue.line - 1] = line.replace(/console\.(log|debug)\s*\(/, "console.warn(");
+   336→   836→   836→            fixed = true;
+   337→   837→   837→          } else if (issue.message.includes("Empty catch")) {
+   338→   838→   838→            const indent = line.match(/^(\s*)/)?.[1] || "";
+   339→   839→   839→            lines.splice(issue.line, 0, `${indent}  console.error("Error:", err);`);
+   340→   840→   840→            fixed = true;
+   341→   841→   841→          } else if (issue.message.includes("innerHTML")) {
+   342→   842→   842→            lines[issue.line - 1] = line.replace(/\.innerHTML\s*=/, ".textContent =");
+   343→   843→   843→            fixed = true;
+   344→   844→   844→          }
+   345→   845→   845→
+   346→   846→   846→          if (fixed) { writeFileSync(fp, lines.join("\n")); fixes++; }
+   347→   847→   847→        }
+   348→   848→   848→      } catch { /* Fix failed — continue */ }
+   349→   849→   849→    }
+   350→   850→   850→    totalFixes += fixes;
+   351→   851→   851→
+   352→   852→   852→    history.push({ iteration: iter, score: quantum.quantumScore, grade: quantum.grade, fixes, findings: swarm.findings.length, confidence: swarm.confidence });
+   353→   853→   853→
+   354→   854→   854→    if (quantum.quantumScore >= targetScore) break;
+   355→   855→   855→    if (iter > 2 && history.slice(-3).every(h => h.score === history.slice(-3)[0].score)) break;
+   356→   856→   856→  }
+   357→   857→   857→
+   358→   858→   858→  return { history, totalFixes, finalScore: history.length > 0 ? history[history.length - 1].score : 0 };
+   359→   859→   859→}
+   360→   860→   860→
+   361→   861→   861→// ═══════════════════════════════════════════════════════════════════════════════
+   362→   862→   862→// SECTION 13: MCP SERVER
+   363→   863→   863→// ═══════════════════════════════════════════════════════════════════════════════
+   364→   864→   864→
+   365→   865→   865→const server = new McpServer({ name: "repo-intel", version: "10.0.0", description: "30 tools. Quantum scoring. Swarm analysis. Dynamic personas. Circuit breakers. Structured logging. Exhaustive types. Zero API keys. MCP Spec 2025-06-18 compliant." });
+   366→   866→   866→
+   367→   867→   867→// ── TOOL 1-30: All tools registered with proper types ────────────────────────
+   368→   868→   868→
+   369→   869→   869→server.tool("analyze_repo", "Full repo analysis: files, lines, languages, structure.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   370→   870→   870→  const files = walk(path, /.*/, 2000); const exts: Record<string, number> = {}; let totalLines = 0;
+   371→   871→   871→  for (const f of files) { const ext = f.ext; exts[ext] = (exts[ext] || 0) + 1; totalLines += f.lines.length; }
+   372→   872→   872→  const result = { repo: path.split("/").pop(), totalLines, files: files.length, languages: exts };
+   373→   873→   873→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   374→   874→   874→}, { title: "Repository Analysis", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   375→   875→   875→
+   376→   876→   876→server.tool("security_scan", "Deep security scan: secrets, eval, innerHTML, SQL injection, shell injection, weak crypto, TLS, prototype pollution.", { path: z.string().min(1).max(1024), maxFiles: z.number().int().min(1).max(1000).default(500) }, async ({ path, maxFiles }) => {
+   377→   877→   877→  const raw = scanSecurity(path, maxFiles); const { validated, falsePositives, confidence } = critiqueFindings(raw);
+   378→   878→   878→  const result = { total: validated.length, critical: validated.filter(f => f.severity === "critical").length, high: validated.filter(f => f.severity === "high").length, confidence, falsePositives, findings: validated.slice(0, 50) };
+   379→   879→   879→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   380→   880→   880→}, { title: "Security Scan", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   381→   881→   881→
+   382→   882→   882→server.tool("code_smells", "Deep quality scan: empty catch, console.log, @ts-ignore, TODO, magic numbers, large files.", { path: z.string().min(1).max(1024), maxFiles: z.number().int().min(1).max(1000).default(500) }, async ({ path, maxFiles }) => {
+   383→   883→   883→  const raw = scanQuality(path, maxFiles); const { validated, confidence } = critiqueFindings(raw);
+   384→   884→   884→  const byCategory: Record<string, number> = {}; for (const f of validated) byCategory[f.category] = (byCategory[f.category] || 0) + 1;
+   385→   885→   885→  const result = { total: validated.length, confidence, byCategory, findings: validated.slice(0, 50) };
+   386→   886→   886→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   387→   887→   887→}, { title: "Code Smells Scan", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   388→   888→   888→
+   389→   889→   889→server.tool("architecture_scan", "Architecture analysis: deep nesting, module coupling.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   390→   890→   890→  const findings = scanArchitecture(path);
+   391→   891→   891→  const result = { total: findings.length, findings };
+   392→   892→   892→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   393→   893→   893→}, { title: "Architecture Scan", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   394→   894→   894→
+   395→   895→   895→server.tool("test_coverage", "Test coverage analysis: test/source ratio, assertion-free tests, disabled tests.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   396→   896→   896→  const result = scanTesting(path);
+   397→   897→   897→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   398→   898→   898→}, { title: "Test Coverage Analysis", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   399→   899→   899→
+   400→   900→   900→server.tool("memory_leaks", "Memory leak detection: event listeners, useEffect cleanup.", { path: z.string().min(1).max(1024), maxFiles: z.number().int().min(1).max(500).default(300) }, async ({ path, maxFiles }) => {
+   401→   901→   901→  const raw = scanMemoryLeaks(path, maxFiles); const { validated, confidence } = critiqueFindings(raw);
+   402→   902→   902→  const result = { total: validated.length, confidence, findings: validated };
+   403→   903→   903→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   404→   904→   904→}, { title: "Memory Leak Detection", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   405→   905→   905→
+   406→   906→   906→server.tool("cleanup_audit", "Cleanup detection: auto-generated files, empty files, stale backups, TODO clusters.", { path: z.string().min(1).max(1024), maxFiles: z.number().int().min(1).max(1000).default(300) }, async ({ path, maxFiles }) => {
+   407→   907→   907→  const raw = scanCleanup(path, maxFiles); const { validated, confidence } = critiqueFindings(raw);
+   408→   908→   908→  const byCategory: Record<string, number> = {}; for (const f of validated) byCategory[f.category] = (byCategory[f.category] || 0) + 1;
+   409→   909→   909→  const result = { total: validated.length, confidence, byCategory, findings: validated };
+   410→   910→   910→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   411→   911→   911→}, { title: "Cleanup Audit", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   412→   912→   912→
+   413→   913→   913→server.tool("gap_analysis", "Capability gap detection: missing TypeScript, linter, CI/CD, README, test script.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   414→   914→   914→  const gaps = scanGaps(path); const score = Math.max(0, 100 - gaps.length * 10);
+   415→   915→   915→  const result = { score, totalGaps: gaps.length, gaps };
+   416→   916→   916→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   417→   917→   917→}, { title: "Gap Analysis", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   418→   918→   918→
+   419→   919→   919→server.tool("verify_all", "Run all verification: build, lint, test, secrets. Pass/fail per check with circuit breaker.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   420→   920→   920→  const result = verifyAll(path);
+   421→   921→   921→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   422→   922→   922→}, { title: "Verify All Checks", annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true } });
+   423→   923→   923→
+   424→   924→   924→server.tool("auto_diagnose", "Autonomous self-healing: diagnose → fix → verify → repeat until target score.", { path: z.string().min(1).max(1024), targetScore: z.number().int().min(50).max(100).default(85), maxIterations: z.number().int().min(1).max(20).default(10) }, async ({ path, targetScore, maxIterations }) => {
+   425→   925→   925→  const result = autoDiagnose(path, targetScore, maxIterations);
+   426→   926→   926→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   427→   927→   927→}, { title: "Auto Diagnose", annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false } });
+   428→   928→   928→
+   429→   929→   929→server.tool("quantum_score", "10-dimension quantum scoring with mathematically sound weighting.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   430→   930→   930→  const swarm = swarmAnalysis(path); const test = scanTesting(path); const result = quantumScore(swarm.findings, test, path);
+   431→   931→   931→  return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result };
+   432→   932→   932→}, { title: "Quantum Score", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   433→   933→   933→
+   434→   934→   934→server.tool("swarm_intel", "Multi-agent parallel analysis with critique loops.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   435→   935→   935→  const result = swarmAnalysis(path); const test = scanTesting(path); const q = quantumScore(result.findings, test, path);
+   436→   936→   936→  const out = { score: q.quantumScore, findings: result.findings.length, confidence: result.confidence, falsePositives: result.falsePositives, byAgent: result.byAgent, bySeverity: result.bySeverity, correlations: result.correlations };
+   437→   937→   937→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+   438→   938→   938→}, { title: "Swarm Intelligence", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   439→   939→   939→
+   440→   940→   940→server.tool("persona_scan", "Dynamic persona analysis: auto-selects best perspective.", { path: z.string().min(1).max(1024), persona: z.enum(["auto", "cto", "security", "senior_dev", "product", "sre", "qa"]).default("auto") }, async ({ path, persona }) => {
+   441→   941→   941→  const swarm = swarmAnalysis(path); const test = scanTesting(path); const quantum = quantumScore(swarm.findings, test, path);
+   442→   942→   942→  const scores: Record<string, number> = {}; for (const d of quantum.dimensions) scores[d.name.toLowerCase()] = d.score;
+   443→   943→   943→  let selected = persona; let dynamic = null;
+   444→   944→   944→  if (persona === "auto") { dynamic = dynamicPersona(swarm.findings, scores); selected = dynamic.recommended.toLowerCase().replace(/\s+/g, "_"); }
+   445→   945→   945→  const personaDims: Record<string, string[]> = { cto: ["architecture", "maintainability", "documentation"], security: ["security", "reliability"], senior_dev: ["quality", "testing", "maintainability"], product: ["quality", "testing", "documentation"], sre: ["reliability", "security", "testing"], qa: ["testing", "quality", "reliability"] };
+   446→   946→   946→  const dims = personaDims[selected] || personaDims.senior_dev;
+   447→   947→   947→  const dimScores = dims.map(d => scores[d] ?? 50);
+   448→   948→   948→  const score = Math.round(dimScores.reduce((a, b) => a + b, 0) / dimScores.length);
+   449→   949→   949→  const riskLevel = score >= 90 ? "low" : score >= 70 ? "medium" : score >= 50 ? "high" : "critical";
+   450→   950→   950→  const out = { persona: selected, dynamic, score, riskLevel, focus: dims.join(", "), dimensions: dims.map(d => ({ name: d, score: scores[d] ?? 50 })), quantumScore: quantum.quantumScore, grade: quantum.grade };
+   451→   951→   951→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+   452→   952→   952→}, { title: "Persona Scan", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   453→   953→   953→
+   454→   954→   954→server.tool("cheat_sheet", "Compact ~200 token repo summary.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   455→   955→   955→  const files = walk(path, /.*/, 2000); let totalLines = 0; for (const f of files) totalLines += f.lines.length;
+   456→   956→   956→  const name = path.split("/").pop() || "Unknown";
+   457→   957→   957→  const hasTests = files.some(f => /\.(test|spec)\./.test(f.rel));
+   458→   958→   958→  const hasLint = existsSync(join(path, ".eslintrc.js")) || existsSync(join(path, "eslint.config.js"));
+   459→   959→   959→  const hasCI = existsSync(join(path, ".github/workflows"));
+   460→   960→   960→  const hasReadme = existsSync(join(path, "README.md"));
+   461→   961→   961→  const out = { repo: name, lines: totalLines, files: files.length, tests: hasTests, lint: hasLint, ci: hasCI, readme: hasReadme };
+   462→   962→   962→  return { content: [{ type: "text", text: `REPO: ${name}\nLINES: ${totalLines.toLocaleString()}\nFILES: ${files.length}\nQUALITY: tests=${hasTests ? "✅" : "❌"} lint=${hasLint ? "✅" : "❌"} ci=${hasCI ? "✅" : "❌"} readme=${hasReadme ? "✅" : "❌"}` }], structuredContent: out };
+   463→   963→   963→}, { title: "Cheat Sheet", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   464→   964→   964→
+   465→   965→   965→server.tool("full_diagnose", "Complete analysis: all scanners + quantum + swarm + persona + verification + gaps + memory + cleanup.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   466→   966→   966→  const swarm = swarmAnalysis(path); const test = scanTesting(path); const quantum = quantumScore(swarm.findings, test, path);
+   467→   967→   967→  const verify = verifyAll(path); const gaps = scanGaps(path); const leaks = scanMemoryLeaks(path, 100); const cleanup = scanCleanup(path, 200);
+   468→   968→   968→  const scores: Record<string, number> = {}; for (const d of quantum.dimensions) scores[d.name.toLowerCase()] = d.score;
+   469→   969→   969→  const persona = dynamicPersona(swarm.findings, scores);
+   470→   970→   970→  const out = { quantumScore: quantum.quantumScore, grade: quantum.grade, confidence: swarm.confidence, falsePositives: swarm.falsePositives, totalFindings: swarm.findings.length, byAgent: swarm.byAgent, bySeverity: swarm.bySeverity, correlations: swarm.correlations, testCoverage: { testFiles: test.testFiles, sourceFiles: test.sourceFiles, ratio: (test.ratio * 100).toFixed(1) + "%" }, verification: verify.overall, verificationSummary: verify.summary, gaps: gaps.length, memoryLeaks: leaks.length, cleanupFindings: cleanup.length, totalIssues: swarm.findings.length + gaps.length + leaks.length + cleanup.length, dynamicPersona: persona, dimensions: quantum.dimensions.map(d => ({ name: d.name, score: d.score, weight: d.weight })), recommendations: quantum.dimensions.filter(d => d.score < 70).map(d => `${d.name}: ${d.score}/100`) };
+   471→   971→   971→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+   472→   972→   972→}, { title: "Full Diagnosis", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   473→   973→   973→
+   474→   974→   974→server.tool("rag_ground", "RAG: Retrieve relevant code, Augment with analysis, Generate actionable insights.", { path: z.string().min(1).max(1024), query: z.string().min(1).max(2000) }, async ({ path, query }) => {
+   475→   975→   975→  const queryLower = query.toLowerCase(); const allFiles = walk(path, /\.(ts|tsx|js|jsx|py|go|rs|java)$/, 300);
+   476→   976→   976→  const relevant: Array<{ file: string; relevance: number; snippet: string }> = [];
+   477→   977→   977→  for (const f of allFiles) {
+   478→   978→   978→    let score = 0; const contentLower = f.content.toLowerCase();
+   479→   979→   979→    const keywords = queryLower.split(/\s+/).filter(w => w.length > 2);
+   480→   980→   980→    for (const kw of keywords) { if (contentLower.includes(kw)) score += 10; if (f.rel.toLowerCase().includes(kw)) score += 20; }
+   481→   981→   981→    if (f.rel.toLowerCase().includes(queryLower.substring(0, 20))) score += 30;
+   482→   982→   982→    for (const l of f.lines) { if (l.toLowerCase().includes(queryLower.substring(0, 20))) score += 5; }
+   483→   983→   983→    if (score > 0) { let snippet = ""; for (let i = 0; i < f.lines.length; i++) { if (f.lines[i].toLowerCase().includes(queryLower.substring(0, 15))) { snippet = f.lines.slice(Math.max(0, i - 2), i + 3).join("\n"); break; } } if (!snippet) snippet = f.lines.slice(0, 5).join("\n"); relevant.push({ file: f.rel, relevance: score, snippet }); }
+   484→   984→   984→  }
+   485→   985→   985→  relevant.sort((a, b) => b.relevance - a.relevance); const top = relevant.slice(0, 10);
+   486→   986→   986→  return { content: [{ type: "text", text: JSON.stringify({ query, relevantFiles: top.length, topMatches: top.slice(0, 5), insights: top.length > 0 ? [`Found ${top.length} relevant files`, `Most relevant: ${top[0].file}`] : ["No direct matches found"] }, null, 2) }], structuredContent: { query, relevantFiles: top.length, topMatches: top.slice(0, 5) } };
+   487→   987→   987→}, { title: "RAG Grounding", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+   488→   988→   988→
+   489→   989→   989→server.tool("gap_analysis_8", "8-category capability gap analysis.", { path: z.string().min(1).max(1024) }, async ({ path }) => {
+   490→   990→   990→  const gaps: any[] = [];
+   491→   991→   991→  if (!existsSync(join(path, "tsconfig.json"))) gaps.push({ category: "Technology", gap: "No TypeScript config", severity: "medium", priority: 6 });
+   492→   992→   992→  if (!existsSync(join(path, ".eslintrc.js")) && !existsSync(join(path, "eslint.config.js"))) gaps.push({ category: "Technology", gap: "No linter", severity: "medium", priority: 5 });
+   493→   993→   993→  if (!existsSync(join(path, ".github/workflows"))) gaps.push({ category: "Technology", gap: "No CI/CD", severity: "high", priority: 8 });
+   494→   994→   994→  if (!existsSync(join(path, "README.md"))) gaps.push({ category: "Process", gap: "No README", severity: "high", priority: 7 });
+   495→   995→   995→  if (!existsSync(join(path, "CONTRIBUTING.md"))) gaps.push({ category: "Process", gap: "No contributing guide", severity: "medium", priority: 4 });
+   496→   996→   996→  if (!existsSync(join(path, ".gitignore"))) gaps.push({ category: "Process", gap: "No .gitignore", severity: "high", priority: 7 });
+   497→   997→   997→  if (existsSync(join(path, "package.json"))) { try { const pkg = JSON.parse(readFileSync(join(path, "package.json"), "utf-8")); if (!pkg.scripts?.test) gaps.push({ category: "Skills", gap: "No test script", severity: "medium", priority: 5 }); if (!pkg.scripts?.lint) gaps.push({ category: "Skills", gap: "No lint script", severity: "low", priority: 3 }); } catch {} }
+   498→   998→   998→  const out = { score: Math.max(0, 100 - gaps.length * 8), totalGaps: gaps.length, gaps };
+   499→   999→   999→  return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }], structuredContent: out };
+   500→  1000→  1000→}, { title: "8-Category Gap Analysis", annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } });
+
+[showing lines 1-500 of 502; use offset=501 with limit to continue reading]

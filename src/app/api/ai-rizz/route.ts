@@ -15,6 +15,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { targetBio = '', style = 'sweet' } = body;
 
+    // Sanitize style to prevent prompt injection - allow only letters and spaces, max 50 chars
+    const sanitizedStyle = (style || 'friendly').replace(/[^a-zA-Z\s]/g, '').substring(0, 50) || 'friendly';
+
     const bioContext = targetBio
       ? `The person's bio is: "${targetBio}"`
       : 'The person has no bio.';
@@ -24,13 +27,13 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'user',
-          content: `You are a creative assistant for a gay dating/social app. Generate 3 unique, creative opening messages in a "${style}" style.
+          content: `You are a creative assistant for a gay dating/social app. Generate 3 unique, creative opening messages in a "${sanitizedStyle}" style.
 
 ${bioContext}
 
 Requirements:
 - Each line must be unique, original, and not a cliché
-- Match the requested style: ${style}
+- Match the requested style: ${sanitizedStyle}
 - Keep each line conversational and under 100 characters
 - Do NOT use cheesy pickup lines — make them feel genuine and context-aware
 - If a bio is provided, reference something specific from it
@@ -60,7 +63,7 @@ Example format: ["line one", "line two", "line three"]`,
     return NextResponse.json({
       data: {
         line: lines[0],
-        style,
+        style: sanitizedStyle,
         context: bioSnippet,
         alternatives: lines.slice(1, 3),
       },

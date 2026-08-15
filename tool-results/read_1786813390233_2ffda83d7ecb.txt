@@ -1,0 +1,502 @@
+     1→   901→    try {
+     2→   902→      const payload: any = {};
+     3→   903→      for (const [k, v] of Object.entries(editForm)) { if (v !== '' && v !== undefined) { if (k === 'height' || k === 'weight') payload[k] = parseInt(v); else payload[k] = v; } }
+     4→   904→      const res = await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+     5→   905→      if (res.ok) { const data = await res.json(); setCurrentUser(data.data); setEditingProfile(false); }
+     6→   906→    } catch {}
+     7→   907→  }, [currentUser, editForm]);
+     8→   908→
+     9→   909→  const handleSaveSettings = useCallback(async () => {
+    10→   910→    if (!currentUser) return;
+    11→   911→    try { await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settingsPrivacy) }); setCurrentUser({ ...currentUser, ...settingsPrivacy }); } catch {}
+    12→   912→  }, [currentUser, settingsPrivacy]);
+    13→   913→
+    14→   914→  const handleChatRequest = useCallback(async (requestId: string, action: 'accept' | 'decline') => {
+    15→   915→    try { await fetch('/api/chat-requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestId, action }) }); setChatRequests(prev => prev.filter(r => r.id !== requestId)); setPendingRequestCount(prev => Math.max(0, prev - 1)); } catch {}
+    16→   916→  }, []);
+    17→   917→
+    18→   918→  const handleShout = useCallback(async () => {
+    19→   919→    if (!shoutInput.trim() || !currentUser) return;
+    20→   920→    try {
+    21→   921→      const res = await fetch(`/api/shouts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: shoutInput.trim(), type: shoutType }) });
+    22→   922→      if (res.ok) { const data = await res.json(); if (data.data) addShout(data.data); setShoutInput(''); }
+    23→   923→    } catch {}
+    24→   924→  }, [shoutInput, currentUser, shoutType]);
+    25→   925→
+    26→   926→  const handleFetchMap = useCallback(async () => {
+    27→   927→    const lat = userLat || currentUser?.lat || 35.69;
+    28→   928→    const lng = userLng || currentUser?.lng || 14.42;
+    29→   929→    setMapLoading(true);
+    30→   930→    try {
+    31→   931→      const res = await fetch(`/api/user-map?lat=${lat}&lng=${lng}&radius=${mapRadius}&userId=${CURRENT_USER_ID}`);
+    32→   932→      const data = await res.json();
+    33→   933→      setMapUsers(data.users || []);
+    34→   934→    } catch {} finally { setMapLoading(false); }
+    35→   935→  }, [currentUser, userLat, userLng, mapRadius]);
+    36→   936→
+    37→   937→  const handleFavorite = useCallback(async (targetId: string, isSuper: boolean = false) => {
+    38→   938→    if (!currentUser) return;
+    39→   939→    try { await fetch(`/api/favorites?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId, isSuper }) }); } catch {}
+    40→   940→  }, [currentUser]);
+    41→   941→
+    42→   942→  const handleSaveNote = useCallback(async () => {
+    43→   943→    if (!currentUser || !noteTargetId || !noteContent.trim()) return;
+    44→   944→    try { await fetch(`/api/notes?writerId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: noteTargetId, content: noteContent.trim() }) }); setShowNoteDialog(false); setNoteContent(''); setNoteTargetId(null); } catch {}
+    45→   945→  }, [currentUser, noteTargetId, noteContent]);
+    46→   946→
+    47→   947→  const handleDeleteNote = useCallback(async (noteId: string) => {
+    48→   948→    try { await fetch(`/api/notes/${noteId}`, { method: 'DELETE' }); setNotes(prev => prev.filter((n: any) => n.id !== noteId)); } catch {}
+    49→   949→  }, []);
+    50→   950→
+    51→   951→  const handleInfer = useCallback(async (category?: InferCategory) => {
+    52→   952→    if (!inferTargetUser) return;
+    53→   953→    const cats = category ? [category] : INFER_CATEGORIES.map(c => c.id);
+    54→   954→    setInferLoading(true);
+    55→   955→    const newResults: Record<string, any> = {};
+    56→   956→    for (const cat of cats) {
+    57→   957→      try {
+    58→   958→        const res = await fetch('/api/ai-rizz', {
+    59→   959→          method: 'POST', headers: { 'Content-Type': 'application/json' },
+    60→   960→          body: JSON.stringify({ targetBio: inferTargetUser.bio || '', style: cat, fullProfile: inferTargetUser, inferCategory: cat }),
+    61→   961→        });
+    62→   962→        const data = await res.json();
+    63→   963→        newResults[cat] = { category: cat, confidence: 75 + (cat.length * 3) % 26, title: data.data?.line || 'Analysis complete', content: data.data?.context || `Detailed ${cat} analysis for ${inferTargetUser.displayName}`, bulletPoints: ['Based on profile analysis', 'AI-generated insights', 'Personalized recommendations'], color: cat === 'red-flags' ? 'red' : cat === 'green-flags' ? 'green' : 'blue' };
+    64→   964→      } catch { newResults[cat] = { category: cat, confidence: 50, title: 'Analysis unavailable', content: 'Could not generate analysis', bulletPoints: [], color: 'gray' }; }
+    65→   965→    }
+    66→   966→    setInferResultsMap(newResults);
+    67→   967→    setInferLoading(false);
+    68→   968→  }, [inferTargetUser]);
+    69→   969→
+    70→   970→  const handleCreateGroup = useCallback(async () => {
+    71→   971→    if (!currentUser || !groupForm.name.trim()) return;
+    72→   972→    try {
+    73→   973→      const res = await fetch('/api/groups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(groupForm) });
+    74→   974→      if (res.ok) { const data = await res.json(); setGroups(prev => [data.data, ...prev]); setShowCreateGroup(false); setGroupForm({ name: '', description: '', isPublic: true }); }
+    75→   975→    } catch {}
+    76→   976→  }, [currentUser, groupForm]);
+    77→   977→
+    78→   978→  const handleCreateBanner = useCallback(async () => {
+    79→   979→    if (!currentUser) return;
+    80→   980→    try {
+    81→   981→      const res = await fetch('/api/banners', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'My Banner', imageUrl: DEFAULT_COVER, position: 0 }) });
+    82→   982→      if (res.ok) { const data = await res.json(); setBanners(prev => [...prev, data.data]); }
+    83→   983→    } catch {}
+    84→   984→  }, [currentUser]);
+    85→   985→
+    86→   986→  // Filtered discover users
+    87→   987→  const filteredDiscover = discoverUsers.filter(u => {
+    88→   988→    if (onlineOnly && !u.online) return false;
+    89→   989→    if (u.age && (u.age < ageRange[0] || u.age > ageRange[1])) return false;
+    90→   990→    if (lookingFor !== 'all' && u.lookingFor !== lookingFor) return false;
+    91→   991→    if (ethnicityFilter !== 'all' && u.ethnicity !== ethnicityFilter) return false;
+    92→   992→    if (bodyTypeFilter !== 'all' && u.bodyType !== bodyTypeFilter) return false;
+    93→   993→    return true;
+    94→   994→  });
+    95→   995→
+    96→   996→  const cascadeUser = filteredDiscover[cascadeIndex];
+    97→   997→
+    98→   998→  // ═══════════════════════════════════════════════════════════════
+    99→   999→  // LOGIN SCREEN
+   100→  1000→  // ═══════════════════════════════════════════════════════════════
+   101→  1001→  if (authLoading) {
+   102→  1002→    return (
+   103→  1003→      <div className="h-screen flex flex-col items-center justify-center bg-background gap-4">
+   104→  1004→        <div className="text-2xl font-bold gradient-text">NEXUS</div>
+   105→  1005→        <Skeleton className="h-4 w-32" />
+   106→  1006→      </div>
+   107→  1007→    );
+   108→  1008→  }
+   109→  1009→
+   110→  1010→  if (!authed) {
+   111→  1011→    return (
+   112→  1012→      <div className="h-screen flex flex-col items-center justify-center bg-background px-6">
+   113→  1013→        <div className="text-4xl font-bold gradient-text mb-2">NEXUS</div>
+   114→  1014→        <p className="text-muted-foreground text-sm mb-8">Connect. Discover. Thrive.</p>
+   115→  1015→        <Card className="w-full max-w-sm bg-card border-border"><CardContent className="p-6">
+   116→  1016→          <button onClick={() => { setCurrentUser({ id: CURRENT_USER_ID, username: 'testuser', displayName: 'Test User', email: 'test@nexus.app', avatar: DEFAULT_AVATAR, bio: 'Love adventures and good coffee ☕', age: 28, gender: 'male', location: 'Valletta, Malta', lat: 35.8989, lng: 14.5146, geoCity: 'Valletta', geoRegion: 'Central Region', geoCountry: 'Malta', online: true, lastSeen: new Date().toISOString(), isPremium: true, isVerified: true, showOnline: true, showDistance: true, showAge: true, showActivity: true, hidePicsOffline: false, lookingFor: 'relationship', aboutMe: 'Adventurous soul looking for meaningful connections. I love hiking, photography, and trying new cuisines. Always up for a good conversation over coffee or wine.', height: 180, weight: 75, ethnicity: 'white', bodyType: 'athletic', relationshipStatus: 'single', position: 'versatile', pronouns: 'he/him', displayUnits: 'metric', lang: 'en', soundOff: false, notifPushOff: false, notifEmailOff: false, notifTelegramOff: false, mailingInternal: true, mailingPartner: true, profileOff: false, privateAuto: false, noPros: false, noPub: false, isProfessional: false, professionalStatus: 'none', verificationStatus: 'verified', voucher: null, _count: { photos: 12, receivedLikes: 47, receivedViews: 234, shouts: 5, favorites: 18, blogs: 2, videos: 1, sentMessages: 89, receivedMessages: 76, notesWritten: 8 } } as any); setAuthed(true); }} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium">
+   117→  1017→            Quick Login as Test User
+   118→  1018→          </button>
+   119→  1019→        </CardContent></Card>
+   120→  1020→      </div>
+   121→  1021→    );
+   122→  1022→  }
+   123→  1023→
+   124→  1024→
+   125→  1025→  // ═══════════════════════════════════════════════════════════════
+   126→  1026→  // MAIN NAV CONSTANTS
+   127→  1027→  // ═══════════════════════════════════════════════════════════════
+   128→  1028→  const MAIN_TABS = [
+   129→  1029→    { tab: 'discover' as const, icon: Compass, label: 'Discover', badge: 0 },
+   130→  1030→    { tab: 'map' as const, icon: MapPinned, label: 'Map', badge: 0 },
+   131→  1031→    { tab: 'chat' as const, icon: MessageCircle, label: 'Chat', badge: totalUnread + pendingRequestCount },
+   132→  1032→    { tab: 'likes' as const, icon: Heart, label: 'Likes', badge: receivedLikes.length },
+   133→  1033→    { tab: 'more' as const, icon: Grid2X2, label: 'More', badge: 0 },
+   134→  1034→  ];
+   135→  1035→
+   136→  1036→  const isMainTab = (t: string) => ['discover', 'map', 'chat', 'likes', 'more'].includes(t);
+   137→  1037→
+   138→  1038→  const getPageTitle = () => {
+   139→  1039→    const titles: Record<string, string> = {
+   140→  1040→      events: 'Events & Agenda', viewed: 'Viewed Me', shouts: 'Shouts',
+   141→  1041→      fansites: 'Fansites', videos: 'Videos', blogs: 'Blogs', groups: 'Groups',
+   142→  1042→      albums: 'Albums', membership: 'Membership', verified: 'Verified',
+   143→  1043→      professional: 'Professional', footprints: 'Footprints', notes: 'Notes',
+   144→  1044→      boosts: 'Boosts', favorites: 'Favorites', account: 'Account',
+   145→  1045→      preferences: 'Preferences', 'geo-settings': 'GEO Settings',
+   146→  1046→      banners: 'Banners', sites: 'Sites', legal: 'Legal', faqs: 'FAQs',
+   147→  1047→      abuse: 'Report & Block', advantages: 'Advantages', affiliation: 'Affiliation',
+   148→  1048→      profile: 'My Profile', infer: 'INFER AI Analysis', more: 'More',
+   149→  1049→      kinks: 'Kinks & Bedroom', circles: 'Circles', travel: 'Travel Mode',
+   150→  1050→      checkins: 'Check-ins', wallet: 'Wallet', 'saved-phrases': 'Saved Phrases',
+   151→  1051→      'liked-photos': 'Liked Photos',
+   152→  1052→    };
+   153→  1053→    return titles[activeTab] || 'NEXUS';
+   154→  1054→  };
+   155→  1055→
+   156→  1056→  // ═══════════════════════════════════════════════════════════════
+   157→  1057→  // RENDER
+   158→  1058→  // ═══════════════════════════════════════════════════════════════
+   159→  1059→  return (
+   160→  1060→    <TooltipProvider>
+   161→  1061→    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+   162→  1062→
+   163→  1063→      {/* ═══ HEADER ═══ */}
+   164→  1064→      <header className="h-14 flex items-center justify-between px-4 bg-card/80 backdrop-blur-lg border-b border-border shrink-0 z-50">
+   165→  1065→        <div className="flex items-center gap-3">
+   166→  1066→          {isMainTab(activeTab) ? (
+   167→  1067→            <span className="text-lg font-bold gradient-text tracking-wider">NEXUS</span>
+   168→  1068→          ) : (
+   169→  1069→            <button onClick={() => setActiveTab('more')} className="p-1 hover:bg-secondary rounded-lg transition-colors">
+   170→  1070→              <ArrowLeft className="w-4 h-4" />
+   171→  1071→            </button>
+   172→  1072→          )}
+   173→  1073→          {activeTab === 'chat' && activeConversation && (
+   174→  1074→            <button onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }} className="md:hidden p-1 hover:bg-secondary rounded-lg transition-colors">
+   175→  1075→              <ChevronLeft className="w-5 h-5" />
+   176→  1076→            </button>
+   177→  1077→          )}
+   178→  1078→          {!isMainTab(activeTab) && <span className="text-sm font-medium">{getPageTitle()}</span>}
+   179→  1079→        </div>
+   180→  1080→        <div className="flex items-center gap-1">
+   181→  1081→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground"><Search className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Search</TooltipContent></Tooltip>
+   182→  1082→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}><Settings className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Settings</TooltipContent></Tooltip>
+   183→  1083→          <button onClick={() => currentUser && openProfile(currentUser.id)} className="ml-1">
+   184→  1084→            <Avatar className="h-8 w-8 border-2 border-primary/50">
+   185→  1085→              <AvatarImage src={getAvatar(currentUser)} alt={currentUser?.displayName || ''} />
+   186→  1086→              <AvatarFallback className="text-xs">{currentUser?.displayName?.[0] || 'U'}</AvatarFallback>
+   187→  1087→            </Avatar>
+   188→  1088→          </button>
+   189→  1089→        </div>
+   190→  1090→      </header>
+   191→  1091→
+   192→  1092→      {/* ═══ MAIN CONTENT ═══ */}
+   193→  1093→      <main className="flex-1 overflow-hidden relative">
+   194→  1094→        {/* Offline Banner */}
+   195→  1095→        {!isOnline && <div className="absolute top-0 inset-x-0 z-50 bg-destructive/90 text-destructive-foreground text-center text-[11px] py-1.5 font-medium"><WifiOff className="w-3 h-3 inline mr-1" />You are offline. Some features may not work.</div>}
+   196→  1096→        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : activeTab === 'kinks' ? <KinksView /> : activeTab === 'circles' ? <CirclesView /> : activeTab === 'travel' ? <TravelView /> : activeTab === 'checkins' ? <CheckinsView /> : activeTab === 'wallet' ? <WalletView /> : activeTab === 'saved-phrases' ? <SavedPhrasesView /> : activeTab === 'liked-photos' ? <LikedPhotosView /> : <MoreView />}
+   197→  1097→      </main>
+   198→  1098→
+   199→  1099→      {/* ═══ BOTTOM NAV ═══ */}
+   200→  1100→      <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-0.5">
+   201→  1101→        {MAIN_TABS.map(({ tab, icon: Icon, label, badge }) => (
+   202→  1102→          <button key={tab} onClick={() => { setActiveTab(tab); setShowSettings(false); if (tab === 'chat') { setChatMobileView('list'); setActiveConversation(null); setActiveGroup(null); } }}
+   203→  1103→            className={`h-12 flex flex-col items-center justify-center gap-0.5 relative transition-colors px-1 ${activeTab === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+   204→  1104→            <Icon className="w-4 h-4" />
+   205→  1105→            <span className="text-[9px] leading-none">{label}</span>
+   206→  1106→            {activeTab === tab && <span className="absolute bottom-0 w-4 h-0.5 bg-primary rounded-full" />}
+   207→  1107→            {badge > 0 && <span className="absolute -top-0.5 right-1/2 translate-x-4 min-w-[14px] h-3.5 flex items-center justify-center text-[8px] font-bold bg-primary text-primary-foreground rounded-full px-0.5">{badge > 99 ? '99+' : badge}</span>}
+   208→  1108→          </button>
+   209→  1109→        ))}
+   210→  1110→      </nav>
+   211→  1111→
+   212→  1112→      {/* ═══ PROFILE DRAWER ═══ */}
+   213→  1113→      <Sheet open={showProfileDrawer} onOpenChange={(open) => { if (!open) closeProfile(); }}>
+   214→  1114→        <SheetContent side="right" className="w-full sm:max-w-md bg-card border-border p-0 overflow-y-auto">
+   215→  1115→          {profileLoading ? <div className="p-6 space-y-4"><Skeleton className="h-64 w-full rounded-xl" /><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-32" /></div>
+   216→  1116→            : profileUser ? <ProfileDrawerContent /> : null}
+   217→  1117→        </SheetContent>
+   218→  1118→      </Sheet>
+   219→  1119→
+   220→  1120→      {/* ═══ FANSITE DETAIL SHEET ═══ */}
+   221→  1121→      <Sheet open={showFansiteSheet} onOpenChange={setShowFansiteSheet}>
+   222→  1122→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   223→  1123→          {selectedFansite && <FansiteDetail />}
+   224→  1124→        </SheetContent>
+   225→  1125→      </Sheet>
+   226→  1126→
+   227→  1127→      {/* ═══ ALBUM DETAIL SHEET ═══ */}
+   228→  1128→      <Sheet open={!!selectedAlbum} onOpenChange={(open) => { if (!open) setSelectedAlbum(null); }}>
+   229→  1129→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   230→  1130→          {selectedAlbum && <AlbumDetail />}
+   231→  1131→        </SheetContent>
+   232→  1132→      </Sheet>
+   233→  1133→
+   234→  1134→      {/* ═══ BLOG DETAIL SHEET ═══ */}
+   235→  1135→      <Sheet open={!!selectedBlog} onOpenChange={(open) => { if (!open) setSelectedBlog(null); }}>
+   236→  1136→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+   237→  1137→          {selectedBlog && <BlogDetail />}
+   238→  1138→        </SheetContent>
+   239→  1139→      </Sheet>
+   240→  1140→
+   241→  1141→      {/* ═══ RIZZ MODAL ═══ */}
+   242→  1142→      <Dialog open={showRizzModal} onOpenChange={setShowRizzModal}>
+   243→  1143→        <DialogContent className="bg-card border-border sm:max-w-md">
+   244→  1144→          <DialogHeader><DialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI Rizz Generator</DialogTitle></DialogHeader>
+   245→  1145→          <div className="space-y-4 py-2">
+   246→  1146→            <div className="flex flex-wrap gap-2">
+   247→  1147→              {RIZZ_STYLES.map(s => (
+   248→  1148→                <button key={s.value} onClick={() => setRizzStyle(s.value)}
+   249→  1149→                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${rizzStyle === s.value ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-secondary-foreground border-border hover:border-primary/50'}`}>
+   250→  1150→                  {s.icon} {s.label}
+   251→  1151→                </button>
+   252→  1152→              ))}
+   253→  1153→            </div>
+   254→  1154→            <Button onClick={handleRizz} disabled={rizzLoading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+   255→  1155→              {rizzLoading ? 'Generating...' : 'Generate Pickup Line'}
+   256→  1156→            </Button>
+   257→  1157→            {rizzResult && (
+   258→  1158→              <div className="p-4 rounded-xl bg-secondary border border-border space-y-3">
+   259→  1159→                <p className="text-sm leading-relaxed">{rizzResult.line}</p>
+   260→  1160→                {rizzResult.context && <p className="text-[11px] text-muted-foreground">{rizzResult.context}</p>}
+   261→  1161→                <div className="flex gap-2">
+   262→  1162→                  <Button variant="outline" size="sm" onClick={copyRizz} className="text-xs border-border"><Copy className="w-3 h-3 mr-1" /> Copy</Button>
+   263→  1163→                  <Button size="sm" onClick={handleSendRizz} className="text-xs bg-primary text-primary-foreground"><Send className="w-3 h-3 mr-1" /> Send</Button>
+   264→  1164→                </div>
+   265→  1165→                {rizzResult.alternatives?.length > 0 && (
+   266→  1166→                  <div className="space-y-1 pt-2 border-t border-border">
+   267→  1167→                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Alternatives</p>
+   268→  1168→                    {rizzResult.alternatives.map((alt: string, i: number) => (
+   269→  1169→                      <p key={i} className="text-xs text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => setRizzResult({ ...rizzResult, line: alt })}>{alt}</p>
+   270→  1170→                    ))}
+   271→  1171→                  </div>
+   272→  1172→                )}
+   273→  1173→              </div>
+   274→  1174→            )}
+   275→  1175→          </div>
+   276→  1176→        </DialogContent>
+   277→  1177→      </Dialog>
+   278→  1178→
+   279→  1179→      {/* ═══ NOTE DIALOG ═══ */}
+   280→  1180→      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
+   281→  1181→        <DialogContent className="bg-card border-border sm:max-w-sm">
+   282→  1182→          <DialogHeader><DialogTitle className="flex items-center gap-2"><StickyNote className="w-5 h-5 text-primary" /> Add Note</DialogTitle></DialogHeader>
+   283→  1183→          <div className="space-y-3 py-2">
+   284→  1184→            <Textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Write a private note..." className="bg-secondary border-border text-sm" rows={3} />
+   285→  1185→            <div className="flex gap-2">
+   286→  1186→              <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveNote} disabled={!noteContent.trim()}>Save</Button>
+   287→  1187→              <Button size="sm" variant="outline" className="border-border" onClick={() => { setShowNoteDialog(false); setNoteContent(''); }}>Cancel</Button>
+   288→  1188→            </div>
+   289→  1189→          </div>
+   290→  1190→        </DialogContent>
+   291→  1191→      </Dialog>
+   292→  1192→
+   293→  1193→      {/* ═══ BLOCK ALERT ═══ */}
+   294→  1194→      <AlertDialog open={showBlockAlert} onOpenChange={setShowBlockAlert}>
+   295→  1195→        <AlertDialogContent className="bg-card border-border">
+   296→  1196→          <AlertDialogHeader>
+   297→  1197→            <AlertDialogTitle>Block this user?</AlertDialogTitle>
+   298→  1198→            <AlertDialogDescription>This user won't be able to see your profile or message you.</AlertDialogDescription>
+   299→  1199→          </AlertDialogHeader>
+   300→  1200→          <AlertDialogFooter>
+   301→  1201→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+   302→  1202→            <AlertDialogAction onClick={() => profileUser && handleBlock(profileUser.id)} className="bg-destructive text-white">Block</AlertDialogAction>
+   303→  1203→          </AlertDialogFooter>
+   304→  1204→        </AlertDialogContent>
+   305→  1205→      </AlertDialog>
+   306→  1206→
+   307→  1207→      {/* ═══ CREATE EVENT DIALOG ═══ */}
+   308→  1208→      <Dialog open={showCreateEvent} onOpenChange={setShowCreateEvent}>
+   309→  1209→        <DialogContent className="bg-card border-border sm:max-w-md">
+   310→  1210→          <DialogHeader><DialogTitle>Create Event</DialogTitle></DialogHeader>
+   311→  1211→          <div className="space-y-3 py-2">
+   312→  1212→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={eventForm.title} onChange={e => setEventForm(p => ({ ...p, title: e.target.value }))} placeholder="Event name" className="bg-secondary border-border" /></div>
+   313→  1213→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={eventForm.description} onChange={e => setEventForm(p => ({ ...p, description: e.target.value }))} placeholder="What's this about?" className="bg-secondary border-border" rows={3} /></div>
+   314→  1214→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Location</Label><Input value={eventForm.location} onChange={e => setEventForm(p => ({ ...p, location: e.target.value }))} placeholder="Venue" className="bg-secondary border-border" /></div>
+   315→  1215→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date & Time</Label><Input type="datetime-local" value={eventForm.startDate} onChange={e => setEventForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+   316→  1216→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Image URL</Label><Input value={eventForm.imageUrl} onChange={e => setEventForm(p => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." className="bg-secondary border-border" /></div>
+   317→  1217→          </div>
+   318→  1218→          <DialogFooter>
+   319→  1219→            <Button variant="outline" onClick={() => setShowCreateEvent(false)} className="border-border">Cancel</Button>
+   320→  1220→            <Button onClick={handleCreateEvent} className="bg-primary text-primary-foreground" disabled={!eventForm.title || !eventForm.startDate}>Create</Button>
+   321→  1221→          </DialogFooter>
+   322→  1222→        </DialogContent>
+   323→  1223→      </Dialog>
+   324→  1224→
+   325→  1225→      {/* ═══ CREATE GROUP DIALOG ═══ */}
+   326→  1226→      <Dialog open={showCreateGroup} onOpenChange={setShowCreateGroup}>
+   327→  1227→        <DialogContent className="bg-card border-border sm:max-w-md">
+   328→  1228→          <DialogHeader><DialogTitle>Create Group</DialogTitle></DialogHeader>
+   329→  1229→          <div className="space-y-3 py-2">
+   330→  1230→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Group Name</Label><Input value={groupForm.name} onChange={e => setGroupForm(p => ({ ...p, name: e.target.value }))} placeholder="Group name" className="bg-secondary border-border" /></div>
+   331→  1231→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={groupForm.description} onChange={e => setGroupForm(p => ({ ...p, description: e.target.value }))} placeholder="About this group" className="bg-secondary border-border" rows={2} /></div>
+   332→  1232→          </div>
+   333→  1233→          <DialogFooter>
+   334→  1234→            <Button variant="outline" onClick={() => setShowCreateGroup(false)} className="border-border">Cancel</Button>
+   335→  1235→            <Button onClick={handleCreateGroup} className="bg-primary text-primary-foreground" disabled={!groupForm.name.trim()}>Create</Button>
+   336→  1236→          </DialogFooter>
+   337→  1237→        </DialogContent>
+   338→  1238→      </Dialog>
+   339→  1239→
+   340→  1240→      {/* ═══ CREATE CIRCLE DIALOG ═══ */}
+   341→  1241→      <Dialog open={showCreateCircle} onOpenChange={setShowCreateCircle}>
+   342→  1242→        <DialogContent className="bg-card border-border sm:max-w-md">
+   343→  1243→          <DialogHeader><DialogTitle>Create Circle</DialogTitle></DialogHeader>
+   344→  1244→          <div className="space-y-3 py-2">
+   345→  1245→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Circle Name</Label><Input value={circleForm.name} onChange={e => setCircleForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Hot Guys" className="bg-secondary border-border" /></div>
+   346→  1246→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Color</Label><Input type="color" value={circleForm.color} onChange={e => setCircleForm(p => ({ ...p, color: e.target.value }))} className="h-10 w-16 bg-secondary border-border" /></div>
+   347→  1247→          </div>
+   348→  1248→          <DialogFooter>
+   349→  1249→            <Button variant="outline" onClick={() => setShowCreateCircle(false)} className="border-border">Cancel</Button>
+   350→  1250→            <Button onClick={async () => {
+   351→  1251→              if (!circleForm.name.trim()) return;
+   352→  1252→              try { const res = await fetch('/api/circles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(circleForm) }); const data = await res.json(); if (data.data) { setCircles(prev => [...prev, data.data]); setShowCreateCircle(false); setCircleForm({ name: '', color: '#6366f1', icon: 'users' }); } } catch {}
+   353→  1253→            }} className="bg-primary text-primary-foreground" disabled={!circleForm.name.trim()}>Create</Button>
+   354→  1254→          </DialogFooter>
+   355→  1255→        </DialogContent>
+   356→  1256→      </Dialog>
+   357→  1257→
+   358→  1258→      {/* ═══ ADD MEMBER TO CIRCLE DIALOG ═══ */}
+   359→  1259→      <Dialog open={showAddMember} onOpenChange={setShowAddMember}>
+   360→  1260→        <DialogContent className="bg-card border-border sm:max-w-md">
+   361→  1261→          <DialogHeader><DialogTitle>Add Member to Circle</DialogTitle></DialogHeader>
+   362→  1262→          <div className="space-y-3 py-2">
+   363→  1263→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">User ID</Label><Input value={addMemberId} onChange={e => setAddMemberId(e.target.value)} placeholder="Enter user ID" className="bg-secondary border-border" /></div>
+   364→  1264→          </div>
+   365→  1265→          <DialogFooter>
+   366→  1266→            <Button variant="outline" onClick={() => setShowAddMember(false)} className="border-border">Cancel</Button>
+   367→  1267→            <Button onClick={async () => {
+   368→  1268→              if (!selectedCircle || !addMemberId.trim()) return;
+   369→  1269→              try { await fetch(`/api/circles/${selectedCircle.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetUserId: addMemberId.trim() }) }); const res = await fetch(`/api/circles/${selectedCircle.id}`); const data = await res.json(); setCircleMembers(data.members || []); setShowAddMember(false); setAddMemberId(''); } catch {}
+   370→  1270→            }} className="bg-primary text-primary-foreground" disabled={!addMemberId.trim()}>Add</Button>
+   371→  1271→          </DialogFooter>
+   372→  1272→        </DialogContent>
+   373→  1273→      </Dialog>
+   374→  1274→
+   375→  1275→      {/* ═══ SET TRAVEL LOCATION DIALOG ═══ */}
+   376→  1276→      <Dialog open={showSetTravel} onOpenChange={setShowSetTravel}>
+   377→  1277→        <DialogContent className="bg-card border-border sm:max-w-md">
+   378→  1278→          <DialogHeader><DialogTitle className="flex items-center gap-2"><Plane className="w-5 h-5 text-primary" /> Set Travel Location</DialogTitle></DialogHeader>
+   379→  1279→          <div className="space-y-3 py-2">
+   380→  1280→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">City</Label><Input value={travelForm.city} onChange={e => setTravelForm(p => ({ ...p, city: e.target.value }))} placeholder="e.g. Berlin" className="bg-secondary border-border" /></div>
+   381→  1281→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Country</Label><Input value={travelForm.country} onChange={e => setTravelForm(p => ({ ...p, country: e.target.value }))} placeholder="e.g. Germany" className="bg-secondary border-border" /></div>
+   382→  1282→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Start Date</Label><Input type="date" value={travelForm.startDate} onChange={e => setTravelForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+   383→  1283→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">End Date</Label><Input type="date" value={travelForm.endDate} onChange={e => setTravelForm(p => ({ ...p, endDate: e.target.value }))} className="bg-secondary border-border" /></div>
+   384→  1284→          </div>
+   385→  1285→          <DialogFooter>
+   386→  1286→            <Button variant="outline" onClick={() => setShowSetTravel(false)} className="border-border">Cancel</Button>
+   387→  1287→            <Button onClick={async () => {
+   388→  1288→              if (!travelForm.city.trim()) return;
+   389→  1289→              try { await fetch('/api/travel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(travelForm) }); const res = await fetch('/api/travel'); const data = await res.json(); setTravelData(data.data || null); setShowSetTravel(false); } catch {}
+   390→  1290→            }} className="bg-primary text-primary-foreground" disabled={!travelForm.city.trim()}>Start Traveling</Button>
+   391→  1291→          </DialogFooter>
+   392→  1292→        </DialogContent>
+   393→  1293→      </Dialog>
+   394→  1294→
+   395→  1295→      {/* ═══ CHECKIN DIALOG ═══ */}
+   396→  1296→      <Dialog open={showCheckin} onOpenChange={setShowCheckin}>
+   397→  1297→        <DialogContent className="bg-card border-border sm:max-w-md">
+   398→  1298→          <DialogHeader><DialogTitle className="flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> Check In</DialogTitle></DialogHeader>
+   399→  1299→          <div className="space-y-3 py-2">
+   400→  1300→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Venue Name</Label><Input value={checkinVenue} onChange={e => setCheckinVenue(e.target.value)} placeholder="e.g. The Alley Bar" className="bg-secondary border-border" /></div>
+   401→  1301→          </div>
+   402→  1302→          <DialogFooter>
+   403→  1303→            <Button variant="outline" onClick={() => setShowCheckin(false)} className="border-border">Cancel</Button>
+   404→  1304→            <Button onClick={async () => {
+   405→  1305→              if (!checkinVenue.trim()) return;
+   406→  1306→              try { await fetch('/api/checkins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ venueName: checkinVenue.trim(), lat: 35.9, lng: 14.4 }) }); const res = await fetch('/api/checkins'); const data = await res.json(); setCheckins(data.data || []); setShowCheckin(false); setCheckinVenue(''); } catch {}
+   407→  1307→            }} className="bg-primary text-primary-foreground" disabled={!checkinVenue.trim()}>Check In</Button>
+   408→  1308→          </DialogFooter>
+   409→  1309→        </DialogContent>
+   410→  1310→      </Dialog>
+   411→  1311→
+   412→  1312→      {/* ═══ SAVED PHRASE DIALOG ═══ */}
+   413→  1313→      <Dialog open={showPhraseDialog} onOpenChange={(open) => { if (!open) { setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' }); } }}>
+   414→  1314→        <DialogContent className="bg-card border-border sm:max-w-md">
+   415→  1315→          <DialogHeader><DialogTitle>{editingPhraseId ? 'Edit Phrase' : 'Create Phrase'}</DialogTitle></DialogHeader>
+   416→  1316→          <div className="space-y-3 py-2">
+   417→  1317→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={phraseForm.title} onChange={e => setPhraseForm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Greeting" className="bg-secondary border-border" /></div>
+   418→  1318→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Content</Label><Textarea value={phraseForm.content} onChange={e => setPhraseForm(p => ({ ...p, content: e.target.value }))} placeholder="Hey! How are you?" className="bg-secondary border-border" rows={3} /></div>
+   419→  1319→          </div>
+   420→  1320→          <DialogFooter>
+   421→  1321→            <Button variant="outline" onClick={() => { setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' }); }} className="border-border">Cancel</Button>
+   422→  1322→            <Button onClick={async () => {
+   423→  1323→              if (!phraseForm.title.trim() || !phraseForm.content.trim()) return;
+   424→  1324→              try {
+   425→  1325→                if (editingPhraseId) {
+   426→  1326→                  await fetch(`/api/saved-phrases/${editingPhraseId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(phraseForm) });
+   427→  1327→                } else {
+   428→  1328→                  await fetch('/api/saved-phrases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(phraseForm) });
+   429→  1329→                }
+   430→  1330→                const res = await fetch('/api/saved-phrases'); const data = await res.json(); setSavedPhrases(data.data || []);
+   431→  1331→                setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' });
+   432→  1332→              } catch {}
+   433→  1333→            }} className="bg-primary text-primary-foreground" disabled={!phraseForm.title.trim() || !phraseForm.content.trim()}>{editingPhraseId ? 'Save' : 'Create'}</Button>
+   434→  1334→          </DialogFooter>
+   435→  1335→        </DialogContent>
+   436→  1336→      </Dialog>
+   437→  1337→
+   438→  1338→      {/* ═══ DELETE ACCOUNT ALERT ═══ */}
+   439→  1339→      <AlertDialog open={showDeleteAccount} onOpenChange={setShowDeleteAccount}>
+   440→  1340→        <AlertDialogContent className="bg-card border-border">
+   441→  1341→          <AlertDialogHeader><AlertDialogTitle>Delete Account?</AlertDialogTitle><AlertDialogDescription>This is permanent and cannot be undone. All your data will be removed.</AlertDialogDescription></AlertDialogHeader>
+   442→  1342→          <AlertDialogFooter>
+   443→  1343→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+   444→  1344→            <AlertDialogAction className="bg-destructive text-white" onClick={() => { setCurrentUser(null); setAuthed(false); setShowDeleteAccount(false); }}>Delete</AlertDialogAction>
+   445→  1345→          </AlertDialogFooter>
+   446→  1346→        </AlertDialogContent>
+   447→  1347→      </AlertDialog>
+   448→  1348→
+   449→  1349→    </div>
+   450→  1350→    </TooltipProvider>
+   451→  1351→  );
+   452→  1352→
+   453→  1353→  // ═══════════════════════════════════════════════════════════════
+   454→  1354→  // VIEW FUNCTIONS (hoisted — available throughout component)
+   455→  1355→  // ═══════════════════════════════════════════════════════════════
+   456→  1356→
+   457→  1357→  // ─── DISCOVER ────────────────────────────────────────────────
+   458→  1358→  function DiscoverView() {
+   459→  1359→    if (discoverLoading) return <LoadingGrid />;
+   460→  1360→    if (discoverUsers.length === 0) return <EmptyState icon={Compass} title="No profiles found" desc="Check back later for new people nearby" />;
+   461→  1361→    return (
+   462→  1362→      <div className="h-full flex flex-col">
+   463→  1363→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+   464→  1364→          <button onClick={() => setOnlineOnly(!onlineOnly)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${onlineOnly ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>🟢 Online</button>
+   465→  1365→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{ageRange[0]}–{ageRange[1]}</button></PopoverTrigger>
+   466→  1366→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Age Range</Label><Slider value={ageRange} onValueChange={setAgeRange} min={18} max={80} step={1} className="mt-2" /><div className="flex justify-between text-[11px] text-muted-foreground mt-1"><span>{ageRange[0]}</span><span>{ageRange[1]}</span></div></PopoverContent>
+   467→  1367→          </Popover>
+   468→  1368→          <Select value={lookingFor} onValueChange={setLookingFor}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All</SelectItem><SelectItem value="relationship">Relationship</SelectItem><SelectItem value="casual">Casual</SelectItem><SelectItem value="friends">Friends</SelectItem><SelectItem value="networking">Networking</SelectItem></SelectContent></Select>
+   469→  1369→          <Select value={ethnicityFilter} onValueChange={setEthnicityFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Ethnicity" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Ethnicity</SelectItem><SelectItem value="white">White</SelectItem><SelectItem value="black">Black</SelectItem><SelectItem value="latino">Latino</SelectItem><SelectItem value="asian">Asian</SelectItem><SelectItem value="middle-eastern">Middle Eastern</SelectItem><SelectItem value="indian">Indian</SelectItem><SelectItem value="mixed">Mixed</SelectItem></SelectContent></Select>
+   470→  1370→          <Select value={bodyTypeFilter} onValueChange={setBodyTypeFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Body" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Body Type</SelectItem><SelectItem value="slim">Slim</SelectItem><SelectItem value="average">Average</SelectItem><SelectItem value="athletic">Athletic</SelectItem><SelectItem value="muscular">Muscular</SelectItem><SelectItem value="curvy">Curvy</SelectItem></SelectContent></Select>
+   471→  1371→          <div className="ml-auto flex gap-1 shrink-0">
+   472→  1372→            <button onClick={() => setDiscoverView('grid')} className={`p-1.5 rounded-lg ${discoverView === 'grid' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Grid3X3 className="w-4 h-4" /></button>
+   473→  1373→            <button onClick={() => setDiscoverView('cascade')} className={`p-1.5 rounded-lg ${discoverView === 'cascade' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Layers className="w-4 h-4" /></button>
+   474→  1374→          </div>
+   475→  1375→        </div>
+   476→  1376→        <ScrollArea className="flex-1">
+   477→  1377→          {discoverView === 'cascade' ? (
+   478→  1378→            <div className="flex items-center justify-center p-6 h-full">
+   479→  1379→              {cascadeUser ? (
+   480→  1380→                <div key={cascadeUser.id} className="w-full max-w-sm cascade-animate">
+   481→  1381→                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-secondary">
+   482→  1382→                    {(cascadeUser.photos && cascadeUser.photos[0]) ? <img src={cascadeUser.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>}
+   483→  1383→                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/60 to-transparent" />
+   484→  1384→                    {cascadeUser.isPremium && <div className="absolute top-3 right-3"><Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge></div>}
+   485→  1385→                    {cascadeUser.isVerified && <div className="absolute top-3 left-3"><Badge className="bg-blue-500/20 text-blue-400 text-[10px] border-blue-500/30"><ShieldCheck className="w-3 h-3" /></Badge></div>}
+   486→  1386→                    {cascadeUser.online && cascadeUser.showOnline && <div className="absolute top-3 left-1/2 -translate-x-1/2"><span className="flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] text-green-400"><span className="w-1.5 h-1.5 bg-green-400 rounded-full online-pulse" /> Online</span></div>}
+   487→  1387→                    <div className="absolute bottom-0 left-0 right-0 p-4">
+   488→  1388→                      <h3 className="text-xl font-bold">{cascadeUser.displayName}{cascadeUser.age ? `, ${cascadeUser.age}` : ''}</h3>
+   489→  1389→                      {cascadeUser.location && <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3" />{cascadeUser.location}</p>}
+   490→  1390→                      {cascadeUser.bio && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{truncate(cascadeUser.bio, 100)}</p>}
+   491→  1391→                      {cascadeUser.lookingFor && <Badge className="mt-2 bg-primary/20 text-primary text-[10px] border-primary/30 capitalize">{cascadeUser.lookingFor}</Badge>}
+   492→  1392→                    </div>
+   493→  1393→                  </div>
+   494→  1394→                  <div className="flex gap-3 mt-4 justify-center">
+   495→  1395→                    <button onClick={() => setCascadeIndex(i => i + 1)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+   496→  1396→                    <button onClick={() => handleLike(cascadeUser.id)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><Heart className="w-5 h-5" /></button>
+   497→  1397→                    <button onClick={() => openChat(cascadeUser)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><MessageCircle className="w-5 h-5" /></button>
+   498→  1398→                    <button onClick={() => openProfile(cascadeUser.id)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Star className="w-5 h-5" /></button>
+   499→  1399→                    <button onClick={() => { setRizzTargetBio(cascadeUser.bio || ''); setShowRizzModal(true); }} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Sparkles className="w-5 h-5" /></button>
+   500→  1400→                  </div>
+
+[showing lines 1-500 of 502; use offset=501 with limit to continue reading]

@@ -1,0 +1,2002 @@
+     1→'use client';
+     2→
+     3→import React, { useState, useEffect, useRef, useCallback } from 'react';
+     4→import dynamic from 'next/dynamic';
+     5→import NexusChat from '@/components/chat/NexusChat';
+     6→import { io as socketIO, Socket } from 'socket.io-client';
+     7→import { formatDistanceToNow, format, isToday, isThisWeek, isThisMonth } from 'date-fns';
+     8→import { useAppStore } from '@/store/app';
+     9→import type {
+    10→  User, Message, Conversation, Like, Fansite, AppEvent, GroupChat,
+    11→  Photo, Album, ChatRequest, ProfileView as ProfileViewType,
+    12→  Shout, Blog, Video as VideoType,
+    13→  Banner, Verification, UserSession, InferCategory, TabId,
+    14→} from '@/types';
+    15→import {
+    16→  TRIBE_OPTIONS, FETISH_CLOTHING_OPTIONS, SM_LEVEL_OPTIONS, FF_ROLE_OPTIONS,
+    17→  SAFER_SEX_OPTIONS, DICK_SIZE_OPTIONS, CIRCUMCISION_OPTIONS,
+    18→  HAIR_COLOR_OPTIONS, HAIR_LENGTH_OPTIONS, EYE_COLOR_OPTIONS, BEARD_OPTIONS,
+    19→  PIERCING_OPTIONS, TATTOO_OPTIONS, GOING_OUT_OPTIONS,
+    20→  MUSIC_GENRE_OPTIONS, SPORT_OPTIONS, FOOD_OPTIONS,
+    21→  TRAVEL_STYLE_OPTIONS, PROFESSION_OPTIONS, DIRTY_SEX_OPTIONS, MEET_AT_OPTIONS,
+    22→  CHAT_SORT_OPTIONS,
+    23→} from '@/types';
+    24→import { Button } from '@/components/ui/button';
+    25→import { Input } from '@/components/ui/input';
+    26→import { Textarea } from '@/components/ui/textarea';
+    27→import { Label } from '@/components/ui/label';
+    28→import { Badge } from '@/components/ui/badge';
+    29→import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+    30→import { Card, CardContent } from '@/components/ui/card';
+    31→import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+    32→import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+    33→import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+    34→import { ScrollArea } from '@/components/ui/scroll-area';
+    35→import { Separator } from '@/components/ui/separator';
+    36→import { Switch } from '@/components/ui/switch';
+    37→import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+    38→import { Skeleton } from '@/components/ui/skeleton';
+    39→import { Slider } from '@/components/ui/slider';
+    40→import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+    41→import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+    42→import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+    43→import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+    44→import { Progress } from '@/components/ui/progress';
+    45→import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+    46→import {
+    47→  Compass, MessageCircle, Heart, Star, Calendar, User, Search,
+    48→  Bell, Settings, X, Send, Paperclip, Check, CheckCheck, Crown,
+    49→  Shield, MapPin, ChevronLeft, ChevronRight, Grid3X3, Layers,
+    50→  ThumbsUp, ThumbsDown, Eye, Image as ImageIcon, Users, Zap,
+    51→  Copy, Sparkles, LogOut, Link2, ExternalLink, Flag, Ban as Block,
+    52→  Pencil, Camera, MoreVertical, ArrowLeft, Plus, Clock, Globe,
+    53→  Map, Megaphone, Video, FileText, Bookmark, StickyNote, MapPinned,
+    54→  StarOff, ShieldCheck, MonitorSmartphone, Crosshair, Grid2X2,
+    55→  Fingerprint, Scale, HelpCircle, AlertTriangle, Gift, TrendingUp,
+    56→  Brain, Target, Lightbulb, AlertCircle, CheckCircle2, PartyPopper,
+    57→  Music, Palette, Briefcase, Info,
+    58→  Radio, ChevronDown, Tag, Lock,
+    59→  MapPinOff, Navigation, Wifi, WifiOff,
+    60→  EyeOff, Wallet, Gem, Rocket,
+    61→  Share2, MessageSquare, Cherry,
+    62→  Smartphone, FlameIcon,
+    63→  Shirt, Utensils, ScanSearch, BookmarkCheck,
+    64→  Bot, HeartPulse, Clock3,
+    65→  Plane, CircleDot, Wallet as WalletIcon, FolderOpen, BellOff, Archive, VolumeX,
+    66→  HeartOff,
+    67→} from 'lucide-react';
+    68→
+    69→// ═══════════════════════════════════════════════════════════════
+    70→// CONSTANTS
+    71→// ═══════════════════════════════════════════════════════════════
+    72→
+    73→const RIZZ_STYLES = [
+    74→  { value: 'romantic', label: 'Romantic', icon: '💖' },
+    75→  { value: 'funny', label: 'Funny', icon: '😂' },
+    76→  { value: 'bold', label: 'Bold', icon: '🔥' },
+    77→  { value: 'nerdy', label: 'Nerdy', icon: '🤓' },
+    78→  { value: 'sweet', label: 'Sweet', icon: '🍯' },
+    79→  { value: 'flirty', label: 'Flirty', icon: '😘' },
+    80→];
+    81→
+    82→const CANNED_SHOUTS = [
+    83→  { value: 'looking-now', label: 'Looking right now', emoji: '👀' },
+    84→  { value: 'bored', label: 'Bored', emoji: '😴' },
+    85→  { value: 'wanna-chat', label: 'Wanna chat?', emoji: '💬' },
+    86→  { value: 'new-in-town', label: 'New in town', emoji: '🏙️' },
+    87→  { value: 'party-tonight', label: 'Party tonight', emoji: '🎉' },
+    88→  { value: 'netflix-chill', label: 'Netflix & Chill', emoji: '🎬' },
+    89→  { value: 'gym-buddy', label: 'Gym buddy', emoji: '💪' },
+    90→  { value: 'travel-companion', label: 'Travel companion', emoji: '✈️' },
+    91→  { value: 'coffee-date', label: 'Coffee date', emoji: '☕' },
+    92→  { value: 'video-call', label: 'Video call', emoji: '📹' },
+    93→];
+    94→
+    95→const FAQ_DATA = [
+    96→  { q: 'What is NEXUS?', a: 'NEXUS is a premium dating and social platform that connects people through smart matching, real-time chat, events, and community features. Whether you\'re looking for romance, friendship, or networking, NEXUS has you covered.' },
+    97→  { q: 'How do I verify my profile?', a: 'Go to More → Verified to submit verification. We offer age verification, photo verification, ID verification, face matching, and social media verification. Verified users get a blue badge and more visibility.' },
+    98→  { q: 'What is INFER AI Analysis?', a: 'INFER is our AI-powered profile analysis tool that provides deep insights into compatibility, icebreakers, conversation starters, red flags, green flags, date ideas, and personality analysis for any user profile.' },
+    99→  { q: 'How do boosts work?', a: 'Boosts temporarily increase your profile visibility. Standard boost lasts 30 min, Super boost lasts 1 hour, Spotlight puts you at the top of discover for 2 hours, and Mega boost lasts 24 hours with maximum visibility.' },
+   100→  { q: 'Can I hide my location?', a: 'Yes! Go to More → GEO Settings to choose from Auto GPS, Manual City, Fake Location, or Hide Location modes. You can also set a custom geo name that displays instead of your real location.' },
+   101→  { q: 'How do I create a group chat?', a: 'Go to More → Groups and tap "Create Group". You can set it as public or private, add a description, tags, and invite members. Group chats support up to 50 members.' },
+   102→  { q: 'What are fansites?', a: 'Fansites are personal creator pages where users can share content, links, and products. Creators can earn through subscriptions and product sales on their fansite.' },
+   103→  { q: 'How do I report abuse?', a: 'Go to More → Abuse & Report. You can report users, messages, or content. We take all reports seriously and investigate promptly. You can also block users directly from their profile.' },
+   104→  { q: 'What premium features are available?', a: 'Premium includes unlimited likes, see who viewed you, advanced filters, INFER AI analysis, boost discounts, priority support, and more. Check More → Advantages for full comparison.' },
+   105→  { q: 'How do I delete my account?', a: 'Go to More → Account and scroll to the bottom to find "Delete Account". This action is permanent and cannot be undone. All your data will be permanently removed.' },
+   106→];
+   107→
+   108→const PAGE_DIRECTORY: Record<string, { id: TabId; label: string; description: string; icon: any; badge?: number; isNew?: boolean }[]> = {
+   109→  Social: [
+   110→    { id: 'events', label: 'Events', description: 'Find and create events', icon: Calendar },
+   111→    { id: 'viewed', label: 'Viewed Me', description: 'Who checked your profile', icon: Eye },
+   112→    { id: 'shouts', label: 'Shouts', description: 'Community feed', icon: Megaphone },
+   113→    { id: 'groups', label: 'Groups', description: 'Group chats & communities', icon: Users },
+   114→    { id: 'blogs', label: 'Blogs', description: 'Articles & stories', icon: FileText },
+   115→    { id: 'circles', label: 'Circles', description: 'Profile groups', icon: CircleDot, isNew: true },
+   116→    { id: 'checkins', label: 'Check-ins', description: 'Location feed', icon: MapPin, isNew: true },
+   117→  ],
+   118→  Content: [
+   119→    { id: 'fansites', label: 'Fansites', description: 'Creator pages', icon: Star },
+   120→    { id: 'videos', label: 'Videos', description: 'Video content', icon: Video },
+   121→    { id: 'albums', label: 'Albums', description: 'Photo albums', icon: ImageIcon },
+   122→    { id: 'banners', label: 'Banners', description: 'Promotional banners', icon: Layers },
+   123→    { id: 'sites', label: 'Sites', description: 'Connected links', icon: Link2 },
+   124→  ],
+   125→  Profile: [
+   126→    { id: 'profile', label: 'My Profile', description: 'View & edit profile', icon: User },
+   127→    { id: 'favorites', label: 'Favorites', description: 'Saved profiles', icon: Bookmark },
+   128→    { id: 'notes', label: 'Notes', description: 'Private notes on users', icon: StickyNote },
+   129→    { id: 'footprints', label: 'Footprints', description: 'Visit history', icon: FootprintsIcon },
+   130→    { id: 'infer', label: 'INFER AI', description: 'AI profile analysis', icon: Brain, badge: 1 },
+   131→    { id: 'kinks', label: 'Kinks & Bedroom', description: 'Sexual profile & kinks', icon: Cherry, isNew: true },
+   132→    { id: 'liked-photos', label: 'Liked Photos', description: 'Gallery of liked photos', icon: Heart, isNew: true },
+   133→    { id: 'saved-phrases', label: 'Saved Phrases', description: 'Quick reply templates', icon: MessageSquare, isNew: true },
+   134→  ],
+   135→  Premium: [
+   136→    { id: 'membership', label: 'Membership', description: 'Plans & pricing', icon: Crown },
+   137→    { id: 'boosts', label: 'Boosts', description: 'Increase visibility', icon: Zap },
+   138→    { id: 'verified', label: 'Verified', description: 'Get verified badge', icon: ShieldCheck },
+   139→    { id: 'professional', label: 'Professional', description: 'Pro creator status', icon: Briefcase },
+   140→    { id: 'advantages', label: 'Advantages', description: 'Premium features', icon: Gem },
+   141→  ],
+   142→  Settings: [
+   143→    { id: 'account', label: 'Account', description: 'Email, password, username', icon: Lock },
+   144→    { id: 'preferences', label: 'Preferences', description: 'All app settings', icon: Settings },
+   145→    { id: 'geo-settings', label: 'GEO Settings', description: 'Location & privacy', icon: MapPin },
+   146→    { id: 'travel', label: 'Travel Mode', description: 'Set travel location', icon: Plane, isNew: true },
+   147→    { id: 'wallet', label: 'Wallet', description: 'Virtual wallet & balance', icon: WalletIcon, isNew: true },
+   148→  ],
+   149→  Info: [
+   150→    { id: 'legal', label: 'Legal', description: 'Terms & policies', icon: Scale },
+   151→    { id: 'faqs', label: 'FAQs', description: 'Help & answers', icon: HelpCircle },
+   152→    { id: 'abuse', label: 'Abuse', description: 'Report & block', icon: Flag },
+   153→    { id: 'affiliation', label: 'Affiliation', description: 'Referral program', icon: Gift },
+   154→  ],
+   155→};
+   156→
+   157→const SUBSCRIPTION_TIERS = [
+   158→  { tier: 'free', label: 'Free', price: 0, color: 'from-gray-500 to-gray-600', features: ['5 likes/day', 'Basic filters', 'Limited chat', 'View 10 profiles/day', 'Standard search'] },
+   159→  { tier: 'premium', label: 'Premium', price: 9.99, color: 'from-purple-500 to-pink-500', features: ['Unlimited likes', 'Advanced filters', 'Unlimited chat', 'See who viewed you', 'Boost discounts', 'INFER AI Basic', 'Priority support'], popular: true },
+   160→  { tier: 'vip', label: 'VIP', price: 24.99, color: 'from-yellow-500 to-amber-500', features: ['Everything in Premium', 'Spotlight boosts', 'INFER AI Pro', 'Anonymous browsing', 'Travel mode', 'Video calls', 'Personal manager', 'Verified badge'] },
+   161→  { tier: 'creator', label: 'Creator', price: 0, color: 'from-emerald-500 to-teal-500', features: ['Fansite page', 'Content monetization', 'Product sales', 'Subscriber analytics', 'Custom branding', 'Priority listing', 'Creator badge'] },
+   162→];
+   163→
+   164→const BOOST_TYPES = [
+   165→  { type: 'standard', label: 'Standard', duration: 30, price: 2.99, desc: '30 min visibility boost', color: 'from-blue-500 to-cyan-500' },
+   166→  { type: 'super', label: 'Super', duration: 60, price: 5.99, desc: '1 hour enhanced boost', color: 'from-purple-500 to-pink-500' },
+   167→  { type: 'spotlight', label: 'Spotlight', duration: 120, price: 9.99, desc: '2 hours top placement', color: 'from-yellow-500 to-amber-500' },
+   168→  { type: 'mega', label: 'Mega', duration: 1440, price: 19.99, desc: '24 hours max visibility', color: 'from-red-500 to-orange-500' },
+   169→];
+   170→
+   171→const INFER_CATEGORIES: { id: InferCategory; label: string; icon: any; color: string; desc: string }[] = [
+   172→  { id: 'compatibility', label: 'Compatibility', icon: Heart, color: 'text-pink-400', desc: 'Overall match score' },
+   173→  { id: 'icebreakers', label: 'Icebreakers', icon: Lightbulb, color: 'text-yellow-400', desc: 'Perfect opening lines' },
+   174→  { id: 'conversation-starters', label: 'Starters', icon: MessageSquare, color: 'text-blue-400', desc: 'Keep the chat going' },
+   175→  { id: 'profile-tips', label: 'Profile Tips', icon: Star, color: 'text-purple-400', desc: 'Optimize your profile' },
+   176→  { id: 'red-flags', label: 'Red Flags', icon: AlertCircle, color: 'text-red-400', desc: 'Warning signs to watch' },
+   177→  { id: 'green-flags', label: 'Green Flags', icon: CheckCircle2, color: 'text-green-400', desc: 'Positive indicators' },
+   178→  { id: 'date-ideas', label: 'Date Ideas', icon: PartyPopper, color: 'text-orange-400', desc: 'Creative date suggestions' },
+   179→  { id: 'personality-analysis', label: 'Personality', icon: Brain, color: 'text-cyan-400', desc: 'Deep personality insights' },
+   180→];
+   181→
+   182→const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face';
+   183→const DEFAULT_COVER = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&h=400&fit=crop';
+   184→const CURRENT_USER_ID = 'test-user-1';
+   185→
+   186→// Dynamically import Leaflet map (no SSR - requires window)
+   187→const MapLeaflet = dynamic(() => import('@/components/MapViewComponent'), { ssr: false, loading: () => <div className="w-full h-full bg-secondary/30 animate-pulse" /> });
+   188→
+   189→// Error boundary for map and other dynamic components
+   190→class ErrorBoundary extends React.Component<{ fallback: React.ReactNode }, { hasError: boolean }> {
+   191→  state = { hasError: false };
+   192→  static getDerivedStateFromError() { return { hasError: true }; }
+   193→  render() { return this.state.hasError ? this.props.fallback : this.props.children; }
+   194→}
+   195→
+   196→// ═══════════════════════════════════════════════════════════════
+   197→// HELPER COMPONENTS & FUNCTIONS
+   198→// ═══════════════════════════════════════════════════════════════
+   199→
+   200→function FootprintsIcon(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 16v-2.38C4 11.5 2.97 9.5 3 8c.07-2.48 1.52-4 4-4 2 0 3 1 4 3 1-2 2-3 4-3 2.48 0 3.93 1.52 4 4 .03 1.5-1 3.5-1 5.62V16"/><path d="M4 16c0 2 1.5 4 3 4 1.5 0 2-1 3-2s2.5-2 4-2 3 1 4 2 1.5 2 3 2c1.5 0 3-2 3-4"/></svg>; }
+   201→
+   202→function timeAgo(dateStr: string): string {
+   203→  try { return formatDistanceToNow(new Date(dateStr), { addSuffix: true }); } catch { return ''; }
+   204→}
+   205→
+   206→function fmtDate(dateStr: string): string {
+   207→  try { return format(new Date(dateStr), 'MMM d, yyyy h:mm a'); } catch { return dateStr; }
+   208→}
+   209→
+   210→function fmtDateShort(dateStr: string): string {
+   211→  try { return format(new Date(dateStr), 'MMM d'); } catch { return dateStr; }
+   212→}
+   213→
+   214→function getAvatar(user: { avatar?: string | null } | null | undefined): string {
+   215→  return user?.avatar || DEFAULT_AVATAR;
+   216→}
+   217→
+   218→function truncate(str: string | null | undefined, len: number): string {
+   219→  if (!str) return '';
+   220→  return str.length > len ? str.slice(0, len) + '...' : str;
+   221→}
+   222→
+   223→function getLastSeenText(user: User): string {
+   224→  if (user.online && user.showOnline) return 'Online now';
+   225→  if (user.lastSeen) return `Last seen ${timeAgo(user.lastSeen)}`;
+   226→  return 'Offline';
+   227→}
+   228→
+   229→function SectionHeader({ icon: Icon, label, count, action }: { icon: any; label: string; count?: number; action?: React.ReactNode }) {
+   230→  return (
+   231→    <div className="flex items-center justify-between mb-3">
+   232→      <h3 className="text-xs text-muted-foreground uppercase tracking-wider font-semibold flex items-center gap-2">
+   233→        <Icon className="w-3.5 h-3.5" /> {label} {count !== undefined && <span className="text-foreground">({count})</span>}
+   234→      </h3>
+   235→      {action}
+   236→    </div>
+   237→  );
+   238→}
+   239→
+   240→function UserRow({ user, sub, actions, onClick }: { user: User; sub?: React.ReactNode; actions?: React.ReactNode; onClick?: () => void }) {
+   241→  return (
+   242→    <div className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+   243→      <div className="relative shrink-0">
+   244→        <button onClick={onClick} className="block">
+   245→          <Avatar className="h-11 w-11">
+   246→            <AvatarImage src={getAvatar(user)} />
+   247→            <AvatarFallback className="text-xs">{user.displayName?.[0] || '?'}</AvatarFallback>
+   248→          </Avatar>
+   249→        </button>
+   250→        {user.online && user.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+   251→      </div>
+   252→      <div className="flex-1 min-w-0">
+   253→        <button onClick={onClick} className="text-[13px] font-semibold hover:text-primary transition-colors truncate block">
+   254→          {user.displayName}{user.age != null && user.showAge !== false ? `, ${user.age}` : ''}
+   255→        </button>
+   256→        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+   257→          {user.location && <span className="flex items-center gap-0.5 truncate"><MapPin className="w-3 h-3 shrink-0" />{truncate(user.location, 20)}</span>}
+   258→          {sub}
+   259→        </div>
+   260→      </div>
+   261→      <div className="shrink-0 flex items-center gap-1">{actions}</div>
+   262→    </div>
+   263→  );
+   264→}
+   265→
+   266→function EmptyState({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) {
+   267→  return (
+   268→    <div className="flex flex-col items-center justify-center py-16 px-4">
+   269→      <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-4">
+   270→        <Icon className="w-7 h-7 text-muted-foreground" />
+   271→      </div>
+   272→      <p className="text-sm font-medium mb-1">{title}</p>
+   273→      <p className="text-xs text-muted-foreground text-center">{desc}</p>
+   274→    </div>
+   275→  );
+   276→}
+   277→
+   278→function BackHeader({ title, onBack, action }: { title: string; onBack: () => void; action?: React.ReactNode }) {
+   279→  return (
+   280→    <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
+   281→      <div className="flex items-center gap-3">
+   282→        <button onClick={onBack} className="p-1 -ml-1 hover:bg-secondary rounded-lg transition-colors"><ArrowLeft className="w-5 h-5" /></button>
+   283→        <h2 className="text-base font-semibold">{title}</h2>
+   284→      </div>
+   285→      {action}
+   286→    </div>
+   287→  );
+   288→}
+   289→
+   290→function LoadingGrid({ cols = 2, rows = 3 }: { cols?: number; rows?: number }) {
+   291→  return (
+   292→    <div className={`grid grid-cols-${cols} gap-3 p-4`}>
+   293→      {Array.from({ length: cols * rows }).map((_, i) => (
+   294→        <div key={i} className="space-y-2">
+   295→          <Skeleton className="aspect-[3/4] w-full rounded-xl" />
+   296→          <Skeleton className="h-4 w-3/4" />
+   297→          <Skeleton className="h-3 w-1/2" />
+   298→        </div>
+   299→      ))}
+   300→    </div>
+   301→  );
+   302→}
+   303→
+   304→// ═══════════════════════════════════════════════════════════════
+   305→// MAIN COMPONENT
+   306→// ═══════════════════════════════════════════════════════════════
+   307→
+   308→export default function NexusApp() {
+   309→  const store = useAppStore();
+   310→  const {
+   311→    currentUser, setCurrentUser, activeTab, setActiveTab,
+   312→    selectedUserId, setSelectedUserId, selectedGroupId, setSelectedGroupId,
+   313→    showProfileDrawer, setShowProfileDrawer, showSettings, setShowSettings,
+   314→    showRizzModal, setShowRizzModal, rizzTargetBio, setRizzTargetBio,
+   315→    conversations, setConversations, activeConversation, setActiveConversation,
+   316→    messages, setMessages, addMessage, refreshDiscover, triggerRefreshDiscover,
+   317→    discoverView, setDiscoverView, chatRequests, setChatRequests, pendingRequestCount, setPendingRequestCount,
+   318→    shouts, setShouts, addShout, favorites, setFavorites, notes, setNotes,
+   319→    blogs, setBlogs, videos, setVideos, banners, setBanners,
+   320→    userLat, setUserLat, userLng, setUserLng,
+   321→    geoMode, setGeoMode, geoName, setGeoName,
+   322→    agendaView, setAgendaView, agendaFilter, setAgendaFilter,
+   323→    mapFilter, setMapFilter, mapHidden, setMapHidden,
+   324→    inferResults, setInferResults, inferLoading, setInferLoading,
+   325→  } = store;
+   326→
+   327→  // ── Auth state ──
+   328→  const [authed, setAuthed] = useState(false);
+   329→  const [authLoading, setAuthLoading] = useState(true);
+   330→
+   331→  // ── Discover state ──
+   332→  const [discoverUsers, setDiscoverUsers] = useState<(User & { distance?: number | null })[]>([]);
+   333→  const [discoverLoading, setDiscoverLoading] = useState(true);
+   334→  const [onlineOnly, setOnlineOnly] = useState(false);
+   335→  const [ageRange, setAgeRange] = useState([18, 60]);
+   336→  const [lookingFor, setLookingFor] = useState('all');
+   337→  const [ethnicityFilter, setEthnicityFilter] = useState('all');
+   338→  const [bodyTypeFilter, setBodyTypeFilter] = useState('all');
+   339→  const [cascadeIndex, setCascadeIndex] = useState(0);
+   340→
+   341→  // ── Chat state ──
+   342→  const [chatLoading, setChatLoading] = useState(false);
+   343→  const [msgInput, setMsgInput] = useState('');
+   344→  const [groups, setGroups] = useState<GroupChat[]>([]);
+   345→  const [groupMessages, setGroupMessages] = useState<Message[]>([]);
+   346→  const [activeGroup, setActiveGroup] = useState<GroupChat | null>(null);
+   347→  const [chatMobileView, setChatMobileView] = useState<'list' | 'chat'>('list');
+   348→  const socketRef = useRef<Socket | null>(null);
+   349→  const msgEndRef = useRef<HTMLDivElement>(null);
+   350→
+   351→  // ── Likes state ──
+   352→  const [likesTab, setLikesTab] = useState<'received' | 'sent'>('received');
+   353→  const [receivedLikes, setReceivedLikes] = useState<Like[]>([]);
+   354→  const [sentLikes, setSentLikes] = useState<Like[]>([]);
+   355→  const [likesLoading, setLikesLoading] = useState(true);
+   356→
+   357→  // ── Profile views state ──
+   358→  const [profileViews, setProfileViews] = useState<ProfileViewType[]>([]);
+   359→  const [viewsLoading, setViewsLoading] = useState(false);
+   360→
+   361→  // ── Fansites state ──
+   362→  const [fansites, setFansites] = useState<Fansite[]>([]);
+   363→  const [fansiteLoading, setFansiteLoading] = useState(true);
+   364→  const [selectedFansite, setSelectedFansite] = useState<Fansite | null>(null);
+   365→  const [showFansiteSheet, setShowFansiteSheet] = useState(false);
+   366→
+   367→  // ── Events state ──
+   368→  const [events, setEvents] = useState<AppEvent[]>([]);
+   369→  const [eventsLoading, setEventsLoading] = useState(true);
+   370→  const [showCreateEvent, setShowCreateEvent] = useState(false);
+   371→  const [eventForm, setEventForm] = useState({ title: '', description: '', location: '', startDate: '', imageUrl: '' });
+   372→  const [userRsvps, setUserRsvps] = useState<Record<string, string>>({});
+   373→
+   374→  // ── Profile state ──
+   375→  const [profileUser, setProfileUser] = useState<User | null>(null);
+   376→  const [profileLoading, setProfileLoading] = useState(false);
+   377→  const [profilePhotos, setProfilePhotos] = useState<Photo[]>([]);
+   378→  const [profileAlbums, setProfileAlbums] = useState<Album[]>([]);
+   379→  const [profileGalleryIndex, setProfileGalleryIndex] = useState(0);
+   380→  const [editingProfile, setEditingProfile] = useState(false);
+   381→  const [editForm, setEditForm] = useState({ displayName: '', bio: '', lookingFor: '', aboutMe: '', height: '', weight: '', ethnicity: '', bodyType: '', relationshipStatus: '', position: '', pronouns: '', location: '' });
+   382→  const [mySubscriptions, setMySubscriptions] = useState<any[]>([]);
+   383→  const [myBoosts, setMyBoosts] = useState<any[]>([]);
+   384→  const [blockedUsers, setBlockedUsers] = useState<any[]>([]);
+   385→
+   386→  // ── Settings state ──
+   387→  const [settingsPrivacy, setSettingsPrivacy] = useState({ showOnline: true, showDistance: true, showAge: true });
+   388→  const [settingsNotifs, setSettingsNotifs] = useState({ push: true, chat: true, likes: true, views: true });
+   389→
+   390→  // ── Rizz state ──
+   391→  const [rizzStyle, setRizzStyle] = useState('sweet');
+   392→  const [rizzLoading, setRizzLoading] = useState(false);
+   393→  const [rizzResult, setRizzResult] = useState<any>(null);
+   394→
+   395→  // ── Misc state ──
+   396→  const [showBlockAlert, setShowBlockAlert] = useState(false);
+   397→  const [totalUnread, setTotalUnread] = useState(0);
+   398→
+   399→  // ── Shouts state ──
+   400→  const [shoutInput, setShoutInput] = useState('');
+   401→  const [shoutLoading, setShoutLoading] = useState(true);
+   402→
+   403→  // ── Map state ──
+   404→  const [mapUsers, setMapUsers] = useState<(User & { distance?: number })[]>([]);
+   405→  const [mapLoading, setMapLoading] = useState(false);
+   406→  const [mapRadius, setMapRadius] = useState(50);
+   407→
+   408→  // ── Videos / Blogs / Notes / Favorites loading ──
+   409→  const [videosLoading, setVideosLoading] = useState(true);
+   410→  const [blogsLoading, setBlogsLoading] = useState(true);
+   411→  const [noteContent, setNoteContent] = useState('');
+   412→  const [noteTargetId, setNoteTargetId] = useState<string | null>(null);
+   413→  const [showNoteDialog, setShowNoteDialog] = useState(false);
+   414→  const [favoritesLoading, setFavoritesLoading] = useState(true);
+   415→  const [footprints, setFootprints] = useState<any[]>([]);
+   416→  const [footprintsLoading, setFootprintsLoading] = useState(true);
+   417→  const [allBoosts, setAllBoosts] = useState<any[]>([]);
+   418→  const [boostsLoading, setBoostsLoading] = useState(true);
+   419→
+   420→  // ── Verification / Sessions ──
+   421→  const [myVerification, setMyVerification] = useState<Verification | null>(null);
+   422→  const [mySessions, setMySessions] = useState<UserSession[]>([]);
+   423→
+   424→  // ── Account settings ──
+   425→  const [accountForm, setAccountForm] = useState({ email: '', password: '', username: '', displayName: '' });
+   426→  const [newPassword, setNewPassword] = useState('');
+   427→  const [confirmPassword, setConfirmPassword] = useState('');
+   428→  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+   429→
+   430→  // ── Preferences ──
+   431→  const [prefs, setPrefs] = useState({
+   432→    geoMode: 'auto' as string, geoName: '', displayUnits: 'metric' as string, lang: 'en',
+   433→    ageMin: 18, ageMax: 60, showOnline: true, showDistance: true, showAge: true,
+   434→    showActivity: true, hidePicsOffline: false, soundOff: false,
+   435→    notifPushOff: false, notifEmailOff: false, notifTelegramOff: false,
+   436→    mailingInternal: true, mailingPartner: true, profileOff: false,
+   437→    privateAuto: false, noPros: false, noPub: false,
+   438→    profileTags: '', profileTagCategorys: '', profileMeetNowTags: '',
+   439→  });
+   440→
+   441→  // ── Albums ──
+   442→  const [albums, setAlbums] = useState<Album[]>([]);
+   443→  const [albumsLoading, setAlbumsLoading] = useState(true);
+   444→  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+   445→
+   446→  // ── Infer state ──
+   447→  const [inferTargetUser, setInferTargetUser] = useState<User | null>(null);
+   448→  const [inferCategory, setInferCategory] = useState<InferCategory>('compatibility');
+   449→  const [inferResultsMap, setInferResultsMap] = useState<Record<string, any>>({});
+   450→
+   451→  // ── Blog detail ──
+   452→  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
+   453→
+   454→  // ── Kinks / Profile Data ──
+   455→  const [kinkFields, setKinkFields] = useState<Record<string, string>>({});
+   456→  const [kinkLoading, setKinkLoading] = useState(false);
+   457→  const [kinkTab, setKinkTab] = useState('bedroom');
+   458→  // ── AI Chat Analysis ──
+   459→  const [chatSortMode, setChatSortMode] = useState('recent');
+   460→  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+   461→  const [aiLoading, setAiLoading] = useState(false);
+   462→  // ── Enhanced Albums ──
+   463→  const [isOnline, setIsOnline] = useState(true);
+   464→
+   465→  // ── Groups ──
+   466→  const [groupSearch, setGroupSearch] = useState('');
+   467→  const [showCreateGroup, setShowCreateGroup] = useState(false);
+   468→  const [groupForm, setGroupForm] = useState({ name: '', description: '', isPublic: true });
+   469→
+   470→  // ── Abuse ──
+   471→  const [abuseForm, setAbuseForm] = useState({ category: 'harassment', description: '', userId: '' });
+   472→
+   473→  // ── Video search ──
+   474→  const [videoSearch, setVideoSearch] = useState('');
+   475→
+   476→  // ── Blog search ──
+   477→  const [blogSearch, setBlogSearch] = useState('');
+   478→
+   479→  // ── Shout type ──
+   480→  const [shoutType, setShoutType] = useState<'text' | 'image' | 'video'>('text');
+   481→
+   482→  // ── Circles state ──
+   483→  const [circles, setCircles] = useState<any[]>([]);
+   484→  const [circlesLoading, setirclesLoading] = useState(true);
+   485→  const [selectedCircle, setSelectedCircle] = useState<any>(null);
+   486→  const [showCreateCircle, setShowCreateCircle] = useState(false);
+   487→  const [circleForm, setCircleForm] = useState({ name: '', color: '#6366f1', icon: 'users' });
+   488→  const [circleMembers, setCircleMembers] = useState<any[]>([]);
+   489→  const [showAddMember, setShowAddMember] = useState(false);
+   490→  const [addMemberId, setAddMemberId] = useState('');
+   491→
+   492→  // ── Travel state ──
+   493→  const [travelData, setTravelData] = useState<any>(null);
+   494→  const [travelLoading, setTravelLoading] = useState(false);
+   495→  const [showSetTravel, setShowSetTravel] = useState(false);
+   496→  const [travelForm, setTravelForm] = useState({ city: '', country: '', startDate: '', endDate: '' });
+   497→
+   498→  // ── Checkins state ──
+   499→  const [checkins, setCheckins] = useState<any[]>([]);
+   500→  const [checkinsLoading, setCheckinsLoading] = useState(true);
+   501→  const [showCheckin, setShowCheckin] = useState(false);
+   502→  const [checkinVenue, setCheckinVenue] = useState('');
+   503→
+   504→  // ── Wallet state ──
+   505→  const [walletData, setWalletData] = useState<any>(null);
+   506→  const [walletLoading, setWalletLoading] = useState(true);
+   507→  const [transactions, setTransactions] = useState<any[]>([]);
+   508→
+   509→  // ── Saved Phrases state ──
+   510→  const [savedPhrases, setSavedPhrases] = useState<any[]>([]);
+   511→  const [phrasesLoading, setPhrasesLoading] = useState(true);
+   512→  const [showPhraseDialog, setShowPhraseDialog] = useState(false);
+   513→  const [phraseForm, setPhraseForm] = useState({ title: '', content: '' });
+   514→  const [editingPhraseId, setEditingPhraseId] = useState<string | null>(null);
+   515→
+   516→  // ── Liked Photos state ──
+   517→  const [likedPhotos, setLikedPhotos] = useState<any[]>([]);
+   518→  const [likedPhotosLoading, setLikedPhotosLoading] = useState(true);
+   519→  const [selectedLikedPhoto, setSelectedLikedPhoto] = useState<any>(null);
+   520→
+   521→  // ── Contact Folders state ──
+   522→  const [contactFolders, setContactFolders] = useState<any[]>([]);
+   523→  const [contactFoldersLoading, setContactFoldersLoading] = useState(false);
+   524→  const [favViewMode, setFavViewMode] = useState<'all' | 'folders'>('all');
+   525→  const [selectedFolder, setSelectedFolder] = useState<any>(null);
+   526→
+   527→  // ── DND state ──
+   528→  const [dndSettings, setDndSettings] = useState({ dndEnabled: false, dndStart: '22:00', dndEnd: '08:00' });
+   529→
+   530→  // ── Chat Mute/Archive state ──
+   531→  const [chatTab, setChatTab] = useState<'all' | 'archived'>('all');
+   532→  const [chatMenuOpen, setChatMenuOpen] = useState<string | null>(null);
+   533→
+   534→  // ═══════════════════════════════════════════════════════════════
+   535→  // EFFECTS — Data Fetching
+   536→  // ═══════════════════════════════════════════════════════════════
+   537→
+   538→  // Auth
+   539→  useEffect(() => {
+   540→    fetch('/api/auth')
+   541→      .then(r => r.ok ? r.json() : Promise.reject())
+   542→      .then(res => { setCurrentUser(res.data); setAuthed(true); })
+   543→      .catch(() => setAuthLoading(false))
+   544→      .finally(() => setAuthLoading(false));
+   545→  }, []);
+   546→
+   547→  // Socket.io
+   548→  useEffect(() => {
+   549→    if (!authed || !currentUser) return;
+   550→    const socket = socketIO('/?XTransformPort=3001', { transports: ['websocket'], autoConnect: false });
+   551→    socket.connect();
+   552→    socket.on('connect', () => socket.emit('join', { userId: currentUser.id }));
+   553→    socket.on('new-message', (msg: Message) => addMessage(msg));
+   554→    socketRef.current = socket;
+   555→    return () => { socket.disconnect(); socketRef.current = null; };
+   556→  }, [authed, currentUser?.id]);
+   557→
+   558→  // Discover
+   559→  useEffect(() => {
+   560→    if (!authed) return;
+   561→    setDiscoverLoading(true);
+   562→    fetch('/api/discover')
+   563→      .then(r => r.json())
+   564→      .then(res => { setDiscoverUsers(res.data || []); setCascadeIndex(0); })
+   565→      .catch(() => {}).finally(() => setDiscoverLoading(false));
+   566→  }, [authed, refreshDiscover]);
+   567→
+   568→  // Conversations + Groups + Chat Requests
+   569→  useEffect(() => {
+   570→    if (!authed || (activeTab !== 'chat' && activeTab !== 'more')) return;
+   571→    setChatLoading(true);
+   572→    Promise.all([
+   573→      fetch('/api/messages/conversations').then(r => r.json()),
+   574→      fetch('/api/groups').then(r => r.json()),
+   575→      fetch('/api/chat-requests').then(r => r.json()).catch(() => ({ data: [] })),
+   576→    ]).then(([convRes, groupRes, reqRes]) => {
+   577→      const convos = convRes.data || [];
+   578→      setConversations(convos);
+   579→      setGroups(groupRes.data || []);
+   580→      setTotalUnread(convos.reduce((sum: number, c: any) => sum + (c.unreadCount || 0), 0));
+   581→      const reqs = reqRes.data || [];
+   582→      const pending = reqs.filter((r: ChatRequest) => r.status === 'pending');
+   583→      setChatRequests(pending);
+   584→      setPendingRequestCount(pending.length);
+   585→    }).catch(() => {}).finally(() => setChatLoading(false));
+   586→  }, [authed, activeTab]);
+   587→
+   588→  // Kinks / Profile Data
+   589→  useEffect(() => {
+   590→    if (!authed || activeTab !== 'kinks') return;
+   591→    setKinkLoading(true);
+   592→    fetch('/api/profile-data?userId=test-user-1').then(r => r.json()).then(res => {
+   593→      const fields: Record<string, string> = {};
+   594→      (res.data || []).forEach((f: any) => { fields[f.key] = f.value; });
+   595→      setKinkFields(fields);
+   596→    }).catch(() => {}).finally(() => setKinkLoading(false));
+   597→  }, [authed, activeTab]);
+   598→
+   599→  // PWA install prompt
+   600→  useEffect(() => {
+   601→    const handler = () => setIsOnline(true);
+   602→    const offHandler = () => setIsOnline(false);
+   603→    window.addEventListener('online', handler);
+   604→    window.addEventListener('offline', offHandler);
+   605→    return () => { window.removeEventListener('online', handler); window.removeEventListener('offline', offHandler); };
+   606→  }, []);
+   607→
+   608→  // Likes
+   609→  useEffect(() => {
+   610→    if (!authed || activeTab !== 'likes') return;
+   611→    setLikesLoading(true);
+   612→    Promise.all([
+   613→      fetch('/api/likes?type=received').then(r => r.json()),
+   614→      fetch('/api/likes?type=sent').then(r => r.json()),
+   615→    ]).then(([recRes, sentRes]) => {
+   616→      setReceivedLikes(recRes.data || []);
+   617→      setSentLikes(sentRes.data || []);
+   618→    }).catch(() => {}).finally(() => setLikesLoading(false));
+   619→  }, [authed, activeTab]);
+   620→
+   621→  // Profile Views
+   622→  useEffect(() => {
+   623→    if (!authed || activeTab !== 'viewed') return;
+   624→    setViewsLoading(true);
+   625→    fetch('/api/profile-views').then(r => r.json()).then(res => setProfileViews(res.data || [])).catch(() => {}).finally(() => setViewsLoading(false));
+   626→  }, [authed, activeTab]);
+   627→
+   628→  // Fansites
+   629→  useEffect(() => {
+   630→    if (!authed || activeTab !== 'fansites') return;
+   631→    setFansiteLoading(true);
+   632→    fetch('/api/fansites').then(r => r.json()).then(res => setFansites(res.data || [])).catch(() => {}).finally(() => setFansiteLoading(false));
+   633→  }, [authed, activeTab]);
+   634→
+   635→  // Events
+   636→  useEffect(() => {
+   637→    if (!authed || activeTab !== 'events') return;
+   638→    setEventsLoading(true);
+   639→    fetch('/api/events/upcoming').then(r => r.json()).then(res => setEvents(res.data || [])).catch(() => {}).finally(() => setEventsLoading(false));
+   640→  }, [authed, activeTab]);
+   641→
+   642→  // Shouts
+   643→  useEffect(() => {
+   644→    if (!authed || activeTab !== 'shouts') return;
+   645→    setShoutLoading(true);
+   646→    fetch('/api/shouts').then(r => r.json()).then(res => setShouts(res.data || [])).catch(() => {}).finally(() => setShoutLoading(false));
+   647→  }, [authed, activeTab]);
+   648→
+   649→  // Map
+   650→  useEffect(() => {
+   651→    if (!authed || activeTab !== 'map') return;
+   652→    handleFetchMap();
+   653→  }, [authed, activeTab, mapRadius]);
+   654→
+   655→  // Videos
+   656→  useEffect(() => {
+   657→    if (!authed || activeTab !== 'videos') return;
+   658→    setVideosLoading(true);
+   659→    fetch('/api/videos').then(r => r.json()).then(res => setVideos(res.videos || [])).catch(() => {}).finally(() => setVideosLoading(false));
+   660→  }, [authed, activeTab]);
+   661→
+   662→  // Blogs
+   663→  useEffect(() => {
+   664→    if (!authed || activeTab !== 'blogs') return;
+   665→    setBlogsLoading(true);
+   666→    fetch('/api/blogs').then(r => r.json()).then(res => setBlogs(res.blogs || [])).catch(() => {}).finally(() => setBlogsLoading(false));
+   667→  }, [authed, activeTab]);
+   668→
+   669→  // Banners
+   670→  useEffect(() => {
+   671→    fetch('/api/banners').then(r => r.json()).then(res => setBanners(res.data || [])).catch(() => {});
+   672→  }, [authed]);
+   673→
+   674→  // Profile drawer
+   675→  useEffect(() => {
+   676→    if (!selectedUserId) return;
+   677→    setProfileLoading(true);
+   678→    fetch(`/api/users/${selectedUserId}`).then(r => r.json()).then(res => {
+   679→      const u = res.data;
+   680→      setProfileUser(u);
+   681→      setProfilePhotos(u.photos || []);
+   682→      setProfileAlbums(u.albums || []);
+   683→      setRizzTargetBio(u.bio || '');
+   684→    }).catch(() => {}).finally(() => setProfileLoading(false));
+   685→  }, [selectedUserId]);
+   686→
+   687→  // My profile data
+   688→  useEffect(() => {
+   689→    if (!authed || !currentUser || activeTab !== 'profile') return;
+   690→    Promise.all([
+   691→      fetch(`/api/users/${currentUser.id}`).then(r => r.json()),
+   692→      fetch('/api/subscriptions').then(r => r.json()),
+   693→      fetch('/api/boosts').then(r => r.json()),
+   694→      fetch('/api/blocks').then(r => r.json()),
+   695→      fetch('/api/verification?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: null })),
+   696→      fetch('/api/sessions?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+   697→      fetch('/api/favorites?userId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+   698→      fetch('/api/notes?writerId=' + currentUser.id).then(r => r.json()).catch(() => ({ data: [] })),
+   699→    ]).then(([userRes, subRes, boostRes, blockRes, verRes, sessRes, favRes, noteRes]) => {
+   700→      const u = userRes.data;
+   701→      setCurrentUser(u);
+   702→      setMySubscriptions(subRes.data || []);
+   703→      setMyBoosts((boostRes.data || []).filter((b: any) => b.isActive));
+   704→      setBlockedUsers(blockRes.data || []);
+   705→      setSettingsPrivacy({ showOnline: u.showOnline ?? true, showDistance: u.showDistance ?? true, showAge: u.showAge ?? true });
+   706→      setMyVerification(verRes.data || null);
+   707→      setMySessions(sessRes.data || []);
+   708→      setFavorites(favRes.data || []);
+   709→      setNotes(noteRes.data || []);
+   710→    }).catch(() => {});
+   711→  }, [authed, activeTab]);
+   712→
+   713→  // Footprints
+   714→  useEffect(() => {
+   715→    if (!authed || activeTab !== 'footprints') return;
+   716→    setFootprintsLoading(true);
+   717→    fetch('/api/footprints?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setFootprints(res.data || [])).catch(() => {}).finally(() => setFootprintsLoading(false));
+   718→  }, [authed, activeTab]);
+   719→
+   720→  // Favorites
+   721→  useEffect(() => {
+   722→    if (!authed || activeTab !== 'favorites') return;
+   723→    setFavoritesLoading(true);
+   724→    fetch('/api/favorites?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setFavorites(res.data || [])).catch(() => {}).finally(() => setFavoritesLoading(false));
+   725→  }, [authed, activeTab]);
+   726→
+   727→  // Notes
+   728→  useEffect(() => {
+   729→    if (!authed || activeTab !== 'notes') return;
+   730→    fetch('/api/notes?writerId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setNotes(res.data || [])).catch(() => {});
+   731→  }, [authed, activeTab]);
+   732→
+   733→  // Boosts
+   734→  useEffect(() => {
+   735→    if (!authed || activeTab !== 'boosts') return;
+   736→    setBoostsLoading(true);
+   737→    fetch('/api/boosts?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setAllBoosts(res.data || [])).catch(() => {}).finally(() => setBoostsLoading(false));
+   738→  }, [authed, activeTab]);
+   739→
+   740→  // Albums
+   741→  useEffect(() => {
+   742→    if (!authed || activeTab !== 'albums') return;
+   743→    setAlbumsLoading(true);
+   744→    fetch('/api/albums?userId=' + CURRENT_USER_ID).then(r => r.json()).then(res => setAlbums(res.data || [])).catch(() => {}).finally(() => setAlbumsLoading(false));
+   745→  }, [authed, activeTab]);
+   746→
+   747→  // Groups
+   748→  useEffect(() => {
+   749→    if (!authed || activeTab !== 'groups') return;
+   750→    fetch('/api/groups').then(r => r.json()).then(res => setGroups(res.data || [])).catch(() => {});
+   751→  }, [authed, activeTab]);
+   752→
+   753→  // Circles
+   754→  useEffect(() => {
+   755→    if (!authed || activeTab !== 'circles') return;
+   756→    setirclesLoading(true);
+   757→    fetch('/api/circles').then(r => r.json()).then(res => setCircles(res.data || [])).catch(() => {}).finally(() => setirclesLoading(false));
+   758→  }, [authed, activeTab]);
+   759→
+   760→  // Selected Circle Members
+   761→  useEffect(() => {
+   762→    if (!selectedCircle) return;
+   763→    fetch(`/api/circles/${selectedCircle.id}`).then(r => r.json()).then(res => setCircleMembers(res.members || [])).catch(() => {});
+   764→  }, [selectedCircle]);
+   765→
+   766→  // Travel
+   767→  useEffect(() => {
+   768→    if (!authed || activeTab !== 'travel') return;
+   769→    setTravelLoading(true);
+   770→    fetch('/api/travel').then(r => r.json()).then(res => setTravelData(res.data || null)).catch(() => {}).finally(() => setTravelLoading(false));
+   771→  }, [authed, activeTab]);
+   772→
+   773→  // Checkins
+   774→  useEffect(() => {
+   775→    if (!authed || activeTab !== 'checkins') return;
+   776→    setCheckinsLoading(true);
+   777→    fetch('/api/checkins').then(r => r.json()).then(res => setCheckins(res.data || [])).catch(() => {}).finally(() => setCheckinsLoading(false));
+   778→  }, [authed, activeTab]);
+   779→
+   780→  // Wallet
+   781→  useEffect(() => {
+   782→    if (!authed || activeTab !== 'wallet') return;
+   783→    setWalletLoading(true);
+   784→    fetch('/api/wallet').then(r => r.json()).then(res => { setWalletData(res.data); setTransactions(res.data?.transactions || []); }).catch(() => {}).finally(() => setWalletLoading(false));
+   785→  }, [authed, activeTab]);
+   786→
+   787→  // Saved Phrases
+   788→  useEffect(() => {
+   789→    if (!authed || activeTab !== 'saved-phrases') return;
+   790→    setPhrasesLoading(true);
+   791→    fetch('/api/saved-phrases').then(r => r.json()).then(res => setSavedPhrases(res.data || [])).catch(() => {}).finally(() => setPhrasesLoading(false));
+   792→  }, [authed, activeTab]);
+   793→
+   794→  // Liked Photos
+   795→  useEffect(() => {
+   796→    if (!authed || activeTab !== 'liked-photos') return;
+   797→    setLikedPhotosLoading(true);
+   798→    fetch('/api/liked-photos').then(r => r.json()).then(res => setLikedPhotos(res.data || [])).catch(() => {}).finally(() => setLikedPhotosLoading(false));
+   799→  }, [authed, activeTab]);
+   800→
+   801→  // Contact Folders
+   802→  useEffect(() => {
+   803→    if (!authed || activeTab !== 'favorites') return;
+   804→    setContactFoldersLoading(true);
+   805→    fetch('/api/contact-folders').then(r => r.json()).then(res => setContactFolders(res.data || [])).catch(() => {}).finally(() => setContactFoldersLoading(false));
+   806→  }, [authed, activeTab]);
+   807→
+   808→  // DND Settings
+   809→  useEffect(() => {
+   810→    if (!authed) return;
+   811→    fetch('/api/dnd').then(r => r.json()).then(res => {
+   812→      if (res.data) setDndSettings({ dndEnabled: res.data.dndEnabled ?? false, dndStart: res.data.dndStart || '22:00', dndEnd: res.data.dndEnd || '08:00' });
+   813→    }).catch(() => {});
+   814→  }, [authed]);
+   815→
+   816→  // Messages scroll
+   817→  useEffect(() => { msgEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, groupMessages]);
+   818→
+   819→  // ═══════════════════════════════════════════════════════════════
+   820→  // HANDLERS
+   821→  // ═══════════════════════════════════════════════════════════════
+   822→
+   823→  const openProfile = useCallback((userId: string) => setSelectedUserId(userId), []);
+   824→  const closeProfile = useCallback(() => { setShowProfileDrawer(false); setSelectedUserId(null); setProfileUser(null); }, []);
+   825→
+   826→  const openChat = useCallback(async (otherUser: User) => {
+   827→    const convo: Conversation = {
+   828→      otherUser,
+   829→      lastMessage: { id: '', content: '', senderId: '', receiverId: '', chatType: 'direct', isRead: true, type: 'text', createdAt: new Date().toISOString() },
+   830→      unreadCount: 0,
+   831→    };
+   832→    setActiveConversation(convo);
+   833→    setMessages([]);
+   834→    setChatMobileView('chat');
+   835→    if (currentUser) {
+   836→      fetch(`/api/messages?userId=${otherUser.id}`).then(r => r.json()).then(res => setMessages(res.data || [])).catch(() => {});
+   837→    }
+   838→  }, [currentUser]);
+   839→
+   840→  const sendMessage = useCallback(() => {
+   841→    if (!msgInput.trim() || !activeConversation || !currentUser) return;
+   842→    const content = msgInput.trim();
+   843→    setMsgInput('');
+   844→    const optimisticMsg: Message = { id: `temp-${Date.now()}`, content, senderId: currentUser.id, receiverId: activeConversation.otherUser.id, chatType: 'direct', isRead: false, type: 'text', createdAt: new Date().toISOString() };
+   845→    addMessage(optimisticMsg);
+   846→    fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ receiverId: activeConversation.otherUser.id, content, type: 'text' }) })
+   847→      .then(r => r.json()).then(res => { if (res.data) { setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? res.data : m)); socketRef.current?.emit('message', res.data); } }).catch(() => {});
+   848→  }, [msgInput, activeConversation, currentUser]);
+   849→
+   850→  const sendGroupMessage = useCallback(() => {
+   851→    if (!msgInput.trim() || !activeGroup || !currentUser) return;
+   852→    const content = msgInput.trim();
+   853→    setMsgInput('');
+   854→    const optimisticMsg: Message = { id: `temp-${Date.now()}`, content, senderId: currentUser.id, receiverId: '', chatType: 'group', isRead: false, type: 'text', createdAt: new Date().toISOString(), sender: currentUser };
+   855→    setGroupMessages(prev => [...prev, optimisticMsg]);
+   856→    fetch(`/api/groups/${activeGroup.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'message', content }) }).catch(() => {});
+   857→  }, [msgInput, activeGroup, currentUser]);
+   858→
+   859→  const handleLike = useCallback(async (receiverId: string) => {
+   860→    try { await fetch('/api/likes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ receiverId }) }); triggerRefreshDiscover(); } catch {}
+   861→  }, []);
+   862→
+   863→  const handleUnlike = useCallback(async (receiverId: string) => {
+   864→    try { await fetch(`/api/likes?receiverId=${receiverId}`, { method: 'DELETE' }); triggerRefreshDiscover(); } catch {}
+   865→  }, []);
+   866→
+   867→  const handleBlock = useCallback(async (userId: string) => {
+   868→    try { await fetch('/api/blocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blockedId: userId }) }); setShowBlockAlert(false); closeProfile(); } catch {}
+   869→  }, [closeProfile]);
+   870→
+   871→  const handleRizz = useCallback(async () => {
+   872→    setRizzLoading(true); setRizzResult(null);
+   873→    try {
+   874→      const res = await fetch('/api/ai-rizz', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetBio: rizzTargetBio, style: rizzStyle }) });
+   875→      const data = await res.json();
+   876→      setRizzResult(data.data);
+   877→    } catch { setRizzResult({ line: 'Failed to generate. Try again!', style: rizzStyle }); } finally { setRizzLoading(false); }
+   878→  }, [rizzTargetBio, rizzStyle]);
+   879→
+   880→  const copyRizz = useCallback(() => { if (rizzResult?.line) navigator.clipboard.writeText(rizzResult.line); }, [rizzResult]);
+   881→
+   882→  const handleSendRizz = useCallback(() => {
+   883→    if (!rizzResult || !activeConversation && !profileUser) return;
+   884→    if (activeConversation) { setMsgInput(rizzResult.line); setShowRizzModal(false); }
+   885→    else if (profileUser) { openChat(profileUser); setTimeout(() => { setMsgInput(rizzResult.line); setShowRizzModal(false); }, 300); }
+   886→  }, [rizzResult, activeConversation, profileUser, openChat]);
+   887→
+   888→  const handleRsvp = useCallback(async (eventId: string, status: string) => {
+   889→    try { await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'rsvp', eventId, status }) }); setUserRsvps(prev => ({ ...prev, [eventId]: status })); } catch {}
+   890→  }, []);
+   891→
+   892→  const handleCreateEvent = useCallback(async () => {
+   893→    try {
+   894→      const res = await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(eventForm) });
+   895→      if (res.ok) { const data = await res.json(); setEvents(prev => [data.data, ...prev]); setShowCreateEvent(false); setEventForm({ title: '', description: '', location: '', startDate: '', imageUrl: '' }); }
+   896→    } catch {}
+   897→  }, [eventForm]);
+   898→
+   899→  const handleSaveProfile = useCallback(async () => {
+   900→    if (!currentUser) return;
+   901→    try {
+   902→      const payload: any = {};
+   903→      for (const [k, v] of Object.entries(editForm)) { if (v !== '' && v !== undefined) { if (k === 'height' || k === 'weight') payload[k] = parseInt(v); else payload[k] = v; } }
+   904→      const res = await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+   905→      if (res.ok) { const data = await res.json(); setCurrentUser(data.data); setEditingProfile(false); }
+   906→    } catch {}
+   907→  }, [currentUser, editForm]);
+   908→
+   909→  const handleSaveSettings = useCallback(async () => {
+   910→    if (!currentUser) return;
+   911→    try { await fetch(`/api/users/${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settingsPrivacy) }); setCurrentUser({ ...currentUser, ...settingsPrivacy }); } catch {}
+   912→  }, [currentUser, settingsPrivacy]);
+   913→
+   914→  const handleChatRequest = useCallback(async (requestId: string, action: 'accept' | 'decline') => {
+   915→    try { await fetch('/api/chat-requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestId, action }) }); setChatRequests(prev => prev.filter(r => r.id !== requestId)); setPendingRequestCount(prev => Math.max(0, prev - 1)); } catch {}
+   916→  }, []);
+   917→
+   918→  const handleShout = useCallback(async () => {
+   919→    if (!shoutInput.trim() || !currentUser) return;
+   920→    try {
+   921→      const res = await fetch(`/api/shouts?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: shoutInput.trim(), type: shoutType }) });
+   922→      if (res.ok) { const data = await res.json(); if (data.data) addShout(data.data); setShoutInput(''); }
+   923→    } catch {}
+   924→  }, [shoutInput, currentUser, shoutType]);
+   925→
+   926→  const handleFetchMap = useCallback(async () => {
+   927→    const lat = userLat || currentUser?.lat || 35.69;
+   928→    const lng = userLng || currentUser?.lng || 14.42;
+   929→    setMapLoading(true);
+   930→    try {
+   931→      const res = await fetch(`/api/user-map?lat=${lat}&lng=${lng}&radius=${mapRadius}&userId=${CURRENT_USER_ID}`);
+   932→      const data = await res.json();
+   933→      setMapUsers(data.users || []);
+   934→    } catch {} finally { setMapLoading(false); }
+   935→  }, [currentUser, userLat, userLng, mapRadius]);
+   936→
+   937→  const handleFavorite = useCallback(async (targetId: string, isSuper: boolean = false) => {
+   938→    if (!currentUser) return;
+   939→    try { await fetch(`/api/favorites?userId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId, isSuper }) }); } catch {}
+   940→  }, [currentUser]);
+   941→
+   942→  const handleSaveNote = useCallback(async () => {
+   943→    if (!currentUser || !noteTargetId || !noteContent.trim()) return;
+   944→    try { await fetch(`/api/notes?writerId=${currentUser.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: noteTargetId, content: noteContent.trim() }) }); setShowNoteDialog(false); setNoteContent(''); setNoteTargetId(null); } catch {}
+   945→  }, [currentUser, noteTargetId, noteContent]);
+   946→
+   947→  const handleDeleteNote = useCallback(async (noteId: string) => {
+   948→    try { await fetch(`/api/notes/${noteId}`, { method: 'DELETE' }); setNotes(prev => prev.filter((n: any) => n.id !== noteId)); } catch {}
+   949→  }, []);
+   950→
+   951→  const handleInfer = useCallback(async (category?: InferCategory) => {
+   952→    if (!inferTargetUser) return;
+   953→    const cats = category ? [category] : INFER_CATEGORIES.map(c => c.id);
+   954→    setInferLoading(true);
+   955→    const newResults: Record<string, any> = {};
+   956→    for (const cat of cats) {
+   957→      try {
+   958→        const res = await fetch('/api/ai-rizz', {
+   959→          method: 'POST', headers: { 'Content-Type': 'application/json' },
+   960→          body: JSON.stringify({ targetBio: inferTargetUser.bio || '', style: cat, fullProfile: inferTargetUser, inferCategory: cat }),
+   961→        });
+   962→        const data = await res.json();
+   963→        newResults[cat] = { category: cat, confidence: 75 + (cat.length * 3) % 26, title: data.data?.line || 'Analysis complete', content: data.data?.context || `Detailed ${cat} analysis for ${inferTargetUser.displayName}`, bulletPoints: ['Based on profile analysis', 'AI-generated insights', 'Personalized recommendations'], color: cat === 'red-flags' ? 'red' : cat === 'green-flags' ? 'green' : 'blue' };
+   964→      } catch { newResults[cat] = { category: cat, confidence: 50, title: 'Analysis unavailable', content: 'Could not generate analysis', bulletPoints: [], color: 'gray' }; }
+   965→    }
+   966→    setInferResultsMap(newResults);
+   967→    setInferLoading(false);
+   968→  }, [inferTargetUser]);
+   969→
+   970→  const handleCreateGroup = useCallback(async () => {
+   971→    if (!currentUser || !groupForm.name.trim()) return;
+   972→    try {
+   973→      const res = await fetch('/api/groups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(groupForm) });
+   974→      if (res.ok) { const data = await res.json(); setGroups(prev => [data.data, ...prev]); setShowCreateGroup(false); setGroupForm({ name: '', description: '', isPublic: true }); }
+   975→    } catch {}
+   976→  }, [currentUser, groupForm]);
+   977→
+   978→  const handleCreateBanner = useCallback(async () => {
+   979→    if (!currentUser) return;
+   980→    try {
+   981→      const res = await fetch('/api/banners', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'My Banner', imageUrl: DEFAULT_COVER, position: 0 }) });
+   982→      if (res.ok) { const data = await res.json(); setBanners(prev => [...prev, data.data]); }
+   983→    } catch {}
+   984→  }, [currentUser]);
+   985→
+   986→  // Filtered discover users
+   987→  const filteredDiscover = discoverUsers.filter(u => {
+   988→    if (onlineOnly && !u.online) return false;
+   989→    if (u.age && (u.age < ageRange[0] || u.age > ageRange[1])) return false;
+   990→    if (lookingFor !== 'all' && u.lookingFor !== lookingFor) return false;
+   991→    if (ethnicityFilter !== 'all' && u.ethnicity !== ethnicityFilter) return false;
+   992→    if (bodyTypeFilter !== 'all' && u.bodyType !== bodyTypeFilter) return false;
+   993→    return true;
+   994→  });
+   995→
+   996→  const cascadeUser = filteredDiscover[cascadeIndex];
+   997→
+   998→  // ═══════════════════════════════════════════════════════════════
+   999→  // LOGIN SCREEN
+  1000→  // ═══════════════════════════════════════════════════════════════
+  1001→  if (authLoading) {
+  1002→    return (
+  1003→      <div className="h-screen flex flex-col items-center justify-center bg-background gap-4">
+  1004→        <div className="text-2xl font-bold gradient-text">NEXUS</div>
+  1005→        <Skeleton className="h-4 w-32" />
+  1006→      </div>
+  1007→    );
+  1008→  }
+  1009→
+  1010→  if (!authed) {
+  1011→    return (
+  1012→      <div className="h-screen flex flex-col items-center justify-center bg-background px-6">
+  1013→        <div className="text-4xl font-bold gradient-text mb-2">NEXUS</div>
+  1014→        <p className="text-muted-foreground text-sm mb-8">Connect. Discover. Thrive.</p>
+  1015→        <Card className="w-full max-w-sm bg-card border-border"><CardContent className="p-6">
+  1016→          <button onClick={() => { setCurrentUser({ id: CURRENT_USER_ID, username: 'testuser', displayName: 'Test User', email: 'test@nexus.app', avatar: DEFAULT_AVATAR, bio: 'Love adventures and good coffee ☕', age: 28, gender: 'male', location: 'Valletta, Malta', lat: 35.8989, lng: 14.5146, geoCity: 'Valletta', geoRegion: 'Central Region', geoCountry: 'Malta', online: true, lastSeen: new Date().toISOString(), isPremium: true, isVerified: true, showOnline: true, showDistance: true, showAge: true, showActivity: true, hidePicsOffline: false, lookingFor: 'relationship', aboutMe: 'Adventurous soul looking for meaningful connections. I love hiking, photography, and trying new cuisines. Always up for a good conversation over coffee or wine.', height: 180, weight: 75, ethnicity: 'white', bodyType: 'athletic', relationshipStatus: 'single', position: 'versatile', pronouns: 'he/him', displayUnits: 'metric', lang: 'en', soundOff: false, notifPushOff: false, notifEmailOff: false, notifTelegramOff: false, mailingInternal: true, mailingPartner: true, profileOff: false, privateAuto: false, noPros: false, noPub: false, isProfessional: false, professionalStatus: 'none', verificationStatus: 'verified', voucher: null, _count: { photos: 12, receivedLikes: 47, receivedViews: 234, shouts: 5, favorites: 18, blogs: 2, videos: 1, sentMessages: 89, receivedMessages: 76, notesWritten: 8 } } as any); setAuthed(true); }} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium">
+  1017→            Quick Login as Test User
+  1018→          </button>
+  1019→        </CardContent></Card>
+  1020→      </div>
+  1021→    );
+  1022→  }
+  1023→
+  1024→
+  1025→  // ═══════════════════════════════════════════════════════════════
+  1026→  // MAIN NAV CONSTANTS
+  1027→  // ═══════════════════════════════════════════════════════════════
+  1028→  const MAIN_TABS = [
+  1029→    { tab: 'discover' as const, icon: Compass, label: 'Discover', badge: 0 },
+  1030→    { tab: 'map' as const, icon: MapPinned, label: 'Map', badge: 0 },
+  1031→    { tab: 'chat' as const, icon: MessageCircle, label: 'Chat', badge: totalUnread + pendingRequestCount },
+  1032→    { tab: 'likes' as const, icon: Heart, label: 'Likes', badge: receivedLikes.length },
+  1033→    { tab: 'more' as const, icon: Grid2X2, label: 'More', badge: 0 },
+  1034→  ];
+  1035→
+  1036→  const isMainTab = (t: string) => ['discover', 'map', 'chat', 'likes', 'more'].includes(t);
+  1037→
+  1038→  const getPageTitle = () => {
+  1039→    const titles: Record<string, string> = {
+  1040→      events: 'Events & Agenda', viewed: 'Viewed Me', shouts: 'Shouts',
+  1041→      fansites: 'Fansites', videos: 'Videos', blogs: 'Blogs', groups: 'Groups',
+  1042→      albums: 'Albums', membership: 'Membership', verified: 'Verified',
+  1043→      professional: 'Professional', footprints: 'Footprints', notes: 'Notes',
+  1044→      boosts: 'Boosts', favorites: 'Favorites', account: 'Account',
+  1045→      preferences: 'Preferences', 'geo-settings': 'GEO Settings',
+  1046→      banners: 'Banners', sites: 'Sites', legal: 'Legal', faqs: 'FAQs',
+  1047→      abuse: 'Report & Block', advantages: 'Advantages', affiliation: 'Affiliation',
+  1048→      profile: 'My Profile', infer: 'INFER AI Analysis', more: 'More',
+  1049→      kinks: 'Kinks & Bedroom', circles: 'Circles', travel: 'Travel Mode',
+  1050→      checkins: 'Check-ins', wallet: 'Wallet', 'saved-phrases': 'Saved Phrases',
+  1051→      'liked-photos': 'Liked Photos',
+  1052→    };
+  1053→    return titles[activeTab] || 'NEXUS';
+  1054→  };
+  1055→
+  1056→  // ═══════════════════════════════════════════════════════════════
+  1057→  // RENDER
+  1058→  // ═══════════════════════════════════════════════════════════════
+  1059→  return (
+  1060→    <TooltipProvider>
+  1061→    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+  1062→
+  1063→      {/* ═══ HEADER ═══ */}
+  1064→      <header className="h-14 flex items-center justify-between px-4 bg-card/80 backdrop-blur-lg border-b border-border shrink-0 z-50">
+  1065→        <div className="flex items-center gap-3">
+  1066→          {isMainTab(activeTab) ? (
+  1067→            <span className="text-lg font-bold gradient-text tracking-wider">NEXUS</span>
+  1068→          ) : (
+  1069→            <button onClick={() => setActiveTab('more')} className="p-1 hover:bg-secondary rounded-lg transition-colors">
+  1070→              <ArrowLeft className="w-4 h-4" />
+  1071→            </button>
+  1072→          )}
+  1073→          {activeTab === 'chat' && activeConversation && (
+  1074→            <button onClick={() => { setActiveConversation(null); setActiveGroup(null); setChatMobileView('list'); }} className="md:hidden p-1 hover:bg-secondary rounded-lg transition-colors">
+  1075→              <ChevronLeft className="w-5 h-5" />
+  1076→            </button>
+  1077→          )}
+  1078→          {!isMainTab(activeTab) && <span className="text-sm font-medium">{getPageTitle()}</span>}
+  1079→        </div>
+  1080→        <div className="flex items-center gap-1">
+  1081→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground"><Search className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Search</TooltipContent></Tooltip>
+  1082→          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground" onClick={() => setShowSettings(true)}><Settings className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Settings</TooltipContent></Tooltip>
+  1083→          <button onClick={() => currentUser && openProfile(currentUser.id)} className="ml-1">
+  1084→            <Avatar className="h-8 w-8 border-2 border-primary/50">
+  1085→              <AvatarImage src={getAvatar(currentUser)} alt={currentUser?.displayName || ''} />
+  1086→              <AvatarFallback className="text-xs">{currentUser?.displayName?.[0] || 'U'}</AvatarFallback>
+  1087→            </Avatar>
+  1088→          </button>
+  1089→        </div>
+  1090→      </header>
+  1091→
+  1092→      {/* ═══ MAIN CONTENT ═══ */}
+  1093→      <main className="flex-1 overflow-hidden relative">
+  1094→        {/* Offline Banner */}
+  1095→        {!isOnline && <div className="absolute top-0 inset-x-0 z-50 bg-destructive/90 text-destructive-foreground text-center text-[11px] py-1.5 font-medium"><WifiOff className="w-3 h-3 inline mr-1" />You are offline. Some features may not work.</div>}
+  1096→        {showSettings ? <SettingsPanel /> : activeTab === 'discover' ? <DiscoverView /> : activeTab === 'map' ? <MapView /> : activeTab === 'chat' ? <ChatView /> : activeTab === 'likes' ? <LikesView /> : activeTab === 'more' ? <MoreView /> : activeTab === 'events' ? <EventsView /> : activeTab === 'viewed' ? <ViewedMeView /> : activeTab === 'shouts' ? <ShoutsView /> : activeTab === 'fansites' ? <FansitesView /> : activeTab === 'videos' ? <VideosView /> : activeTab === 'blogs' ? <BlogsView /> : activeTab === 'groups' ? <GroupsView /> : activeTab === 'albums' ? <AlbumsView /> : activeTab === 'membership' ? <MembershipView /> : activeTab === 'verified' ? <VerifiedView /> : activeTab === 'professional' ? <ProfessionalView /> : activeTab === 'footprints' ? <FootprintsView /> : activeTab === 'notes' ? <NotesView /> : activeTab === 'boosts' ? <BoostsView /> : activeTab === 'favorites' ? <FavoritesView /> : activeTab === 'account' ? <AccountView /> : activeTab === 'preferences' ? <PreferencesView /> : activeTab === 'geo-settings' ? <GeoSettingsView /> : activeTab === 'banners' ? <BannersView /> : activeTab === 'sites' ? <SitesView /> : activeTab === 'legal' ? <LegalView /> : activeTab === 'faqs' ? <FaqsView /> : activeTab === 'abuse' ? <AbuseView /> : activeTab === 'advantages' ? <AdvantagesView /> : activeTab === 'affiliation' ? <AffiliationView /> : activeTab === 'profile' ? <ProfileView /> : activeTab === 'infer' ? <InferView /> : activeTab === 'kinks' ? <KinksView /> : activeTab === 'circles' ? <CirclesView /> : activeTab === 'travel' ? <TravelView /> : activeTab === 'checkins' ? <CheckinsView /> : activeTab === 'wallet' ? <WalletView /> : activeTab === 'saved-phrases' ? <SavedPhrasesView /> : activeTab === 'liked-photos' ? <LikedPhotosView /> : <MoreView />}
+  1097→      </main>
+  1098→
+  1099→      {/* ═══ BOTTOM NAV ═══ */}
+  1100→      <nav className="h-14 flex items-center justify-around bg-card border-t border-border shrink-0 z-50 px-0.5">
+  1101→        {MAIN_TABS.map(({ tab, icon: Icon, label, badge }) => (
+  1102→          <button key={tab} onClick={() => { setActiveTab(tab); setShowSettings(false); if (tab === 'chat') { setChatMobileView('list'); setActiveConversation(null); setActiveGroup(null); } }}
+  1103→            className={`h-12 flex flex-col items-center justify-center gap-0.5 relative transition-colors px-1 ${activeTab === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+  1104→            <Icon className="w-4 h-4" />
+  1105→            <span className="text-[9px] leading-none">{label}</span>
+  1106→            {activeTab === tab && <span className="absolute bottom-0 w-4 h-0.5 bg-primary rounded-full" />}
+  1107→            {badge > 0 && <span className="absolute -top-0.5 right-1/2 translate-x-4 min-w-[14px] h-3.5 flex items-center justify-center text-[8px] font-bold bg-primary text-primary-foreground rounded-full px-0.5">{badge > 99 ? '99+' : badge}</span>}
+  1108→          </button>
+  1109→        ))}
+  1110→      </nav>
+  1111→
+  1112→      {/* ═══ PROFILE DRAWER ═══ */}
+  1113→      <Sheet open={showProfileDrawer} onOpenChange={(open) => { if (!open) closeProfile(); }}>
+  1114→        <SheetContent side="right" className="w-full sm:max-w-md bg-card border-border p-0 overflow-y-auto">
+  1115→          {profileLoading ? <div className="p-6 space-y-4"><Skeleton className="h-64 w-full rounded-xl" /><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-32" /></div>
+  1116→            : profileUser ? <ProfileDrawerContent /> : null}
+  1117→        </SheetContent>
+  1118→      </Sheet>
+  1119→
+  1120→      {/* ═══ FANSITE DETAIL SHEET ═══ */}
+  1121→      <Sheet open={showFansiteSheet} onOpenChange={setShowFansiteSheet}>
+  1122→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+  1123→          {selectedFansite && <FansiteDetail />}
+  1124→        </SheetContent>
+  1125→      </Sheet>
+  1126→
+  1127→      {/* ═══ ALBUM DETAIL SHEET ═══ */}
+  1128→      <Sheet open={!!selectedAlbum} onOpenChange={(open) => { if (!open) setSelectedAlbum(null); }}>
+  1129→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+  1130→          {selectedAlbum && <AlbumDetail />}
+  1131→        </SheetContent>
+  1132→      </Sheet>
+  1133→
+  1134→      {/* ═══ BLOG DETAIL SHEET ═══ */}
+  1135→      <Sheet open={!!selectedBlog} onOpenChange={(open) => { if (!open) setSelectedBlog(null); }}>
+  1136→        <SheetContent side="bottom" className="max-h-[85vh] bg-card border-border rounded-t-2xl">
+  1137→          {selectedBlog && <BlogDetail />}
+  1138→        </SheetContent>
+  1139→      </Sheet>
+  1140→
+  1141→      {/* ═══ RIZZ MODAL ═══ */}
+  1142→      <Dialog open={showRizzModal} onOpenChange={setShowRizzModal}>
+  1143→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1144→          <DialogHeader><DialogTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI Rizz Generator</DialogTitle></DialogHeader>
+  1145→          <div className="space-y-4 py-2">
+  1146→            <div className="flex flex-wrap gap-2">
+  1147→              {RIZZ_STYLES.map(s => (
+  1148→                <button key={s.value} onClick={() => setRizzStyle(s.value)}
+  1149→                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${rizzStyle === s.value ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-secondary-foreground border-border hover:border-primary/50'}`}>
+  1150→                  {s.icon} {s.label}
+  1151→                </button>
+  1152→              ))}
+  1153→            </div>
+  1154→            <Button onClick={handleRizz} disabled={rizzLoading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+  1155→              {rizzLoading ? 'Generating...' : 'Generate Pickup Line'}
+  1156→            </Button>
+  1157→            {rizzResult && (
+  1158→              <div className="p-4 rounded-xl bg-secondary border border-border space-y-3">
+  1159→                <p className="text-sm leading-relaxed">{rizzResult.line}</p>
+  1160→                {rizzResult.context && <p className="text-[11px] text-muted-foreground">{rizzResult.context}</p>}
+  1161→                <div className="flex gap-2">
+  1162→                  <Button variant="outline" size="sm" onClick={copyRizz} className="text-xs border-border"><Copy className="w-3 h-3 mr-1" /> Copy</Button>
+  1163→                  <Button size="sm" onClick={handleSendRizz} className="text-xs bg-primary text-primary-foreground"><Send className="w-3 h-3 mr-1" /> Send</Button>
+  1164→                </div>
+  1165→                {rizzResult.alternatives?.length > 0 && (
+  1166→                  <div className="space-y-1 pt-2 border-t border-border">
+  1167→                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Alternatives</p>
+  1168→                    {rizzResult.alternatives.map((alt: string, i: number) => (
+  1169→                      <p key={i} className="text-xs text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => setRizzResult({ ...rizzResult, line: alt })}>{alt}</p>
+  1170→                    ))}
+  1171→                  </div>
+  1172→                )}
+  1173→              </div>
+  1174→            )}
+  1175→          </div>
+  1176→        </DialogContent>
+  1177→      </Dialog>
+  1178→
+  1179→      {/* ═══ NOTE DIALOG ═══ */}
+  1180→      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
+  1181→        <DialogContent className="bg-card border-border sm:max-w-sm">
+  1182→          <DialogHeader><DialogTitle className="flex items-center gap-2"><StickyNote className="w-5 h-5 text-primary" /> Add Note</DialogTitle></DialogHeader>
+  1183→          <div className="space-y-3 py-2">
+  1184→            <Textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Write a private note..." className="bg-secondary border-border text-sm" rows={3} />
+  1185→            <div className="flex gap-2">
+  1186→              <Button size="sm" className="flex-1 bg-primary text-primary-foreground" onClick={handleSaveNote} disabled={!noteContent.trim()}>Save</Button>
+  1187→              <Button size="sm" variant="outline" className="border-border" onClick={() => { setShowNoteDialog(false); setNoteContent(''); }}>Cancel</Button>
+  1188→            </div>
+  1189→          </div>
+  1190→        </DialogContent>
+  1191→      </Dialog>
+  1192→
+  1193→      {/* ═══ BLOCK ALERT ═══ */}
+  1194→      <AlertDialog open={showBlockAlert} onOpenChange={setShowBlockAlert}>
+  1195→        <AlertDialogContent className="bg-card border-border">
+  1196→          <AlertDialogHeader>
+  1197→            <AlertDialogTitle>Block this user?</AlertDialogTitle>
+  1198→            <AlertDialogDescription>This user won't be able to see your profile or message you.</AlertDialogDescription>
+  1199→          </AlertDialogHeader>
+  1200→          <AlertDialogFooter>
+  1201→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1202→            <AlertDialogAction onClick={() => profileUser && handleBlock(profileUser.id)} className="bg-destructive text-white">Block</AlertDialogAction>
+  1203→          </AlertDialogFooter>
+  1204→        </AlertDialogContent>
+  1205→      </AlertDialog>
+  1206→
+  1207→      {/* ═══ CREATE EVENT DIALOG ═══ */}
+  1208→      <Dialog open={showCreateEvent} onOpenChange={setShowCreateEvent}>
+  1209→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1210→          <DialogHeader><DialogTitle>Create Event</DialogTitle></DialogHeader>
+  1211→          <div className="space-y-3 py-2">
+  1212→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={eventForm.title} onChange={e => setEventForm(p => ({ ...p, title: e.target.value }))} placeholder="Event name" className="bg-secondary border-border" /></div>
+  1213→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={eventForm.description} onChange={e => setEventForm(p => ({ ...p, description: e.target.value }))} placeholder="What's this about?" className="bg-secondary border-border" rows={3} /></div>
+  1214→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Location</Label><Input value={eventForm.location} onChange={e => setEventForm(p => ({ ...p, location: e.target.value }))} placeholder="Venue" className="bg-secondary border-border" /></div>
+  1215→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date & Time</Label><Input type="datetime-local" value={eventForm.startDate} onChange={e => setEventForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+  1216→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Image URL</Label><Input value={eventForm.imageUrl} onChange={e => setEventForm(p => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." className="bg-secondary border-border" /></div>
+  1217→          </div>
+  1218→          <DialogFooter>
+  1219→            <Button variant="outline" onClick={() => setShowCreateEvent(false)} className="border-border">Cancel</Button>
+  1220→            <Button onClick={handleCreateEvent} className="bg-primary text-primary-foreground" disabled={!eventForm.title || !eventForm.startDate}>Create</Button>
+  1221→          </DialogFooter>
+  1222→        </DialogContent>
+  1223→      </Dialog>
+  1224→
+  1225→      {/* ═══ CREATE GROUP DIALOG ═══ */}
+  1226→      <Dialog open={showCreateGroup} onOpenChange={setShowCreateGroup}>
+  1227→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1228→          <DialogHeader><DialogTitle>Create Group</DialogTitle></DialogHeader>
+  1229→          <div className="space-y-3 py-2">
+  1230→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Group Name</Label><Input value={groupForm.name} onChange={e => setGroupForm(p => ({ ...p, name: e.target.value }))} placeholder="Group name" className="bg-secondary border-border" /></div>
+  1231→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Description</Label><Textarea value={groupForm.description} onChange={e => setGroupForm(p => ({ ...p, description: e.target.value }))} placeholder="About this group" className="bg-secondary border-border" rows={2} /></div>
+  1232→          </div>
+  1233→          <DialogFooter>
+  1234→            <Button variant="outline" onClick={() => setShowCreateGroup(false)} className="border-border">Cancel</Button>
+  1235→            <Button onClick={handleCreateGroup} className="bg-primary text-primary-foreground" disabled={!groupForm.name.trim()}>Create</Button>
+  1236→          </DialogFooter>
+  1237→        </DialogContent>
+  1238→      </Dialog>
+  1239→
+  1240→      {/* ═══ CREATE CIRCLE DIALOG ═══ */}
+  1241→      <Dialog open={showCreateCircle} onOpenChange={setShowCreateCircle}>
+  1242→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1243→          <DialogHeader><DialogTitle>Create Circle</DialogTitle></DialogHeader>
+  1244→          <div className="space-y-3 py-2">
+  1245→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Circle Name</Label><Input value={circleForm.name} onChange={e => setCircleForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Hot Guys" className="bg-secondary border-border" /></div>
+  1246→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Color</Label><Input type="color" value={circleForm.color} onChange={e => setCircleForm(p => ({ ...p, color: e.target.value }))} className="h-10 w-16 bg-secondary border-border" /></div>
+  1247→          </div>
+  1248→          <DialogFooter>
+  1249→            <Button variant="outline" onClick={() => setShowCreateCircle(false)} className="border-border">Cancel</Button>
+  1250→            <Button onClick={async () => {
+  1251→              if (!circleForm.name.trim()) return;
+  1252→              try { const res = await fetch('/api/circles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(circleForm) }); const data = await res.json(); if (data.data) { setCircles(prev => [...prev, data.data]); setShowCreateCircle(false); setCircleForm({ name: '', color: '#6366f1', icon: 'users' }); } } catch {}
+  1253→            }} className="bg-primary text-primary-foreground" disabled={!circleForm.name.trim()}>Create</Button>
+  1254→          </DialogFooter>
+  1255→        </DialogContent>
+  1256→      </Dialog>
+  1257→
+  1258→      {/* ═══ ADD MEMBER TO CIRCLE DIALOG ═══ */}
+  1259→      <Dialog open={showAddMember} onOpenChange={setShowAddMember}>
+  1260→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1261→          <DialogHeader><DialogTitle>Add Member to Circle</DialogTitle></DialogHeader>
+  1262→          <div className="space-y-3 py-2">
+  1263→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">User ID</Label><Input value={addMemberId} onChange={e => setAddMemberId(e.target.value)} placeholder="Enter user ID" className="bg-secondary border-border" /></div>
+  1264→          </div>
+  1265→          <DialogFooter>
+  1266→            <Button variant="outline" onClick={() => setShowAddMember(false)} className="border-border">Cancel</Button>
+  1267→            <Button onClick={async () => {
+  1268→              if (!selectedCircle || !addMemberId.trim()) return;
+  1269→              try { await fetch(`/api/circles/${selectedCircle.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetUserId: addMemberId.trim() }) }); const res = await fetch(`/api/circles/${selectedCircle.id}`); const data = await res.json(); setCircleMembers(data.members || []); setShowAddMember(false); setAddMemberId(''); } catch {}
+  1270→            }} className="bg-primary text-primary-foreground" disabled={!addMemberId.trim()}>Add</Button>
+  1271→          </DialogFooter>
+  1272→        </DialogContent>
+  1273→      </Dialog>
+  1274→
+  1275→      {/* ═══ SET TRAVEL LOCATION DIALOG ═══ */}
+  1276→      <Dialog open={showSetTravel} onOpenChange={setShowSetTravel}>
+  1277→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1278→          <DialogHeader><DialogTitle className="flex items-center gap-2"><Plane className="w-5 h-5 text-primary" /> Set Travel Location</DialogTitle></DialogHeader>
+  1279→          <div className="space-y-3 py-2">
+  1280→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">City</Label><Input value={travelForm.city} onChange={e => setTravelForm(p => ({ ...p, city: e.target.value }))} placeholder="e.g. Berlin" className="bg-secondary border-border" /></div>
+  1281→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Country</Label><Input value={travelForm.country} onChange={e => setTravelForm(p => ({ ...p, country: e.target.value }))} placeholder="e.g. Germany" className="bg-secondary border-border" /></div>
+  1282→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Start Date</Label><Input type="date" value={travelForm.startDate} onChange={e => setTravelForm(p => ({ ...p, startDate: e.target.value }))} className="bg-secondary border-border" /></div>
+  1283→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">End Date</Label><Input type="date" value={travelForm.endDate} onChange={e => setTravelForm(p => ({ ...p, endDate: e.target.value }))} className="bg-secondary border-border" /></div>
+  1284→          </div>
+  1285→          <DialogFooter>
+  1286→            <Button variant="outline" onClick={() => setShowSetTravel(false)} className="border-border">Cancel</Button>
+  1287→            <Button onClick={async () => {
+  1288→              if (!travelForm.city.trim()) return;
+  1289→              try { await fetch('/api/travel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(travelForm) }); const res = await fetch('/api/travel'); const data = await res.json(); setTravelData(data.data || null); setShowSetTravel(false); } catch {}
+  1290→            }} className="bg-primary text-primary-foreground" disabled={!travelForm.city.trim()}>Start Traveling</Button>
+  1291→          </DialogFooter>
+  1292→        </DialogContent>
+  1293→      </Dialog>
+  1294→
+  1295→      {/* ═══ CHECKIN DIALOG ═══ */}
+  1296→      <Dialog open={showCheckin} onOpenChange={setShowCheckin}>
+  1297→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1298→          <DialogHeader><DialogTitle className="flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> Check In</DialogTitle></DialogHeader>
+  1299→          <div className="space-y-3 py-2">
+  1300→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Venue Name</Label><Input value={checkinVenue} onChange={e => setCheckinVenue(e.target.value)} placeholder="e.g. The Alley Bar" className="bg-secondary border-border" /></div>
+  1301→          </div>
+  1302→          <DialogFooter>
+  1303→            <Button variant="outline" onClick={() => setShowCheckin(false)} className="border-border">Cancel</Button>
+  1304→            <Button onClick={async () => {
+  1305→              if (!checkinVenue.trim()) return;
+  1306→              try { await fetch('/api/checkins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ venueName: checkinVenue.trim(), lat: 35.9, lng: 14.4 }) }); const res = await fetch('/api/checkins'); const data = await res.json(); setCheckins(data.data || []); setShowCheckin(false); setCheckinVenue(''); } catch {}
+  1307→            }} className="bg-primary text-primary-foreground" disabled={!checkinVenue.trim()}>Check In</Button>
+  1308→          </DialogFooter>
+  1309→        </DialogContent>
+  1310→      </Dialog>
+  1311→
+  1312→      {/* ═══ SAVED PHRASE DIALOG ═══ */}
+  1313→      <Dialog open={showPhraseDialog} onOpenChange={(open) => { if (!open) { setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' }); } }}>
+  1314→        <DialogContent className="bg-card border-border sm:max-w-md">
+  1315→          <DialogHeader><DialogTitle>{editingPhraseId ? 'Edit Phrase' : 'Create Phrase'}</DialogTitle></DialogHeader>
+  1316→          <div className="space-y-3 py-2">
+  1317→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title</Label><Input value={phraseForm.title} onChange={e => setPhraseForm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Greeting" className="bg-secondary border-border" /></div>
+  1318→            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Content</Label><Textarea value={phraseForm.content} onChange={e => setPhraseForm(p => ({ ...p, content: e.target.value }))} placeholder="Hey! How are you?" className="bg-secondary border-border" rows={3} /></div>
+  1319→          </div>
+  1320→          <DialogFooter>
+  1321→            <Button variant="outline" onClick={() => { setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' }); }} className="border-border">Cancel</Button>
+  1322→            <Button onClick={async () => {
+  1323→              if (!phraseForm.title.trim() || !phraseForm.content.trim()) return;
+  1324→              try {
+  1325→                if (editingPhraseId) {
+  1326→                  await fetch(`/api/saved-phrases/${editingPhraseId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(phraseForm) });
+  1327→                } else {
+  1328→                  await fetch('/api/saved-phrases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(phraseForm) });
+  1329→                }
+  1330→                const res = await fetch('/api/saved-phrases'); const data = await res.json(); setSavedPhrases(data.data || []);
+  1331→                setShowPhraseDialog(false); setEditingPhraseId(null); setPhraseForm({ title: '', content: '' });
+  1332→              } catch {}
+  1333→            }} className="bg-primary text-primary-foreground" disabled={!phraseForm.title.trim() || !phraseForm.content.trim()}>{editingPhraseId ? 'Save' : 'Create'}</Button>
+  1334→          </DialogFooter>
+  1335→        </DialogContent>
+  1336→      </Dialog>
+  1337→
+  1338→      {/* ═══ DELETE ACCOUNT ALERT ═══ */}
+  1339→      <AlertDialog open={showDeleteAccount} onOpenChange={setShowDeleteAccount}>
+  1340→        <AlertDialogContent className="bg-card border-border">
+  1341→          <AlertDialogHeader><AlertDialogTitle>Delete Account?</AlertDialogTitle><AlertDialogDescription>This is permanent and cannot be undone. All your data will be removed.</AlertDialogDescription></AlertDialogHeader>
+  1342→          <AlertDialogFooter>
+  1343→            <AlertDialogCancel className="bg-secondary border-border">Cancel</AlertDialogCancel>
+  1344→            <AlertDialogAction className="bg-destructive text-white" onClick={() => { setCurrentUser(null); setAuthed(false); setShowDeleteAccount(false); }}>Delete</AlertDialogAction>
+  1345→          </AlertDialogFooter>
+  1346→        </AlertDialogContent>
+  1347→      </AlertDialog>
+  1348→
+  1349→    </div>
+  1350→    </TooltipProvider>
+  1351→  );
+  1352→
+  1353→  // ═══════════════════════════════════════════════════════════════
+  1354→  // VIEW FUNCTIONS (hoisted — available throughout component)
+  1355→  // ═══════════════════════════════════════════════════════════════
+  1356→
+  1357→  // ─── DISCOVER ────────────────────────────────────────────────
+  1358→  function DiscoverView() {
+  1359→    if (discoverLoading) return <LoadingGrid />;
+  1360→    if (discoverUsers.length === 0) return <EmptyState icon={Compass} title="No profiles found" desc="Check back later for new people nearby" />;
+  1361→    return (
+  1362→      <div className="h-full flex flex-col">
+  1363→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1364→          <button onClick={() => setOnlineOnly(!onlineOnly)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${onlineOnly ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>🟢 Online</button>
+  1365→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{ageRange[0]}–{ageRange[1]}</button></PopoverTrigger>
+  1366→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Age Range</Label><Slider value={ageRange} onValueChange={setAgeRange} min={18} max={80} step={1} className="mt-2" /><div className="flex justify-between text-[11px] text-muted-foreground mt-1"><span>{ageRange[0]}</span><span>{ageRange[1]}</span></div></PopoverContent>
+  1367→          </Popover>
+  1368→          <Select value={lookingFor} onValueChange={setLookingFor}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All</SelectItem><SelectItem value="relationship">Relationship</SelectItem><SelectItem value="casual">Casual</SelectItem><SelectItem value="friends">Friends</SelectItem><SelectItem value="networking">Networking</SelectItem></SelectContent></Select>
+  1369→          <Select value={ethnicityFilter} onValueChange={setEthnicityFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Ethnicity" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Ethnicity</SelectItem><SelectItem value="white">White</SelectItem><SelectItem value="black">Black</SelectItem><SelectItem value="latino">Latino</SelectItem><SelectItem value="asian">Asian</SelectItem><SelectItem value="middle-eastern">Middle Eastern</SelectItem><SelectItem value="indian">Indian</SelectItem><SelectItem value="mixed">Mixed</SelectItem></SelectContent></Select>
+  1370→          <Select value={bodyTypeFilter} onValueChange={setBodyTypeFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue placeholder="Body" /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">Any Body Type</SelectItem><SelectItem value="slim">Slim</SelectItem><SelectItem value="average">Average</SelectItem><SelectItem value="athletic">Athletic</SelectItem><SelectItem value="muscular">Muscular</SelectItem><SelectItem value="curvy">Curvy</SelectItem></SelectContent></Select>
+  1371→          <div className="ml-auto flex gap-1 shrink-0">
+  1372→            <button onClick={() => setDiscoverView('grid')} className={`p-1.5 rounded-lg ${discoverView === 'grid' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Grid3X3 className="w-4 h-4" /></button>
+  1373→            <button onClick={() => setDiscoverView('cascade')} className={`p-1.5 rounded-lg ${discoverView === 'cascade' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Layers className="w-4 h-4" /></button>
+  1374→          </div>
+  1375→        </div>
+  1376→        <ScrollArea className="flex-1">
+  1377→          {discoverView === 'cascade' ? (
+  1378→            <div className="flex items-center justify-center p-6 h-full">
+  1379→              {cascadeUser ? (
+  1380→                <div key={cascadeUser.id} className="w-full max-w-sm cascade-animate">
+  1381→                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-secondary">
+  1382→                    {(cascadeUser.photos && cascadeUser.photos[0]) ? <img src={cascadeUser.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User className="w-20 h-20 text-muted-foreground" /></div>}
+  1383→                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-card via-card/60 to-transparent" />
+  1384→                    {cascadeUser.isPremium && <div className="absolute top-3 right-3"><Badge className="bg-yellow-500/20 text-yellow-400 text-[10px] border-yellow-500/30"><Crown className="w-3 h-3 mr-0.5" /> Premium</Badge></div>}
+  1385→                    {cascadeUser.isVerified && <div className="absolute top-3 left-3"><Badge className="bg-blue-500/20 text-blue-400 text-[10px] border-blue-500/30"><ShieldCheck className="w-3 h-3" /></Badge></div>}
+  1386→                    {cascadeUser.online && cascadeUser.showOnline && <div className="absolute top-3 left-1/2 -translate-x-1/2"><span className="flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] text-green-400"><span className="w-1.5 h-1.5 bg-green-400 rounded-full online-pulse" /> Online</span></div>}
+  1387→                    <div className="absolute bottom-0 left-0 right-0 p-4">
+  1388→                      <h3 className="text-xl font-bold">{cascadeUser.displayName}{cascadeUser.age ? `, ${cascadeUser.age}` : ''}</h3>
+  1389→                      {cascadeUser.location && <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3" />{cascadeUser.location}</p>}
+  1390→                      {cascadeUser.bio && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{truncate(cascadeUser.bio, 100)}</p>}
+  1391→                      {cascadeUser.lookingFor && <Badge className="mt-2 bg-primary/20 text-primary text-[10px] border-primary/30 capitalize">{cascadeUser.lookingFor}</Badge>}
+  1392→                    </div>
+  1393→                  </div>
+  1394→                  <div className="flex gap-3 mt-4 justify-center">
+  1395→                    <button onClick={() => setCascadeIndex(i => i + 1)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+  1396→                    <button onClick={() => handleLike(cascadeUser.id)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><Heart className="w-5 h-5" /></button>
+  1397→                    <button onClick={() => openChat(cascadeUser)} className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary"><MessageCircle className="w-5 h-5" /></button>
+  1398→                    <button onClick={() => openProfile(cascadeUser.id)} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Star className="w-5 h-5" /></button>
+  1399→                    <button onClick={() => { setRizzTargetBio(cascadeUser.bio || ''); setShowRizzModal(true); }} className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Sparkles className="w-5 h-5" /></button>
+  1400→                  </div>
+  1401→                </div>
+  1402→              ) : <EmptyState icon={Compass} title="No more profiles" desc="Adjust your filters or check back later" />}
+  1403→            </div>
+  1404→          ) : (
+  1405→            <div className="grid grid-cols-2 gap-3 p-4">
+  1406→              {filteredDiscover.map(user => (
+  1407→                <button key={user.id} onClick={() => openProfile(user.id)} className="profile-card rounded-xl overflow-hidden bg-secondary border border-border text-left">
+  1408→                  <div className="aspect-[3/4] relative">
+  1409→                    {(user.photos && user.photos[0]) ? <img src={user.photos[0].url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-secondary"><User className="w-12 h-12 text-muted-foreground" /></div>}
+  1410→                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-secondary via-secondary/50 to-transparent" />
+  1411→                    {user.online && user.showOnline && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-secondary online-pulse" />}
+  1412→                    {user.isPremium && <Crown className="absolute top-2 left-2 w-3.5 h-3.5 text-yellow-400" />}
+  1413→                  </div>
+  1414→                  <div className="p-2.5 -mt-6 relative">
+  1415→                    <p className="text-[13px] font-semibold truncate">{user.displayName}{user.age ? `, ${user.age}` : ''}</p>
+  1416→                    <p className="text-[10px] text-muted-foreground truncate">{user.location || ''}</p>
+  1417→                    {user.distance != null && <p className="text-[10px] text-primary">{user.distance} km away</p>}
+  1418→                  </div>
+  1419→                </button>
+  1420→              ))}
+  1421→            </div>
+  1422→          )}
+  1423→        </ScrollArea>
+  1424→      </div>
+  1425→    );
+  1426→  }
+  1427→
+  1428→
+  1429→  // ─── MAP VIEW ───────────────────────────────────────────────
+  1430→  function MapView() {
+  1431→    const mapCenterLat = userLat || currentUser?.lat || 35.8989;
+  1432→    const mapCenterLng = userLng || currentUser?.lng || 14.5146;
+  1433→    return (
+  1434→      <div className="h-full flex flex-col">
+  1435→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1436→          <Select value={mapFilter} onValueChange={setMapFilter}><SelectTrigger className="h-7 text-[11px] bg-secondary border-border w-auto"><SelectValue /></SelectTrigger><SelectContent className="bg-card border-border"><SelectItem value="all">All Users</SelectItem><SelectItem value="online">Online</SelectItem><SelectItem value="recent">Recent</SelectItem><SelectItem value="nearby">Nearby</SelectItem><SelectItem value="new">New</SelectItem><SelectItem value="verified">Verified</SelectItem><SelectItem value="premium">Premium</SelectItem></SelectContent></Select>
+  1437→          <Popover><PopoverTrigger asChild><button className="px-3 py-1.5 rounded-full text-[11px] font-medium border bg-secondary text-muted-foreground border-border shrink-0">{mapRadius} km</button></PopoverTrigger>
+  1438→            <PopoverContent className="w-64 bg-card border-border p-3"><Label className="text-xs text-muted-foreground">Radius</Label><Slider value={[mapRadius]} onValueChange={([v]) => setMapRadius(v)} min={1} max={200} step={1} className="mt-2" /><p className="text-[11px] text-muted-foreground mt-1">{mapRadius} km</p></PopoverContent>
+  1439→          </Popover>
+  1440→          <button onClick={() => setMapHidden(!mapHidden)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 ${mapHidden ? 'bg-destructive/20 text-destructive border-destructive/30' : 'bg-secondary text-muted-foreground border-border'}`}>{mapHidden ? '👁 Hidden' : '👁 Visible'}</button>
+  1441→          <span className="ml-auto text-[11px] text-muted-foreground">{mapUsers.length} users</span>
+  1442→        </div>
+  1443→        <div className="flex-1 relative">
+  1444→          {mapLoading ? <div className="absolute inset-0 flex items-center justify-center"><Skeleton className="w-full h-full" /></div> : mapHidden ? (
+  1445→            <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/20 gap-3">
+  1446→              <MapPinOff className="w-12 h-12 text-muted-foreground" />
+  1447→              <p className="text-sm text-muted-foreground">Map hidden</p>
+  1448→              <p className="text-xs text-muted-foreground">Your location is not visible to others</p>
+  1449→            </div>
+  1450→          ) : (
+  1451→            <ErrorBoundary fallback={<div className="flex-1 flex items-center justify-center"><div className="text-center"><MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-2" /><p className="text-sm text-muted-foreground">Map unavailable in this environment</p></div></div>}>
+  1452→              <MapLeaflet users={mapUsers} centerLat={mapCenterLat} centerLng={mapCenterLng} radius={mapRadius} onUserClick={openProfile} />
+  1453→            </ErrorBoundary>
+  1454→          )}
+  1455→        </div>
+  1456→      </div>
+  1457→    );
+  1458→  }
+  1459→
+  1460→  // ─── CHAT VIEW ─────────────────────────────────────────────
+  1461→  function ChatView() {
+  1462→    if (chatLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1463→    return (
+  1464→      <div className="h-full flex flex-col">
+  1465→        {chatMobileView === 'chat' && (activeConversation || activeGroup) ? (
+  1466→          <NexusChat
+  1467→            msgInput={msgInput}
+  1468→            setMsgInput={setMsgInput}
+  1469→            sendMessage={sendMessage}
+  1470→            sendGroupMessage={sendGroupMessage}
+  1471→            activeConversation={activeConversation}
+  1472→            activeGroup={activeGroup}
+  1473→            messages={messages}
+  1474→            groupMessages={groupMessages}
+  1475→            setGroupMessages={setGroupMessages}
+  1476→            getAvatar={getAvatar}
+  1477→            openProfile={openProfile}
+  1478→            setActiveConversation={setActiveConversation}
+  1479→            setActiveGroup={setActiveGroup}
+  1480→            setChatMobileView={setChatMobileView}
+  1481→            msgEndRef={msgEndRef}
+  1482→            socket={socketRef.current}
+  1483→          />
+  1484→        ) : (
+  1485→          <ScrollArea className="flex-1">
+  1486→            <div className="p-4 space-y-4">
+  1487→            {/* Sort & AI Controls */}
+  1488→            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+  1489→              {CHAT_SORT_OPTIONS.map(mode => (
+  1490→                <button key={mode} onClick={() => setChatSortMode(mode)}
+  1491→                  className={`px-2.5 py-1 rounded-full text-[10px] font-medium border shrink-0 transition-all ${chatSortMode === mode ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1492→                  {mode === 'recent' && <Clock3 className="w-3 h-3 mr-1 inline" />}
+  1493→                  {mode === 'intent' && <Target className="w-3 h-3 mr-1 inline" />}
+  1494→                  {mode === 'quality' && <HeartPulse className="w-3 h-3 mr-1 inline" />}
+  1495→                  {mode === 'unread' && <MessageSquare className="w-3 h-3 mr-1 inline" />}
+  1496→                  {mode === 'online' && <Wifi className="w-3 h-3 mr-1 inline" />}
+  1497→                  {mode.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+  1498→                </button>
+  1499→              ))}
+  1500→              <button onClick={async () => { setAiLoading(true); try { const res = await fetch('/api/chat/ai-analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: 'test-user-1' }) }); const data = await res.json(); setAiAnalysis(data); } catch {} setAiLoading(false); }}
+  1501→                className="ml-auto px-2.5 py-1 rounded-full text-[10px] font-medium border bg-primary/10 text-primary border-primary/30 shrink-0" disabled={aiLoading}>
+  1502→                <Bot className="w-3 h-3 mr-1 inline" />{aiLoading ? 'Analyzing...' : 'AI Analyze All'}
+  1503→              </button>
+  1504→            </div>
+  1505→            {/* Chat Requests */}
+  1506→            {chatRequests.length > 0 && (
+  1507→                <div className="space-y-2">
+  1508→                  <SectionHeader icon={Bell} label="Chat Requests" count={chatRequests.length} />
+  1509→                  {chatRequests.map(req => (
+  1510→                    <div key={req.id} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+  1511→                      <button onClick={() => openProfile(req.sender?.id || '')}><Avatar className="h-10 w-10"><AvatarImage src={getAvatar(req.sender)} /><AvatarFallback className="text-xs">{req.sender?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1512→                      <div className="flex-1 min-w-0">
+  1513→                        <p className="text-[12px] font-semibold">{req.sender?.displayName}</p>
+  1514→                        <p className="text-[11px] text-muted-foreground truncate">{req.message || 'Wants to chat with you'}</p>
+  1515→                      </div>
+  1516→                      <div className="flex gap-1.5 shrink-0">
+  1517→                        <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => handleChatRequest(req.id, 'accept')}>Accept</Button>
+  1518→                        <Button size="sm" variant="outline" className="h-7 text-[10px] border-border px-2" onClick={() => handleChatRequest(req.id, 'decline')}>Decline</Button>
+  1519→                      </div>
+  1520→                    </div>
+  1521→                  ))}
+  1522→                </div>
+  1523→              )}
+  1524→              {/* Conversations */}
+  1525→              <Tabs defaultValue="all">
+  1526→                <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  1527→                  <TabsTrigger value="all" className="text-[11px] flex-1 h-7">All</TabsTrigger>
+  1528→                  <TabsTrigger value="archived" className="text-[11px] flex-1 h-7"><Archive className="w-3 h-3 mr-1 inline" />Archived</TabsTrigger>
+  1529→                  <TabsTrigger value="groups" className="text-[11px] flex-1 h-7">Groups</TabsTrigger>
+  1530→                </TabsList>
+  1531→                <TabsContent value="all" className="mt-3 space-y-1">
+  1532→                  {conversations.length === 0 ? <EmptyState icon={MessageCircle} title="No messages yet" desc="Start a conversation from someone's profile" />
+  1533→                    : conversations.map(convo => (
+  1534→                      <div key={convo.otherUser.id} className="flex items-center gap-2">
+  1535→                        <button onClick={() => { setActiveConversation(convo); setChatMobileView('chat'); fetch(`/api/messages?userId=${convo.otherUser.id}`).then(r => r.json()).then(res => setMessages(res.data || [])).catch(() => {}); }}
+  1536→                          className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors flex-1">
+  1537→                          <div className="relative shrink-0">
+  1538→                            <Avatar className="h-11 w-11"><AvatarImage src={getAvatar(convo.otherUser)} /><AvatarFallback className="text-xs">{convo.otherUser.displayName?.[0]}</AvatarFallback></Avatar>
+  1539→                            {convo.otherUser.online && convo.otherUser.showOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card online-pulse" />}
+  1540→                          </div>
+  1541→                          <div className="flex-1 min-w-0">
+  1542→                            <div className="flex items-center justify-between">
+  1543→                              <div className="flex items-center gap-1.5"><p className="text-[13px] font-semibold truncate">{convo.otherUser.displayName}</p>{convo.isMuted && <VolumeX className="w-3 h-3 text-muted-foreground" />}</div>
+  1544→                              <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(convo.lastMessage.createdAt)}</span>
+  1545→                            </div>
+  1546→                            <p className="text-[11px] text-muted-foreground truncate mt-0.5">{convo.lastMessage.content || '...'}</p>
+  1547→                          </div>
+  1548→                          {convo.unreadCount > 0 && <span className="min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground rounded-full">{convo.unreadCount}</span>}
+  1549→                        </button>
+  1550→                        <DropdownMenu>
+  1551→                          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger>
+  1552→                          <DropdownMenuContent align="end" className="bg-card border-border w-44">
+  1553→                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/mute', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch {} }}><BellOff className="w-4 h-4" /> {convo.isMuted ? 'Unmute' : 'Mute'}</DropdownMenuItem>
+  1554→                            <DropdownMenuItem className="gap-2 text-foreground cursor-pointer" onClick={async (e) => { e.stopPropagation(); try { await fetch('/api/chat/archive', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otherUserId: convo.otherUser.id }) }); } catch {} }}><Archive className="w-4 h-4" /> Archive</DropdownMenuItem>
+  1555→                          </DropdownMenuContent>
+  1556→                        </DropdownMenu>
+  1557→                      </div>
+  1558→                    ))}
+  1559→                </TabsContent>
+  1560→                <TabsContent value="archived" className="mt-3">
+  1561→                  <EmptyState icon={Archive} title="Archived Chats" desc="Archived conversations will appear here" />
+  1562→                </TabsContent>
+  1563→                <TabsContent value="groups" className="mt-3 space-y-1">
+  1564→                  {groups.length === 0 ? <EmptyState icon={Users} title="No groups yet" desc="Create or join a group to get started" />
+  1565→                    : groups.filter((g: any) => !g.hidden).map(group => (
+  1566→                      <button key={group.id} onClick={() => { setActiveGroup(group); setGroupMessages([]); setChatMobileView('chat'); }}
+  1567→                        className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
+  1568→                        <Avatar className="h-11 w-11"><AvatarImage src={group.avatar} /><AvatarFallback className="text-xs">{group.name?.[0]}</AvatarFallback></Avatar>
+  1569→                        <div className="flex-1 min-w-0">
+  1570→                          <p className="text-[13px] font-semibold truncate">{group.name}</p>
+  1571→                          <p className="text-[11px] text-muted-foreground">{group._count?.members || 0} members {group.geoName ? `· ${group.geoName}` : ''}</p>
+  1572→                        </div>
+  1573→                      </button>
+  1574→                    ))}
+  1575→                </TabsContent>
+  1576→              </Tabs>
+  1577→            </div>
+  1578→          </ScrollArea>
+  1579→        )}
+  1580→      </div>
+  1581→    );
+  1582→  }
+  1583→
+  1584→  // ─── LIKES VIEW ─────────────────────────────────────────────
+  1585→  function LikesView() {
+  1586→    if (likesLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1587→    return (
+  1588→      <div className="h-full flex flex-col">
+  1589→        <Tabs value={likesTab} onValueChange={(v) => setLikesTab(v as 'received' | 'sent')} className="flex flex-col h-full">
+  1590→          <div className="px-4 pt-3 shrink-0">
+  1591→            <TabsList className="bg-secondary border border-border w-full h-9 p-0.5">
+  1592→              <TabsTrigger value="received" className="text-[11px] flex-1 h-7">Received ({receivedLikes.length})</TabsTrigger>
+  1593→              <TabsTrigger value="sent" className="text-[11px] flex-1 h-7">Sent ({sentLikes.length})</TabsTrigger>
+  1594→            </TabsList>
+  1595→          </div>
+  1596→          <ScrollArea className="flex-1">
+  1597→            <TabsContent value="received" className="mt-3 px-4">
+  1598→              {receivedLikes.length === 0 ? <EmptyState icon={Heart} title="No likes received" desc="When someone likes you, they'll appear here" />
+  1599→                : receivedLikes.map(like => like.sender && (
+  1600→                  <div key={like.id} className="mb-2">
+  1601→                    <UserRow user={like.sender} sub={<span>{timeAgo(like.createdAt)}</span>}
+  1602→                      onClick={() => openProfile(like.sender.id)}
+  1603→                      actions={
+  1604→                        <>
+  1605→                          <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => openChat(like.sender)}>Accept</Button>
+  1606→                          <Button size="sm" variant="ghost" className="h-7 text-[10px] text-muted-foreground px-2" onClick={() => handleUnlike(like.sender.id)}><X className="w-3 h-3" /></Button>
+  1607→                        </>
+  1608→                      } />
+  1609→                  </div>
+  1610→                ))}
+  1611→            </TabsContent>
+  1612→            <TabsContent value="sent" className="mt-3 px-4">
+  1613→              {sentLikes.length === 0 ? <EmptyState icon={Heart} title="No likes sent" desc="Like someone and they'll appear here" />
+  1614→                : sentLikes.map(like => like.receiver && (
+  1615→                  <div key={like.id} className="mb-2">
+  1616→                    <UserRow user={like.receiver} sub={<span>{timeAgo(like.createdAt)}</span>} onClick={() => openProfile(like.receiver.id)}
+  1617→                      actions={<Button size="sm" variant="ghost" className="h-7 text-[10px] text-destructive px-2" onClick={() => handleUnlike(like.receiver.id)}><X className="w-3 h-3" /></Button>} />
+  1618→                  </div>
+  1619→                ))}
+  1620→            </TabsContent>
+  1621→          </ScrollArea>
+  1622→        </Tabs>
+  1623→      </div>
+  1624→    );
+  1625→  }
+  1626→
+  1627→  // ─── MORE VIEW (Page Directory) ───────────────────────────
+  1628→  function MoreView() {
+  1629→    return (
+  1630→      <ScrollArea className="h-full">
+  1631→        <div className="p-4 space-y-6">
+  1632→          <p className="text-xs text-muted-foreground">Explore all features of NEXUS</p>
+  1633→          {Object.entries(PAGE_DIRECTORY).map(([category, pages]) => (
+  1634→            <div key={category}>
+  1635→              <h3 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-3">{category}</h3>
+  1636→              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  1637→                {pages.map(page => {
+  1638→                  const Icon = page.icon;
+  1639→                  return (
+  1640→                    <button key={page.id} onClick={() => setActiveTab(page.id)}
+  1641→                      className="flex flex-col items-start gap-2 p-3 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all text-left group">
+  1642→                      <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+  1643→                        <Icon className="w-4 h-4 text-primary" />
+  1644→                      </div>
+  1645→                      <div className="flex-1 min-w-0">
+  1646→                        <p className="text-[12px] font-semibold truncate">{page.label}</p>
+  1647→                        <p className="text-[10px] text-muted-foreground truncate">{page.description}</p>
+  1648→                      </div>
+  1649→                      {page.badge && <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />}
+  1650→                    </button>
+  1651→                  );
+  1652→                })}
+  1653→              </div>
+  1654→            </div>
+  1655→          ))}
+  1656→          <div className="h-4" />
+  1657→        </div>
+  1658→      </ScrollArea>
+  1659→    );
+  1660→  }
+  1661→
+  1662→  // ─── EVENTS VIEW ───────────────────────────────────────────
+  1663→  function EventsView() {
+  1664→    if (eventsLoading) return <LoadingGrid cols={1} rows={4} />;
+  1665→    const filteredEvents = events.filter((e: any) => {
+  1666→      if (agendaFilter === 'today') return isToday(new Date(e.startDate));
+  1667→      if (agendaFilter === 'this-week') return isThisWeek(new Date(e.startDate));
+  1668→      if (agendaFilter === 'this-month') return isThisMonth(new Date(e.startDate));
+  1669→      return true;
+  1670→    });
+  1671→    return (
+  1672→      <div className="h-full flex flex-col">
+  1673→        <div className="px-3 py-2 flex items-center gap-2 border-b border-border shrink-0 overflow-x-auto">
+  1674→          {(['all', 'today', 'this-week', 'this-month', 'nearby', 'my-events'] as const).map(f => (
+  1675→            <button key={f} onClick={() => setAgendaFilter(f)} className={`px-3 py-1.5 rounded-full text-[11px] font-medium border shrink-0 transition-all ${agendaFilter === f ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1676→              {f.replace('-', ' ')}
+  1677→            </button>
+  1678→          ))}
+  1679→          <div className="ml-auto flex gap-1 shrink-0">
+  1680→            <button onClick={() => setAgendaView('list')} className={`p-1.5 rounded-lg ${agendaView === 'list' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><FileText className="w-4 h-4" /></button>
+  1681→            <button onClick={() => setAgendaView('calendar')} className={`p-1.5 rounded-lg ${agendaView === 'calendar' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><Calendar className="w-4 h-4" /></button>
+  1682→            <button onClick={() => setAgendaView('map')} className={`p-1.5 rounded-lg ${agendaView === 'map' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}><MapPinned className="w-4 h-4" /></button>
+  1683→          </div>
+  1684→        </div>
+  1685→        <ScrollArea className="flex-1">
+  1686→          <div className="p-4 space-y-3">
+  1687→            <Button className="w-full bg-primary text-primary-foreground h-9 text-xs" onClick={() => setShowCreateEvent(true)}><Plus className="w-3.5 h-3.5 mr-1.5" /> Create Event</Button>
+  1688→            {filteredEvents.length === 0 ? <EmptyState icon={Calendar} title="No events found" desc="Create one or adjust filters" />
+  1689→              : filteredEvents.map((event: any) => (
+  1690→                <Card key={event.id} className="bg-secondary border-border overflow-hidden">
+  1691→                  {event.imageUrl && <img src={event.imageUrl} alt="" className="w-full h-32 object-cover" />}
+  1692→                  <CardContent className="p-3">
+  1693→                    <div className="flex items-start justify-between gap-2">
+  1694→                      <div className="flex-1 min-w-0">
+  1695→                        <h3 className="text-sm font-semibold">{event.title}</h3>
+  1696→                        {event.description && <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{event.description}</p>}
+  1697→                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-2">
+  1698→                          <span className="flex items-center gap-0.5"><Clock className="w-3 h-3" />{fmtDate(event.startDate)}</span>
+  1699→                          {event.location && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{truncate(event.location, 20)}</span>}
+  1700→                        </div>
+  1701→                      </div>
+  1702→                    </div>
+  1703→                    <div className="flex gap-1.5 mt-3">
+  1704→                      {(['going', 'maybe', 'interested', 'declined'] as const).map(status => (
+  1705→                        <button key={status} onClick={() => handleRsvp(event.id, status)}
+  1706→                          className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all ${userRsvps[event.id] === status ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border'}`}>
+  1707→                          {status}
+  1708→                        </button>
+  1709→                      ))}
+  1710→                    </div>
+  1711→                  </CardContent>
+  1712→                </Card>
+  1713→              ))}
+  1714→          </div>
+  1715→        </ScrollArea>
+  1716→      </div>
+  1717→    );
+  1718→  }
+  1719→
+  1720→  // ─── VIEWED ME VIEW ────────────────────────────────────────
+  1721→  function ViewedMeView() {
+  1722→    if (viewsLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  1723→    return (
+  1724→      <ScrollArea className="h-full">
+  1725→        <div className="p-4 space-y-1">
+  1726→          {profileViews.length === 0 ? <EmptyState icon={Eye} title="No profile views" desc="When someone views your profile, they'll appear here" />
+  1727→            : profileViews.map(view => view.viewer && (
+  1728→              <UserRow key={view.id} user={view.viewer} sub={<span>Viewed {timeAgo(view.createdAt)}</span>} onClick={() => openProfile(view.viewer.id)}
+  1729→                actions={<Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => openChat(view.viewer)}>Chat</Button>} />
+  1730→            ))}
+  1731→        </div>
+  1732→      </ScrollArea>
+  1733→    );
+  1734→  }
+  1735→
+  1736→  // ─── SHOUTS VIEW ───────────────────────────────────────────
+  1737→  function ShoutsView() {
+  1738→    if (shoutLoading) return <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}</div>;
+  1739→    return (
+  1740→      <div className="h-full flex flex-col">
+  1741→        <ScrollArea className="flex-1">
+  1742→          <div className="p-4 space-y-4">
+  1743→            {/* Compose */}
+  1744→            <div className="p-3 rounded-xl bg-secondary border border-border space-y-2">
+  1745→              <Textarea value={shoutInput} onChange={e => setShoutInput(e.target.value)} placeholder="What's on your mind?" className="bg-background border-border text-sm resize-none" rows={2} />
+  1746→              <div className="flex items-center justify-between">
+  1747→                <div className="flex gap-1">
+  1748→                  <button onClick={() => setShoutType('text')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'text' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Text</button>
+  1749→                  <button onClick={() => setShoutType('image')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'image' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Image</button>
+  1750→                  <button onClick={() => setShoutType('video')} className={`px-2 py-1 rounded text-[10px] ${shoutType === 'video' ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}>Video</button>
+  1751→                </div>
+  1752→                <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-3" onClick={handleShout} disabled={!shoutInput.trim()}><Megaphone className="w-3 h-3 mr-1" /> Shout</Button>
+  1753→              </div>
+  1754→              {/* Canned shouts */}
+  1755→              <div className="flex flex-wrap gap-1 pt-2 border-t border-border">
+  1756→                {CANNED_SHOUTS.map(cs => (
+  1757→                  <button key={cs.value} onClick={() => setShoutInput(cs.label)} className="px-2 py-1 rounded-full text-[10px] bg-background border border-border text-muted-foreground hover:border-primary/30 transition-all">
+  1758→                    {cs.emoji} {cs.label}
+  1759→                  </button>
+  1760→                ))}
+  1761→              </div>
+  1762→            </div>
+  1763→            {/* Feed */}
+  1764→            {shouts.length === 0 ? <EmptyState icon={Megaphone} title="No shouts yet" desc="Be the first to share something!" />
+  1765→              : shouts.map((shout: any) => (
+  1766→                <Card key={shout.id} className="bg-secondary border-border">
+  1767→                  <CardContent className="p-3">
+  1768→                    <div className="flex items-center gap-2 mb-2">
+  1769→                      <button onClick={() => shout.user && openProfile(shout.user.id)}><Avatar className="h-8 w-8"><AvatarImage src={getAvatar(shout.user)} /><AvatarFallback className="text-[10px]">{shout.user?.displayName?.[0]}</AvatarFallback></Avatar></button>
+  1770→                      <div className="flex-1 min-w-0">
+  1771→                        <p className="text-[12px] font-semibold">{shout.user?.displayName}</p>
+  1772→                        <p className="text-[10px] text-muted-foreground">{timeAgo(shout.createdAt)}</p>
+  1773→                      </div>
+  1774→                      <Badge className="text-[9px] bg-muted">{shout.type}</Badge>
+  1775→                    </div>
+  1776→                    <p className="text-[13px] leading-relaxed">{shout.content}</p>
+  1777→                    {shout.mediaUrl && <img src={shout.mediaUrl} alt="" className="mt-2 rounded-lg max-h-48 w-full object-cover" />}
+  1778→                  </CardContent>
+  1779→                </Card>
+  1780→              ))}
+  1781→          </div>
+  1782→        </ScrollArea>
+  1783→      </div>
+  1784→    );
+  1785→  }
+  1786→
+  1787→
+  1788→  // ─── FANSITES VIEW ──────────────────────────────────────────
+  1789→  function FansitesView() {
+  1790→    if (fansiteLoading) return <LoadingGrid />;
+  1791→    return (
+  1792→      <ScrollArea className="h-full">
+  1793→        <div className="p-4 space-y-3">
+  1794→          {fansites.length === 0 ? <EmptyState icon={Star} title="No fansites" desc="Creator pages will appear here" />
+  1795→            : fansites.map(fs => (
+  1796→              <Card key={fs.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => { setSelectedFansite(fs); setShowFansiteSheet(true); }}>
+  1797→                <div className="flex gap-3 p-3">
+  1798→                  <Avatar className="h-14 w-14 shrink-0"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-sm">{fs.user?.displayName?.[0]}</AvatarFallback></Avatar>
+  1799→                  <div className="flex-1 min-w-0">
+  1800→                    <div className="flex items-center gap-2">
+  1801→                      <h3 className="text-sm font-semibold truncate">{fs.name}</h3>
+  1802→                      {fs.status === 'active' && <Badge className="text-[9px] bg-green-400/20 text-green-400">Active</Badge>}
+  1803→                    </div>
+  1804→                    {fs.nick && <p className="text-[11px] text-muted-foreground">@{fs.nick}</p>}
+  1805→                    {fs.description && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{fs.description}</p>}
+  1806→                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-2">
+  1807→                      <span>{fs.links?.length || 0} links</span>
+  1808→                      <span>{fs.products?.length || 0} products</span>
+  1809→                    </div>
+  1810→                  </div>
+  1811→                </div>
+  1812→              </Card>
+  1813→            ))}
+  1814→        </div>
+  1815→      </ScrollArea>
+  1816→    );
+  1817→  }
+  1818→
+  1819→  function FansiteDetail() {
+  1820→    if (!selectedFansite) return null;
+  1821→    const fs = selectedFansite;
+  1822→    return (
+  1823→      <div className="space-y-4 p-4">
+  1824→        <div className="flex items-center gap-3">
+  1825→          <Avatar className="h-14 w-14"><AvatarImage src={getAvatar(fs.user)} /><AvatarFallback className="text-sm">{fs.user?.displayName?.[0]}</AvatarFallback></Avatar>
+  1826→          <div className="flex-1 min-w-0">
+  1827→            <h3 className="text-lg font-bold">{fs.name}</h3>
+  1828→            {fs.geoName && <p className="text-xs text-muted-foreground">{fs.geoName}</p>}
+  1829→          </div>
+  1830→          <Badge className={fs.status === 'active' ? 'bg-green-400/20 text-green-400' : 'bg-muted'}>{fs.status}</Badge>
+  1831→        </div>
+  1832→        {fs.description && <p className="text-sm text-muted-foreground">{fs.description}</p>}
+  1833→        {fs.trailerImageUrl && <img src={fs.trailerImageUrl} alt="" className="w-full rounded-xl" />}
+  1834→        {/* Links */}
+  1835→        {fs.links && fs.links.length > 0 && (
+  1836→          <div className="space-y-2">
+  1837→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Links</h4>
+  1838→            {fs.links.map(link => (
+  1839→              <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2.5 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-all">
+  1840→                <ExternalLink className="w-4 h-4 text-primary shrink-0" />
+  1841→                <div className="flex-1 min-w-0"><p className="text-[12px] font-medium truncate">{link.label || link.type}</p><p className="text-[10px] text-muted-foreground truncate">{link.url}</p></div>
+  1842→              </a>
+  1843→            ))}
+  1844→          </div>
+  1845→        )}
+  1846→        {/* Products */}
+  1847→        {fs.products && fs.products.length > 0 && (
+  1848→          <div className="space-y-2">
+  1849→            <h4 className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Products</h4>
+  1850→            {fs.products.map(product => (
+  1851→              <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary border border-border">
+  1852→                <div><p className="text-[12px] font-medium">{product.period}</p>{product.until && <p className="text-[10px] text-muted-foreground">Until {product.until}</p>}</div>
+  1853→                <div className="text-right">
+  1854→                  {product.priceOld && <p className="text-[10px] text-muted-foreground line-through">${product.priceOld}</p>}
+  1855→                  <p className="text-sm font-bold text-primary">${product.price}</p>
+  1856→                </div>
+  1857→              </div>
+  1858→            ))}
+  1859→          </div>
+  1860→        )}
+  1861→      </div>
+  1862→    );
+  1863→  }
+  1864→
+  1865→  // ─── VIDEOS VIEW ───────────────────────────────────────────
+  1866→  function VideosView() {
+  1867→    if (videosLoading) return <LoadingGrid />;
+  1868→    const filtered = videoSearch ? videos.filter((v: any) => v.title.toLowerCase().includes(videoSearch.toLowerCase())) : videos;
+  1869→    return (
+  1870→      <div className="h-full flex flex-col">
+  1871→        <div className="px-4 py-2 border-b border-border shrink-0">
+  1872→          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={videoSearch} onChange={e => setVideoSearch(e.target.value)} placeholder="Search videos..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1873→        </div>
+  1874→        <ScrollArea className="flex-1">
+  1875→          <div className="p-4 grid grid-cols-2 gap-3">
+  1876→            {filtered.length === 0 ? <div className="col-span-2"><EmptyState icon={Video} title="No videos" desc="Videos from the community will appear here" /></div>
+  1877→              : filtered.map((video: any) => (
+  1878→                <button key={video.id} className="rounded-xl overflow-hidden bg-secondary border border-border text-left group">
+  1879→                  <div className="aspect-video relative bg-card">
+  1880→                    {video.thumbnailUrl ? <img src={video.thumbnailUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Video className="w-8 h-8 text-muted-foreground" /></div>}
+  1881→                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><div className="w-10 h-10 rounded-full bg-primary/80 flex items-center justify-center"><Play className="w-5 h-5 text-primary-foreground fill-current ml-0.5" /></div></div>
+  1882→                    {video.duration && <Badge className="absolute bottom-1 right-1 text-[9px] bg-black/60">{Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}</Badge>}
+  1883→                  </div>
+  1884→                  <div className="p-2"><p className="text-[11px] font-medium truncate">{video.title}</p><p className="text-[10px] text-muted-foreground">{video.user?.displayName}</p></div>
+  1885→                </button>
+  1886→              ))}
+  1887→          </div>
+  1888→        </ScrollArea>
+  1889→      </div>
+  1890→    );
+  1891→  }
+  1892→
+  1893→  function Play(props: any) { return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>; }
+  1894→
+  1895→  // ─── BLOGS VIEW ─────────────────────────────────────────────
+  1896→  function BlogsView() {
+  1897→    if (blogsLoading) return <LoadingGrid cols={1} rows={3} />;
+  1898→    const filtered = blogSearch ? blogs.filter((b: any) => b.title.toLowerCase().includes(blogSearch.toLowerCase())) : blogs;
+  1899→    return (
+  1900→      <div className="h-full flex flex-col">
+  1901→        <div className="px-4 py-2 border-b border-border shrink-0">
+  1902→          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={blogSearch} onChange={e => setBlogSearch(e.target.value)} placeholder="Search blogs..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1903→        </div>
+  1904→        <ScrollArea className="flex-1">
+  1905→          <div className="p-4 space-y-3">
+  1906→            {filtered.length === 0 ? <EmptyState icon={FileText} title="No blogs" desc="Articles and stories will appear here" />
+  1907→              : filtered.map((blog: any) => (
+  1908→                <Card key={blog.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedBlog(blog)}>
+  1909→                  {blog.imageUrl && <img src={blog.imageUrl} alt="" className="w-full h-36 object-cover" />}
+  1910→                  <CardContent className="p-3">
+  1911→                    <h3 className="text-sm font-semibold">{blog.title}</h3>
+  1912→                    {blog.content && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{truncate(blog.content, 120)}</p>}
+  1913→                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-2">
+  1914→                      <span>{blog.user?.displayName}</span><span>·</span><span>{timeAgo(blog.createdAt)}</span>
+  1915→                    </div>
+  1916→                  </CardContent>
+  1917→                </Card>
+  1918→              ))}
+  1919→          </div>
+  1920→        </ScrollArea>
+  1921→      </div>
+  1922→    );
+  1923→  }
+  1924→
+  1925→  function BlogDetail() {
+  1926→    if (!selectedBlog) return null;
+  1927→    return (
+  1928→      <ScrollArea className="max-h-[70vh]">
+  1929→        <div className="space-y-4 p-4">
+  1930→          {selectedBlog.imageUrl && <img src={selectedBlog.imageUrl} alt="" className="w-full rounded-xl" />}
+  1931→          <h2 className="text-xl font-bold">{selectedBlog.title}</h2>
+  1932→          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+  1933→            <span>{selectedBlog.user?.displayName}</span><span>·</span><span>{fmtDate(selectedBlog.createdAt)}</span>
+  1934→          </div>
+  1935→          <Separator className="bg-border" />
+  1936→          <div className="text-sm leading-relaxed whitespace-pre-wrap">{selectedBlog.content}</div>
+  1937→        </div>
+  1938→      </ScrollArea>
+  1939→    );
+  1940→  }
+  1941→
+  1942→  // ─── GROUPS VIEW ───────────────────────────────────────────
+  1943→  function GroupsView() {
+  1944→    const filtered = groupSearch ? groups.filter((g: any) => g.name.toLowerCase().includes(groupSearch.toLowerCase())) : groups;
+  1945→    return (
+  1946→      <div className="h-full flex flex-col">
+  1947→        <div className="px-4 py-2 border-b border-border shrink-0 flex items-center gap-2">
+  1948→          <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><Input value={groupSearch} onChange={e => setGroupSearch(e.target.value)} placeholder="Search groups..." className="bg-secondary border-border h-9 pl-9 text-xs" /></div>
+  1949→          <Button size="sm" className="h-9 text-xs bg-primary text-primary-foreground shrink-0" onClick={() => setShowCreateGroup(true)}><Plus className="w-3.5 h-3.5 mr-1" /> New</Button>
+  1950→        </div>
+  1951→        <ScrollArea className="flex-1">
+  1952→          <div className="p-4 space-y-2">
+  1953→            {filtered.length === 0 ? <EmptyState icon={Users} title="No groups" desc="Create or join a group" />
+  1954→              : filtered.filter((g: any) => !g.hidden).map((group: any) => (
+  1955→                <Card key={group.id} className="bg-secondary border-border">
+  1956→                  <CardContent className="p-3">
+  1957→                    <div className="flex items-center gap-3">
+  1958→                      <Avatar className="h-11 w-11"><AvatarImage src={group.avatar} /><AvatarFallback className="text-xs">{group.name?.[0]}</AvatarFallback></Avatar>
+  1959→                      <div className="flex-1 min-w-0">
+  1960→                        <h3 className="text-[13px] font-semibold truncate">{group.name}</h3>
+  1961→                        <p className="text-[11px] text-muted-foreground">{group._count?.members || 0} members</p>
+  1962→                        {group.description && <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{group.description}</p>}
+  1963→                        {group.geoName && <Badge className="text-[9px] mt-1 bg-muted">{group.geoName}</Badge>}
+  1964→                      </div>
+  1965→                      <Button size="sm" className="h-7 text-[10px] bg-primary text-primary-foreground px-2" onClick={() => { setActiveGroup(group); setGroupMessages([]); setChatMobileView('chat'); setActiveTab('chat'); }}>Open</Button>
+  1966→                    </div>
+  1967→                  </CardContent>
+  1968→                </Card>
+  1969→              ))}
+  1970→          </div>
+  1971→        </ScrollArea>
+  1972→      </div>
+  1973→    );
+  1974→  }
+  1975→
+  1976→  // ─── ALBUMS VIEW ────────────────────────────────────────────
+  1977→  function AlbumsView() {
+  1978→    if (albumsLoading) return <LoadingGrid />;
+  1979→    return (
+  1980→      <ScrollArea className="h-full">
+  1981→        <div className="p-4 space-y-4">
+  1982→          {albums.length === 0 ? <EmptyState icon={ImageIcon} title="No albums" desc="Create albums to organize your photos" />
+  1983→            : albums.map(album => (
+  1984→              <Card key={album.id} className="bg-secondary border-border overflow-hidden cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedAlbum(album)}>
+  1985→                <CardContent className="p-3">
+  1986→                  <div className="flex items-center gap-3">
+  1987→                    <div className="w-14 h-14 rounded-xl bg-card flex items-center justify-center overflow-hidden">
+  1988→                      {album.photos && album.photos[0] ? <img src={album.photos[0].url} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="w-6 h-6 text-muted-foreground" />}
+  1989→                    </div>
+  1990→                    <div className="flex-1 min-w-0">
+  1991→                      <h3 className="text-sm font-semibold">{album.name}</h3>
+  1992→                      <p className="text-[11px] text-muted-foreground">{album.photos?.length || 0} photos</p>
+  1993→                      {album.isPrivate && <Badge className="text-[9px] mt-1 bg-yellow-500/20 text-yellow-400"><Lock className="w-2.5 h-2.5 mr-0.5" /> Private</Badge>}
+  1994→                    </div>
+  1995→                  </div>
+  1996→                </CardContent>
+  1997→              </Card>
+  1998→            ))}
+  1999→        </div>
+  2000→      </ScrollArea>
+
+[showing lines 1-2000 of 3472; use offset=2001 with limit to continue reading]
